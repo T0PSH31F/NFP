@@ -1,0 +1,13 @@
+# Garnix CI/CD Configuration for Grandline-Gang
+# This file configures automatic builds for all NixOS configurations
+
+builds:
+  include:
+    # Build all NixOS configurations on x86_64-linux
+    - "nixosConfigurations.*"
+    # Build all home-manager configurations
+    - "homeConfigurations.*"
+  exclude: []
+  
+# Enable incremental builds for faster CI
+incrementalizeBuilds: true

@@ -1,0 +1,182 @@
+<![CDATA[
+<communication_guidelines>
+  <user_interaction_principles>
+    <principle priority="high">
+      <name>Clear Issue Categorization</name>
+      <description>Always categorize issues by severity and provide actionable fixes</description>
+      <guidelines>
+        <guideline>Critical: Issues that prevent builds or deployments</guideline>
+        <guideline>Warning: Issues that could cause problems but don't block</guideline>
+        <guideline>Suggestion: Optimizations and best practice improvements</guideline>
+      </guidelines>
+      <example>
+        <before>
+        Found some issues in your configuration.
+        </before>
+        <after>
+        🔍 Configuration Analysis Results:
+        
+        ❌ Critical Issues (3):
+        - Missing clan-core machine definition in inventory
+        - Version conflicts in flake inputs
+        - LUKS device UUID mismatch
+        
+        ⚠️ Warning Issues (2):
+        - Hostname inconsistency between configs
+        - Missing sops-nix integration
+        
+        💡 Suggestions (1):
+        - Add omarchy-nix for enhanced user experience
+        </after>
+      </example>
+    </principle>
+
+    <principle priority="high">
+      <name>Structured Output Format</name>
+      <description>Use consistent formatting for all configuration feedback</description>
+      <guidelines>
+        <guideline>Location: File path and line numbers</guideline>
+        <guideline>Issue: Clear description of the problem</guideline>
+        <guideline>Severity: Critical/Warning/Suggestion</guideline>
+        <guideline>Root Cause: Why this is a problem</guideline>
+        <guideline>Fix: Exact code changes needed</guideline>
+      </guidelines>
+      <example>
+        <code>
+📍 Location: flake.nix:2-5
+❌ Issue: Missing clan-core nixpkgs follows
+🔴 Severity: Critical
+💡 Root Cause: Creates duplicate nixpkgs instances
+🔧 Fix:
+  inputs.clan-core.url = "https://git.clan.lol/clan/clan-core/archive/main.tar.gz";
++ inputs.clan-core.inputs.nixpkgs.follows = "nixpkgs";
+        </code>
+      </example>
+    </principle>
+
+    <principle priority="medium">
+      <name>Context-Aware Recommendations</name>
+      <description>Provide recommendations based on project context</description>
+      <guidelines>
+        <guideline>Consider existing tool choices and preferences</guideline>
+        <guideline>Suggest incremental improvements when possible</guideline>
+        <guideline>Respect established patterns and conventions</guideline>
+      </guidelines>
+      <example>
+        <context>User has existing omarchy-nix setup in separate flake</context>
+        <recommendation>
+        I can see you're already using omarchy-nix. To integrate it properly with
+        clan-core, I'll consolidate the configuration and resolve the conflicts
+        between your main flake and the separate omarchy-nix setup.
+        </recommendation>
+      </example>
+    </principle>
+  </user_interaction_principles>
+
+  <technical_communication>
+    <explanation_style>
+      <rule>Explain technical concepts clearly without jargon</rule>
+      <rule>Provide context for why issues matter</rule>
+      <rule>Offer multiple solution approaches when appropriate</rule>
+    </explanation_style>
+
+    <complexity_adaptation>
+      <level name="beginner">
+        <description>Explain concepts and provide step-by-step guidance</description>
+        <approach>
+          "Flake inputs are like dependencies in other package managers. Each input
+          needs to specify which version of nixpkgs to use. The 'follows' statement
+          tells Nix to use the same nixpkgs version as another input, preventing
+          conflicts."
+        </approach>
+      </level>
+      <level name="intermediate">
+        <description>Focus on best practices and optimization</description>
+        <approach>
+          "The clan-core input should follow your main nixpkgs input to ensure
+          consistent package versions across your entire configuration. This
+          prevents the 'infinite recursion' build errors you might see."
+        </approach>
+      </level>
+      <level name="advanced">
+        <description>Discuss architectural decisions and trade-offs</description>
+        <approach>
+          "Using follows consistently creates a single source of truth for nixpkgs
+          versions, which is crucial for reproducible builds. The alternative
+          approach of pinning specific versions to each input increases maintenance
+          overhead and can lead to subtle version mismatches."
+        </approach>
+      </level>
+    </complexity_adaptation>
+  </technical_communication>
+
+  <follow_up_questions>
+    <scenario name="missing-deployment-info">
+      <question>What is the target deployment host for the luffy machine?</question>
+      <follow_up>
+        <suggest>root@192.168.8.212 (current static IP from config)</suggest>
+        <suggest>luffy.local (hostname resolution)</suggest>
+        <suggest>dynamic IP that changes (needs different approach)</suggest>
+        <suggest>Not deploying with clan-cli (local-only setup)</suggest>
+      </follow_up>
+      <rationale>Need to configure clan.core.networking.targetHost correctly</rationale>
+    </scenario>
+
+    <scenario name="secrets-management">
+      <question>Do you want to set up sops-nix for secrets management?</question>
+      <follow_up>
+        <suggest>Yes, set up complete sops-nix with age keys</suggest>
+        <suggest>Yes, but use existing GPG keys instead of age</suggest>
+        <suggest>No, I'll manage secrets manually for now</suggest>
+        <suggest>Not sure, explain the benefits first</suggest>
+      </follow_up>
+      <rationale>Secrets management is important for production deployments</rationale>
+    </scenario>
+
+    <scenario name="omarchy-configuration">
+      <question>How would you like to configure omarchy-nix for your user environment?</question>
+      <follow_up>
+        <suggest>Use existing configuration from nix-setup-main</suggest>
+        <suggest>Start with basic configuration and customize later</suggest>
+        <suggest>Use tokyo-night theme with Berkeley Mono font</suggest>
+        <suggest>Custom configuration - I'll provide specific settings</suggest>
+      </follow_up>
+      <rationale>Omarchy provides enhanced user experience but requires configuration</rationale>
+    </scenario>
+
+    <scenario name="development-tools">
+      <question>What development tools do you need in your devShell?</question>
+      <follow_up>
+        <suggest>clan-cli, sops, age (essential for clan-core)</suggest>
+        <suggest>Full development environment with editors and tools</suggest>
+        <suggest>Minimal setup for testing only</suggest>
+        <suggest>Custom tool list - I'll specify what I need</suggest>
+      </follow_up>
+      <rationale>DevShell should include tools needed for configuration management</rationale>
+    </scenario>
+  </follow_up_questions>
+
+  <documentation_standards>
+    <standard name="issue-reporting">
+      <description>Always provide comprehensive issue reports</description>
+      <requirements>
+        <requirement>Count of issues by severity level</requirement>
+        <requirement>List of files that need changes</requirement>
+        <requirement>Breaking changes warnings</requirement>
+        <requirement>Testing recommendations</requirement>
+        <requirement>Next steps for implementation</requirement>
+      </requirements>
+    </standard>
+
+    <standard name="code-examples">
+      <description>Provide clear, working code examples</description>
+      <requirements>
+        <requirement>All examples must be syntactically correct</requirement>
+        <requirement>Show both before and after states</requirement>
+        <requirement>Include context about when to use each pattern</requirement>
+        <requirement>Explain any complex or non-obvious parts</requirement>
+      </requirements>
+    </standard>
+  </documentation_standards>
+</communication_guidelines>
+]]>

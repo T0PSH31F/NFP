@@ -1,0 +1,9 @@
+{
+  "ignore": [
+    "gtk.webview.js",
+    "src/api/clan/client-fetch.ts",
+    "stylelint.config.js",
+    "api/**",
+    "tailwind/**"
+  ]
+}

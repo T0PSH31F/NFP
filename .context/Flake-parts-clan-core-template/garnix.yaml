@@ -1,0 +1,7 @@
+builds:
+  include:
+    - "nixosConfigurations.*"
+    - "homeConfigurations.*"
+  exclude: []
+  
+incrementalizeBuilds: true

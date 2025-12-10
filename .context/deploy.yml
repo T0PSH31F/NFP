@@ -1,0 +1,51 @@
+name: Deploy NixOS Configurations
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Install Nix
+        uses: cachix/install-nix-action@v26
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+      
+      - name: Setup Cachix
+        uses: cachix/cachix-action@v14
+        with:
+          name: garnix
+          authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+          skipPush: true
+      
+      - name: Check flake
+        run: nix flake check
+      
+      # Uncomment the following steps when you want automatic deployment
+      # You'll need to add SSH_PRIVATE_KEY to GitHub Secrets
+      
+      # - name: Setup SSH
+      #   env:
+      #     SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      #   run: |
+      #     mkdir -p ~/.ssh
+      #     echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+      #     chmod 600 ~/.ssh/id_ed25519
+      #     ssh-keyscan -H 192.168.8.212 >> ~/.ssh/known_hosts
+      
+      # - name: Deploy to luffy
+      #   run: |
+      #     nix run nixpkgs#nixos-rebuild -- switch \
+      #       --flake .#luffy \
+      #       --target-host root@192.168.8.212 \
+      #       --use-remote-sudo

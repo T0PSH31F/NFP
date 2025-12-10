@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+# To install:
+# ln -sf ../../scripts/pre-commit .git/hooks/pre-commit
+set -o errexit
+set -o nounset
+set -o pipefail
+
+readarray staged < <(git diff --name-only --cached)
+[[ ${#staged[@]} = 0 ]] && exit
+unstash() {
+  local ret=$?
+  set +e
+  git stash pop -q
+  exit "$ret"
+}
+git stash push --quiet --keep-index --message "pre-commit"
+trap unstash EXIT
+
+# always ignore untracked files
+mapfile -t untracked < <(git ls-files --others --exclude-standard)
+if [[ ${#untracked[@]} -gt 0 ]]; then
+  for item in "${untracked[@]}"; do
+    exclude_args+=("--excludes" "$item")
+  done
+  treefmt=(treefmt "${exclude_args[@]}")
+else
+  treefmt=(treefmt)
+fi
+"${treefmt[@]}"
+
+{
+  changed=$(git diff --name-only --exit-code);
+  status=$?;
+} || true
+if [[ $status -ne 0 ]]; then
+  exec 1>&2
+  echo Files changed by pre-commit hook:
+  echo "$changed"
+  exit $status
+fi

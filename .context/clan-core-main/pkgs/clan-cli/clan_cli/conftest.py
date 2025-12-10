@@ -1,0 +1,14 @@
+pytest_plugins = [
+    "clan_cli.tests.temporary_dir",
+    "clan_cli.tests.root",
+    "clan_cli.tests.age_keys",
+    "clan_cli.tests.gpg_keys",
+    "clan_cli.tests.git_repo",
+    "clan_cli.tests.sshd",
+    "clan_cli.tests.command",
+    "clan_cli.tests.ports",
+    "clan_cli.tests.hosts",
+    "clan_cli.tests.runtime",
+    "clan_cli.tests.fixtures_flakes",
+    "clan_cli.tests.stdout",
+]

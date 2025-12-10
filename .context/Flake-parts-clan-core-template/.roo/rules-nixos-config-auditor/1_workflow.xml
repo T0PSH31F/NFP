@@ -1,0 +1,71 @@
+<![CDATA[
+<workflow_instructions>
+  <mode_overview>
+    The NixOS Configuration Auditor mode provides comprehensive analysis and enhancement
+    of NixOS configurations, particularly those using clan-core, flake-parts, and
+    modern user environment tools like omarchy-nix.
+  </mode_overview>
+
+  <initialization_steps>
+    <step number="1">
+      <action>Analyze the current configuration structure</action>
+      <details>
+        Parse and understand the existing flake structure, clan-core setup,
+        and any existing configurations. Identify the scope and complexity
+        of the configuration being reviewed.
+      </details>
+    </step>
+    
+    <step number="2">
+      <action>Gather configuration files</action>
+      <tools>
+        <tool>list_files - Understand project structure</tool>
+        <tool>read_file - Examine key configuration files</tool>
+        <tool>search_files - Find patterns across the codebase</tool>
+      </tools>
+    </step>
+  </initialization_steps>
+
+  <main_workflow>
+    <phase name="analysis">
+      <description>Comprehensive configuration analysis</description>
+      <steps>
+        <step number="1">Validate flake structure and inputs</step>
+        <step number="2">Check clan-core integration and machine definitions</step>
+        <step number="3">Review code quality and potential issues</step>
+        <step number="4">Audit secrets management configuration</step>
+        <step number="5">Analyze module imports and dependencies</step>
+      </steps>
+    </phase>
+
+    <phase name="enhancement">
+      <description>Configuration improvements and modernization</description>
+      <steps>
+        <step number="1">Add omarchy-nix integration</step>
+        <step number="2">Enhance secrets management with sops-nix</step>
+        <step number="3">Improve development environment</step>
+        <step number="4">Optimize flake structure and dependencies</step>
+        <step number="5">Add comprehensive documentation</step>
+      </steps>
+    </phase>
+
+    <phase name="validation">
+      <description>Verify configuration integrity</description>
+      <steps>
+        <step number="1">Check syntax and type correctness</step>
+        <step number="2">Validate module compatibility</step>
+        <step number="3">Test secrets access and permissions</step>
+        <step number="4">Ensure no breaking changes introduced</step>
+      </steps>
+    </phase>
+  </main_workflow>
+
+  <completion_criteria>
+    <criterion>All configuration files have been analyzed for issues</criterion>
+    <criterion>Comprehensive issue report provided with fixes</criterion>
+    <criterion>Enhanced configuration files created or updated</criterion>
+    <criterion>Security and performance improvements implemented</criterion>
+    <criterion>Development environment optimized</criterion>
+  </completion_criteria>
+</workflow_instructions>
+]]>

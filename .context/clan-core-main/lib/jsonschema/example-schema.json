@@ -1,0 +1,114 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["services", "userModules"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "default": "John Doe",
+      "description": "The name of the user"
+    },
+    "age": {
+      "type": "integer",
+      "default": 42,
+      "description": "The age of the user"
+    },
+    "isAdmin": {
+      "type": "boolean",
+      "default": false,
+      "description": "Is the user an admin?"
+    },
+    "kernelModules": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": ["nvme", "xhci_pci", "ahci"],
+      "description": "A list of enabled kernel modules"
+    },
+    "userIds": {
+      "type": "object",
+      "default": {
+        "horst": 1,
+        "peter": 2,
+        "albrecht": 3
+      },
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "description": "Some attributes"
+    },
+    "userModules": {
+      "type": "object",
+      "additionalProperties": {
+        "additionalProperties": false,
+        "type": "object",
+        "properties": {
+          "foo": {
+            "type": [
+              "boolean",
+              "integer",
+              "number",
+              "string",
+              "array",
+              "object",
+              "null"
+            ]
+          }
+        },
+        "required": ["foo"]
+      }
+    },
+    "colour": {
+      "default": "red",
+      "description": "The colour of the user",
+      "enum": ["red", "blue", "green"]
+    },
+    "services": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "opt": {
+          "type": "string",
+          "default": "foo",
+          "description": "A submodule option"
+        }
+      },
+      "required": []
+    },
+    "programs": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "opt": {
+          "type": "string",
+          "default": "bar",
+          "description": "Another submodule option"
+        }
+      },
+      "required": [],
+      "default": {}
+    },
+    "destinations": {
+      "additionalProperties": {
+        "properties": {
+          "name": {
+            "default": "‹name›",
+            "description": "the name of the backup job",
+            "type": "string"
+          },
+          "repo": {
+            "description": "the borgbackup repository to backup to",
+            "type": "string"
+          }
+        },
+        "required": ["repo"],
+        "additionalProperties": false,
+        "type": "object"
+      },
+      "default": {},
+      "type": "object"
+    }
+  }
+}

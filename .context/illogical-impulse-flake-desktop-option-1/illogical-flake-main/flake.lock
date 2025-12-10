@@ -1,0 +1,110 @@
+{
+  "nodes": {
+    "dotfiles": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1761735938,
+        "narHash": "sha256-uPSGyH8CUNdwE900UbITw/fH9QMUyMB5G6pyYvjYVNQ=",
+        "ref": "refs/heads/main",
+        "rev": "d835d8bc302159bfa9b386413ffc56a857d16755",
+        "revCount": 4895,
+        "submodules": true,
+        "type": "git",
+        "url": "https://github.com/end-4/dots-hyprland"
+      },
+      "original": {
+        "submodules": true,
+        "type": "git",
+        "url": "https://github.com/end-4/dots-hyprland"
+      }
+    },
+    "flake-parts": {
+      "inputs": {
+        "nixpkgs-lib": [
+          "nur",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1733312601,
+        "narHash": "sha256-4pDvzqnegAfRkPwO3wmwBhVi/Sye1mzps0zHWYnP88c=",
+        "owner": "hercules-ci",
+        "repo": "flake-parts",
+        "rev": "205b12d8b7cd4802fbcb8e8ef6a0f1408781a4f9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "hercules-ci",
+        "repo": "flake-parts",
+        "type": "github"
+      }
+    },
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1761373498,
+        "narHash": "sha256-Q/uhWNvd7V7k1H1ZPMy/vkx3F8C13ZcdrKjO7Jv7v0c=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "6a08e6bb4e46ff7fcbb53d409b253f6bad8a28ce",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixos-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nur": {
+      "inputs": {
+        "flake-parts": "flake-parts",
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1761737576,
+        "narHash": "sha256-KFwAewjWvHYhd23XQXoMtwCa06EEMpAs8Mn8khe60S4=",
+        "owner": "nix-community",
+        "repo": "NUR",
+        "rev": "45040fd78c3317a6360b9fb3bbecd11304b6465b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "NUR",
+        "type": "github"
+      }
+    },
+    "quickshell": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1761643228,
+        "narHash": "sha256-G16tcvlv9tHqrNQB8UTtdqTd6jur9wNuik1Kx6NDH5Y=",
+        "ref": "refs/heads/master",
+        "rev": "1b147a2c78983877909f9e531fc8ce17c35a297a",
+        "revCount": 698,
+        "type": "git",
+        "url": "https://git.outfoxxed.me/outfoxxed/quickshell"
+      },
+      "original": {
+        "type": "git",
+        "url": "https://git.outfoxxed.me/outfoxxed/quickshell"
+      }
+    },
+    "root": {
+      "inputs": {
+        "dotfiles": "dotfiles",
+        "nixpkgs": "nixpkgs",
+        "nur": "nur",
+        "quickshell": "quickshell"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}

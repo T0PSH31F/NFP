@@ -1,0 +1,248 @@
+site_name: Documentation
+site_url: https://docs.clan.lol
+repo_url: https://git.clan.lol/clan/clan-core/
+repo_name: "_>"
+edit_uri: _edit/main/docs/site/
+
+validation:
+  omitted_files: warn
+  absolute_links: ignore
+  unrecognized_links: warn
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - footnotes
+  - md_in_html
+  - def_list
+  - meta
+  - plantuml_markdown
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.details
+  - pymdownx.highlight:
+      use_pygments: true
+      anchor_linenums: true
+  - pymdownx.keys
+  - pymdownx.snippets:
+      base_path: ../.
+  - toc:
+      title: On this page
+
+exclude_docs: |
+  .*
+  !templates/
+  /drafts/
+
+nav:
+  - Getting Started:
+      - Overview: index.md
+      - getting-started/creating-your-first-clan.md
+      - getting-started/add-machines.md
+      - getting-started/add-users.md
+      - getting-started/add-services.md
+      - Deploy to Physical Machine:
+          - getting-started/deploy-to-physical-machine/flash-installer.md
+          - getting-started/deploy-to-physical-machine/install-machine.md
+      - getting-started/deploy-to-virtual-machine.md
+      - getting-started/configure-disk.md
+      - getting-started/update-machines.md
+      - getting-started/continuous-integration.md
+      - Convert existing NixOS configurations: getting-started/convert-existing-NixOS-configuration.md
+  - Guides:
+      - Inventory:
+          - Introduction to Inventory: guides/inventory/inventory.md
+          - File Autoincludes: guides/inventory/autoincludes.md
+      - Services:
+          - Introduction to Services: guides/services/introduction-to-services.md
+          - Author Your Own Service: guides/services/community.md
+          - Internal Services with SSL: guides/internal-ssl-services.md
+      - Vars:
+          - Introduction to Vars: guides/vars/vars-overview.md
+          - Minimal Example: guides/vars/vars-backend.md
+          - Diving deeper: guides/vars/vars-concepts.md
+          - Advanced Examples: guides/vars/vars-advanced-examples.md
+          - Troubleshooting: guides/vars/vars-troubleshooting.md
+          - Sops Backend:
+              - Yubikeys & Age Plugins: guides/vars/sops/age-plugins.md
+          - Managing Users (OLD): guides/secrets.md
+      - Backups:
+          - Introduction to Backups: guides/backups/backup-intro.md
+          - Minimal Example: guides/backups/minimal-example.md
+          - Digging Deeper: guides/backups/digging-deeper.md
+          - Advanced Example: guides/backups/advanced-example.md
+      - Networking:
+          - Introduction to Networking: guides/networking/networking.md
+          - Zerotier VPN: guides/networking/mesh-vpn.md
+      - Nixpkgs Flake Input: guides/nixpkgs-flake-input/index.md
+      - Flake-parts: guides/flake-parts.md
+      - NixOS Rebuild: guides/nixos-rebuild.md
+      - macOS: guides/macos.md
+      # Should be part of the respective sections above
+      # machines, disko, clan
+      - Templates:
+          - Introduction to Templates: concepts/templates.md
+          - Community Disko Templates: guides/disko-templates/community.md
+      - Migrations:
+          - clan modules to clan services: guides/migrations/migrate-inventory-services.md
+          - Facts to Vars: guides/migrations/migration-facts-vars.md
+          - Disk id: guides/migrations/disk-id.md
+      - Disk Encryption: guides/disk-encryption.md
+      - Disable Secure Boot: guides/secure-boot.md
+      - Contributing:
+          - guides/contributing/CONTRIBUTING.md
+          - guides/contributing/debugging.md
+          - guides/contributing/testing.md
+
+  - Reference:
+      - Overview: reference/index.md
+      - Options:
+          - reference/options/clan.md
+          - reference/options/clan_inventory.md
+          - reference/options/clan_service.md
+
+      - clan.core (Machine Options):
+          - Overview: reference/clan.core/index.md
+          - reference/clan.core/backups.md
+          - reference/clan.core/deployment.md
+          - reference/clan.core/facts.md
+          - reference/clan.core/networking.md
+          - reference/clan.core/postgresql.md
+          - reference/clan.core/settings.md
+          - reference/clan.core/sops.md
+          - reference/clan.core/state.md
+          - reference/clan.core/vars.md
+
+      - CLI:
+          - Overview: reference/cli/index.md
+
+          - reference/cli/backups.md
+          - reference/cli/facts.md
+          - reference/cli/flakes.md
+          - reference/cli/flash.md
+          - reference/cli/machines.md
+          - reference/cli/select.md
+          - reference/cli/secrets.md
+          - reference/cli/show.md
+          - reference/cli/ssh.md
+          - reference/cli/state.md
+          - reference/cli/templates.md
+          - reference/cli/vars.md
+          - reference/cli/vms.md
+
+      - clanLib: reference/clanLib/index.md
+      - HTTP API: api.md
+
+      - Decisions:
+          - decisions/Architecture-decisions.md
+          - decisions/01-Clan-Modules.md
+          - decisions/02-clan-as-library.md
+          - decisions/03-adr-numbering-process.md
+          - decisions/04-fetching-nix-from-python.md
+          - decisions/05-deployment-parameters.md
+          - decisions/template.md
+      - Glossary: reference/glossary.md
+  - Services:
+      - services/definition.md
+      # Generated list from the list of official services
+      - Official:
+          - services/official/admin.md
+          - services/official/borgbackup.md
+          - services/official/certificates.md
+          - services/official/coredns.md
+          - services/official/data-mesher.md
+          - services/official/dyndns.md
+          - services/official/emergency-access.md
+          - services/official/garage.md
+          - services/official/hello-world.md
+          - services/official/internet.md
+          - services/official/importer.md
+          - services/official/kde.md
+          - services/official/localbackup.md
+          - services/official/matrix-synapse.md
+          - services/official/mycelium.md
+          - services/official/monitoring.md
+          - services/official/packages.md
+          - services/official/sshd.md
+          - services/official/syncthing.md
+          - services/official/trusted-nix-caches.md
+          - services/official/tor.md
+          - services/official/users.md
+          - services/official/wifi.md
+          - services/official/wireguard.md
+          - services/official/yggdrasil.md
+          - services/official/zerotier.md
+      - services/community.md
+
+  - Search Clan Options: "/option-search"
+
+docs_dir: site
+site_dir: out
+
+theme:
+  font: false
+  logo: static/icons/clan-logo.svg
+  favicon: https://clan.lol/favicon.svg
+  name: material
+  features:
+    - navigation.footer
+    - navigation.instant
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - content.code.annotate
+    - content.code.copy
+    - content.tabs.link
+    - content.action.edit
+  icon:
+    repo: fontawesome/brands/git
+  custom_dir: overrides
+
+  palette:
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: teal
+      accent: deep purple
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      primary: teal
+      accent: deep purple
+      scheme: slate
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+
+extra_css:
+  - static/extra.css
+
+extra:
+  social:
+    - icon: fontawesome/regular/comment
+      link: https://matrix.to/#/#clan:clan.lol
+    - icon: fontawesome/brands/git
+      link: https://git.clan.lol/clan/clan-core
+    - icon: fontawesome/brands/github
+      link: https://github.com/clan-lol/clan-core
+    - icon: fontawesome/solid/rss
+      link: https://clan.lol/feed.xml
+
+plugins:
+  - search
+  - redoc-tag
+  - redirects:
+      redirect_maps:
+        guides/getting-started/secrets.md: guides/vars/vars-overview.md
