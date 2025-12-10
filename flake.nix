@@ -138,7 +138,7 @@
             inherit system;
             config.allowUnfree = true;
             overlays = [
-              inputs.nur.overlay
+              inputs.nur.overlays.default
             ];
           };
       };

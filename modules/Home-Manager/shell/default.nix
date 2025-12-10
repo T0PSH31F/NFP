@@ -34,9 +34,9 @@
   programs.btop = {
     enable = true;
     settings = {
-      color_theme = "tokyo-night";
+      color_theme = "everforest";
       theme_background = false;
-      update_ms = 1000;
+      update_ms = pkgs.lib.mkForce 1000;
     };
   };
 

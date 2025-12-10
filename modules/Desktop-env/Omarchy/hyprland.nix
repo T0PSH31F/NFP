@@ -12,7 +12,7 @@ in {
     omarchy = {
       full_name = "t0psh31f";
       email_address = "t0psh31f@grandlix.gang"; # Placeholder
-      theme = "tokyo-night";
+      theme = "everforest";
     };
 
     home-manager.users.t0psh31f = {

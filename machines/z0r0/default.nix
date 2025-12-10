@@ -88,8 +88,8 @@
   # GAMING & VIRTUALIZATION
   # ============================================================================
 
-  gaming.enable = false;
-  virtualization.enable = false;
+  gaming.enable = true;
+  virtualization.enable = true;
 
   # ============================================================================
   # SYSTEM
@@ -97,4 +97,7 @@
 
   nixpkgs.hostPlatform = "x86_64-linux";
   system.stateVersion = "25.05";
+
+  # Sops configuration
+  sops.age.keyFile = "/home/t0psh31f/.config/sops/age/keys.txt";
 }

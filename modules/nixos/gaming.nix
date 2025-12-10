@@ -77,10 +77,8 @@ with lib; {
         # Emulators (consolidated from home-manager)
       ]
       ++ optionals config.gaming.enableEmulators [
-        retroarch
-        # RetroArch cores
-        (retroarch.override {
-          cores = with libretro; [
+        (retroarch.withCores (cores:
+          with cores; [
             beetle-psx-hw
             snes9x
             genesis-plus-gx
@@ -90,8 +88,7 @@ with lib; {
             ppsspp
             desmume
             mgba
-          ];
-        })
+          ]))
 
         # Standalone emulators
         bign-handheld-thumbnailer

@@ -3,10 +3,6 @@
 
   inventory = {
     machines = {
-      luffy = {
-        tags = ["client" "laptop"];
-        deploy.targetHost = "root@192.168.1.182";
-      };
       z0r0 = {
         tags = ["client" "laptop"];
         deploy.targetHost = "root@192.168.1.159";
@@ -27,9 +23,6 @@
   };
 
   machines = {
-    luffy = {...}: {
-      imports = [./machines/luffy/default.nix];
-    };
     z0r0 = {...}: {
       imports = [./machines/z0r0/default.nix];
     };

@@ -40,17 +40,8 @@
   # Git configuration
   programs.git = {
     enable = true;
-    userName = "Grandlix User";
-    userEmail = "user@grandlix.gang";
-
-    delta = {
-      enable = true;
-      options = {
-        features = "decorations";
-        side-by-side = true;
-        navigate = true;
-      };
-    };
+    userName = "t0psh31f";
+    userEmail = pkgs.lib.mkForce "t0psh31f@grandlix.gang";
 
     aliases = {
       st = "status";
@@ -68,6 +59,15 @@
       push.autoSetupRemote = true;
       merge.conflictStyle = "diff3";
       diff.colorMoved = "default";
+    };
+  };
+
+  programs.delta = {
+    enable = true;
+    options = {
+      features = "decorations";
+      side-by-side = true;
+      navigate = true;
     };
   };
 }
