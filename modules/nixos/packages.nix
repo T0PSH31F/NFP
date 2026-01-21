@@ -33,6 +33,7 @@
     feh # image viewer
     figlet # print large text from a string
     fzf # fuzzy finder
+    gedit # text editor
     ghostty # terminal emulator
     git # distributed version control system
     git-credential-manager # Git credential manager

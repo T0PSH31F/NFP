@@ -69,6 +69,8 @@ in
         cosmic-files
         # hyprlax
         grimblast
+        grim # Screenshot tool
+        slurp # Area selection tool
         # quickshell - provided by desktop environment modules
         vicinae
         rofi
@@ -127,13 +129,13 @@ in
             "borders-plus-plus" = {
               add_borders = 2; # Two extra borders for the halo effect
 
-              # Inner ring: dynamic primary color from matugen
+              # Inner ring: dynamic primary color from matugen (hardcoded for debug)
               border_size_1 = 4;
-              "border_color_1" = "$halo_inner";
+              "border_color_1" = "rgba(d0bcffdd)";
 
-              # Outer ring: dynamic tertiary color from matugen
+              # Outer ring: dynamic tertiary color from matugen (hardcoded for debug)
               border_size_2 = 10;
-              "border_color_2" = "$halo_outer";
+              "border_color_2" = "rgba(efb8c855)";
               natural_rounding = true;
             };
 
@@ -193,10 +195,10 @@ in
             "SUPER ALT, L, exec, dms ipc call lock lock" # DMS Lock screen
 
             # Swap windows
-            "SUPERSHIFT, left, movewindow, l"
-            "SUPERSHIFT, right, movewindow, r"
-            "SUPERSHIFT, up, movewindow, u"
-            "SUPERSHIFT, down, movewindow, d"
+            "SUPER SHIFT, left, movewindow, l"
+            "SUPER SHIFT, right, movewindow, r"
+            "SUPER SHIFT, up, movewindow, u"
+            "SUPER SHIFT, down, movewindow, d"
             # Move focus
             "SUPER, left, movefocus, l"
             "SUPER, right, movefocus, r"
@@ -206,22 +208,22 @@ in
             "SUPER, BracketRight, movefocus, r"
 
             # Workspace, window, tab switch with keyboard
-            "CONTROLSUPER, right, workspace, +1"
-            "CONTROLSUPER, left, workspace, -1"
-            "CONTROLSUPER, BracketLeft, workspace, -1"
-            "CONTROLSUPER, BracketRight, workspace, +1"
-            "CONTROLSUPER, up, workspace, -5"
-            "CONTROLSUPER, down, workspace, +5"
+            "SUPER CTRL, right, workspace, +1"
+            "SUPER CTRL, left, workspace, -1"
+            "SUPER CTRL, BracketLeft, workspace, -1"
+            "SUPER CTRL, BracketRight, workspace, +1"
+            "SUPER CTRL, up, workspace, -5"
+            "SUPER CTRL, down, workspace, +5"
             "SUPER, Page_Down, workspace, +1"
             "SUPER, Page_Up, workspace, -1"
-            "CONTROLSUPER, Page_Down, workspace, +1"
-            "CONTROLSUPER, Page_Up, workspace, -1"
-            "SUPERSHIFT, Page_Down, movetoworkspace, +1"
-            "SUPERSHIFT, Page_Up, movetoworkspace, -1"
-            "CONTROLSUPERSHIFT, Right, movetoworkspace, +1"
-            "CONTROLSUPERSHIFT, Left, movetoworkspace, -1"
-            "SUPERSHIFT, mouse_down, movetoworkspace, -1"
-            "SUPERSHIFT, mouse_up, movetoworkspace, +1"
+            "SUPER CTRL, Page_Down, workspace, +1"
+            "SUPER CTRL, Page_Up, workspace, -1"
+            "SUPER SHIFT, Page_Down, movetoworkspace, +1"
+            "SUPER SHIFT, Page_Up, movetoworkspace, -1"
+            "SUPER CTRL SHIFT, Right, movetoworkspace, +1"
+            "SUPER CTRL SHIFT, Left, movetoworkspace, -1"
+            "SUPER SHIFT, mouse_down, movetoworkspace, -1"
+            "SUPER SHIFT, mouse_up, movetoworkspace, +1"
 
             # Fullscreen
             "SUPER, B, fullscreen, 0"
@@ -253,15 +255,15 @@ in
             "SUPER ALT, 8, movetoworkspacesilent, 8"
             "SUPER ALT, 9, movetoworkspacesilent, 9"
             "SUPER ALT, 0, movetoworkspacesilent, 10"
-            "CONTROLSHIFTSUPER, Up, movetoworkspacesilent, special"
-            "SUPERALT, S, movetoworkspacesilent, special"
+            "SUPER CTRL SHIFT, Up, movetoworkspacesilent, special"
+            "SUPER ALT, S, movetoworkspacesilent, special"
 
             # Scroll through existing workspaces with (Control) + Super + scroll
             "SUPER, mouse_up, workspace, +1"
             "SUPER, mouse_down, workspace, -1"
-            "CONTROLSUPER, mouse_up, workspace, +1"
-            "CONTROLSUPER, mouse_down, workspace, -1"
-            "CONTROLSUPER, Backslash, resizeactive, exact 640 480"
+            "SUPER CTRL, mouse_up, workspace, +1"
+            "SUPER CTRL, mouse_down, workspace, -1"
+            "SUPER CTRL, Backslash, resizeactive, exact 640 480"
             # Workspace move binds (9-0)
             "SUPER SHIFT, 1, movetoworkspace, 1"
             "SUPER SHIFT, 2, movetoworkspace, 2"
