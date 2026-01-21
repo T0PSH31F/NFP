@@ -1,8 +1,19 @@
 {
   config,
   lib,
+  pkgs,
   ...
 }: {
+  # Ensure desktop-file-utils is available for updating the desktop database
+  home.packages = with pkgs; [
+    desktop-file-utils
+    shared-mime-info
+  ];
+
+  # Note: XDG_DATA_DIRS is handled by xdg.systemDirs.data below
+
+  xdg.configFile."uwsm/env".source = "${config.home.sessionVariablesPackage}/etc/profile.d/hm-session-vars.sh"; 
+
   xdg = {
     enable = true;
     mime.enable = true;
@@ -19,8 +30,18 @@
         "text/x-javascript" = ["ghostty.desktop"];
         "text/x-rust" = ["ghostty.desktop"];
 
-        # Documents
+        # Documents & eBooks
         "application/pdf" = ["org.pwmt.zathura.desktop"];
+        "application/msword" = ["libreoffice.desktop"];
+        "application/vnd.ms-excel" = ["libreoffice.desktop"];
+        "application/vnd.ms-powerpoint" = ["libreoffice.desktop"];
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document" = ["libreoffice.desktop"];
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" = ["libreoffice.desktop"];
+        "application/vnd.openxmlformats-officedocument.presentationml.presentation" = ["libreoffice.desktop"];
+        "application/rtf" = ["libreoffice.desktop"];
+        "application/epub+zip" = ["librum.desktop"];
+        "application/vnd.amazon.ebook" = ["librum.desktop"];
+        "application/x-mobipocket-ebook" = ["librum.desktop"];
 
         # Media
         "image/jpeg" = ["swayimg.desktop"];
@@ -33,11 +54,19 @@
         "video/quicktime" = ["mpv.desktop"];
 
         # Web
-        "text/html" = ["firefox.desktop"];
-        "x-scheme-handler/http" = ["firefox.desktop"];
-        "x-scheme-handler/https" = ["firefox.desktop"];
+        "text/html" = ["vivaldi.desktop"];
+        "x-scheme-handler/http" = ["vivaldi.desktop"];
+        "x-scheme-handler/https" = ["vivaldi.desktop"];
+
+       
       };
     };
+    # Ensure system applications directory is included
+    systemDirs.data = [
+      "/run/current-system/sw/share"
+      "/nix/var/nix/profiles/default/share"
+      "${config.home.profileDirectory}/share"
+    ];
     userDirs = {
       enable = true;
       createDirectories = true;

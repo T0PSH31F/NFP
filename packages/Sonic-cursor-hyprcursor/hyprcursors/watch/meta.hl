@@ -1,0 +1,9 @@
+resize_algorithm = none
+hotspot_x = 0.50
+hotspot_y = 0.50
+
+define_size = 32, watch_000.png, 50
+define_size = 32, watch_001.png, 50
+define_size = 32, watch_002.png, 50
+define_size = 32, watch_003.png, 50
+

@@ -1,0 +1,13 @@
+resize_algorithm = none
+hotspot_x = 0.06
+hotspot_y = 0.50
+
+define_size = 32, xterm_000.png, 116
+define_size = 32, xterm_001.png, 116
+define_size = 32, xterm_002.png, 116
+define_size = 32, xterm_003.png, 116
+define_size = 32, xterm_004.png, 116
+define_size = 32, xterm_005.png, 116
+define_size = 32, xterm_006.png, 116
+define_size = 32, xterm_007.png, 116
+

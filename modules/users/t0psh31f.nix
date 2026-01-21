@@ -28,6 +28,9 @@
 
   programs.zsh.enable = true;
 
+  # Back up existing files that would be clobbered by home-manager
+  home-manager.backupFileExtension = "hm-bak";
+
   home-manager.users.t0psh31f = {
     imports = [
       ../Home-Manager/default.nix

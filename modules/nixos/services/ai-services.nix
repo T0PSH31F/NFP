@@ -4,9 +4,38 @@
   pkgs,
   ...
 }:
-with lib; {
+with lib;
+{
   options.services.ai-services = {
     enable = mkEnableOption "AI-related services";
+
+    environment.systemPackages = with pkgs; [
+      crewai
+      local-ai
+      librechat
+      # windsurf
+      task-master-ai
+      crush
+      gemini-cli
+      opencode
+      krillinai
+      go-hass-agent
+      aider-chat-full
+      # aichat
+      bluemail
+      qdrant
+      moshi
+      fabric-ai
+      ramalama
+      sillytavern
+      nextjs-ollama-llm-ui
+      cherry-studio
+      lmstudio
+      gpt4all
+      whisper-ctranslate2
+      piper-tts
+
+    ];
 
     postgresql = {
       enable = mkOption {
@@ -84,19 +113,19 @@ with lib; {
     services.postgresql = mkIf config.services.ai-services.postgresql.enable {
       enable = true;
       package = pkgs.postgresql_16;
-      port = config.services.ai-services.postgresql.port;
+      settings.port = config.services.ai-services.postgresql.port;
 
       # Enable extensions
       enableTCPIP = true;
 
-      extraPlugins = with pkgs.postgresql_16.pkgs; [
+      extensions = with pkgs.postgresql_16.pkgs; [
         pgvector
       ];
 
       settings = {
         shared_preload_libraries = "vector";
         max_connections = 100;
-        shared_buffers = "128MB";
+        shared_buffers = "256MB";
       };
 
       authentication = pkgs.lib.mkOverride 10 ''
@@ -106,7 +135,10 @@ with lib; {
         host    all             all             ::1/128                 md5
       '';
 
-      ensureDatabases = ["ai" "vectordb"];
+      ensureDatabases = [
+        "ai"
+        "vectordb"
+      ];
       ensureUsers = [
         {
           name = "ai";
@@ -116,16 +148,18 @@ with lib; {
     };
 
     # Open WebUI - container-based deployment
-    virtualisation.oci-containers.containers.open-webui = mkIf config.services.ai-services.open-webui.enable {
-      image = "ghcr.io/open-webui/open-webui:main";
-      ports = ["${toString config.services.ai-services.open-webui.port}:8080"];
-      volumes = [
-        "open-webui:/app/backend/data"
-      ];
-      extraOptions = [
-        "--add-host=host.docker.internal:host-gateway"
-      ];
-    };
+    virtualisation.oci-containers.containers.open-webui =
+      mkIf config.services.ai-services.open-webui.enable
+        {
+          image = "ghcr.io/open-webui/open-webui:main";
+          ports = [ "${toString config.services.ai-services.open-webui.port}:8080" ];
+          volumes = [
+            "open-webui:/app/backend/data"
+          ];
+          extraOptions = [
+            "--add-host=host.docker.internal:host-gateway"
+          ];
+        };
 
     # Qdrant vector database
     virtualisation.oci-containers.containers.qdrant = mkIf config.services.ai-services.qdrant.enable {
@@ -140,36 +174,38 @@ with lib; {
     };
 
     # ChromaDB vector database
-    virtualisation.oci-containers.containers.chromadb = mkIf config.services.ai-services.chromadb.enable {
-      image = "chromadb/chroma:latest";
-      ports = ["${toString config.services.ai-services.chromadb.port}:8000"];
-      volumes = [
-        "chromadb_data:/chroma/chroma"
-      ];
-    };
+    virtualisation.oci-containers.containers.chromadb =
+      mkIf config.services.ai-services.chromadb.enable
+        {
+          image = "chromadb/chroma:latest";
+          ports = [ "${toString config.services.ai-services.chromadb.port}:8000" ];
+          volumes = [
+            "chromadb_data:/chroma/chroma"
+          ];
+        };
 
     # LocalAI
-    virtualisation.oci-containers.containers.local-ai = mkIf config.services.ai-services.localai.enable {
-      image = "quay.io/go-skynet/local-ai:latest";
-      ports = ["${toString config.services.ai-services.localai.port}:8080"];
-      volumes = [
-        "local-ai-models:/models"
-      ];
-      environment = {
-        THREADS = "4";
-        CONTEXT_SIZE = "512";
-      };
-    };
+    virtualisation.oci-containers.containers.local-ai =
+      mkIf config.services.ai-services.localai.enable
+        {
+          image = "quay.io/go-skynet/local-ai:latest";
+          ports = [ "${toString config.services.ai-services.localai.port}:8080" ];
+          volumes = [
+            "local-ai-models:/models"
+          ];
+          environment = {
+            THREADS = "4";
+            CONTEXT_SIZE = "512";
+          };
+        };
 
     # Enable docker/podman for container services
-    virtualisation.docker.enable =
-      mkIf (
-        config.services.ai-services.open-webui.enable
-        || config.services.ai-services.qdrant.enable
-        || config.services.ai-services.chromadb.enable
-        || config.services.ai-services.localai.enable
-      )
-      true;
+    virtualisation.docker.enable = mkIf (
+      config.services.ai-services.open-webui.enable
+      || config.services.ai-services.qdrant.enable
+      || config.services.ai-services.chromadb.enable
+      || config.services.ai-services.localai.enable
+    ) true;
 
     virtualisation.oci-containers.backend = "docker";
 

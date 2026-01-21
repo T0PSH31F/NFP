@@ -1,4 +1,8 @@
-{config, ...}: {
+{
+  config,
+  lib,
+  ...
+}: {
   networking = {
     networkmanager.enable = true;
 
@@ -88,4 +92,27 @@
     };
   };
   services.tailscale.enable = true;
+
+  # SSH Server Configuration
+  # Ensure host keys persist across reboots to prevent "host key changed" warnings
+  services.openssh = {
+    enable = true;
+    settings = {
+      PasswordAuthentication = lib.mkDefault false;
+      PermitRootLogin = lib.mkForce "yes"; # Force allow root login for clan deployments
+    };
+    # Explicitly define host keys to ensure they're generated in a persistent location
+    # These paths are also persisted by impermanence module at /etc/ssh
+    hostKeys = [
+      {
+        path = "/etc/ssh/ssh_host_ed25519_key";
+        type = "ed25519";
+      }
+      {
+        path = "/etc/ssh/ssh_host_rsa_key";
+        type = "rsa";
+        bits = 4096;
+      }
+    ];
+  };
 }

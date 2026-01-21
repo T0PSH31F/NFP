@@ -3,7 +3,18 @@
   lib,
   pkgs,
   ...
-}: {
+}:
+{
+  # Add chafa for GIF/image display in terminal
+  home.packages = with pkgs; [
+    chafa # Terminal image/GIF viewer with animation support
+    gif-for-cli
+
+    # gifsicle
+    # asesprite
+    # libresprite
+  ];
+
   programs.ghostty = {
     enable = true;
     enableBashIntegration = true;
@@ -30,7 +41,7 @@
       cursor-color = "c5c5c5";
       cursor-text = "131313";
 
-      title = " ";
+      title = " T0PSH31F Terminal ";
 
       # Colors can be changed by setting the 16 colors of `palette`, which each color
       # being defined as regular and bold.
@@ -66,8 +77,10 @@
       window-theme = "dark";
 
       copy-on-select = "clipboard";
-
-      custom-shader = "${config.xdg.configHome}/ghostty/shaders/cursor_rainbow_tapered.glsl";
+      custom-shader = [
+        "${config.xdg.configHome}/ghostty/shaders/cursor_rainbow_tapered_boing.glsl"
+        # "${config.xdg.configHome}/ghostty/shaders/starfield-colors.glsl"
+      ];
     };
   };
 

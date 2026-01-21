@@ -3,7 +3,8 @@
   pkgs,
   lib,
   ...
-}: {
+}:
+{
   programs = {
     zsh = {
       enable = true;
@@ -43,6 +44,19 @@
         export KEYTIMEOUT=1
         bindkey '^Y' autosuggest-accept
         bindkey '^E' autosuggest-clear
+
+        # Anifetch MOTD - Display system info with neofetch/anifetch
+        _anifetch_motd() {
+          if command -v anifetch &> /dev/null; then
+            anifetch 2>/dev/null || neofetch 2>/dev/null || true
+          elif command -v neofetch &> /dev/null; then
+            neofetch 2>/dev/null || true
+          fi
+        }
+        # Only show MOTD for interactive shells, not in tmux/screen, and not in VSCode terminal
+        if [[ $- == *i* ]] && [[ -z "$TMUX" ]] && [[ -z "$STY" ]] && [[ "$TERM_PROGRAM" != "vscode" ]]; then
+          _anifetch_motd
+        fi
       '';
 
       #  initExtra = ''
@@ -67,6 +81,10 @@
         "..." = "cd ../..";
         "...." = "cd ../../..";
         "....." = "cd ../../../..";
+        # Nix package search with fzf (nix-search-tv)
+        ns = "nix-search-tv print | fzf --preview 'nix-search-tv preview {}' --scheme history";
+        # SSH keyscan helper
+        sshks = "ssh-keyscan -t ed25519 192.168.1.0/24 >> ~/.ssh/known_hosts";
       };
 
       antidote = {
@@ -103,7 +121,7 @@
       enable = true;
       enableBashIntegration = true;
       enableZshIntegration = true;
-      options = ["--cmd cd"];
+      options = [ "--cmd cd" ];
     };
 
     eza = {

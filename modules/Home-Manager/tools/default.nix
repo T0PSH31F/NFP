@@ -3,7 +3,7 @@
     ./lf.nix
     ./mcp.nix
     ./zathura.nix
-    ./kanshi.nix
+    ./shikane.nix
     ./btm.nix
     ./inlyne.nix
   ];

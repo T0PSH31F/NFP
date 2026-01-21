@@ -1,0 +1,9 @@
+resize_algorithm = none
+hotspot_x = 0.00
+hotspot_y = 0.00
+
+define_size = 32, arrow_000.png, 100
+define_size = 32, arrow_001.png, 100
+define_size = 32, arrow_002.png, 100
+define_size = 32, arrow_003.png, 100
+

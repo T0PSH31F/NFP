@@ -1,0 +1,13 @@
+resize_algorithm = none
+hotspot_x = 0.06
+hotspot_y = 0.50
+
+define_size = 32, ibeam_000.png, 116
+define_size = 32, ibeam_001.png, 116
+define_size = 32, ibeam_002.png, 116
+define_size = 32, ibeam_003.png, 116
+define_size = 32, ibeam_004.png, 116
+define_size = 32, ibeam_005.png, 116
+define_size = 32, ibeam_006.png, 116
+define_size = 32, ibeam_007.png, 116
+

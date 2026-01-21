@@ -1,4 +1,5 @@
-{...}: {
+{ ... }:
+{
   imports = [
     ./ai-services.nix
     ./avahi.nix
@@ -12,5 +13,6 @@
     ./monitoring.nix
     ./nextcloud.nix
     ./sillytavern.nix
+    ./n8n.nix
   ];
 }

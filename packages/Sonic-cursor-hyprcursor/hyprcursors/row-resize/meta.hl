@@ -1,0 +1,13 @@
+resize_algorithm = none
+hotspot_x = 0.88
+hotspot_y = 0.47
+
+define_size = 32, row-resize_000.png, 3333
+define_size = 32, row-resize_001.png, 50
+define_size = 32, row-resize_002.png, 50
+define_size = 32, row-resize_003.png, 50
+define_size = 32, row-resize_004.png, 166
+define_size = 32, row-resize_005.png, 50
+define_size = 32, row-resize_006.png, 50
+define_size = 32, row-resize_007.png, 50
+

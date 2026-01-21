@@ -1,0 +1,9 @@
+resize_algorithm = none
+hotspot_x = 0.00
+hotspot_y = 0.00
+
+define_size = 32, wayland-cursor_000.png, 100
+define_size = 32, wayland-cursor_001.png, 100
+define_size = 32, wayland-cursor_002.png, 100
+define_size = 32, wayland-cursor_003.png, 100
+

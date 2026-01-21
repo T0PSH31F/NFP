@@ -1,0 +1,13 @@
+resize_algorithm = none
+hotspot_x = 0.88
+hotspot_y = 0.47
+
+define_size = 32, top_side_000.png, 3333
+define_size = 32, top_side_001.png, 50
+define_size = 32, top_side_002.png, 50
+define_size = 32, top_side_003.png, 50
+define_size = 32, top_side_004.png, 166
+define_size = 32, top_side_005.png, 50
+define_size = 32, top_side_006.png, 50
+define_size = 32, top_side_007.png, 50
+

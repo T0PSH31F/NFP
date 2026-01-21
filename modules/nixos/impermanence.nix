@@ -1,10 +1,12 @@
 {
   config,
   lib,
+  pkgs,
   inputs,
   ...
 }:
-with lib; {
+with lib;
+{
   imports = [
     inputs.impermanence.nixosModules.impermanence
   ];
@@ -77,91 +79,117 @@ with lib; {
       ];
 
       # Individual files to persist
+      # Note: /etc/machine-id is managed separately (symlink to /.host-etc/machine-id)
+      # If you need impermanence to manage it, remove the symlink first
       files = [
-        "/etc/machine-id"
         "/etc/nix/id_rsa"
       ];
 
       # User-specific persistence (handled separately)
       users.t0psh31f = {
         directories = [
-          "Appimages"
-          "Desktop"
-          "Downloads"
+          # User Data
+          "Agents"
+          "Clan"
           "Documents"
-          "Flatpaks"
-          "Games"
-          "MCP"
+          "Downloads"
           "Music"
-          "nix-ai-help"
-          "Notes"
+          "NixOS"
           "Pictures"
+          "Projects"
           "Public"
           "Templates"
           "Videos"
+
+          # Custom User Data
+          "Games"
+          "Flatpaks"
+          "Appimages"
+          "Notes"
+
+          # Configs & State
+          ".icons"
+          ".themes"
+          ".cursors"
           ".ssh"
           ".gnupg"
-          ".config"
-          ".local"
-          ".cache"
-          ".antigravity"
-          "74daf1 nextdns id"
-
-          # Development
-          "Clan"
-          "Projects"
-
-          # Application data
+          ".pki"
           ".mozilla"
           ".thunderbird"
+          ".background" # Wallpaper storage
+          ".antigravity"
+          ".cache"
+          ".gemini"
+          ".kodi"
+          ".vscode"
+
+          # Specific App Configs (Add more as needed)
+          ".config/ghostty"
+          ".config/sops"
+          ".config/Signal"
+          ".config/TelegramDesktop"
+          ".config/Antigravity"
+          ".config/mcp"
+          ".config/Bitwarden"
+          ".config/obs-studio"
+          ".config/vesktop"
+          ".config/discord"
+          ".config/dank-material-shell" # Settings persistence
+          ".config/spicetify"
+
+          # Mobile / Sync
+          ".kde/share/config/kdeconnect"
+          ".config/kdeconnect"
+
+          # Application data
           ".var/app" # Flatpak
         ];
 
         files = [
           ".bash_history"
           ".zsh_history"
+          "facter.json"
         ];
       };
     };
 
     # ============================================================================
+    # BTRFS ROOT & HOME WITH SNAPSHOT ROLLBACK
     # ============================================================================
-    # BTRFS ROOT WITH SNAPSHOT ROLLBACK
-    # ============================================================================
-    # Root filesystem is handled by disko.nix (@root subvolume)
-    # The postDeviceCommands below will roll it back to @root-blank on each boot
-    # This provides impermanence without tmpfs
+    # Both / and /home are handled by disko.nix (@root and @home subvolumes)
+    # The postDeviceCommands below will roll them back on each boot
+    # This provides full impermanence (determinate builds)
 
-    # ============================================================================
-    # BOOT OPTIMIZATION
-    # ============================================================================
-    # ============================================================================
-    # BTRFS ROOT WITH SNAPSHOT ROLLBACK
-    # ============================================================================
-    # Root is on btrfs @root subvolume (mounted via disko)
-    # The postDeviceCommands will roll it back to @root-blank snapshot on boot
-    # No need to define "/" here - disko handles it via @root subvolume
+    # Btrfs snapshot rollback for impermanence (Systemd Initrd Version)
+    boot.initrd.systemd.services.rollback = {
+      description = "Rollback BTRFS root and home snapshots";
+      wantedBy = [ "initrd.target" ];
+      after = [ "initrd-root-device.target" ];
+      before = [ "sysroot.mount" ];
+      unitConfig.DefaultDependencies = "no";
+      serviceConfig.Type = "oneshot";
+      script = ''
+        export PATH=${pkgs.btrfs-progs}/bin:$PATH
+        mkdir -p /mnt
+        mount -t btrfs -o subvol=/ ${config.fileSystems."/".device} /mnt
 
-    # Disable systemd stage 1 initrd to allow postDeviceCommands
-    # This is required for btrfs snapshot rollback functionality
-    boot.initrd.systemd.enable = lib.mkForce false;
+        # Rollback @root
+        if [[ ! -e /mnt/@root-blank ]]; then
+            btrfs subvolume snapshot -r /mnt/@root /mnt/@root-blank
+        fi
+        btrfs subvolume delete /mnt/@root
+        btrfs subvolume snapshot /mnt/@root-blank /mnt/@root
 
-    # Btrfs snapshot rollback for impermanence
-    boot.initrd.postDeviceCommands = lib.mkAfter ''
-      # Create blank snapshot if it doesn't exist
-      if [[ ! -e /mnt/@root-blank ]]; then
-          btrfs subvolume snapshot -r /mnt/@root /mnt/@root-blank
-      fi
+        # Rollback @home
+        if [[ ! -e /mnt/@home-blank ]]; then
+            btrfs subvolume snapshot -r /mnt/@home /mnt/@home-blank
+        fi
+        btrfs subvolume delete /mnt/@home
+        btrfs subvolume snapshot /mnt/@home-blank /mnt/@home
 
-      # Delete the root subvolume
-      btrfs subvolume delete /mnt/@root || true
-
-      # Restore root subvolume from blank snapshot
-      btrfs subvolume snapshot /mnt/@root-blank /mnt/@root
-
-      # Cleanup
-      umount /mnt
-    '';
+        umount /mnt
+      '';
+    };
 
     # ============================================================================
     # ADDITIONAL CONFIGURATION

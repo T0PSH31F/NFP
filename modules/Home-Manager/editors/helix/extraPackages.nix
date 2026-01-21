@@ -8,16 +8,13 @@ with pkgs; [
   # Toml
   taplo
 
-  # typst
-  tinymist
-  typstyle # formatter
-
   # Yaml
   yaml-language-server
 
   # Nix
   nixd
-  nixfmt-classic
+  nil
+  nixfmt
 
   # Lua
   stylua
@@ -36,12 +33,7 @@ with pkgs; [
   dockfmt
   docker-compose-language-service
 
-  # web
-  # vscode-css-language-server vscode-eslint-language-server vscode-html-language-server
-  # vscode-json-language-server vscode-markdown-language-server
-  vscode-langservers-extracted
   emmet-ls
-
   typescript-language-server
   tailwindcss-language-server
   svelte-language-server
@@ -49,9 +41,6 @@ with pkgs; [
 
   # PostgreSQL
   pgformatter
-
-  # Powershell
-  powershell-editor-services # powershell pkg in system/configuration.nix
 
   # Markdown
   markdown-oxide

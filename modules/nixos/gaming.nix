@@ -97,7 +97,6 @@ with lib; {
         ppsspp
         rpcs3
         pcsx2
-        duckstation
         melonDS
         sixpair # Pair with SIXAXIS controllers over USB
 

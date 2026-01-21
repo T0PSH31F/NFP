@@ -33,18 +33,18 @@
   # ============================================================================
 
   desktop.dankmaterialshell = {
-    enable = false;
-    backend = "both"; # "hyprland", "niri", or "both"
+    enable = true;
+    backend = "hyprland"; # "hyprland", "niri", or "both"
   };
 
   desktop.omarchy = {
     enable = false;
-    backend = "both";
+    backend = "hyprland";
   };
 
   desktop.caelestia = {
     enable = false;
-    backend = "both";
+    backend = "hyprland";
   };
 
   desktop.illogical.enable = false; # End-4 Hyprland config
@@ -57,6 +57,40 @@
   themes.grub-lain.enable = false;
   themes.plymouth-matrix.enable = false;
   themes.plymouth-hellonavi.enable = false;
+
+  # ============================================================================
+  # MOBILE DEVICE SUPPORT
+  # ============================================================================
+  mobile.android.enable = false;
+  mobile.ios.enable = false;
+
+  # ============================================================================
+  # SERVICES
+  # ============================================================================
+  services.home-assistant-server.enable = false;
+  services.caddy-server.enable = false;
+  services.sillytavern-app.enable = false;
+
+  services.ai-services = {
+    enable = false; # Enables PostgreSQL vector DB
+    # open-webui.enable = false;
+    # localai.enable = false;
+    # chromadb.enable = false;
+  };
+
+  # Media & Cloud
+  services.immich-server.enable = false;
+  services.calibre-web-app.enable = false;
+  services.nextcloud-server.enable = false;
+  services-config.media-stack.enable = false;
+
+  # Communication
+  services.matrix-server.enable = false;
+  services.mautrix-bridges.enable = false;
+  services-config.avahi.enable = false;
+
+  # Monitoring
+  services-config.monitoring.enable = false;
 
   # ============================================================================
   # GAMING

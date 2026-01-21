@@ -3,7 +3,8 @@
   lib,
   pkgs,
   ...
-}: {
+}:
+{
   imports = [
     ./desktop.nix # Laptops are desktops + power management
   ];
@@ -16,4 +17,16 @@
   services.libinput.enable = true;
   services.libinput.touchpad.tapping = true;
   services.libinput.touchpad.naturalScrolling = true;
+  # Keyboard Backlight Control
+  environment.systemPackages = [ pkgs.brightnessctl ];
+
+  # Turn on keyboard backlight on boot
+  systemd.services.keyboard-backlight = {
+    description = "Turn on keyboard backlight";
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${pkgs.bash}/bin/bash -c 'echo 255 > /sys/class/leds/kbd_backlight/brightness || true'";
+    };
+  };
 }

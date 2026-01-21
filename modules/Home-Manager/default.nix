@@ -3,7 +3,8 @@
   pkgs,
   inputs,
   ...
-}: {
+}:
+{
   imports = [
     inputs.spicetify-nix.homeManagerModules.default
     # Core Packages
@@ -18,6 +19,7 @@
 
     # Desktop
     ./xdg.nix
+    ./wallpaper-rotation.nix
 
     # Shells & Terminals (using directory default.nix)
     ./shell
@@ -31,6 +33,9 @@
     # File Managers
     ./yazi
 
+    # Theming
+    ./theming/gtk.nix
+
     # Penetration Testing (commented out)
     # ./pentest
   ];
@@ -39,26 +44,24 @@
 
   # Git configuration
   programs.git = {
-    enable = true;
-    userName = "t0psh31f";
-    userEmail = pkgs.lib.mkForce "t0psh31f@grandlix.gang";
-
-    aliases = {
-      st = "status";
-      co = "checkout";
-      br = "branch";
-      cm = "commit -m";
-      lg = "log --graph --oneline --decorate";
-      unstage = "reset HEAD --";
-      last = "log -1 HEAD";
-    };
-
     settings = {
+      enable = true;
+      userName = "T0PSH31F";
+      userEmail = pkgs.lib.mkForce "wrighterik77@gmail.com";
       init.defaultBranch = "main";
       pull.rebase = false;
       push.autoSetupRemote = true;
       merge.conflictStyle = "diff3";
       diff.colorMoved = "default";
+      aliases = {
+        st = "status";
+        co = "checkout";
+        br = "branch";
+        cm = "commit -m";
+        lg = "log --graph --oneline --decorate";
+        unstage = "reset HEAD --";
+        last = "log -1 HEAD";
+      };
     };
   };
 

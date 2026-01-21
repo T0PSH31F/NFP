@@ -5,9 +5,11 @@
   inputs,
   ...
 }:
-with lib; let
+with lib;
+let
   cfg = config.desktop.niri;
-in {
+in
+{
   options.desktop.niri = {
     enable = mkEnableOption "Niri Desktop Environment";
   };
@@ -16,6 +18,11 @@ in {
     programs.niri = {
       enable = true;
       # package = pkgs.niri; # Default from nixpkgs
+    };
+
+    nix.settings = {
+      extra-substituters = [ "https://niri.cachix.org" ];
+      extra-trusted-public-keys = [ "niri.cachix.org-1:Wv0OmO7PsuocRKzfDoJ3mulSl7Z6oezYhGhR+3W2964=" ];
     };
 
     # UWSM Configuration for Session Management
@@ -41,7 +48,7 @@ in {
 
     xdg.portal = {
       enable = true;
-      extraPortals = [pkgs.xdg-desktop-portal-gtk pkgs.xdg-desktop-portal-gnome];
+      extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
     };
   };
 }

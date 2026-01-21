@@ -357,7 +357,7 @@ in {
       auto-format = true;
       formatter = prettierFormatter "css";
       language-servers =
-        [ "vscode-css-language-server" "emmet-ls" "tailwind-ls" ];
+        [ "emmet-ls" "tailwind-ls" ];
     }
 
     {
@@ -367,7 +367,7 @@ in {
       auto-format = true;
       formatter = prettierFormatter "scss";
       language-servers =
-        [ "vscode-css-language-server" "emmet-ls" "tailwind-ls" ];
+        [ "emmet-ls" "tailwind-ls" ];
     }
 
     {

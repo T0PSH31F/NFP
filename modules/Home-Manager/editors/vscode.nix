@@ -26,7 +26,6 @@
 
       # Utilities
       eamodio.gitlens
-      vscodevim.vim
       yzhang.markdown-all-in-one
 
       # Nix
@@ -46,4 +45,5 @@
       "vim.enableNeovim" = true;
     };
   };
+  programs.npm.enable = true;
 }

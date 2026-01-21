@@ -1,5 +1,0 @@
-include README.md
-include LICENSE
-include pyproject.toml
-include pytest.ini
-recursive-include mcp_nixos *

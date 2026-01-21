@@ -4,7 +4,7 @@
     defaultEditor = true;
 
     settings = {
-      theme = "catppuccin_mocha_transparent";
+      # theme = "catppuccin_mocha_transparent";
       editor = {
         # scrollPastEnd = true;
         text-width = 80;
@@ -75,7 +75,7 @@
   home.packages = with pkgs; [
     nodejs_24
     yarn
-    python314
+
     uv
     docker-compose
     powershell

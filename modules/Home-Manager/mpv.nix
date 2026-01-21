@@ -8,8 +8,7 @@
   programs.mpv = {
     enable = true;
 
-    package = pkgs.mpv-unwrapped.wrapper {
-      mpv = pkgs.mpv-unwrapped;
+    package = pkgs.mpv.override {
       scripts = with pkgs.mpvScripts; [
         mpris
         thumbnail

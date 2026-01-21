@@ -33,7 +33,7 @@ with lib; {
     services.caddy = {
       enable = true;
 
-      globalConfig = ''
+      globalConfig = mkIf (config.services.caddy-server.email != "") ''
         email ${config.services.caddy-server.email}
       '';
 

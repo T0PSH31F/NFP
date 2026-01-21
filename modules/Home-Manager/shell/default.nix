@@ -1,4 +1,5 @@
-{pkgs, ...}: {
+{ pkgs, ... }:
+{
   imports = [
     ./starship.nix
     ./ghostty.nix
@@ -7,6 +8,8 @@
     ./bash.nix
     ./fish.nix
     ./zsh.nix
+    ./anifetch.nix
+    ./tmux.nix
   ];
   # Direnv for development environments
   programs.direnv = {

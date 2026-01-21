@@ -14,6 +14,12 @@ with lib; {
       description = "The domain name of the Matrix homeserver";
     };
 
+    useACME = mkOption {
+      type = types.bool;
+      default = false;
+      description = "Use Let's Encrypt ACME certificates. Disable for .local domains.";
+    };
+
     port = mkOption {
       type = types.int;
       default = 8008;
@@ -81,7 +87,6 @@ with lib; {
           args = {
             user = "matrix-synapse";
             database = "matrix-synapse";
-            host = "localhost";
             cp_min = 5;
             cp_max = 10;
           };
@@ -142,8 +147,14 @@ with lib; {
 
     # Nginx reverse proxy (optional but recommended)
     services.nginx.virtualHosts.${config.services.matrix-server.serverName} = mkIf config.services.nginx.enable {
-      enableACME = true;
-      forceSSL = true;
+      # Only use ACME for non-.local domains
+      enableACME = config.services.matrix-server.useACME;
+      # Use self-signed cert for .local domains when ACME is disabled
+      sslCertificate = mkIf (!config.services.matrix-server.useACME) "/var/lib/matrix-synapse/ssl/cert.pem";
+      sslCertificateKey = mkIf (!config.services.matrix-server.useACME) "/var/lib/matrix-synapse/ssl/key.pem";
+      forceSSL = config.services.matrix-server.useACME;
+      # For local domains, allow both HTTP and HTTPS
+      addSSL = !config.services.matrix-server.useACME;
 
       locations."/_matrix" = {
         proxyPass = "http://[::1]:${toString config.services.matrix-server.port}";
@@ -158,6 +169,31 @@ with lib; {
       locations."/_synapse/client" = {
         proxyPass = "http://[::1]:${toString config.services.matrix-server.port}";
       };
+    };
+
+    # Generate self-signed certificate for .local domains
+    systemd.services.matrix-synapse-ssl-init = mkIf (!config.services.matrix-server.useACME && config.services.nginx.enable) {
+      description = "Generate self-signed SSL certificate for Matrix Synapse";
+      wantedBy = ["multi-user.target"];
+      before = ["nginx.service" "matrix-synapse.service"];
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+      };
+      script = ''
+        SSL_DIR="/var/lib/matrix-synapse/ssl"
+        if [ ! -f "$SSL_DIR/cert.pem" ]; then
+          mkdir -p "$SSL_DIR"
+          ${pkgs.openssl}/bin/openssl req -x509 -newkey rsa:4096 \
+            -keyout "$SSL_DIR/key.pem" \
+            -out "$SSL_DIR/cert.pem" \
+            -days 365 -nodes \
+            -subj "/CN=${config.services.matrix-server.serverName}"
+          chown -R matrix-synapse:matrix-synapse "$SSL_DIR"
+          chmod 600 "$SSL_DIR/key.pem"
+          chmod 644 "$SSL_DIR/cert.pem"
+        fi
+      '';
     };
 
     # Firewall

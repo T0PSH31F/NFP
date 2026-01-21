@@ -2,12 +2,14 @@
   config,
   lib,
   pkgs,
+  inputs,
   ...
 }: {
-  # Placeholder for DankMaterialShell Hyprland config
+  # DankMaterialShell Hyprland-specific config
   # Source: https://github.com/AvengeMedia/DankMaterialShell
 
   config = lib.mkIf (config.desktop.dankmaterialshell.enable && (config.desktop.dankmaterialshell.backend == "hyprland" || config.desktop.dankmaterialshell.backend == "both")) {
-    # Add configuration implementation here
+    # Hyprland-specific DankMaterialShell settings go here
+    # Currently no hyprland-specific settings needed
   };
 }

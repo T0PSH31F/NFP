@@ -3,7 +3,8 @@
   lib,
   ...
 }:
-with lib; {
+with lib;
+{
   # Firefox home-manager configuration
 
   programs.firefox = {
@@ -53,7 +54,7 @@ with lib; {
       };
 
       # Extensions (using nixpkgs firefox addons)
-      extensions = with pkgs.nur.repos.rycee.firefox-addons; [
+      extensions.packages = with pkgs.nur.repos.rycee.firefox-addons; [
         ublock-origin
         privacy-badger
         decentraleyes
@@ -88,7 +89,7 @@ with lib; {
               }
             ];
             icon = "''${pkgs.nixos-icons}/share/icons/hicolor/scalable/apps/nix-snowflake.svg";
-            definedAliases = ["@np"];
+            definedAliases = [ "@np" ];
           };
 
           "NixOS Options" = {
@@ -108,7 +109,7 @@ with lib; {
               }
             ];
             icon = "''${pkgs.nixos-icons}/share/icons/hicolor/scalable/apps/nix-snowflake.svg";
-            definedAliases = ["@no"];
+            definedAliases = [ "@no" ];
           };
 
           "Home Manager" = {
@@ -123,7 +124,7 @@ with lib; {
                 ];
               }
             ];
-            definedAliases = ["@hm"];
+            definedAliases = [ "@hm" ];
           };
 
           "GitHub" = {
@@ -138,7 +139,7 @@ with lib; {
                 ];
               }
             ];
-            definedAliases = ["@gh"];
+            definedAliases = [ "@gh" ];
           };
         };
       };

@@ -1,0 +1,13 @@
+resize_algorithm = none
+hotspot_x = 0.00
+hotspot_y = 0.00
+
+define_size = 32, draft_000.png, 3333
+define_size = 32, draft_001.png, 50
+define_size = 32, draft_002.png, 50
+define_size = 32, draft_003.png, 50
+define_size = 32, draft_004.png, 166
+define_size = 32, draft_005.png, 50
+define_size = 32, draft_006.png, 50
+define_size = 32, draft_007.png, 50
+

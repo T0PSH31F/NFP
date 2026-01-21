@@ -21,9 +21,8 @@
     clouddrive2 # google drive client
     code-server # web based code editor
     deluge # torrent client
-    deluged # torrent daemon
-    dillo-plus # web browser
-    floorp-bin # web browser
+    # deluged # torrent daemon
+    #floorp-bin # web browser
     geopard # web browser
     google-authenticator # 2fa
     google-drive-ocamlfuse # google drive fuse

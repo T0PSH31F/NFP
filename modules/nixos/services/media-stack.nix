@@ -57,6 +57,8 @@ with lib; {
       "d ${config.services-config.media-stack.dataDir}/music 0755 ${config.services-config.media-stack.user} ${config.services-config.media-stack.group} -"
       "d ${config.services-config.media-stack.dataDir}/books 0755 ${config.services-config.media-stack.user} ${config.services-config.media-stack.group} -"
       "d ${config.services-config.media-stack.dataDir}/torrents 0755 ${config.services-config.media-stack.user} ${config.services-config.media-stack.group} -"
+      # Fix Prowlarr state directory ownership
+      "d /var/lib/prowlarr 0750 ${config.services-config.media-stack.user} ${config.services-config.media-stack.group} -"
     ];
 
     # ============================================================================
@@ -142,6 +144,14 @@ with lib; {
     # ============================================================================
     services.prowlarr = {
       enable = true;
+    };
+
+    # Prowlarr doesn't have user/group options, override via systemd
+    systemd.services.prowlarr.serviceConfig = {
+      User = lib.mkForce config.services-config.media-stack.user;
+      Group = lib.mkForce config.services-config.media-stack.group;
+      StateDirectory = lib.mkForce "prowlarr";
+      StateDirectoryMode = lib.mkForce "0750";
     };
 
     # ============================================================================

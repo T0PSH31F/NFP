@@ -4,10 +4,16 @@
   pkgs,
   inputs,
   ...
-}: {
+}:
+{
+  nixpkgs = {
+    overlays = [
+      inputs.anifetch.overlays.anifetch
+    ];
+  };
+
   environment.systemPackages = with pkgs; [
     # AI Tools - will be configured as services where applicable
-    # CLI utilities
     # Development tools
     antigravity-fhs
     aria2
@@ -21,7 +27,7 @@
     devenv # Fast, Declarative, Reproducible, and Composable Developer Environments
     docker-compose # define and run multi-container applications with Docker
     duf # disk usage utility
-    exodus # Crypto currency wallet
+    #exodus # Crypto currency wallet
     eza # fork of exa, a better `ls`
     fd # a better `find`
     feh # image viewer
@@ -38,7 +44,7 @@
     gotree # tree-like view
     gpa # Graphical user interface for the GnuPG
     gparted # partition editor
-    grayjay #n application to stream and download content from various sources
+    grayjay # n application to stream and download content from various sources
     neohtop # interactive process viewer
     hyprviz # hyprland configuration GUI editor
     hyprmon # hyprland monitor
@@ -59,7 +65,6 @@
     mongodb-compass # MongoDB GUI
     motrix # torrent downloader
     mpd # music player daemon
-    mpv # media player
     neovim # advanced text editor
     nextcloud-client # Nextcloud client
     nmap # tool for network discovery and security auditing
@@ -86,15 +91,39 @@
     unrar # Unrar tool
     unzip # Unzip tool
     uv # python package manager
+    xpipe
     vencord # Discord client
     vim # text editor
+    waytrogen
     wget # command-line tool for transferring data with URL syntax
     winetricks # script to install DLLs needed to work around problems in Wine
     wineWowPackages.stable # https://nixos.wiki/wiki/Wine
-    xdg-desktop-portal-hyprland # hyprland desktop portal
     zathura # PDF viewer
+    zellij
     zoxide # cd replacement
     zip # zip tool
+
+    inputs.awww.packages.${pkgs.stdenv.hostPlatform.system}.awww
+    # inputs.lobster.packages.${system}.lobster  # Temporarily disabled - html-xml-utils build failure
+    # inputs.jerry.packages.${system}.jerry  # Temporarily disabled - html-xml-utils build failure
+    inputs.nixai.packages.${system}.default
+    # inputs.anifetch.packages.${pkgs.system}.default
+    anifetch
+    fastfetch
+    neofetch
+
+    # Wireless Pentesting & Security
+    aircrack-ng
+    hcxdumptool
+    hcxtools
+    hashcat
+    wireshark
+    wireshark-cli # provides tshark
+    bettercap
+    kismet
+
+    # TUI Tools (Charm)
+    gum # "Bubble tea" utils
   ];
 
   # Enable nix-ld for running non-NixOS binaries

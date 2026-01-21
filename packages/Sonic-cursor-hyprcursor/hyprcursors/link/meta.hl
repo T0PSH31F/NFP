@@ -1,0 +1,9 @@
+resize_algorithm = none
+hotspot_x = 0.00
+hotspot_y = 0.00
+
+define_size = 32, link_000.png, 66
+define_size = 32, link_001.png, 66
+define_size = 32, link_002.png, 66
+define_size = 32, link_003.png, 66
+

@@ -171,6 +171,7 @@ with lib; {
           retention_enabled = true;
           retention_delete_delay = "2h";
           retention_delete_worker_count = 150;
+          delete_request_store = "filesystem";
         };
       };
     };
@@ -232,6 +233,14 @@ with lib; {
           }
         ];
       };
+    };
+
+    # Fix promtail namespace error (conflicts with impermanence bind mounts)
+    systemd.services.promtail.serviceConfig = {
+      PrivateTmp = lib.mkForce false;
+      ProtectSystem = lib.mkForce false;
+      ProtectHome = lib.mkForce false;
+      ReadWritePaths = ["/var/lib/promtail"];
     };
 
     # ============================================================================
@@ -315,7 +324,7 @@ with lib; {
     # PACKAGES
     # ============================================================================
     environment.systemPackages = with pkgs; [
-      promtool # Prometheus CLI
+      prometheus # Contains promtool
       grafana # Grafana CLI
     ];
   };

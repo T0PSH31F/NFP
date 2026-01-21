@@ -1,0 +1,17 @@
+resize_algorithm = none
+hotspot_x = 0.00
+hotspot_y = 0.00
+
+define_size = 32, whats_this_000.png, 3333
+define_size = 32, whats_this_001.png, 50
+define_size = 32, whats_this_002.png, 50
+define_size = 32, whats_this_003.png, 50
+define_size = 32, whats_this_004.png, 50
+define_size = 32, whats_this_005.png, 50
+define_size = 32, whats_this_006.png, 166
+define_size = 32, whats_this_007.png, 50
+define_size = 32, whats_this_008.png, 50
+define_size = 32, whats_this_009.png, 50
+define_size = 32, whats_this_010.png, 50
+define_size = 32, whats_this_011.png, 50
+

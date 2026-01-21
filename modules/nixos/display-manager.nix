@@ -1,5 +1,6 @@
-{ ... }:
+{ lib, ... }:
 {
-  services.displayManager.sddm.enable = true;
-  services.displayManager.sddm.wayland.enable = true;
+  # SDDM theme is configured in themes/sddm-sel.nix
+  # Only override greetd here to prevent conflicts
+  services.greetd.enable = lib.mkForce false;
 }

@@ -4,15 +4,17 @@
   pkgs,
   ...
 }:
-with lib; {
+with lib;
+{
   imports = [
     ./nvidia.nix
     ./hardware.nix
-    ./amd.nix
+    # ./amd.nix
     ./intel.nix
     ./audio.nix
     ./bluetooth.nix
     ./touchpad.nix
+    ./razer.nix
   ];
 
   # Common hardware support
@@ -22,7 +24,7 @@ with lib; {
 
     # CPU microcode updates
     cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
-    cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
+    # cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
 
     # Graphics support
     graphics = {
@@ -31,15 +33,15 @@ with lib; {
       # Common graphics packages
       extraPackages = with pkgs; [
         intel-media-driver # Intel VAAPI
-        vaapiIntel
-        vaapiVdpau
+        intel-vaapi-driver
+        libva-vdpau-driver
         libvdpau-va-gl
         intel-compute-runtime # Intel OpenCL
       ];
 
       extraPackages32 = with pkgs.pkgsi686Linux; [
-        vaapiIntel
-        vaapiVdpau
+        intel-vaapi-driver
+        libva-vdpau-driver
         libvdpau-va-gl
       ];
     };
@@ -55,7 +57,7 @@ with lib; {
   boot.kernelModules = [
     # Virtualization
     "kvm-intel"
-    "kvm-amd"
+    # "kvm-amd"
 
     # USB
     "usbhid"
@@ -67,21 +69,43 @@ with lib; {
   # Power management
   powerManagement = {
     enable = true;
-    cpuFreqGovernor = lib.mkDefault "powersave";
+    cpuFreqGovernor = lib.mkDefault "performance";
+  };
+
+  # ==========================================================================
+  # MEMORY MANAGEMENT & SYSTEM STABILITY
+  # ==========================================================================
+
+  # Zram - compressed swap in RAM (prevents disk thrashing)
+  zramSwap = {
+    enable = true;
+    algorithm = "zstd"; # Best compression ratio
+    memoryPercent = 50; # Use up to 50% of RAM for compressed swap
+    priority = 100; # Higher priority than disk swap
+  };
+
+  # Kernel parameters for better memory management
+  boot.kernel.sysctl = {
+    # Reduce swappiness - prefer keeping apps in RAM
+    "vm.swappiness" = 10;
+
+    # Improve responsiveness under memory pressure
+    "vm.vfs_cache_pressure" = 50;
+
+    # Increase inotify watches for file-heavy workloads
+    "fs.inotify.max_user_watches" = 524288;
+
+    # Better handling of memory-mapped files
+    "vm.dirty_ratio" = 10;
+    "vm.dirty_background_ratio" = 5;
+
+    # Prevent OOM killer from killing important processes too late
+    "vm.oom_kill_allocating_task" = 1;
   };
 
   services = {
     # Thermal management
     thermald.enable = mkDefault true;
-
-    # Power profiles daemon (modern power management)
-    power-profiles-daemon.enable = true;
-
-    # Hardware monitoring
-    smartd = {
-      enable = true;
-      autodetect = true;
-    };
 
     # Automatic CPU frequency scaling
     auto-cpufreq = {
@@ -120,7 +144,7 @@ with lib; {
     cpupower-gui
 
     # GPU tools
-    glxinfo
+    mesa-demos
     vulkan-tools
 
     # Sensors
@@ -157,23 +181,14 @@ with lib; {
   console = {
     earlySetup = true;
     font = lib.mkDefault "${pkgs.terminus_font}/share/consolefonts/ter-132n.psf.gz";
-    packages = [pkgs.terminus_font];
-  };
-   # XDG Desktop Portals (required for Flatpak)
-  xdg.portal = {
-    enable = true;
-    extraPortals = with pkgs; [
-      xdg-desktop-portal-hyprland
-      xdg-desktop-portal-gtk
-    ];
-    config.common.default = "*";
+    packages = [ pkgs.terminus_font ];
   };
 
   # System services configuration
   services = {
     # Display server
     xserver = {
-      enable = false;
+      enable = true;
       # Keyboard layout
       xkb = {
         layout = "us";
@@ -181,9 +196,6 @@ with lib; {
         options = "caps:escape,compose:ralt";
       };
     };
-
-    # Display Manager (disabled - using greetd instead)
-    # displayManager.sddm.enable = false;
 
     # Touchpad support
     libinput = {
@@ -194,7 +206,6 @@ with lib; {
         clickMethod = "clickfinger";
       };
     };
-
 
     # Network
     resolved = {
@@ -211,7 +222,6 @@ with lib; {
 
     # Power management
     power-profiles-daemon.enable = true;
-    thermald.enable = true;
     upower = {
       enable = true;
       percentageLow = 15;
@@ -253,17 +263,6 @@ with lib; {
       };
     };
 
-    # SSH daemon
-    openssh = {
-      enable = true;
-      settings = {
-        PermitRootLogin = "no";
-        PasswordAuthentication = false;
-        KbdInteractiveAuthentication = false;
-        X11Forwarding = false;
-      };
-    };
-
     # Firewall
     fail2ban = {
       enable = true;
@@ -289,10 +288,10 @@ with lib; {
 
     # Syncthing for file synchronization
     syncthing = {
-      enable = true; 
-      user = cfg.user;
-      dataDir = "/home/${cfg.user}/Documents";
-      configDir = "/home/${cfg.user}/.config/syncthing";
+      enable = true;
+      user = "t0psh31f";
+      dataDir = "/home/t0psh31f/Documents";
+      configDir = "/home/t0psh31f/.config/syncthing";
     };
 
     # GVFS for mounting and trash support
@@ -318,12 +317,26 @@ with lib; {
     #   flake = "/etc/nixos#omnixy";
     # };
 
-    # Earlyoom - out of memory killer
+    # Earlyoom - proactive OOM killer (prevents system freeze)
     earlyoom = {
       enable = true;
-      freeMemThreshold = 5;
-      freeSwapThreshold = 10;
+      freeMemThreshold = 15; # Kill when free RAM < 15%
+      freeSwapThreshold = 15; # Kill when free swap < 15%
+      enableNotifications = true; # Desktop notifications on kill
+      extraArgs = [
+        "--prefer"
+        "^(Web Content|chromium|firefox|electron)$" # Prefer killing browsers
+        "--avoid"
+        "^(Hyprland|waybar|sshd|systemd)$" # Avoid killing critical
+      ];
     };
+
+    # Ananicy-cpp - auto nice daemon for better process prioritization
+    # ananicy-cpp = {
+    #   enable = true;
+    #   package = pkgs.ananicy-cpp;
+    #   rulesProvider = pkgs.ananicy-rules-cachyos; # CachyOS rules are well-maintained
+    # };
 
     # Logrotate
     logrotate = {
@@ -339,13 +352,16 @@ with lib; {
         };
       };
     };
+
+    # System notifications over DBus
+    systembus-notify.enable = lib.mkForce true;
   };
 
   # Systemd services
   systemd = {
     # User session environment
     user.extraConfig = ''
-      DefaultEnvironment="PATH=/run/wrappers/bin:/home/${cfg.user}/.nix-profile/bin:/etc/profiles/per-user/${cfg.user}/bin:/nix/var/nix/profiles/default/bin:/run/current-system/sw/bin"
+      DefaultEnvironment="PATH=/run/wrappers/bin:/home/t0psh31f/.nix-profile/bin:/etc/profiles/per-user/t0psh31f/bin:/nix/var/nix/profiles/default/bin:/run/current-system/sw/bin"
     '';
 
     # Automatic cleanup
@@ -365,7 +381,7 @@ with lib; {
         ExecStart = "${pkgs.coreutils}/bin/find /tmp -type f -atime +7 -delete";
       };
     };
-
+  };
 
   # Security policies
   security = {

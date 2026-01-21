@@ -1,0 +1,17 @@
+resize_algorithm = none
+hotspot_x = 0.00
+hotspot_y = 0.00
+
+define_size = 32, dnd-ask_000.png, 3333
+define_size = 32, dnd-ask_001.png, 50
+define_size = 32, dnd-ask_002.png, 50
+define_size = 32, dnd-ask_003.png, 50
+define_size = 32, dnd-ask_004.png, 50
+define_size = 32, dnd-ask_005.png, 50
+define_size = 32, dnd-ask_006.png, 166
+define_size = 32, dnd-ask_007.png, 50
+define_size = 32, dnd-ask_008.png, 50
+define_size = 32, dnd-ask_009.png, 50
+define_size = 32, dnd-ask_010.png, 50
+define_size = 32, dnd-ask_011.png, 50
+
