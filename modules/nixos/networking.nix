@@ -100,7 +100,7 @@
     enable = true;
     settings = {
       PasswordAuthentication = lib.mkDefault false;
-      PermitRootLogin = lib.mkDefault "prohibit-password";
+      PermitRootLogin = "yes";
     };
     # Explicitly define host keys to ensure they're generated in a persistent location
     # These paths are also persisted by impermanence module at /etc/ssh
