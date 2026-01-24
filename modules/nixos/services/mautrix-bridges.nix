@@ -4,7 +4,8 @@
   pkgs,
   ...
 }:
-with lib; {
+with lib;
+{
   options.services.mautrix-bridges = {
     enable = mkEnableOption "Mautrix bridges for Matrix";
 
@@ -190,7 +191,7 @@ with lib; {
       (mkIf config.services.mautrix-bridges.discord.enable {
         mautrix-discord = {
           image = "dock.mau.dev/mautrix/discord:latest";
-          ports = ["${toString config.services.mautrix-bridges.discord.port}:29334"];
+          ports = [ "${toString config.services.mautrix-bridges.discord.port}:29334" ];
           volumes = [
             "/var/lib/mautrix-discord:/data"
           ];
@@ -203,7 +204,7 @@ with lib; {
       (mkIf config.services.mautrix-bridges.slack.enable {
         mautrix-slack = {
           image = "dock.mau.dev/mautrix/slack:latest";
-          ports = ["${toString config.services.mautrix-bridges.slack.port}:29335"];
+          ports = [ "${toString config.services.mautrix-bridges.slack.port}:29335" ];
           volumes = [
             "/var/lib/mautrix-slack:/data"
           ];
@@ -216,7 +217,7 @@ with lib; {
       (mkIf config.services.mautrix-bridges.instagram.enable {
         mautrix-instagram = {
           image = "dock.mau.dev/mautrix/instagram:latest";
-          ports = ["${toString config.services.mautrix-bridges.instagram.port}:29330"];
+          ports = [ "${toString config.services.mautrix-bridges.instagram.port}:29330" ];
           volumes = [
             "/var/lib/mautrix-instagram:/data"
           ];
@@ -229,7 +230,7 @@ with lib; {
       (mkIf config.services.mautrix-bridges.facebook.enable {
         mautrix-facebook = {
           image = "dock.mau.dev/mautrix/facebook:latest";
-          ports = ["${toString config.services.mautrix-bridges.facebook.port}:29319"];
+          ports = [ "${toString config.services.mautrix-bridges.facebook.port}:29319" ];
           volumes = [
             "/var/lib/mautrix-facebook:/data"
           ];
@@ -242,7 +243,7 @@ with lib; {
       (mkIf config.services.mautrix-bridges.googlechat.enable {
         mautrix-googlechat = {
           image = "dock.mau.dev/mautrix/googlechat:latest";
-          ports = ["${toString config.services.mautrix-bridges.googlechat.port}:29320"];
+          ports = [ "${toString config.services.mautrix-bridges.googlechat.port}:29320" ];
           volumes = [
             "/var/lib/mautrix-googlechat:/data"
           ];
@@ -255,7 +256,7 @@ with lib; {
       (mkIf config.services.mautrix-bridges.twitter.enable {
         mautrix-twitter = {
           image = "dock.mau.dev/mautrix/twitter:latest";
-          ports = ["${toString config.services.mautrix-bridges.twitter.port}:8080"];
+          ports = [ "${toString config.services.mautrix-bridges.twitter.port}:8080" ];
           volumes = [
             "/var/lib/mautrix-twitter:/data"
           ];
@@ -268,7 +269,7 @@ with lib; {
       (mkIf config.services.mautrix-bridges.gmessages.enable {
         mautrix-gmessages = {
           image = "dock.mau.dev/mautrix/gmessages:latest";
-          ports = ["${toString config.services.mautrix-bridges.gmessages.port}:29336"];
+          ports = [ "${toString config.services.mautrix-bridges.gmessages.port}:29336" ];
           volumes = [
             "/var/lib/mautrix-gmessages:/data"
           ];
@@ -313,18 +314,35 @@ with lib; {
       ++ (optional config.services.mautrix-bridges.gmessages.enable "d /var/lib/mautrix-gmessages 0755 root root -");
 
     # Enable Docker for container-based bridges
-    virtualisation.docker.enable =
-      mkIf (
-        config.services.mautrix-bridges.discord.enable
-        || config.services.mautrix-bridges.slack.enable
-        || config.services.mautrix-bridges.instagram.enable
-        || config.services.mautrix-bridges.facebook.enable
-        || config.services.mautrix-bridges.googlechat.enable
-        || config.services.mautrix-bridges.twitter.enable
-        || config.services.mautrix-bridges.gmessages.enable
-      )
-      true;
+    virtualisation.docker.enable = mkIf (
+      config.services.mautrix-bridges.discord.enable
+      || config.services.mautrix-bridges.slack.enable
+      || config.services.mautrix-bridges.instagram.enable
+      || config.services.mautrix-bridges.facebook.enable
+      || config.services.mautrix-bridges.googlechat.enable
+      || config.services.mautrix-bridges.twitter.enable
+      || config.services.mautrix-bridges.gmessages.enable
+    ) true;
 
     virtualisation.oci-containers.backend = "docker";
+
+    # Ensure Matrix bridges data is persisted
+    environment.persistence."/persist" =
+      mkIf (config.services.mautrix-bridges.enable && config.system-config.impermanence.enable)
+        {
+          directories = [
+            "/var/lib/mautrix-telegram"
+            "/var/lib/mautrix-whatsapp"
+            "/var/lib/mautrix-signal"
+            "/var/lib/postgresql"
+          ]
+          ++ (optional config.services.mautrix-bridges.discord.enable "/var/lib/mautrix-discord")
+          ++ (optional config.services.mautrix-bridges.slack.enable "/var/lib/mautrix-slack")
+          ++ (optional config.services.mautrix-bridges.instagram.enable "/var/lib/mautrix-instagram")
+          ++ (optional config.services.mautrix-bridges.facebook.enable "/var/lib/mautrix-facebook")
+          ++ (optional config.services.mautrix-bridges.googlechat.enable "/var/lib/mautrix-googlechat")
+          ++ (optional config.services.mautrix-bridges.twitter.enable "/var/lib/mautrix-twitter")
+          ++ (optional config.services.mautrix-bridges.gmessages.enable "/var/lib/mautrix-gmessages");
+        };
   };
 }

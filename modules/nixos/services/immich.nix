@@ -4,7 +4,8 @@
   pkgs,
   ...
 }:
-with lib; {
+with lib;
+{
   options.services.immich-server = {
     enable = mkEnableOption "Immich photo and video management server";
 
@@ -53,7 +54,7 @@ with lib; {
     # Immich Server
     virtualisation.oci-containers.containers.immich-server = {
       image = "ghcr.io/immich-app/immich-server:release";
-      ports = ["${toString config.services.immich-server.port}:2283"];
+      ports = [ "${toString config.services.immich-server.port}:2283" ];
       volumes = [
         "${config.services.immich-server.uploadLocation}:/usr/src/app/upload"
         "/etc/localtime:/etc/localtime:ro"
@@ -66,30 +67,38 @@ with lib; {
         REDIS_HOSTNAME = "immich-redis";
         UPLOAD_LOCATION = config.services.immich-server.uploadLocation;
       };
-      dependsOn = ["immich-postgres" "immich-redis"];
+      dependsOn = [
+        "immich-postgres"
+        "immich-redis"
+      ];
       extraOptions = [
         "--network=immich-network"
       ];
     };
 
     # Immich Machine Learning (optional)
-    virtualisation.oci-containers.containers.immich-machine-learning = mkIf config.services.immich-server.enableMachineLearning {
-      image = "ghcr.io/immich-app/immich-machine-learning:release";
-      volumes = [
-        "/var/lib/immich/model-cache:/cache"
-      ];
-      environment = {
-        DB_HOSTNAME = "immich-postgres";
-        DB_USERNAME = "immich";
-        DB_PASSWORD = config.services.immich-server.postgresPassword;
-        DB_DATABASE_NAME = "immich";
-        REDIS_HOSTNAME = "immich-redis";
-      };
-      dependsOn = ["immich-postgres" "immich-redis"];
-      extraOptions = [
-        "--network=immich-network"
-      ];
-    };
+    virtualisation.oci-containers.containers.immich-machine-learning =
+      mkIf config.services.immich-server.enableMachineLearning
+        {
+          image = "ghcr.io/immich-app/immich-machine-learning:release";
+          volumes = [
+            "/var/lib/immich/model-cache:/cache"
+          ];
+          environment = {
+            DB_HOSTNAME = "immich-postgres";
+            DB_USERNAME = "immich";
+            DB_PASSWORD = config.services.immich-server.postgresPassword;
+            DB_DATABASE_NAME = "immich";
+            REDIS_HOSTNAME = "immich-redis";
+          };
+          dependsOn = [
+            "immich-postgres"
+            "immich-redis"
+          ];
+          extraOptions = [
+            "--network=immich-network"
+          ];
+        };
 
     # PostgreSQL for Immich
     virtualisation.oci-containers.containers.immich-postgres = {
@@ -118,8 +127,8 @@ with lib; {
     # Create Docker network for Immich
     systemd.services.init-immich-network = {
       description = "Create Immich Docker network";
-      after = ["network.target"];
-      wantedBy = ["multi-user.target"];
+      after = [ "network.target" ];
+      wantedBy = [ "multi-user.target" ];
       serviceConfig.Type = "oneshot";
       script = ''
         ${pkgs.docker}/bin/docker network inspect immich-network >/dev/null 2>&1 || \
@@ -136,6 +145,13 @@ with lib; {
     ];
 
     # Firewall
-    networking.firewall.allowedTCPPorts = [config.services.immich-server.port];
+    networking.firewall.allowedTCPPorts = [ config.services.immich-server.port ];
+
+    # Ensure Immich data is persisted
+    environment.persistence."/persist" = mkIf config.system-config.impermanence.enable {
+      directories = [
+        config.services.immich-server.dataDir
+      ];
+    };
   };
 }

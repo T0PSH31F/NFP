@@ -145,6 +145,7 @@
   };
 
   services-config.avahi.enable = true;
+  services.llm-agents.enable = true;
 
   # ============================================================================
   # LIVE USER CONFIGURATION

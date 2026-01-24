@@ -189,5 +189,15 @@ with lib;
       ++ (optional config.services.ai-services.chromadb.enable config.services.ai-services.chromadb.port)
       ++ (optional config.services.ai-services.localai.enable config.services.ai-services.localai.port)
     );
+
+    # Ensure AI service data is persisted
+    environment.persistence."/persist" =
+      mkIf (config.services.ai-services.enable && config.system-config.impermanence.enable)
+        {
+          directories = [
+            "/var/lib/postgresql"
+            "/var/lib/docker" # Persist all docker volumes
+          ];
+        };
   };
 }

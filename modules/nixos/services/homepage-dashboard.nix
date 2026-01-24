@@ -230,5 +230,14 @@ with lib;
       extraGroups = [ "docker" ];
     };
     users.groups.homepage-dashboard = { };
+
+    # Ensure Homepage data is persisted
+    environment.persistence."/persist" =
+      mkIf (config.services-config.homepage-dashboard.enable && config.system-config.impermanence.enable)
+        {
+          directories = [
+            "/var/lib/homepage-dashboard"
+          ];
+        };
   };
 }

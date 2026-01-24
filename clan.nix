@@ -8,7 +8,7 @@
           "client"
           "laptop"
         ];
-        deploy.targetHost = "root@localhost";
+        deploy.targetHost = "root@z0r0.local";
       };
       Nami = {
         tags = [

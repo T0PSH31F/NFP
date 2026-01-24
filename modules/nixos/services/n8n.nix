@@ -73,7 +73,7 @@ in
 
     # Ensure n8n data directory is persisted
     # This integrates with impermanence if enabled
-    environment.persistence."/persist" = lib.mkIf config.system-config.impermanence.enable {
+    environment.persistence."/persist" = mkIf (cfg.enable && config.system-config.impermanence.enable) {
       directories = [
         cfg.dataDir
       ];

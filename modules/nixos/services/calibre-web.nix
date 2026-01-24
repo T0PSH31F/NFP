@@ -4,7 +4,8 @@
   pkgs,
   ...
 }:
-with lib; {
+with lib;
+{
   options.services.calibre-web-app = {
     enable = mkEnableOption "Calibre-Web service";
 
@@ -31,7 +32,7 @@ with lib; {
     # Run Calibre-Web as a container
     virtualisation.oci-containers.containers.calibre-web = {
       image = "lscr.io/linuxserver/calibre-web:latest";
-      ports = ["${toString config.services.calibre-web-app.port}:8083"];
+      ports = [ "${toString config.services.calibre-web-app.port}:8083" ];
       volumes = [
         "${config.services.calibre-web-app.dataDir}:/config"
         "${config.services.calibre-web-app.libraryPath}:/books"
@@ -50,6 +51,16 @@ with lib; {
     ];
 
     # Firewall
-    networking.firewall.allowedTCPPorts = [config.services.calibre-web-app.port];
+    networking.firewall.allowedTCPPorts = [ config.services.calibre-web-app.port ];
+
+    # Ensure Calibre-Web data is persisted
+    environment.persistence."/persist" =
+      mkIf (config.services.calibre-web-app.enable && config.system-config.impermanence.enable)
+        {
+          directories = [
+            config.services.calibre-web-app.dataDir
+            config.services.calibre-web-app.libraryPath
+          ];
+        };
   };
 }

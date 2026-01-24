@@ -4,7 +4,8 @@
   pkgs,
   ...
 }:
-with lib; {
+with lib;
+{
   options.services.home-assistant-server = {
     enable = mkEnableOption "Home Assistant server";
 
@@ -47,11 +48,14 @@ with lib; {
       ];
 
       config = {
-        default_config = {};
+        default_config = { };
 
         http = {
           server_port = config.services.home-assistant-server.port;
-          trusted_proxies = ["127.0.0.1" "::1"];
+          trusted_proxies = [
+            "127.0.0.1"
+            "::1"
+          ];
         };
 
         homeassistant = {
@@ -66,5 +70,14 @@ with lib; {
     networking.firewall.allowedTCPPorts = mkIf config.services.home-assistant-server.openFirewall [
       config.services.home-assistant-server.port
     ];
+
+    # Ensure Home Assistant data is persisted
+    environment.persistence."/persist" =
+      mkIf (config.services.home-assistant-server.enable && config.system-config.impermanence.enable)
+        {
+          directories = [
+            "/var/lib/hass"
+          ];
+        };
   };
 }

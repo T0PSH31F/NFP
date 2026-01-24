@@ -4,7 +4,8 @@
   pkgs,
   ...
 }:
-with lib; {
+with lib;
+{
   options.services-config.media-stack = {
     enable = mkEnableOption "Complete media management stack (Homarr, Deluge, aria2, *arr suite)";
 
@@ -44,7 +45,7 @@ with lib; {
       createHome = true;
     };
 
-    users.groups.${config.services-config.media-stack.group} = {};
+    users.groups.${config.services-config.media-stack.group} = { };
 
     # ============================================================================
     # DIRECTORY STRUCTURE
@@ -79,7 +80,10 @@ with lib; {
 
         # Network settings
         random_port = false;
-        listen_ports = [6881 6889];
+        listen_ports = [
+          6881
+          6889
+        ];
 
         # Encryption
         enc_prefer_rc4 = true;
@@ -200,12 +204,28 @@ with lib; {
       6889 # Deluge
     ];
 
-    # ============================================================================
-    # PACKAGES
-    # ============================================================================
+    # Packages
     environment.systemPackages = with pkgs; [
       deluge
       aria2
     ];
+
+    # Ensure Media Stack data is persisted
+    environment.persistence."/persist" =
+      mkIf (config.services-config.media-stack.enable && config.system-config.impermanence.enable)
+        {
+          directories = [
+            config.services-config.media-stack.dataDir
+            config.services-config.media-stack.downloadsDir
+            "/var/lib/deluge"
+            "/var/lib/aria2"
+            "/var/lib/sonarr"
+            "/var/lib/radarr"
+            "/var/lib/prowlarr"
+            "/var/lib/lidarr"
+            "/var/lib/readarr"
+            "/var/lib/bazarr"
+          ];
+        };
   };
 }

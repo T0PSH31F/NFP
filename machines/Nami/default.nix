@@ -70,6 +70,7 @@
   services.home-assistant-server.enable = false;
   services.caddy-server.enable = false;
   services.sillytavern-app.enable = false;
+  services.llm-agents.enable = true;
 
   services.ai-services = {
     enable = false; # Enables PostgreSQL vector DB

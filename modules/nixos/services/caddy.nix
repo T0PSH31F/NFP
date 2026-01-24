@@ -4,7 +4,8 @@
   pkgs,
   ...
 }:
-with lib; {
+with lib;
+{
   options.services.caddy-server = {
     enable = mkEnableOption "Caddy web server";
 
@@ -15,16 +16,18 @@ with lib; {
     };
 
     virtualHosts = mkOption {
-      type = types.attrsOf (types.submodule {
-        options = {
-          extraConfig = mkOption {
-            type = types.lines;
-            default = "";
-            description = "Extra Caddy configuration";
+      type = types.attrsOf (
+        types.submodule {
+          options = {
+            extraConfig = mkOption {
+              type = types.lines;
+              default = "";
+              description = "Extra Caddy configuration";
+            };
           };
-        };
-      });
-      default = {};
+        }
+      );
+      default = { };
       description = "Virtual hosts configuration";
     };
   };
@@ -41,7 +44,19 @@ with lib; {
     };
 
     # Firewall
-    networking.firewall.allowedTCPPorts = [80 443];
-    networking.firewall.allowedUDPPorts = [443]; # For QUIC
+    networking.firewall.allowedTCPPorts = [
+      80
+      443
+    ];
+    networking.firewall.allowedUDPPorts = [ 443 ]; # For QUIC
+
+    # Ensure Caddy data (certificates) are persisted
+    environment.persistence."/persist" =
+      mkIf (config.services.caddy-server.enable && config.system-config.impermanence.enable)
+        {
+          directories = [
+            "/var/lib/caddy"
+          ];
+        };
   };
 }

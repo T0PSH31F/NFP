@@ -4,7 +4,8 @@
   pkgs,
   ...
 }:
-with lib; {
+with lib;
+{
   options.services.sillytavern-app = {
     enable = mkEnableOption "SillyTavern service";
 
@@ -25,7 +26,7 @@ with lib; {
     # Run SillyTavern as a container
     virtualisation.oci-containers.containers.sillytavern = {
       image = "ghcr.io/sillytavern/sillytavern:latest";
-      ports = ["${toString config.services.sillytavern-app.port}:8000"];
+      ports = [ "${toString config.services.sillytavern-app.port}:8000" ];
       volumes = [
         "${config.services.sillytavern-app.dataDir}:/home/node/app/data"
       ];
@@ -40,6 +41,15 @@ with lib; {
     ];
 
     # Firewall
-    networking.firewall.allowedTCPPorts = [config.services.sillytavern-app.port];
+    networking.firewall.allowedTCPPorts = [ config.services.sillytavern-app.port ];
+
+    # Ensure SillyTavern data is persisted
+    environment.persistence."/persist" =
+      mkIf (config.services.sillytavern-app.enable && config.system-config.impermanence.enable)
+        {
+          directories = [
+            config.services.sillytavern-app.dataDir
+          ];
+        };
   };
 }

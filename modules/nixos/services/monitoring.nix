@@ -4,7 +4,8 @@
   pkgs,
   ...
 }:
-with lib; {
+with lib;
+{
   options.services-config.monitoring = {
     enable = mkEnableOption "Comprehensive monitoring stack with Prometheus, Loki, and Grafana";
 
@@ -69,7 +70,7 @@ with lib; {
           job_name = "prometheus";
           static_configs = [
             {
-              targets = ["localhost:${toString config.services-config.monitoring.prometheus.port}"];
+              targets = [ "localhost:${toString config.services-config.monitoring.prometheus.port}" ];
             }
           ];
         }
@@ -79,7 +80,7 @@ with lib; {
           job_name = "node";
           static_configs = [
             {
-              targets = ["localhost:9100"];
+              targets = [ "localhost:9100" ];
             }
           ];
         }
@@ -89,7 +90,7 @@ with lib; {
           job_name = "loki";
           static_configs = [
             {
-              targets = ["localhost:${toString config.services-config.monitoring.loki.port}"];
+              targets = [ "localhost:${toString config.services-config.monitoring.loki.port}" ];
             }
           ];
         }
@@ -99,7 +100,7 @@ with lib; {
           job_name = "grafana";
           static_configs = [
             {
-              targets = ["localhost:${toString config.services-config.monitoring.grafana.port}"];
+              targets = [ "localhost:${toString config.services-config.monitoring.grafana.port}" ];
             }
           ];
         }
@@ -207,11 +208,11 @@ with lib; {
             };
             relabel_configs = [
               {
-                source_labels = ["__journal__systemd_unit"];
+                source_labels = [ "__journal__systemd_unit" ];
                 target_label = "unit";
               }
               {
-                source_labels = ["__journal_priority_keyword"];
+                source_labels = [ "__journal_priority_keyword" ];
                 target_label = "level";
               }
             ];
@@ -222,7 +223,7 @@ with lib; {
             job_name = "syslog";
             static_configs = [
               {
-                targets = ["localhost"];
+                targets = [ "localhost" ];
                 labels = {
                   job = "syslog";
                   host = config.networking.hostName;
@@ -240,7 +241,7 @@ with lib; {
       PrivateTmp = lib.mkForce false;
       ProtectSystem = lib.mkForce false;
       ProtectHome = lib.mkForce false;
-      ReadWritePaths = ["/var/lib/promtail"];
+      ReadWritePaths = [ "/var/lib/promtail" ];
     };
 
     # ============================================================================
@@ -320,12 +321,22 @@ with lib; {
       9080 # Promtail
     ];
 
-    # ============================================================================
-    # PACKAGES
-    # ============================================================================
+    # Packages
     environment.systemPackages = with pkgs; [
       prometheus # Contains promtool
       grafana # Grafana CLI
     ];
+
+    # Ensure monitoring data is persisted
+    environment.persistence."/persist" =
+      mkIf (config.services-config.monitoring.enable && config.system-config.impermanence.enable)
+        {
+          directories = [
+            "/var/lib/prometheus2"
+            "/var/lib/loki"
+            "/var/lib/grafana"
+            "/var/lib/promtail"
+          ];
+        };
   };
 }

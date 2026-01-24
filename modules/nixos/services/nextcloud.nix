@@ -4,7 +4,8 @@
   pkgs,
   ...
 }:
-with lib; {
+with lib;
+{
   options.services.nextcloud-server = {
     enable = mkEnableOption "Nextcloud server";
 
@@ -59,7 +60,7 @@ with lib; {
     # PostgreSQL for Nextcloud
     services.postgresql = {
       enable = true;
-      ensureDatabases = ["nextcloud"];
+      ensureDatabases = [ "nextcloud" ];
       ensureUsers = [
         {
           name = "nextcloud";
@@ -75,6 +76,18 @@ with lib; {
     };
 
     # Firewall
-    networking.firewall.allowedTCPPorts = [80 443];
+    networking.firewall.allowedTCPPorts = [
+      80
+      443
+    ];
+
+    # Ensure Nextcloud and DB are persisted
+    environment.persistence."/persist" = mkIf config.system-config.impermanence.enable {
+      directories = [
+        config.services.nextcloud-server.dataDir
+        "/var/lib/postgresql"
+        "/var/lib/redis-nextcloud"
+      ];
+    };
   };
 }

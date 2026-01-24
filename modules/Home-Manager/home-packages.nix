@@ -37,6 +37,58 @@
     glow # terminal markdown viewer
     gnumake # GNU Make (build tool)
     go
+    # Graphics & GUI
+    font-manager
+    bitwarden-desktop
+    pavucontrol
+    signal-desktop
+    obsidian
+    vencord
+    mpv
+    zathura
+    swayimg
+    imv
+    nextcloud-client
+
+    # Icons & Cursors (System Preference)
+    papirus-icon-theme
+    dracula-icon-theme
+    kora-icon-theme
+    candy-icons
+    sweet-folders
+    adwaita-icon-theme
+    bibata-cursors
+    capitaine-cursors
+    rose-pine-hyprcursor
+
+    # CLI Utilities (Refactored from base.nix and packages.nix)
+    htop
+    tree
+    zip
+    unzip
+    alejandra
+    nil
+    nixfmt
+    deadnix
+    statix
+    bat
+    ripgrep
+    fzf
+    jq
+    ps_mem
+    smem
+    fd
+    zoxide
+    fastfetch
+    neofetch
+    duf
+    glances
+    bandwhich
+    zellij
+    gum
+    # Inputs packages
+    inputs.awww.packages.${pkgs.stdenv.hostPlatform.system}.awww
+    inputs.nixai.packages.${pkgs.stdenv.hostPlatform.system}.default
     graphviz
     gpufetch
     hyperfine # command-line benchmarking tool

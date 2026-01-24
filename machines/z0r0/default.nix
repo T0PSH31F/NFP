@@ -147,6 +147,7 @@
   services.home-assistant-server.enable = true;
   services.caddy-server.enable = true;
   services.sillytavern-app.enable = false; # Disabled - Docker container failing
+  services.llm-agents.enable = true;
 
   services.ai-services = {
     enable = true; # Enables PostgreSQL vector DB

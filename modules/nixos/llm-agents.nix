@@ -4,10 +4,15 @@
   ...
 }:
 with lib;
+let
+  cfg = config.services.llm-agents;
+in
 {
   options.services.llm-agents = {
     enable = mkEnableOption "Agentic AI-related services";
+  };
 
+  config = mkIf cfg.enable {
     environment.systemPackages = with pkgs; [
       # Frameworks
       crewai # Framework for orchestrating autonomous AI agents
