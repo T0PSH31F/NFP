@@ -3,7 +3,8 @@
   lib,
   pkgs,
   ...
-}: {
+}:
+{
   # Thunar File Manager
   programs.thunar = {
     enable = true;
@@ -24,6 +25,7 @@
     nemo-fileroller
 
     calibre
+    cosmic-files
     koreader
     openbooks
     readest
@@ -35,7 +37,6 @@
     librum
     superfile
     spacedrive
-    file-roller
     # Dolphin File Manager (KDE)
     kdePackages.dolphin
     kdePackages.dolphin-plugins

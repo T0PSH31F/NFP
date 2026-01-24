@@ -24,8 +24,8 @@
         vim = {
           #package = pkgs-unstable.neovim-unwrapped;
           package = pkgs.neovim-unwrapped;
-          viAlias = false; # changed
-          vimAlias = false; # changed
+          viAlias = true; 
+          vimAlias = true; 
           debugMode = {
             enable = false;
             level = 16;
@@ -38,14 +38,12 @@
           };
 
           lsp = {
-            # This must be enabled for the language modules to hook into
-            # the LSP API.
             enable = true;
 
             formatOnSave = true;
-            lspkind.enable = true; # changed
+            lspkind.enable = true; 
             lightbulb.enable = true;
-            lspsaga.enable = true; # changed
+            lspsaga.enable = true; 
             trouble.enable = true;
             lspSignature.enable = false; # not maximal # conflicts with blink in maximal
             otter-nvim.enable = true; # maximal

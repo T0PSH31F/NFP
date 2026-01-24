@@ -1,8 +1,8 @@
 {
-  config,
   pkgs,
   ...
-}: {
+}:
+{
   users.users.t0psh31f = {
     isNormalUser = true;
     description = "t0psh31f";
@@ -20,16 +20,13 @@
     ];
 
     shell = pkgs.zsh;
-
-    # Hashed password for PIN: 5677
-    # Generated with: mkpasswd -m sha-512 '5677'
     hashedPassword = "$6$WbMMiboG5lnMx4Ok$.RCZzi7GUXpt0gqsdgHL3jnke5OgCfdoOpErWxZ9/2oJj/guc5zZRYPBYzcBkV/929cwSIno/4RtW0Rfz8GCy/";
   };
 
   programs.zsh.enable = true;
 
   # Back up existing files that would be clobbered by home-manager
-  home-manager.backupFileExtension = "hm-bak";
+  home-manager.backupFileExtension = "hm-backup";
 
   home-manager.users.t0psh31f = {
     imports = [

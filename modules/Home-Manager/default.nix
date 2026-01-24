@@ -11,6 +11,7 @@
     ./home-packages.nix
 
     # Browsers
+    ./browsers.nix
     ./browsers
 
     # Media

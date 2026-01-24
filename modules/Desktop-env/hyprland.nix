@@ -64,15 +64,12 @@ in
       home.packages = with pkgs; [
         # xdg-desktop-portal-hyprland is added via xdg.portal.extraPortals below
         # waybar
-        hyprlandPlugins.borders-plus-plus
+        # hyprlandPlugins.borders-plus-plus (Disabled due to rendering issues)
         hyprlandPlugins.hypr-dynamic-cursors
-        cosmic-files
         # hyprlax
-        grimblast
-        grim # Screenshot tool
-        slurp # Area selection tool
         # quickshell - provided by desktop environment modules
         vicinae
+        inputs.danksearch.packages.${pkgs.system}.default # DankSearch
         rofi
         dunst
         swayimg
@@ -109,7 +106,7 @@ in
         plugins = [
           # Version-matched plugins from flake inputs
           inputs.hypr-dynamic-cursors.packages.${pkgs.system}.hypr-dynamic-cursors
-          inputs.hyprland-plugins.packages.${pkgs.system}.borders-plus-plus
+        #  inputs.hyprland-plugins.packages.${pkgs.system}.borders-plus-plus
         ];
 
         settings = {
@@ -119,25 +116,25 @@ in
 
           "$mod" = "SUPER";
           "$terminal" = "ghostty";
-          "$fileManager" = "thunar";
-          "$browser" = "vivaldi-stable";
+          "$fileManager" = "nemo-with-extensions";
+          "$browser" = "vivaldi";
 
           # ============================================================================
           # PLUGIN CONFIGURATION
           # ============================================================================
           plugin = {
-            "borders-plus-plus" = {
-              add_borders = 2; # Two extra borders for the halo effect
-
-              # Inner ring: dynamic primary color from matugen (hardcoded for debug)
-              border_size_1 = 4;
-              "border_color_1" = "rgba(d0bcffdd)";
-
-              # Outer ring: dynamic tertiary color from matugen (hardcoded for debug)
-              border_size_2 = 10;
-              "border_color_2" = "rgba(efb8c855)";
-              natural_rounding = true;
-            };
+            # "borders-plus-plus" = {
+            #   add_borders = 2; # Two extra borders for the halo effect
+            #
+            #   # Inner ring: dynamic primary color from matugen (hardcoded for debug)
+            #   border_size_1 = 4;
+            #   "border_color_1" = "rgb(d0bcff)"; # Solid color for testing
+            #
+            #   # Outer ring: dynamic tertiary color from matugen (hardcoded for debug)
+            #   border_size_2 = 10;
+            #   "border_color_2" = "rgb(efb8c8)"; # Solid color for testing
+            #   natural_rounding = true;
+            # };
 
             "dynamic-cursors" = {
               enabled = true;
@@ -166,21 +163,19 @@ in
             "SUPER, Return, exec, uwsm app -- ghostty" # Terminal (alternate)
             "SUPER SHIFT, T, exec, uwsm app -- kitty" # Kitty terminal
             "SUPER SHIFT, Return, exec, uwsm app -- warp-terminal" # Warp terminal
-            "SUPER, E, exec, uwsm app -- dolphin" # File Manager
+            "SUPER, E, exec, uwsm app -- cosmic-files" # File Manager
             "SUPER SHIFT, E, exec, uwsm app -- thunar" # File Manager (alternate)
             "SUPER SHIFT, Y, exec, ghostty -e yazi" # TUI File Manager
             "SUPER, M, exec, uwsm app -- spotify" # Music
-            "SUPER, S, exec, grimblast --notify copysave area" # Screenshot area to clipboard + file
-            "SUPER SHIFT, S, exec, grimblast --notify copysave screen" # Screenshot full screen
-            ", Print, exec, grimblast --notify copysave area" # Print Screen key - area
-            "SHIFT, Print, exec, grimblast --notify copysave screen" # Shift+Print - full screen
-            "CTRL, Print, exec, grimblast --notify copysave active" # Ctrl+Print - active window
+            # Screenshots (Flameshot)
+            # Full screen
+            "SHIFT, Print, exec, flameshot full --path ~/Pictures/screenshots"
+            # Interactive GUI (Area/Active)
+            "CTRL, Print, exec, flameshot gui --path ~/Pictures/screenshots"
+            ", Print, exec, flameshot gui --path ~/Pictures/screenshots"
+
             "SUPER, F, exec, uwsm app -- vivaldi" # Browser (Firefox)
-            # Wallpaper
-            "SUPER, W, exec, wallpaper-manager random" # Random wallpaper
-            "SUPER SHIFT, W, exec, wallpaper-manager select" # Select wallpaper
-            # Vicinae app launcher
-            "SUPER, A, exec, vicinae toggle" # Vicinae launcher
+           
 
             # DMS Application Launchers
             "SUPER, Space, exec, dms ipc call hypr toggleOverview" # DMS Overview
@@ -190,7 +185,7 @@ in
             "SUPER, comma, exec, dms ipc call settings focusOrToggle" # DMS Settings
             "SUPER, N, exec, dms ipc call notifications toggle" # DMS Notifications
             "SUPER, Y, exec, dms ipc call dankdash wallpaper" # DMS Wallpaper
-
+            "SUPER, A, exec, dms ipc call spotlight toggle" # DMS Spotlight
             # DMS Security
             "SUPER ALT, L, exec, dms ipc call lock lock" # DMS Lock screen
 
@@ -323,6 +318,7 @@ in
 
           env = [
             "XCURSOR_SIZE,36"
+            "XCURSOR_THEME,Sonic-cursor-hyprcursor"
             "HYPRCURSOR_SIZE,36"
             "HYPRCURSOR_THEME,Sonic-cursor-hyprcursor"
             "QT_QPA_PLATFORM,wayland"

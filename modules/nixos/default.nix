@@ -19,7 +19,6 @@
     # Packages & Tools
     ./llm-agents.nix
     ./packages.nix
-    ./browsers.nix
     ./file-managers.nix
     ./nix-tools.nix
     ./nix-settings.nix

@@ -8,19 +8,34 @@
 #
 # Build with: nix build .#packages.x86_64-linux.iso
 {
-  config,
   lib,
   pkgs,
   modulesPath,
   inputs,
   ...
-}: {
+}:
+{
   imports = [
     (modulesPath + "/installer/cd-dvd/installation-cd-minimal.nix")
 
     # Full Grandlix-Gang modules
     ../../modules/nixos/default.nix
     ../../modules/Desktop-env/default.nix
+
+    # User-specific configuration (shell, home-manager, etc.)
+    ../../modules/users/t0psh31f.nix
+
+    # Laptop-specific optimizations
+    ../../modules/nixos/system/laptop.nix
+  ];
+
+  # Disable ZFS to avoid broken kernel package errors
+  boot.supportedFilesystems = lib.mkForce [
+    "btrfs"
+    "vfat"
+    "exfat"
+    "ext4"
+    "ntfs"
   ];
 
   # ISO-specific settings
@@ -42,9 +57,19 @@
   # ============================================================================
   # THEMES
   # ============================================================================
-  themes.sddm-lain.enable = true;
-  # themes.grub-lain.enable = true; # Not needed for ISO (uses isolinux/EFI)
-  # themes.plymouth-matrix.enable = true;
+  # Match z0r0's premium theme setup
+  themes.sddm-sel = {
+    enable = true;
+    variant = "shaders";
+  };
+  themes.sddm-lain.enable = lib.mkForce false;
+  themes.plymouth-hellonavi.enable = true;
+
+  # ============================================================================
+  # RESOURCE LIMITS (Prevent OOM during install)
+  # ============================================================================
+  nix.settings.cores = 4;
+  nix.settings.max-jobs = 4;
 
   # ============================================================================
   # ESSENTIAL INSTALLATION TOOLS
@@ -53,6 +78,8 @@
     # Installers
     calamares
     gparted
+    disko
+    inputs.clan-core.packages.${pkgs.system}.clan-cli
 
     # Editors
     vim
@@ -61,6 +88,8 @@
 
     # Network tools
     networkmanager
+    wpa_supplicant
+    iwd
     wget
     curl
 
@@ -68,9 +97,17 @@
     git
     htop
     tree
+    lsd
+    gotree
+    hyprpolkitagent
     eza
     bat
+    toybox
     ripgrep
+    antigravity-fhs # User requested
+    thunar # User requested
+    thunar-volman
+    thunar-archive-plugin
 
     # Disk tools
     parted
@@ -86,8 +123,18 @@
   # ============================================================================
   # NETWORKING
   # ============================================================================
-  networking.networkmanager.enable = true;
-  networking.wireless.enable = false; # Disable to use NetworkManager
+  networking.networkmanager = {
+    enable = true;
+    wifi.backend = "iwd";
+  };
+  networking.wireless.iwd.enable = true;
+  networking.wireless.enable = lib.mkForce false; # Disable to use NetworkManager
+
+  # ============================================================================
+  # REPOSITORY INCLUSION
+  # ============================================================================
+  # Include a clean copy of the configuration repository
+  environment.etc."Grandlix-Gang".source = inputs.self;
 
   # ============================================================================
   # SSH FOR REMOTE INSTALLATION
@@ -97,10 +144,12 @@
     settings.PermitRootLogin = "yes";
   };
 
+  services-config.avahi.enable = true;
+
   # ============================================================================
   # LIVE USER CONFIGURATION
   # ============================================================================
-  # Set a default password for live user (hashed password: 5677)
+  # Set a default password for live user and root for fallback convenience
   users.users.nixos = {
     initialHashedPassword = lib.mkForce "$6$o5YE7K.oDW2Ow8iK$xxFnhKRYuM1EOaoQoyaV6VjsqkkVMf1hX/g9snl4nW1SjFFtREwmZljaOuU7H1IDsTueQIqcicGksJ34AO3Mj0";
   };

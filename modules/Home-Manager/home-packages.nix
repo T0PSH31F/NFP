@@ -14,7 +14,6 @@
     asciinema # record the terminal
     baobab # disk usage utility
     blahaj
-    #bruno # IDE for exploring/testing APIs (Postman/Insomnia alternative)
     buildah # build OCI images (alternative to docker build)
     ctop # top-like interface for container metrics
     cpufetch
@@ -25,7 +24,6 @@
     difftastic # syntax-aware diff
     distrobox # Wrapper around podman or docker to create and start containers
     dive # explore the layers of a container image
-    # emojione # open source emoji set TODO: this failed to build on 2024/07/25
     exif # read and manipulate EXIF data in digital photographs
     fd
     ffmpeg
@@ -39,12 +37,9 @@
     glow # terminal markdown viewer
     gnumake # GNU Make (build tool)
     go
-    #google-chrome
-    #google-cloud-sdk # Google Cloud Platform CLI (gcloud)
     graphviz
     gpufetch
     hyperfine # command-line benchmarking tool
-    #imhex # HEX editor
     #inkscape # vector graphics editor
     libreoffice # a variant of openoffice.org
     lm_sensors # tools for reading hardware sensors
@@ -55,24 +50,16 @@
     mtr # network diagnostics tool (basically traceroute + ping)
     ncdu # disk usage utility
     neofetch
-    #nodePackages.node-gyp # Node.js native addon build tool
-    #nodePackages.wrangler # Cloudflare Workers CLI
     ocrmypdf # adds an OCR text layer to scanned PDF files, allowing them to be searched (e.g. with ripgrep-all)
-    #openshot-qt # video editor
     ouch # compress/decompress files and directories
-    # nodejs_22
     obsidian # knowledge base
     qt6Packages.qt6ct
     libsForQt5.qt5ct
     pgadmin4
     pgcli # Command-line interface for PostgreSQL
-    #pinta # image editor
-    #pitivi # video editor
-    # postman # https://github.com/NixOS/nixpkgs/issues/259147
     prettyping # a nicer ping
     procs # a better `ps`
     pstree # show the set of running processes as a tree
-    # python3 # conflicts with python314 in helix module
     pywalfox-native
     remmina # remote desktop client
     rm-improved
@@ -92,22 +79,14 @@
     #simplescreenrecorder # screen recorder gui
     sqlite
     sqlitebrowser
-    #steghide # steganography tool for images and audio files
-    #stegseek # tool to crack steganography
-    stripe-cli
-    supabase-cli
     tealdeer # TLDR pages for commands
     thunderbird # email client
     toybox
-    #tokei # display statistics about your code
-    trash-cli # alternative to rm
-    # trashy # alternative to rm and trash-cli (not working?)
     unzrip # unzip replacement with parallel decompression
     usbutils # tools for working with USB devices, such as lsusb
     visidata # CLI for Exploratory Data Analysis
     w3m # text-based web browser
     wget
-
     yarr # Yet another rss reader
     yt-dlp
     zeal # offline documentation browser

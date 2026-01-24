@@ -86,11 +86,11 @@ with lib;
 
   # Kernel parameters for better memory management
   boot.kernel.sysctl = {
-    # Reduce swappiness - prefer keeping apps in RAM
-    "vm.swappiness" = 10;
+    # Increase swappiness - prefer compressed zram swap
+    "vm.swappiness" = 100;
 
     # Improve responsiveness under memory pressure
-    "vm.vfs_cache_pressure" = 50;
+    "vm.vfs_cache_pressure" = 100;
 
     # Increase inotify watches for file-heavy workloads
     "fs.inotify.max_user_watches" = 524288;

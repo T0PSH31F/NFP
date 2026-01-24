@@ -10,6 +10,13 @@
         ];
         deploy.targetHost = "root@localhost";
       };
+      Nami = {
+        tags = [
+          "client"
+          "laptop"
+        ];
+        deploy.targetHost = "root@nami.local";
+      };
     };
 
     instances = {
@@ -31,6 +38,11 @@
       { ... }:
       {
         imports = [ ./machines/z0r0/default.nix ];
+      };
+    Nami =
+      { ... }:
+      {
+        imports = [ ./machines/Nami/default.nix ];
       };
   };
 }

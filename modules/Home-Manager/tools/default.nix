@@ -1,4 +1,5 @@
-{pkgs, ...}: {
+{ pkgs, ... }:
+{
   imports = [
     ./lf.nix
     ./mcp.nix
@@ -6,5 +7,6 @@
     ./shikane.nix
     ./btm.nix
     ./inlyne.nix
+    ./flameshot.nix
   ];
 }

@@ -1,8 +1,5 @@
 {
-  config,
-  lib,
   pkgs,
-  inputs,
   ...
 }:
 {
@@ -95,7 +92,6 @@
     tree
     zip
     unzip
-    appimage-run
 
     # Nix Tools
     alejandra
@@ -138,37 +134,13 @@
     bibata-cursors
     capitaine-cursors
     rose-pine-hyprcursor
-
-    # Custom Pkgs Import
-    # Custom Packages (Inline fallback)
-    #   (pkgs.stdenv.mkDerivation {
-    #     pname = "lobster";
-    #     version = "4.5.0";
-    #     src = pkgs.fetchFromGitHub {
-    #       owner = "justchokingaround";
-    #       repo = "lobster";
-    #       rev = "main";
-    #       sha256 = "sha256-MVQq27PVxy5WAdKm5c1xfoo7WUsNYEhHua4KubdZdTU="; # Need hash
-    #     };
-    #     nativeBuildInputs = [pkgs.makeWrapper];
-    #     installPhase = ''
-    #       mkdir -p $out/bin
-    #       cp lobster.sh $out/bin/lobster
-    #       chmod +x $out/bin/lobster
-    #       wrapProgram $out/bin/lobster --prefix PATH : ${lib.makeBinPath [pkgs.curl pkgs.mpv pkgs.fzf]}
-    #     '';
-    #   })
     hyprviz
     waytrogen
     aircrack-ng
     macchanger
+    ps_mem
+    smem
   ];
-
-  # AppImage Support
-  programs.appimage = {
-    enable = true;
-    binfmt = true;
-  };
 
   # Flatpak Support
   services.flatpak.enable = true;
@@ -185,13 +157,10 @@
   fonts = {
     enableDefaultPackages = true;
     packages = with pkgs; [
-      noto-fonts
-      noto-fonts-cjk-sans
-      noto-fonts-cjk-serif
-      noto-fonts-color-emoji
       nerd-fonts.fira-code
       nerd-fonts.jetbrains-mono
       nerd-fonts.hack
+      nerd-fonts.gohufont
       nerd-fonts.iosevka
       nerd-fonts.meslo-lg
       nerd-fonts.caskaydia-cove
@@ -210,21 +179,12 @@
       material-symbols
       creep
       pixel-code
-      terminus_font
-      terminus_font_ttf
       tamzen
       tamsyn
       scientifica
-      profont
-      liberation_ttf
-      dejavu_fonts
-      ubuntu-classic
       source-code-pro
       source-sans-pro
       source-serif-pro
-      jetbrains-mono
-      fira-code
-      fira-code-symbols
       font-awesome
       font-awesome_5
       font-awesome_6
@@ -234,12 +194,12 @@
       enable = true;
       defaultFonts = {
         serif = [
-          "Noto Serif"
+          "pixel-code"
           "Source Serif Pro"
         ];
 
         sansSerif = [
-          "Noto Sans"
+          "nerd-fonts.fira-code"
           "Source Sans Pro"
         ];
 
@@ -250,8 +210,11 @@
         ];
 
         emoji = [
-          "Noto Color Emoji"
-          "Twemoji"
+          "material-design-icons"
+          "material-icons"
+          "material-symbols"
+          "powerline-symbols"
+          "twemoji-color-font"
         ];
 
       };

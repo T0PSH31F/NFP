@@ -187,6 +187,12 @@
   # Monitoring
   services-config.monitoring.enable = false; # Disabled - Promtail NAMESPACE issue
 
+  # Dashboard
+  services-config.homepage-dashboard.enable = true;
+
+  # n8n Automation
+  services.n8n-server.enable = true;
+
   # ============================================================================
   # SECURITY / ACME
   # ============================================================================

@@ -14,5 +14,6 @@
     ./nextcloud.nix
     ./sillytavern.nix
     ./n8n.nix
+    ./homepage-dashboard.nix
   ];
 }

@@ -9,34 +9,6 @@ with lib;
   options.services.ai-services = {
     enable = mkEnableOption "AI-related services";
 
-    environment.systemPackages = with pkgs; [
-      crewai
-      local-ai
-      librechat
-      # windsurf
-      task-master-ai
-      crush
-      gemini-cli
-      opencode
-      krillinai
-      go-hass-agent
-      aider-chat-full
-      # aichat
-      bluemail
-      qdrant
-      moshi
-      fabric-ai
-      ramalama
-      sillytavern
-      nextjs-ollama-llm-ui
-      cherry-studio
-      lmstudio
-      gpt4all
-      whisper-ctranslate2
-      piper-tts
-
-    ];
-
     postgresql = {
       enable = mkOption {
         type = types.bool;

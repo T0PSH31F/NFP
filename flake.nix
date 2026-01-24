@@ -140,6 +140,10 @@
     # Dendritic pattern support
     import-tree.url = "github:vic/import-tree";
 
+    nixos-hardware = {
+      url = "github:NixOS/nixos-hardware/master";
+    };
+
     nixos-facter-modules = {
       url = "github:numtide/nixos-facter-modules";
       #  inputs.nixpkgs.follows = "nixpkgs";
@@ -249,7 +253,7 @@
             packages = {
               # # Live ISO
               iso = inputs.nixos-generators.nixosGenerate {
-                localSystem = system;
+                system = system;
                 specialArgs = { inherit inputs; };
                 modules = [
                   ./templates/iso/default.nix

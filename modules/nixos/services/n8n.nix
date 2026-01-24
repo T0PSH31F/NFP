@@ -49,9 +49,9 @@ in
       enable = true;
       openFirewall = cfg.openFirewall;
 
-      settings = {
+      environment = {
         # Server configuration
-        port = cfg.port;
+        port = toString cfg.port;
         protocol = "http";
 
         # Webhook configuration
@@ -63,8 +63,8 @@ in
         # Execution settings
         EXECUTIONS_DATA_SAVE_ON_ERROR = "all";
         EXECUTIONS_DATA_SAVE_ON_SUCCESS = "all";
-        EXECUTIONS_DATA_SAVE_ON_PROGRESS = true;
-        EXECUTIONS_DATA_SAVE_MANUAL_EXECUTIONS = true;
+        EXECUTIONS_DATA_SAVE_ON_PROGRESS = "true";
+        EXECUTIONS_DATA_SAVE_MANUAL_EXECUTIONS = "true";
 
         # Queue mode for better performance (optional)
         # EXECUTIONS_MODE = "queue";
@@ -73,7 +73,7 @@ in
 
     # Ensure n8n data directory is persisted
     # This integrates with impermanence if enabled
-    environment.persistence."/persist" = lib.mkIf (config.environment.persistence ? "/persist") {
+    environment.persistence."/persist" = lib.mkIf config.system-config.impermanence.enable {
       directories = [
         cfg.dataDir
       ];

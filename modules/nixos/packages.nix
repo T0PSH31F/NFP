@@ -53,6 +53,7 @@
     hyprsysteminfo # hyprland system info
     hyprpolkitagent # hyprland polkit agent
     hdrop # hyprland retractable workspace pager
+    imv # image viewer
     imagemagick # Software suite to create, edit, compose, or convert bitmap images
     img2pdf # Convert images to PDF via direct JPEG inclusion
     jq # command-line JSON processor
