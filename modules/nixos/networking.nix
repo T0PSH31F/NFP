@@ -2,7 +2,8 @@
   config,
   lib,
   ...
-}: {
+}:
+{
   networking = {
     networkmanager.enable = true;
 
@@ -99,7 +100,7 @@
     enable = true;
     settings = {
       PasswordAuthentication = lib.mkDefault false;
-      PermitRootLogin = lib.mkForce "yes"; # Force allow root login for clan deployments
+      PermitRootLogin = lib.mkDefault "prohibit-password";
     };
     # Explicitly define host keys to ensure they're generated in a persistent location
     # These paths are also persisted by impermanence module at /etc/ssh
