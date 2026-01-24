@@ -225,6 +225,7 @@ with lib;
             "/var/lib/lidarr"
             "/var/lib/readarr"
             "/var/lib/bazarr"
+            "/var/lib/redis"
           ];
         };
   };

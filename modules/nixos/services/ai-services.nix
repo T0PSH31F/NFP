@@ -197,6 +197,8 @@ with lib;
           directories = [
             "/var/lib/postgresql"
             "/var/lib/docker" # Persist all docker volumes
+            "/var/lib/ollama"
+            "/var/lib/qdrant"
           ];
         };
   };

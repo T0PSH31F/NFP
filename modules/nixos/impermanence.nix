@@ -36,43 +36,10 @@ with lib;
         # Network
         "/etc/NetworkManager/system-connections"
 
-        # Services
+        # Virtualization/Containers (System level)
+        "/var/lib/libvirt"
         "/var/lib/docker"
         "/var/lib/podman"
-        "/var/lib/libvirt"
-        "/var/lib/postgresql"
-        "/var/lib/redis"
-        "/var/lib/grafana"
-        "/var/lib/prometheus2"
-        "/var/lib/loki"
-        "/var/lib/private/promtail"
-
-        # Media stack
-        "/var/lib/media"
-        "/var/lib/sonarr"
-        "/var/lib/radarr"
-        "/var/lib/prowlarr"
-        "/var/lib/lidarr"
-        "/var/lib/readarr"
-        "/var/lib/bazarr"
-        "/var/lib/deluge"
-        "/var/lib/aria2"
-
-        # AI Services
-        "/var/lib/ollama"
-        "/var/lib/qdrant"
-
-        # Communication
-        "/var/lib/matrix-synapse"
-        "/var/lib/mautrix-telegram"
-        "/var/lib/mautrix-whatsapp"
-        "/var/lib/mautrix-signal"
-
-        # Cloud services
-        "/var/lib/nextcloud"
-        "/var/lib/immich"
-        "/var/lib/calibre-web"
-        "/var/lib/home-assistant"
 
         # SSH daemon keys
         "/etc/ssh"
