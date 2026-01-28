@@ -8,5 +8,6 @@
     ./btm.nix
     ./inlyne.nix
     ./flameshot.nix
+    ./keybinds.nix
   ];
 }

@@ -3,6 +3,6 @@
     ./nvf.nix
     ./vscode.nix
     ./zed.nix
-    ./helix
+    # helix moved to old/ - now using yazelix integration in yazi/
   ];
 }

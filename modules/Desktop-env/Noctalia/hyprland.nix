@@ -2,25 +2,28 @@
   inputs,
   lib,
   config,
+  pkgs,
   ...
 }:
 let
   cfg = config.desktop.noctalia;
 in
 {
-  options.desktop.noctalia = {
-    enable = lib.mkEnableOption "Noctalia (Hyprland)";
-  };
-
-  config = lib.mkIf cfg.enable {
+  # Noctalia Hyprland backend configuration
+  # This module is imported when desktop.noctalia.backend = "hyprland"
+  
+  config = lib.mkIf (cfg.enable && cfg.backend == "hyprland") {
+    # Import keybinds and IPC modules
     home-manager.users.t0psh31f = {
       imports = [
-        inputs.noctalia.homeModules.default
+        ./hyprland/keybinds.nix
+        ./hyprland/ipc.nix
       ];
 
       programs.noctalia-shell = {
         enable = true;
-        settings = {
+        settings = lib.mkMerge [
+          {
           settingsVersion = 0;
           bar = {
             position = "top";
@@ -445,7 +448,9 @@ in
             gridSnap = false;
             monitorWidgets = [ ];
           };
-        };
+          }
+          cfg.settings
+        ];
       };
     };
   };

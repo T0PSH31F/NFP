@@ -3,6 +3,10 @@
   inputs,
   ...
 }: {
+  imports = [
+    ./yazelix.nix
+  ];
+
   home.packages = with pkgs; [trash-cli ouch glow exiftool];
 
   programs.yazi = {

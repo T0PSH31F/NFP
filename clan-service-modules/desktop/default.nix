@@ -27,5 +27,23 @@
       perInstance.nixosModule = ./end4.nix;
       description = "End-4 Illogical Impulse: Feature-rich Hyprland configuration";
     };
+
+    # SSH Agent Service
+    ssh-agent = {
+      perInstance.nixosModule = ./ssh-agent.nix;
+      description = "SSH Agent: Secure SSH key management for desktop sessions";
+    };
+
+    # SearxNG Metasearch Engine
+    searxng = {
+      perInstance.nixosModule = ./searxng.nix;
+      description = "SearxNG: Privacy-respecting metasearch engine";
+    };
+
+    # PrivateBin Pastebin
+    pastebin = {
+      perInstance.nixosModule = ./pastebin.nix;
+      description = "PrivateBin: Secure, encrypted pastebin service";
+    };
   };
 }

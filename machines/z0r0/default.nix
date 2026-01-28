@@ -5,17 +5,23 @@
   ...
 }:
 {
+  # ============================================================================
+  # IMPORTS
+  # ============================================================================
   imports = [
-    # Clan already provides facter support - just set facter.reportPath below
     ../../modules/nixos/default.nix
     ../../modules/nixos/system/laptop.nix
+    ../../modules/nixos/system/desktop-portals.nix
     ../../modules/Desktop-env/default.nix
+    ../../modules/Desktop-env/Noctalia/default.nix
     ../../modules/users/t0psh31f.nix
+    ../../clan-service-modules/desktop/ssh-agent.nix
   ];
 
-  # Hardware detection via facter.json (clan auto-discovers this)
-  # fileSystems must be defined manually (facter doesn't handle this)
-
+  # ============================================================================
+  # HARDWARE CONFIGURATION
+  # ============================================================================
+  
   # Boot configuration
   boot.initrd.luks.devices."crypted".device =
     "/dev/disk/by-uuid/458b615c-3ac2-4cff-98a2-c8e266bae90f";
@@ -72,48 +78,62 @@
   boot.kernelParams = [ "systemd.swap=0" ];
 
   networking.hostName = "z0r0";
+  nixpkgs.hostPlatform = "x86_64-linux";
+  system.stateVersion = "25.05";
 
   # ============================================================================
-  # DESKTOP ENVIRONMENT SELECTION
+  # FEATURE TOGGLES (Dendritic Pattern)
+  # ============================================================================
+  
+  config = {
+    nix-tools.enable = true;
+    desktop-portals.enable = true;
+  };
+
+  # Yazelix (Yazi + Helix integration)
+  programs.yazelix.enable = true;
+
+  # Keybind cheatsheet overlay
+  programs.keybind-cheatsheet.enable = true;
+
+  # ============================================================================
+  # DESKTOP ENVIRONMENT
   # ============================================================================
 
-  desktop.dankmaterialshell = {
+  # Noctalia Shell (Primary DE)
+  desktop.noctalia = {
     enable = true;
     backend = "hyprland";
   };
 
-  desktop.omarchy = {
-    enable = false;
-    backend = "both";
-  };
-
-  desktop.caelestia = {
-    enable = false;
-    backend = "both";
-  };
-
+  # Alternative DEs (disabled)
+  desktop.dankmaterialshell.enable = false;
+  desktop.omarchy.enable = false;
+  desktop.caelestia.enable = false;
   desktop.illogical.enable = false;
 
   # ============================================================================
   # THEMES
   # ============================================================================
 
-  themes.sddm-lain.enable = false;
-  themes.sddm-sel = {
-    enable = true;
-    variant = "shaders"; # Options: "shaders" (with effects) or "basic" (lighter)
-  };
-  themes.grub-lain.enable = true;
-  themes.plymouth-hellonavi = {
-    enable = true;
-    # color = "red"; # Match Lain theme aesthetic
+  themes = {
+    sddm-lain.enable = false;
+    sddm-sel = {
+      enable = true;
+      variant = "shaders";
+    };
+    grub-lain.enable = true;
+    plymouth-hellonavi.enable = true;
   };
 
   # ============================================================================
   # MOBILE DEVICE SUPPORT
   # ============================================================================
-  mobile.android.enable = true;
-  mobile.ios.enable = true;
+  
+  mobile = {
+    android.enable = true;
+    ios.enable = true;
+  };
 
   # ============================================================================
   # GAMING & VIRTUALIZATION
@@ -123,41 +143,43 @@
   virtualization.enable = true;
 
   # ============================================================================
-  # SYSTEM
+  # SYSTEM CONFIGURATION
   # ============================================================================
-  config = {
-    nix-tools.enable = true;
-  };
 
-  nixpkgs.hostPlatform = "x86_64-linux";
-  system.stateVersion = "25.05";
-
-  # Sops configuration
+  # Sops secrets management
   sops.age.keyFile = "/home/t0psh31f/.config/sops/age/keys.txt";
 
-  # Enable Impermanence
+  # Impermanence
   system-config.impermanence.enable = true;
 
-  # Optimized for 12th Gen Intel (4P + 8E = 12 Cores / 16 Threads)
-  # Leave some headroom for system responsiveness
-  nix.settings.cores = 4; # Cores per build job
-  nix.settings.max-jobs = 4; # Total parallel build jobs (reduced to prevent OOM)
-
-  
+  # Nix settings (optimized for 12th Gen Intel: 4P + 8E = 12 Cores / 16 Threads)
+  nix.settings = {
+    cores = 4; # Cores per build job
+    max-jobs = 4; # Total parallel build jobs (reduced to prevent OOM)
+  };
 
   # ============================================================================
-  # SERVICES
+  # SERVICE TOGGLES (Dendritic Pattern)
   # ============================================================================
+
+  # Desktop Services
+  services.ssh-agent.enable = true;
+  # services.searxng.enable = false; # Optional: Enable SearxNG metasearch
+  # services.pastebin.enable = false; # Optional: Enable PrivateBin
+
+  # Home Automation & Infrastructure
   services.home-assistant-server.enable = true;
   services.caddy-server.enable = true;
-  services.sillytavern-app.enable = true; # Disabled - Docker container failing
-  services.llm-agents.enable = true;
+  services.n8n-server.enable = true;
 
+  # AI Services
+  services.sillytavern-app.enable = true;
+  services.llm-agents.enable = true;
   services.ai-services = {
-    enable = true; # Enables PostgreSQL vector DB
-    open-webui.enable = true; # Interface
-    localai.enable = true; # Local inference
-    chromadb.enable = true; # Vector DB
+    enable = true;
+    open-webui.enable = true;
+    localai.enable = true;
+    chromadb.enable = true;
   };
 
   # Media & Cloud
@@ -166,27 +188,9 @@
   services.nextcloud-server.enable = true;
   services-config.media-stack.enable = false; # Disabled - Prowlarr STATE_DIRECTORY issue
 
-  # Fix for missing Aria2 secret (required when RPC is enabled)
-  services.aria2.rpcSecretFile = "/etc/aria2-rpc-token";
-  environment.etc."aria2-rpc-token" = {
-    text = "temporary-secret-change-me";
-    mode = "0400";
-    user = "media"; # Matches media-stack user
-    group = "media";
-  };
-
-  # Fix for missing Deluge auth file (required for declarative config)
-  services.deluge.authFile = "/etc/deluge-auth";
-  environment.etc."deluge-auth" = {
-    text = "localclient:a7c6f0e3bc4:10"; # Dummy credentials
-    mode = "0400";
-    user = "media";
-    group = "media";
-  };
-
   # Communication
   services.matrix-server.enable = true;
-  services.mautrix-bridges.enable = true; # Base enablement
+  services.mautrix-bridges.enable = true;
   services-config.avahi.enable = true; # mDNS
 
   # Monitoring
@@ -195,14 +199,34 @@
   # Dashboard
   services-config.homepage-dashboard.enable = true;
 
-  # n8n Automation
-  services.n8n-server.enable = true;
+  # ============================================================================
+  # SERVICE FIXES (Temporary workarounds)
+  # ============================================================================
+
+  # Aria2 RPC secret
+  services.aria2.rpcSecretFile = "/etc/aria2-rpc-token";
+  environment.etc."aria2-rpc-token" = {
+    text = "temporary-secret-change-me";
+    mode = "0400";
+    user = "media";
+    group = "media";
+  };
+
+  # Deluge auth file
+  services.deluge.authFile = "/etc/deluge-auth";
+  environment.etc."deluge-auth" = {
+    text = "localclient:a7c6f0e3bc4:10";
+    mode = "0400";
+    user = "media";
+    group = "media";
+  };
 
   # ============================================================================
   # SECURITY / ACME
   # ============================================================================
+  
   security.acme = {
     acceptTerms = true;
-    defaults.email = "admin@grandlix.com"; # Placeholder for Let's Encrypt via config if needed, or use placeholder
+    defaults.email = "admin@grandlix.com";
   };
 }
