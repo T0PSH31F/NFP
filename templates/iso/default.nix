@@ -8,6 +8,7 @@
 #
 # Build with: nix build .#packages.x86_64-linux.iso
 {
+  config,
   lib,
   pkgs,
   modulesPath,
