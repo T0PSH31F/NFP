@@ -10,7 +10,7 @@
         ];
         deploy.targetHost = "root@z0r0.local";
       };
-      Nami = {
+      nami = {
         tags = [
           "client"
           "laptop"
@@ -39,10 +39,10 @@
       {
         imports = [ ./machines/z0r0/default.nix ];
       };
-    Nami =
+    nami =
       { ... }:
       {
-        imports = [ ./machines/Nami/default.nix ];
+        imports = [ ./machines/nami/default.nix ];
       };
   };
 }

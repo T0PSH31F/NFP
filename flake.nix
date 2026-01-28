@@ -79,10 +79,6 @@
       url = "github:jutraim/niri-caelestia-shell";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nix-search-tv = {
-      url = "github:3timeslazy/nix-search-tv";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     nixai = {
       url = "github:olafkfreund/nix-ai-help";
       inputs.nixpkgs.follows = "nixpkgs";

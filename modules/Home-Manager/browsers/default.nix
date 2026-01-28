@@ -1,28 +1,76 @@
 {
-  config,
-  lib,
   pkgs,
   ...
-}: {
+}:
+#with lib;
+{
+  #  options.browsers = {
+  #    firefox.enable = mkEnableOption "Firefox browser";
+  #    brave.enable = mkEnableOption "Brave browser";
+  #    vivaldi.enable = mkEnableOption "Vivaldi browser";
+  #    qutebrowser.enable = mkEnableOption "Qutebrowser";
+  #
+  #    # Default to enable all browsers
+  #    enableAll = mkOption {
+  #      type = types.bool;
+  #      default = false;
+  #      description = "Enable all browsers";
+  #    };
+  #  };
+
   imports = [
     ./firefox.nix
     ./qutebrowser.nix
   ];
-  # Browser-related packages
+
+  # config = mkMerge [
+  #   # Firefox
+  #   (mkIf (config.browsers.firefox.enable || config.browsers.enableAll) {
+  #     home.packages = with pkgs; [
+  #     ];
+  #
+  #     # Firefox policies for better defaults
+  #     programs.firefox = {
+  #       enable = true;
+  #       };
+  #     };
+  #   })
+  #
+  #   # Brave
+  #   (mkIf (config.browsers.brave.enable || config.browsers.enableAll) {
+  #     home.packages = with pkgs; [
+  #       brave
+  #     ];
+  #   })
+  #
+  #   # Vivaldi
+  #   (mkIf (config.browsers.vivaldi.enable || config.browsers.enableAll) {
+  #     home.packages = with pkgs; [
+  #       vivaldi
+  #       vivaldi-ffmpeg-codecs # Additional codec support
+  #     ];
+  #   })
+  #
+  #   # Qutebrowser
+  #   (mkIf (config.browsers.qutebrowser.enable || config.browsers.enableAll) {
+  #     home.packages = with pkgs; [
+  #       qutebrowser
+  #     ];
+  #   })
+  # ];
+
+  # Additional browser-related utility packages
   home.packages = with pkgs; [
-    # Browser extensions and tools
     actiona # automation tool
     ariang # aria2 web ui
     autobrr # torrent tracker
+    brave
     bombadillo # gopher, gemini, finger browser
-    brave # chromium based
     browserpass # Pass integration
     browsh # vim like cmd line browser
     clouddrive2 # google drive client
     code-server # web based code editor
     deluge # torrent client
-    # deluged # torrent daemon
-    #floorp-bin # web browser
     geopard # web browser
     google-authenticator # 2fa
     google-drive-ocamlfuse # google drive fuse
@@ -38,7 +86,6 @@
     popcorntime # watch movies
     protonvpn-gui # protonvpn gui
     quiet # vpn client
-    qutebrowser # web browser
     shadowfox # firefox based
     spacedrive # spacedrive
     tootik # tootkit
@@ -47,11 +94,7 @@
     torrentstream # torrent stream
     tractor # torrent tracker
     varia # torrent tracker
-    vivaldi # chromium based
-    # castor
-    # lagrange
-    # ncgopher
-    # Alternative frontends
-    # libredirect # Redirect to privacy-friendly frontends
+    vivaldi
+    vivaldi-ffmpeg-codecs
   ];
 }

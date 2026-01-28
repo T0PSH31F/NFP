@@ -1,13 +1,13 @@
-# Installing Nami (Dell XPS 13)
+# Installing nami (Dell XPS 13)
 
-Follow these steps to install NixOS on Nami using the Grandlix-Gang configuration.
+Follow these steps to install NixOS on nami using the Grandlix-Gang configuration.
 
 ## Prerequisites
 - A USB drive with the Grandlix-Gang ISO (see "Building the ISO" below).
 - Internet connection (Wi-Fi or Ethernet).
 
 ## 1. Boot from ISO
-1. Insert the USB drive into Nami.
+1. Insert the USB drive into nami.
 2. Power on and press `F12` (or your BIOS boot menu key) to select the USB drive.
 3. Once booted, you will be in the Hyprland environment. Open a terminal (Ghostty).
 
@@ -25,20 +25,20 @@ Run the disko command that uses the pre-evaluated configuration from our flake:
 # Ensure you are in the repo directory
 cd /etc/Grandlix-Gang
 
-# Run the evaluated disko script for Nami
-sudo nix run .#nixosConfigurations.Nami.config.system.build.diskoScript
+# Run the evaluated disko script for nami
+sudo nix run .#nixosConfigurations.nami.config.system.build.diskoScript
 ```
 
 ## 3. Generate Hardware Facts
 Clan uses hardware facts for specific optimizations.
 ```bash
-clan facts generate Nami
+clan facts generate nami
 ```
 
 ## 4. Install
 Run the installation command:
 ```bash
-sudo nixos-install --flake .#Nami
+sudo nixos-install --flake .#nami
 ```
 
 ## 5. Post-Installation

@@ -225,7 +225,7 @@ with lib;
         {
           directories = [
             "/var/lib/matrix-synapse"
-            "/var/lib/postgresql"
+            #  "/var/lib/postgresql"
           ];
         };
   };

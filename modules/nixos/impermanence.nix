@@ -33,6 +33,9 @@ with lib;
         "/var/lib/nixos"
         "/var/lib/systemd/coredump"
 
+        # Database
+        "/var/lib/postgresql"
+
         # Network
         "/etc/NetworkManager/system-connections"
 

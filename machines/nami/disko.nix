@@ -6,7 +6,7 @@
   disko.devices = {
     disk.main = {
       type = "disk";
-      device = "/dev/sda"; # Change this to your target disk
+      device = "/dev/nvme0n1"; # Standard for Dell XPS 13 9360
       content = {
         type = "gpt";
         partitions = {

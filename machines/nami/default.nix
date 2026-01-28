@@ -7,6 +7,7 @@
 #   4. Add to clan.nix inventory and machines sections
 #   5. Build and deploy!
 {
+  config,
   inputs,
   ...
 }:
@@ -24,7 +25,7 @@
   # BASIC CONFIGURATION
   # ============================================================================
 
-  networking.hostName = "Nami"; # Set your hostname
+  networking.hostName = "nami"; # Set your hostname
 
   system.stateVersion = "25.05"; # Don't change after initial install
 
@@ -112,4 +113,14 @@
   # services.flatpak.enable = false;
   # programs.appimage.enable = false;
   system-config.impermanence.enable = true;
+
+  # Machine-specific internet fixes
+  services.resolved.dnssec = "false";
+  boot.extraModulePackages = [ config.boot.kernelPackages.broadcom_sta ];
+  boot.blacklistedKernelModules = [
+    "b43"
+    "bcma"
+    "brcmsmac"
+    "ssb"
+  ];
 }

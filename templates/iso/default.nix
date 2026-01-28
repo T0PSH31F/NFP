@@ -92,7 +92,10 @@
     iwd
     wget
     curl
-
+    dnsutils
+    iw
+    toybox
+    
     # Utilities
     git
     htop
@@ -146,6 +149,17 @@
 
   services-config.avahi.enable = true;
   services.llm-agents.enable = true;
+
+  # Internet fixes for Dell laptops
+  services.resolved.dnssec = "false";
+  boot.extraModulePackages = [ config.boot.kernelPackages.broadcom_sta ];
+  boot.blacklistedKernelModules = [
+    "b43"
+    "bcma"
+    "brcmsmac"
+    "ssb"
+  ];
+
 
   # ============================================================================
   # LIVE USER CONFIGURATION

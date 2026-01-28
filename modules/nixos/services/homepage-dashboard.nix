@@ -215,6 +215,13 @@ with lib;
                 description = "Matrix Server";
               };
             }
+            {
+              "Calibre-Web" = {
+                icon = "calibre.png";
+                href = "http://localhost:${toString config.services.calibre-web-app.port}";
+                description = "E-book library";
+              };
+            }
           ];
         }
       ];
@@ -239,5 +246,16 @@ with lib;
             "/var/lib/homepage-dashboard"
           ];
         };
+
+    # Fix for STATE_DIRECTORY failure with impermanence
+    # Systemd managing StateDirectory conflicts with impermanence symlinks/bind-mounts
+    systemd.services.homepage-dashboard.serviceConfig = {
+      StateDirectory = lib.mkForce [ ]; # Disable systemd management
+    };
+
+    systemd.tmpfiles.rules = [
+      "d /persist/var/lib/homepage-dashboard 0700 homepage-dashboard homepage-dashboard -"
+      "d /var/lib/homepage-dashboard 0700 homepage-dashboard homepage-dashboard -"
+    ];
   };
 }

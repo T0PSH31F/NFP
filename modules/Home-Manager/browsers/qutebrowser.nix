@@ -1,4 +1,7 @@
-{pkgs, ...}: {
+{
+  ...
+}:
+{
   # Qutebrowser configuration
   programs.qutebrowser = {
     enable = true;
@@ -30,7 +33,7 @@
         "yt" = "https://www.youtube.com/results?search_query={}";
       };
 
-      url.start_pages = ["about:blank"];
+      url.start_pages = [ "about:blank" ];
       url.default_page = "about:blank";
 
       # Fonts

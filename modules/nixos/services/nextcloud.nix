@@ -85,7 +85,7 @@ with lib;
     environment.persistence."/persist" = mkIf config.system-config.impermanence.enable {
       directories = [
         config.services.nextcloud-server.dataDir
-        "/var/lib/postgresql"
+        # "/var/lib/postgresql"
         "/var/lib/redis-nextcloud"
       ];
     };

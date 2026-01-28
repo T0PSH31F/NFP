@@ -62,6 +62,9 @@ with lib; {
     # Helpful shell aliases for home-manager users
     home-manager.users.t0psh31f = {
       home.shellAliases = {
+        cunt = "clan machines update nami";
+        cumz = "clan machines update z0r0";
+        cum = "clan machines update";
         # NH shortcuts
         nos = "nh os switch";
         nob = "nh os boot";

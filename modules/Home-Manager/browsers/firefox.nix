@@ -143,11 +143,36 @@ with lib;
           };
         };
       };
-
-      # User Chrome CSS (optional, can be enabled later)
-      # userChrome = ''
-      #   /* Custom CSS here */
-      # '';
     };
+    policies = {
+      DisableTelemetry = true;
+      DisableFirefoxStudies = true;
+      DisablePocket = true;
+      DisableFirefoxAccounts = true;
+      DisableFormHistory = true;
+      DisplayBookmarksToolbar = "newtab";
+      DontCheckDefaultBrowser = true;
+
+      # Enable tracking protection
+      EnableTrackingProtection = {
+        Value = true;
+        Locked = true;
+        Cryptomining = true;
+        Fingerprinting = true;
+      };
+
+      # Performance settings
+      Preferences = {
+        "browser.cache.disk.enable" = false;
+        "browser.cache.memory.enable" = true;
+        "browser.cache.memory.capacity" = 512000;
+        "media.ffmpeg.vaapi.enabled" = true;
+        "media.hardware-video-decoding.force-enabled" = true;
+      };
+    };
+    # User Chrome CSS (optional, can be enabled later)
+    # userChrome = ''
+    #   /* Custom CSS here */
+    # '';
   };
 }

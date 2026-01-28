@@ -27,6 +27,8 @@
   };
 
   services.tailscale.enable = true;
+  services.udisks2.enable = true;
+  services.gvfs.enable = true;
 
   # ============================================================================
   # PACKAGES & TOOLS (Minimal System-level)

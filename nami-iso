@@ -1,0 +1,1 @@
+/nix/store/iqdscwlzzj752ghva7cvnczd5jsp9xxd-nixos-minimal-26.05.20260111.ffbc9f8-x86_64-linux.iso

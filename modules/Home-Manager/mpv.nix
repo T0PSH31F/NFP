@@ -1,9 +1,8 @@
 {
-  config,
-  lib,
   pkgs,
   ...
-}: {
+}:
+{
   # MPV configuration with anime4k shaders and cinematic playback
   programs.mpv = {
     enable = true;

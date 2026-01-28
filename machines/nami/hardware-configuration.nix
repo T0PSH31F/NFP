@@ -14,14 +14,13 @@
 }: {
   imports = [];
 
-  # This is a placeholder. Replace with actual hardware configuration!
-  # Key things to configure:
-  # - boot.initrd.availableKernelModules
-  # - boot.initrd.kernelModules
-  # - boot.kernelModules
-  # - fileSystems
-  # - swapDevices
-  # - nixpkgs.hostPlatform
+  boot.initrd.availableKernelModules = [
+    "xhci_pci"
+    "nvme"
+    "usb_storage"
+    "sd_mod"
+    "rtsx_pci_sdmmc"
+  ];
 
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;

@@ -195,8 +195,8 @@ with lib;
       mkIf (config.services.ai-services.enable && config.system-config.impermanence.enable)
         {
           directories = [
-            "/var/lib/postgresql"
-            "/var/lib/docker" # Persist all docker volumes
+
+            # "/var/lib/docker" # Persist all docker volumes
             "/var/lib/ollama"
             "/var/lib/qdrant"
           ];

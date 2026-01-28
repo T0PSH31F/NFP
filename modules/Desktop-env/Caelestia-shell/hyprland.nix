@@ -4,9 +4,11 @@
   inputs,
   pkgs,
   ...
-}: let
+}:
+let
   cfg = config.desktop.caelestia;
-in {
+in
+{
   config = lib.mkIf (cfg.enable && (cfg.backend == "hyprland" || cfg.backend == "both")) {
     # Use with-cli package for full caelestia functionality (CLI commands)
     environment.systemPackages = [
@@ -76,20 +78,6 @@ in {
             "col.inactive_border" = "rgba(595959aa)";
             layout = "dwindle";
           };
-        };
-      };
-
-      # GTK Theme and Icons
-      gtk = {
-        enable = true;
-        iconTheme = {
-          name = "Papirus-Dark";
-          package = pkgs.papirus-icon-theme;
-        };
-        cursorTheme = {
-          name = "Bibata-Modern-Classic";
-          package = pkgs.bibata-cursors;
-          size = 24;
         };
       };
 

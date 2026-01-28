@@ -1,7 +1,6 @@
 {
   config,
   lib,
-  pkgs,
   ...
 }:
 with lib;
@@ -334,7 +333,7 @@ with lib;
             "/var/lib/mautrix-telegram"
             "/var/lib/mautrix-whatsapp"
             "/var/lib/mautrix-signal"
-            "/var/lib/postgresql"
+            #  "/var/lib/postgresql"
           ]
           ++ (optional config.services.mautrix-bridges.discord.enable "/var/lib/mautrix-discord")
           ++ (optional config.services.mautrix-bridges.slack.enable "/var/lib/mautrix-slack")

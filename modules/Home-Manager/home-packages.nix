@@ -1,6 +1,4 @@
 {
-  config,
-  lib,
   pkgs,
   inputs,
   ...
@@ -25,7 +23,6 @@
     unzip
     unzrip # Parallel unzip
     ouch # Modern compression tool
-    toybox
 
     # --- CLI Utilities & Modern Replacements ---
     bat # cat with wings
@@ -89,19 +86,18 @@
 
     # --- Nix Ecosystem ---
     alejandra # nix formatter
-    nixfmt-rfc-style
+    nixfmt
     deadnix # find dead code
     statix # nix lints
     nix-top
-    inputs.nix-search-tv.packages.${pkgs.system}.default
-    television # required for nix-search-tv
+    nix-search-tv
+    television
     inputs.nixai.packages.${pkgs.system}.default
 
     # --- Graphics & Multimedia ---
     feh # image viewer
     imv # image viewer
     swayimg
-    mpv # media player
     vlc
     kodi
     ffmpeg
@@ -168,13 +164,12 @@
     })
 
     # --- System Themes (Home-Manager Preference) ---
-    papirus-icon-theme
-    dracula-icon-theme
-    kora-icon-theme
-    candy-icons
-    sweet-folders
-    adwaita-icon-theme
-    bibata-cursors
+    # dracula-icon-theme
+    # kora-icon-theme
+    # candy-icons
+    # sweet-folders
+    # adwaita-icon-theme
+    # bibata-cursors
     capitaine-cursors
     rose-pine-hyprcursor
     qt6Packages.qt6ct
@@ -192,7 +187,7 @@
 
       # Dribbblish theme
       theme = spicePkgs.themes.dribbblish;
-      colorScheme = "nord-dark"; # Options: base, nord-dark, nord-light, etc.
+      colorScheme = "rosepine"; # Options: base, nord-dark, nord-light, etc.
 
       enabledExtensions = with spicePkgs.extensions; [
         adblock

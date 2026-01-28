@@ -1,4 +1,9 @@
-{ ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 {
   imports = [
     # Clan already provides facter support - just set facter.reportPath below
@@ -59,7 +64,7 @@
   swapDevices = [
     {
       device = "/persist/swapfile";
-      size = 16384; # 16GB
+      size = 32768; # 32GB
     }
   ];
 
@@ -120,6 +125,9 @@
   # ============================================================================
   # SYSTEM
   # ============================================================================
+  config = {
+    nix-tools.enable = true;
+  };
 
   nixpkgs.hostPlatform = "x86_64-linux";
   system.stateVersion = "25.05";
@@ -135,18 +143,14 @@
   nix.settings.cores = 4; # Cores per build job
   nix.settings.max-jobs = 4; # Total parallel build jobs (reduced to prevent OOM)
 
-  # Vicinae cachix cache (requires NOT following nixpkgs in flake input)
-  nix.settings.extra-substituters = [ "https://vicinae.cachix.org" ];
-  nix.settings.extra-trusted-public-keys = [
-    "vicinae.cachix.org-1:1kDrfienkGHPYbkpNj1mWTr7Fm1+zcenzgTizIcI3oc="
-  ];
+  
 
   # ============================================================================
   # SERVICES
   # ============================================================================
   services.home-assistant-server.enable = true;
   services.caddy-server.enable = true;
-  services.sillytavern-app.enable = false; # Disabled - Docker container failing
+  services.sillytavern-app.enable = true; # Disabled - Docker container failing
   services.llm-agents.enable = true;
 
   services.ai-services = {
