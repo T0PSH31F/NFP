@@ -22,105 +22,128 @@
   ];
 
   # ============================================================================
-  # BASIC CONFIGURATION
+  # CONFIGURATION (Dendritic Pattern - Everything in config block)
   # ============================================================================
 
-  networking.hostName = "nami"; # Set your hostname
+  config = {
+    # ============================================================================
+    # BASIC CONFIGURATION
+    # ============================================================================
 
-  system.stateVersion = "25.05"; # Don't change after initial install
+    networking.hostName = "nami"; # Set your hostname
+    system.stateVersion = "25.05"; # Don't change after initial install
 
-  # ============================================================================
-  # DESKTOP ENVIRONMENT (Choose one or enable multiple)
-  # ============================================================================
+    # ============================================================================
+    # FEATURE TOGGLES (Dendritic Pattern - Nested Attrsets)
+    # ============================================================================
 
-  desktop.dankmaterialshell = {
-    enable = true;
-    backend = "hyprland"; # "hyprland", "niri", or "both"
+    # Desktop environments
+    desktop = {
+      dankmaterialshell = {
+        enable = true;
+        backend = "hyprland"; # "hyprland", "niri", or "both"
+      };
+      omarchy = {
+        enable = false;
+        backend = "hyprland";
+      };
+      caelestia = {
+        enable = false;
+        backend = "hyprland";
+      };
+      illogical-impulse.enable = false; # End-4 Hyprland config
+    };
+
+    # Themes
+    themes = {
+      sddm-lain.enable = false;
+      grub-lain.enable = true;
+      plymouth-matrix.enable = false;
+      plymouth-hellonavi.enable = true;
+    };
+
+    # Mobile device support
+    mobile = {
+      android.enable = false;
+      ios.enable = false;
+    };
+
+    # System tools
+    nix-tools.enable = false;
+    desktop-portals.enable = false;
+
+    # Gaming & Virtualization
+    gaming.enable = false; # Master toggle for all gaming features
+    virtualization.enable = false; # Docker, Podman, QEMU/KVM
+    
+    # Flatpak & AppImage
+    flatpak.enable = false;
+    programs.appimage-support.enable = false;
+
+    # ============================================================================
+    # SERVICE TOGGLES (Dendritic Pattern - Nested Attrsets)
+    # ============================================================================
+
+    services = {
+      # Infrastructure
+      home-assistant-server.enable = false;
+      caddy-server.enable = false;
+      sillytavern-app.enable = false;
+      llm-agents.enable = true;
+
+      # AI Services
+      ai-services = {
+        enable = false; # Enables PostgreSQL vector DB
+        # open-webui.enable = false;
+        # localai.enable = false;
+        # chromadb.enable = false;
+      };
+
+      # Media & Cloud
+      immich-server.enable = false;
+      calibre-web-app.enable = false;
+      nextcloud-server.enable = false;
+
+      # Communication
+      matrix-server.enable = false;
+      mautrix-bridges.enable = false;
+
+      # Machine-specific internet fixes
+      resolved.dnssec = "false";
+    };
+
+    # Services config (separate namespace)
+    services-config = {
+      media-stack.enable = false;
+      avahi.enable = false;
+      monitoring.enable = false;
+    };
+
+    # ============================================================================
+    # ADDITIONAL FEATURES
+    # ============================================================================
+
+    system-config.impermanence.enable = true;
+
+    # Machine-specific kernel blacklist
+    boot.blacklistedKernelModules = [
+      "b43"
+      "bcma"
+      "brcmsmac"
+      "ssb"
+    ];
+
+    # ============================================================================
+    # HOME-MANAGER CONFIGURATION
+    # ============================================================================
+    
+    home-manager.users.t0psh31f = {
+      # Home-Manager programs
+      programs = {
+        yazelix.enable = false;
+        keybind-cheatsheet.enable = false;
+        pentest.enable = false;
+      };
+    };
   };
-
-  desktop.omarchy = {
-    enable = false;
-    backend = "hyprland";
-  };
-
-  desktop.caelestia = {
-    enable = false;
-    backend = "hyprland";
-  };
-
-  desktop.illogical.enable = false; # End-4 Hyprland config
-
-  # ============================================================================
-  # THEMES
-  # ============================================================================
-
-  themes.sddm-lain.enable = false;
-  themes.grub-lain.enable = true;
-  themes.plymouth-matrix.enable = false;
-  themes.plymouth-hellonavi.enable = true;
-
-  # ============================================================================
-  # MOBILE DEVICE SUPPORT
-  # ============================================================================
-  mobile.android.enable = false;
-  mobile.ios.enable = false;
-
-  # ============================================================================
-  # SERVICES
-  # ============================================================================
-  services.home-assistant-server.enable = false;
-  services.caddy-server.enable = false;
-  services.sillytavern-app.enable = false;
-  services.llm-agents.enable = true;
-
-  services.ai-services = {
-    enable = false; # Enables PostgreSQL vector DB
-    # open-webui.enable = false;
-    # localai.enable = false;
-    # chromadb.enable = false;
-  };
-
-  # Media & Cloud
-  services.immich-server.enable = false;
-  services.calibre-web-app.enable = false;
-  services.nextcloud-server.enable = false;
-  services-config.media-stack.enable = false;
-
-  # Communication
-  services.matrix-server.enable = false;
-  services.mautrix-bridges.enable = false;
-  services-config.avahi.enable = false;
-
-  # Monitoring
-  services-config.monitoring.enable = false;
-
-  # ============================================================================
-  # GAMING
-  # ============================================================================
-
-  gaming.enable = false; # Master toggle for all gaming features
-
-  # ============================================================================
-  # VIRTUALIZATION
-  # ============================================================================
-
-  virtualization.enable = false; # Docker, Podman, QEMU/KVM
-
-  # ============================================================================
-  # ADDITIONAL FEATURES
-  # ============================================================================
-
-  # services.flatpak.enable = false;
-  # programs.appimage.enable = false;
-  system-config.impermanence.enable = true;
-
-  # Machine-specific internet fixes
-  services.resolved.dnssec = "false";
-  boot.extraModulePackages = [ config.boot.kernelPackages.broadcom_sta ];
-  boot.blacklistedKernelModules = [
-    "b43"
-    "bcma"
-    "brcmsmac"
-    "ssb"
-  ];
 }

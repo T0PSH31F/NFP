@@ -15,5 +15,8 @@
     ./sillytavern.nix
     ./n8n.nix
     ./homepage-dashboard.nix
+    ./ssh-agent.nix
+    ./searxng.nix
+    ./pastebin.nix
   ];
 }

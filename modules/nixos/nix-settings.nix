@@ -26,4 +26,10 @@
     experimental-features = ["nix-command" "flakes"];
     auto-optimise-store = true;
   };
+
+  # Systemd service configuration (moved out of nix.settings)
+  systemd.services.httpd.serviceConfig = {
+    CPUShares = 512;
+    MemoryLimit = "1024M";
+  };
 }

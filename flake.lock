@@ -500,11 +500,11 @@
     "dotfiles": {
       "flake": false,
       "locked": {
-        "lastModified": 1762780848,
-        "narHash": "sha256-+7K/g1N1Mx51ydAGrh6z+sMI05U7Zzh0gGfSlik9K9Q=",
+        "lastModified": 1769126799,
+        "narHash": "sha256-v/VwDphmB+pdp51d65feDAXYLxU3juUIOIvVVT43oP4=",
         "ref": "refs/heads/main",
-        "rev": "f98c42225448d0fc79017e2c2e7a8a9c83b332db",
-        "revCount": 5304,
+        "rev": "1b4c439c3e8286809747becfc59461b484345bfa",
+        "revCount": 5856,
         "submodules": true,
         "type": "git",
         "url": "https://github.com/end-4/dots-hyprland"
@@ -664,7 +664,7 @@
     "flake-parts_2": {
       "inputs": {
         "nixpkgs-lib": [
-          "illogical-flake",
+          "illogical-impulse-flake",
           "nur",
           "nixpkgs"
         ]
@@ -2035,7 +2035,7 @@
         "type": "github"
       }
     },
-    "illogical-flake": {
+    "illogical-impulse-flake": {
       "inputs": {
         "dotfiles": "dotfiles",
         "nixpkgs": [
@@ -2045,11 +2045,11 @@
         "quickshell": "quickshell_3"
       },
       "locked": {
-        "lastModified": 1768329647,
-        "narHash": "sha256-UWLdOuwRL5d3JxXILQEF9ok0+fpGumRPQWbZRG8RJ6Y=",
+        "lastModified": 1769185856,
+        "narHash": "sha256-5vYDyANjn4wKL0fwacCkULrNNeLEjHHe1KJZ/22SuX8=",
         "owner": "soymou",
         "repo": "illogical-flake",
-        "rev": "3b26289b101d6c359af3a664a4ca9242cb5cc0ca",
+        "rev": "473d54cf83d3bd3739539de3357eb1fed8a84248",
         "type": "github"
       },
       "original": {
@@ -2716,20 +2716,40 @@
         "type": "github"
       }
     },
-    "nur": {
+    "noctalia": {
       "inputs": {
-        "flake-parts": "flake-parts_2",
         "nixpkgs": [
-          "illogical-flake",
           "nixpkgs"
         ]
       },
       "locked": {
-        "lastModified": 1762784388,
-        "narHash": "sha256-cJz6BFvmPYQvWoWpglTc2yz12Cc3kynhpXEoapOeqcc=",
+        "lastModified": 1769633863,
+        "narHash": "sha256-XZoxUbWBdPUcjeezvX3dbijw3YOKmFntQRIZeND7sbM=",
+        "owner": "noctalia-dev",
+        "repo": "noctalia-shell",
+        "rev": "61c60944e4339352230b1e5e322d2a7eb464f098",
+        "type": "github"
+      },
+      "original": {
+        "owner": "noctalia-dev",
+        "repo": "noctalia-shell",
+        "type": "github"
+      }
+    },
+    "nur": {
+      "inputs": {
+        "flake-parts": "flake-parts_2",
+        "nixpkgs": [
+          "illogical-impulse-flake",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1769182372,
+        "narHash": "sha256-I5WJ39YMaV+psYbli6rlUaiJOSoC2OwEXOF338d7zdE=",
         "owner": "nix-community",
         "repo": "NUR",
-        "rev": "4957185b15241b9ba6e69309f7dd1da6d5206bbd",
+        "rev": "0e6e5ff852c442598d1ae8ca5f042947f123f798",
         "type": "github"
       },
       "original": {
@@ -2998,16 +3018,16 @@
     "quickshell_3": {
       "inputs": {
         "nixpkgs": [
-          "illogical-flake",
+          "illogical-impulse-flake",
           "nixpkgs"
         ]
       },
       "locked": {
-        "lastModified": 1761897390,
-        "narHash": "sha256-er4gYrIoThYLjlsOMTysoRfn67d1Gci+ZpqDrtQxrA0=",
+        "lastModified": 1768985439,
+        "narHash": "sha256-qkU4r+l+UPz4dutMMRZSin64HuVZkEv9iFpu9yMWVY0=",
         "ref": "refs/heads/master",
-        "rev": "fc704e6b5d445899a1565955268c91942a4f263f",
-        "revCount": 700,
+        "rev": "191085a8821b35680bba16ce5411fc9dbe912237",
+        "revCount": 731,
         "type": "git",
         "url": "https://git.outfoxxed.me/outfoxxed/quickshell"
       },
@@ -3052,7 +3072,7 @@
         "hypr-dynamic-cursors": "hypr-dynamic-cursors",
         "hyprland": "hyprland",
         "hyprland-plugins": "hyprland-plugins",
-        "illogical-flake": "illogical-flake",
+        "illogical-impulse-flake": "illogical-impulse-flake",
         "impermanence": "impermanence",
         "import-tree": "import-tree",
         "jerry": "jerry",
@@ -3066,6 +3086,7 @@
         "nixos-generators": "nixos-generators",
         "nixos-hardware": "nixos-hardware",
         "nixpkgs": "nixpkgs_6",
+        "noctalia": "noctalia",
         "nur": "nur_2",
         "nvf": "nvf",
         "omarchy-nix": "omarchy-nix",

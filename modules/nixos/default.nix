@@ -9,6 +9,7 @@
 
     # System Core
     ./system/base.nix
+    ./system/desktop-portals.nix
 
     # Display & Desktop
     ./display-manager.nix
@@ -34,9 +35,12 @@
     ./gaming.nix
     ./impermanence.nix
     ./mobile.nix
+    ./flatpak.nix
+    ./appimage.nix
 
     # Themes
     ./themes/sddm-lain.nix
+    ./themes/sddm-lainframe.nix
     ./themes/sddm-sel.nix
     ./themes/grub-lain.nix
     ./themes/plymouth-matrix.nix

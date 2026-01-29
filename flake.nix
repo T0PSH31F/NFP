@@ -53,7 +53,7 @@
       url = "github:hyprwm/hyprland-plugins";
       inputs.hyprland.follows = "hyprland";
     };
-    illogical-flake = {
+    illogical-impulse-flake = {
       url = "github:soymou/illogical-flake";
       inputs.nixpkgs.follows = "nixpkgs";
     };
@@ -92,6 +92,10 @@
     };
     nixos-hardware = {
       url = "github:NixOS/nixos-hardware/master";
+    };
+    noctalia = {
+      url = "github:noctalia-dev/noctalia-shell";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     nur.url = "github:nix-community/NUR";
     nvf = {

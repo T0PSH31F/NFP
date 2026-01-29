@@ -9,147 +9,149 @@
 
   home.packages = with pkgs; [
     # --- Core Essentials ---
-    curl
-    wget
-    git
-    gh # GitHub CLI
     age # Encryption
-    sops # Secret management
-    usbutils
-    pciutils
     binutils
+    curl
     file
-    zip
+    gh # GitHub CLI
+    git
+    ouch # Modern compression tool
+    pciutils
+    sops # Secret management
     unzip
     unzrip # Parallel unzip
-    ouch # Modern compression tool
+    usbutils
+    wget
+    zip
 
     # --- CLI Utilities & Modern Replacements ---
+    bandwhich # network monitor
     bat # cat with wings
+    btop # the mac-daddy of tops
+    ctop # container monitor
+    difftastic # structural diff
+    duf # better df
     eza # better ls
     fd # better find
-    ripgrep # better grep
-    fzf # fuzzy finder
-    zoxide # better cd
-    jq # JSON processor
     fx # JSON viewer
-    sd # better sed
-    procs # better ps
-    duf # better df
-    ncdu # better du
-    htop
-    btop
+    fzf # fuzzy finder
     glances # system monitor
-    bandwhich # network monitor
-    ctop # container monitor
-    lsix # thumbnails in terminal
-    tealdeer # tldr pages
+    gotree # gt nice tree-view in terminal
     hyperfine # benchmarking
-    difftastic # structural diff
+    jq # JSON processor
+    lsix # thumbnails in terminal
+    ncdu # better du
+    procs # better ps
+    ripgrep # better grep
     rm-improved # rip
+    sd # better sed
+    tealdeer # tldr pages
+    w3m # cli web-browser
+    zoxide # better cd
 
     # --- Development Tools ---
-    gnumake
-    gcc
-    go
-    python3
-    nodejs
-    typescript
-    poetry # python env
-    uv # faster python
+    buildah # container builds
+    cpufetch
+    dbeaver-bin # GUI
     devenv # developer environments
     distrobox # containers
-    buildah # container builds
     dive # image explorer
-    sqlite
-    pgcli # postgres client
-    visidata # data tables CLI
-    sqlitebrowser # GUI
-    dbeaver-bin # GUI
-    pgadmin4 # GUI
-    graphviz
+    gcc
+    gnumake
+    go
     gpufetch
-    cpufetch
+    graphviz
+    nodejs
+    pgadmin4 # GUI
+    pgcli # postgres client
+    poetry # python env
+    python3
+    sqlite
+    sqlitebrowser # GUI
+    typescript
+    uv # faster python
+    visidata # data tables CLI
 
     # --- System & Maintenance ---
     baobab # disk usage GUI
-    remmina # remote desktop
     ddrescue # data recovery
     ddrescueview # recovery viewer
-    ocrmypdf # OCR for PDFs
-    lshw
-    lm_sensors
-    mtr # network traceroute
-    prettyping
-    screenkey # show keypresses
     font-manager
+    lm_sensors
+    lshw
+    mtr # network traceroute
+    ocrmypdf # OCR for PDFs
+    prettyping
+    remmina # remote desktop
+    screenkey # show keypresses
 
     # --- Nix Ecosystem ---
     alejandra # nix formatter
-    nixfmt
     deadnix # find dead code
-    statix # nix lints
-    nix-top
-    nix-search-tv
-    television
     inputs.nixai.packages.${pkgs.system}.default
+    nix-search-tv
+    nix-top
+    nixfmt
+    statix # nix lints
+    television
 
     # --- Graphics & Multimedia ---
     feh # image viewer
-    imv # image viewer
-    swayimg
-    vlc
-    kodi
     ffmpeg
     imagemagick
     img2pdf
-    yt-dlp
+    imv # image viewer
+    kodi
     pavucontrol # audio control
     spicetify-cli # handled by module below usually
+    swayimg
+    vlc
+    yt-dlp
 
     # --- Desktop Productivity ---
-    obsidian # knowledge base
-    libreoffice
-    thunderbird # email
-    signal-desktop # messaging
-    kotatogram-desktop # telegram
+    bitwarden-desktop
+    calibre # eBooks
     caprine-bin # messenger
     element-desktop # matrix
-    vesktop # discord
-    vencord # discord
-    nextcloud-client
-    bitwarden-desktop
-    zeal # documentation
-    zathura # PDF
-    calibre # eBooks
     foliate # eBook reader
-    librum # Library manager
     koreader # eBook reader
+    kotatogram-desktop # telegram
+    libreoffice
+    librum # Library manager
+    nextcloud-client
+    obsidian # knowledge base
+    signal-desktop # messaging
+    thunderbird # email
+    vencord # discord
+    vesktop # discord
+    yt-dlp # video downloader
+    zathura # PDF
+    zeal # documentation
 
     # --- Terminal Emulators & Multiplexers ---
-    ghostty
-    kitty
     alacritty
     foot
-    wezterm
-    warp-terminal
-    zellij
+    ghostty
+    kitty
     tmux
+    warp-terminal
+    wezterm
+    zellij
 
     # --- Fun & Aesthetics ---
-    fastfetch
-    neofetch
     asciinema # terminal recorder
-    cmatrix
-    cbonsai
-    sl # steam locomotive
-    fortune
-    toilet
-    figlet
-    neo-cowsay
-    lavat
     blahaj # essential
+    cbonsai
+    cmatrix
+    fastfetch
+    figlet
+    fortune
     inputs.awww.packages.${pkgs.system}.awww
+    lavat
+    neo-cowsay
+    neofetch
+    sl # steam locomotive
+    toilet
 
     # --- Custom Shell Scripts ---
     (writeShellApplication {
@@ -164,17 +166,18 @@
     })
 
     # --- System Themes (Home-Manager Preference) ---
-    # dracula-icon-theme
-    # kora-icon-theme
-    # candy-icons
-    # sweet-folders
-    # adwaita-icon-theme
-    # bibata-cursors
+    adwaita-icon-theme
+    bibata-cursors
+    candy-icons
     capitaine-cursors
-    rose-pine-hyprcursor
-    qt6Packages.qt6ct
+    dracula-icon-theme
+    # kora-icon-theme # Conflicts with BeautyLine - using BeautyLine from gtk.nix
     libsForQt5.qt5ct
     pywalfox-native
+    qt6Packages.qt6ct
+    hyprcursor
+    rose-pine-hyprcursor
+    sweet-folders
   ];
 
   # Spicetify configuration

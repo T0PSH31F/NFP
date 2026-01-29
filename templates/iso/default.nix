@@ -53,7 +53,7 @@
   # Disable other desktop environments
   desktop.omarchy.enable = false;
   desktop.caelestia.enable = false;
-  desktop.illogical.enable = false;
+  desktop.illogical-impulse.enable = false;
 
   # ============================================================================
   # THEMES
@@ -153,7 +153,6 @@
 
   # Internet fixes for Dell laptops
   services.resolved.dnssec = "false";
-  boot.extraModulePackages = [ config.boot.kernelPackages.broadcom_sta ];
   boot.blacklistedKernelModules = [
     "b43"
     "bcma"

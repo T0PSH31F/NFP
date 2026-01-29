@@ -11,11 +11,9 @@
   imports = [
     ../../modules/nixos/default.nix
     ../../modules/nixos/system/laptop.nix
-    ../../modules/nixos/system/desktop-portals.nix
     ../../modules/Desktop-env/default.nix
     ../../modules/Desktop-env/Noctalia/default.nix
     ../../modules/users/t0psh31f.nix
-    ../../clan-service-modules/desktop/ssh-agent.nix
   ];
 
   # ============================================================================
@@ -82,65 +80,72 @@
   system.stateVersion = "25.05";
 
   # ============================================================================
-  # FEATURE TOGGLES (Dendritic Pattern)
+  # FEATURE TOGGLES (Dendritic Pattern - Nested Attrsets)
   # ============================================================================
   
-  config = {
-    nix-tools.enable = true;
-    desktop-portals.enable = true;
-  };
+  # System features
+  nix-tools.enable = true;
+  desktop-portals.enable = true;
 
-  # Yazelix (Yazi + Helix integration)
-  programs.yazelix.enable = true;
+  # Desktop environments
+  desktop = {
+      caelestia = {
+        enable = false;
+        #backend = "hyprland";
+        #backend = "niri"
+        #backend = "both"
+       };
 
-  # Keybind cheatsheet overlay
-  programs.keybind-cheatsheet.enable = true;
+      dankmaterialshell = {
+        enable = false;
+        #backend = "hyprland";
+        #backend = "niri"
+        #backend = "both"
+       };
 
-  # ============================================================================
-  # DESKTOP ENVIRONMENT
-  # ============================================================================
+      illogical-impulse.enable = false;
 
-  # Noctalia Shell (Primary DE)
-  desktop.noctalia = {
-    enable = true;
-    backend = "hyprland";
-  };
+      noctalia = {
+        enable = true;
+        backend = "hyprland";
+        #backend = "niri"
+        #backend = "both"
+       };
 
-  # Alternative DEs (disabled)
-  desktop.dankmaterialshell.enable = false;
-  desktop.omarchy.enable = false;
-  desktop.caelestia.enable = false;
-  desktop.illogical.enable = false;
-
-  # ============================================================================
-  # THEMES
-  # ============================================================================
-
-  themes = {
-    sddm-lain.enable = false;
-    sddm-sel = {
-      enable = true;
-      variant = "shaders";
+      omarchy = {
+        enable = false;
+        #backend = "hyprland";
+        #backend = "niri"
+        #backend = "both"
+       };
     };
-    grub-lain.enable = true;
-    plymouth-hellonavi.enable = true;
-  };
-
-  # ============================================================================
-  # MOBILE DEVICE SUPPORT
-  # ============================================================================
   
-  mobile = {
-    android.enable = true;
-    ios.enable = true;
-  };
+ 
+    # Themes
+    themes = {
+      sddm-lainframe.enable = true;
+      sddm-lain.enable = false;
+      sddm-sel = {
+        enable = false;
+        variant = "shaders";
+      };
+      grub-lain.enable = true;
+      plymouth-hellonavi.enable = true;
+    };
 
-  # ============================================================================
-  # GAMING & VIRTUALIZATION
-  # ============================================================================
+    # Mobile device support
+    mobile = {
+      android.enable = true;
+      ios.enable = true;
+    };
 
-  gaming.enable = true;
-  virtualization.enable = true;
+    # Gaming & Virtualization
+    gaming.enable = true;
+    virtualization.enable = true;
+    
+  # Flatpak & AppImage
+  flatpak.enable = true;
+  programs.appimage-support.enable = true;
 
   # ============================================================================
   # SYSTEM CONFIGURATION
@@ -159,52 +164,70 @@
   };
 
   # ============================================================================
-  # SERVICE TOGGLES (Dendritic Pattern)
+  # HOME-MANAGER CONFIGURATION
   # ============================================================================
-
-  # Desktop Services
-  services.ssh-agent.enable = true;
-  # services.searxng.enable = false; # Optional: Enable SearxNG metasearch
-  # services.pastebin.enable = false; # Optional: Enable PrivateBin
-
-  # Home Automation & Infrastructure
-  services.home-assistant-server.enable = true;
-  services.caddy-server.enable = true;
-  services.n8n-server.enable = true;
-
-  # AI Services
-  services.sillytavern-app.enable = true;
-  services.llm-agents.enable = true;
-  services.ai-services = {
-    enable = true;
-    open-webui.enable = true;
-    localai.enable = true;
-    chromadb.enable = true;
+  
+  home-manager.users.t0psh31f = {
+    # Home-Manager programs
+    programs = {
+      yazelix.enable = true;
+      keybind-cheatsheet.enable = true;
+      pentest.enable = false;
+    };
   };
 
-  # Media & Cloud
-  services.immich-server.enable = true;
-  services.calibre-web-app.enable = true;
-  services.nextcloud-server.enable = true;
-  services-config.media-stack.enable = false; # Disabled - Prowlarr STATE_DIRECTORY issue
-
-  # Communication
-  services.matrix-server.enable = true;
-  services.mautrix-bridges.enable = true;
-  services-config.avahi.enable = true; # mDNS
-
-  # Monitoring
-  services-config.monitoring.enable = false; # Disabled - Promtail NAMESPACE issue
-
-  # Dashboard
-  services-config.homepage-dashboard.enable = true;
-
   # ============================================================================
-  # SERVICE FIXES (Temporary workarounds)
+  # SERVICE TOGGLES (Dendritic Pattern - Nested Attrsets)
   # ============================================================================
 
-  # Aria2 RPC secret
-  services.aria2.rpcSecretFile = "/etc/aria2-rpc-token";
+  services = {
+    # Desktop Services
+    ssh-agent.enable = true;
+    searxng.enable = true; # Optional: Enable SearxNG metasearch
+    pastebin.enable = true; # Optional: Enable PrivateBin
+
+    # Home Automation & Infrastructure
+    home-assistant-server.enable = true;
+    caddy-server.enable = true;
+    n8n-server.enable = true;
+
+    # AI Services
+    sillytavern-app.enable = true;
+    llm-agents.enable = true;
+    ai-services = {
+      enable = true;
+      open-webui.enable = true;
+      localai.enable = true;
+      chromadb.enable = true;
+    };
+
+    # Media & Cloud
+    immich-server.enable = true;
+    calibre-web-app.enable = true;
+    nextcloud-server.enable = true;
+
+    # Communication
+    matrix-server.enable = true;
+    mautrix-bridges.enable = true;
+
+    # Service fixes (temporary workarounds)
+    aria2.rpcSecretFile = "/etc/aria2-rpc-token";
+    deluge.authFile = "/etc/deluge-auth";
+  };
+
+  # Services config (separate namespace for config-only services)
+  services-config = {
+    media-stack.enable = true; # Fixed - Prowlarr STATE_DIRECTORY issue resolved
+    avahi.enable = true; # mDNS
+    monitoring.enable = true; # Fixed - Promtail NAMESPACE issue resolved
+    homepage-dashboard.enable = true;
+  };
+
+  # ============================================================================
+  # ENVIRONMENT CONFIGURATION (Service support files)
+  # ============================================================================
+
+  # Aria2 RPC secret file
   environment.etc."aria2-rpc-token" = {
     text = "temporary-secret-change-me";
     mode = "0400";
@@ -213,7 +236,6 @@
   };
 
   # Deluge auth file
-  services.deluge.authFile = "/etc/deluge-auth";
   environment.etc."deluge-auth" = {
     text = "localclient:a7c6f0e3bc4:10";
     mode = "0400";

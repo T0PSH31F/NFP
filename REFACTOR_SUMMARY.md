@@ -168,7 +168,7 @@ This document summarizes the complete NixOS Clan-Core + Flake-Parts overhaul wit
 
 ### Key Changes
 - **Enabled**: Noctalia-Shell (backend: hyprland)
-- **Disabled**: DankMaterialShell, Omarchy, Caelestia, Illogical
+- **Disabled**: DankMaterialShell, Omarchy, Caelestia, illogical-impulse
 - **New Features**: yazelix, keybind-cheatsheet, desktop-portals, ssh-agent
 - **Pattern**: Modules declare → Machines enable
 

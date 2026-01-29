@@ -27,15 +27,7 @@
     initLua = builtins.readFile ./init.lua;
 
     settings = {
-      #manager = {
-      #  show_hidden = true;
-      #  sort_by = "alphabetical";
-      #  sort_sensitive = false;
-      #  sort_reverse = false;
-      #  sort_dir_first = true;
-      #  linemode = "none";
-      #  show_symlink = true;
-      #};
+   
       mgr = {
         # 2/9 width for parent, 3/9 for main, 4/9 for preview
         ratio = [2 3 4];

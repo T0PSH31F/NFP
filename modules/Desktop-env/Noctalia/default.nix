@@ -10,6 +10,12 @@ let
   cfg = config.desktop.noctalia;
 in
 {
+  # Import backend-specific configuration at top level
+  imports = [
+    ./hyprland.nix
+    ./niri/default.nix
+  ];
+
   options.desktop.noctalia = {
     enable = mkEnableOption "Noctalia Shell - Modern desktop environment";
 
@@ -33,12 +39,6 @@ in
   };
 
   config = mkIf cfg.enable {
-    # Import backend-specific configuration
-    imports = [
-      (mkIf (cfg.backend == "hyprland") ./hyprland.nix)
-      (mkIf (cfg.backend == "niri") ./niri/default.nix)
-    ];
-
     # Common Noctalia configuration
     home-manager.users.t0psh31f = {
       imports = [

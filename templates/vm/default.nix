@@ -31,7 +31,7 @@
   };
 
   # Or use one of our desktop environments
-  # grandlix.desktop.illogical.enable = true;
+  # grandlix.desktop.illogical-impulse.enable = true;
 
   # Virtualization guest tools
   services.qemuGuest.enable = true;

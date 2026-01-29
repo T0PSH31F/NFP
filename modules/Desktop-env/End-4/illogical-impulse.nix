@@ -4,9 +4,9 @@
   inputs,
   ...
 }: let
-  cfg = config.desktop.illogical;
+  cfg = config.desktop.illogical-impulse;
 in {
-  options.desktop.illogical = {
+  options.desktop.illogical-impulse = {
     enable = lib.mkEnableOption "End-4 Illogical Impulse (Hyprland)";
   };
 

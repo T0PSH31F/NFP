@@ -28,8 +28,8 @@ in
       enable = true;
       wlr.enable = false; # Disable wlr portal (conflicts with hyprland)
       
+      # Don't add xdg-desktop-portal-hyprland here - programs.hyprland adds it automatically
       extraPortals = with pkgs; [
-        xdg-desktop-portal-hyprland
         xdg-desktop-portal-gtk
       ] ++ cfg.extraPortals;
 

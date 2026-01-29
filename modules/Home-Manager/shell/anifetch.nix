@@ -9,6 +9,9 @@ with lib;
 let
   cfg = config.programs.anifetch;
 
+  # Default Lain GIF path
+  defaultGifPath = "/home/t0psh31f/.background/Giffees/Lain/oldScreen.gif";
+
   # Anifetch configuration file
   anifetchConfig = pkgs.writeText "anifetch.conf" ''
     # Anifetch Configuration
@@ -119,6 +122,37 @@ in
       type = types.bool;
       default = true;
       description = "Run anifetch when opening a new shell";
+    };
+
+    gifPath = mkOption {
+      type = types.str;
+      default = defaultGifPath;
+      description = "Path to the GIF/video file to display with anifetch";
+      example = "/home/user/.background/Giffees/Lain/oldScreen.gif";
+    };
+
+    width = mkOption {
+      type = types.int;
+      default = 40;
+      description = "Width of the animation in characters";
+    };
+
+    height = mkOption {
+      type = types.int;
+      default = 20;
+      description = "Height of the animation in characters";
+    };
+
+    repeat = mkOption {
+      type = types.int;
+      default = 1;
+      description = "Number of times to repeat the animation (0 = infinite)";
+    };
+
+    chafaArgs = mkOption {
+      type = types.str;
+      default = "--symbols wide --fg-only";
+      description = "Additional arguments to pass to chafa";
     };
   };
 

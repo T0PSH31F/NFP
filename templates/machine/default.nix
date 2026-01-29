@@ -29,80 +29,106 @@
   system.stateVersion = "25.05"; # Don't change after initial install
 
   # ============================================================================
-  # DESKTOP ENVIRONMENT (Choose one or enable multiple)
+  # FEATURE TOGGLES (Dendritic Pattern - Nested Attrsets)
   # ============================================================================
 
-  desktop.dankmaterialshell = {
-    enable = true;
-    backend = "hyprland"; # "hyprland", "niri", or "both"
+  config = {
+    # Desktop environments (choose one or enable multiple)
+    desktop = {
+      dankmaterialshell = {
+        enable = true;
+        backend = "hyprland"; # "hyprland", "niri", or "both"
+      };
+      omarchy = {
+        enable = false;
+        backend = "hyprland";
+      };
+      caelestia = {
+        enable = false;
+        backend = "hyprland";
+      };
+      noctalia = {
+        enable = false;
+        backend = "hyprland";
+      };
+      illogical-impulse.enable = false; # End-4 Hyprland config
+    };
+
+    # Programs
+    programs = {
+      yazelix.enable = false; # Yazi + Helix integration
+      keybind-cheatsheet.enable = false; # Super+B keybind overlay
+      pentest.enable = false; # Penetration testing tools
+    };
+
+    # Themes
+    themes = {
+      sddm-lain.enable = false;
+      sddm-sel.enable = false;
+      grub-lain.enable = false;
+      plymouth-matrix.enable = false;
+      plymouth-hellonavi.enable = false;
+    };
+
+    # Mobile device support
+    mobile = {
+      android.enable = false;
+      ios.enable = false;
+    };
+
+    # System tools
+    nix-tools.enable = false; # Nix development tools
+    desktop-portals.enable = false; # XDG desktop portals
+    
+    # Gaming & Virtualization
+    gaming.enable = false; # Master toggle for all gaming features
+    virtualization.enable = false; # Docker, Podman, QEMU/KVM
+    
+    # Flatpak & AppImage
+    flatpak.enable = false;
+    programs.appimage-support.enable = false;
   };
 
-  desktop.omarchy = {
-    enable = false;
-    backend = "hyprland";
+  # ============================================================================
+  # SERVICE TOGGLES (Dendritic Pattern - Nested Attrsets)
+  # ============================================================================
+
+  services = {
+    # Desktop services
+    ssh-agent.enable = false;
+
+    # AI & LLM
+    llm-agents.enable = false;
+
+    # Infrastructure
+    home-assistant-server.enable = false;
+    caddy-server.enable = false;
+    sillytavern-app.enable = false;
+
+    # AI Services
+    ai-services = {
+      enable = false; # Enables PostgreSQL vector DB
+      # open-webui.enable = false;
+      # localai.enable = false;
+      # chromadb.enable = false;
+    };
+
+    # Media & Cloud
+    immich-server.enable = false;
+    calibre-web-app.enable = false;
+    nextcloud-server.enable = false;
+
+    # Communication
+    matrix-server.enable = false;
+    mautrix-bridges.enable = false;
   };
 
-  desktop.caelestia = {
-    enable = false;
-    backend = "hyprland";
+  # Services config (separate namespace)
+  services-config = {
+    media-stack.enable = false;
+    avahi.enable =e;
+    monitoring.enable = false;
   };
-
-  desktop.illogical.enable = false; # End-4 Hyprland config
-
-  # ============================================================================
-  # THEMES
-  # ============================================================================
-
-  themes.sddm-lain.enable = false;
-  themes.grub-lain.enable = false;
-  themes.plymouth-matrix.enable = false;
-  themes.plymouth-hellonavi.enable = false;
-
-  # ============================================================================
-  # MOBILE DEVICE SUPPORT
-  # ============================================================================
-  mobile.android.enable = false;
-  mobile.ios.enable = false;
-
-  # ============================================================================
-  # SERVICES
-  # ============================================================================
-  services.home-assistant-server.enable = false;
-  services.caddy-server.enable = false;
-  services.sillytavern-app.enable = false;
-
-  services.ai-services = {
-    enable = false; # Enables PostgreSQL vector DB
-    # open-webui.enable = false;
-    # localai.enable = false;
-    # chromadb.enable = false;
-  };
-
-  # Media & Cloud
-  services.immich-server.enable = false;
-  services.calibre-web-app.enable = false;
-  services.nextcloud-server.enable = false;
-  services-config.media-stack.enable = false;
-
-  # Communication
-  services.matrix-server.enable = false;
-  services.mautrix-bridges.enable = false;
-  services-config.avahi.enable = false;
-
-  # Monitoring
-  services-config.monitoring.enable = false;
-
-  # ============================================================================
-  # GAMING
-  # ============================================================================
-
-  gaming.enable = false; # Master toggle for all gaming features
-
-  # ============================================================================
-  # VIRTUALIZATION
-  # ============================================================================
-
-  virtualization.enable = false; # Docker, Podman, QEMU/KVM
 
   # ============================================================================
   # ADDITIONAL FEATURES

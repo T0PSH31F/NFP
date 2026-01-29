@@ -35,8 +35,8 @@
     # Theming
     ./theming/gtk.nix
 
-    # Penetration Testing (commented out)
-    # ./pentest
+    # Penetration Testing
+    ./pentest
   ];
 
   programs.home-manager.enable = true;

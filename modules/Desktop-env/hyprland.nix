@@ -21,6 +21,7 @@ in
       package = lib.mkForce inputs.hyprland.packages.${pkgs.system}.hyprland;
       withUWSM = true;
       xwayland.enable = true;
+      # Let programs.hyprland add xdg-desktop-portal-hyprland automatically
     };
 
     # UWSM Configuration for Session Management
@@ -62,7 +63,7 @@ in
       home.stateVersion = "25.05";
       # Essential Hyprland dependencies that might not be in the minimal package
       home.packages = with pkgs; [
-        # xdg-desktop-portal-hyprland is added via xdg.portal.extraPortals below
+        # xdg-desktop-portal-hyprland is handled by desktop-portals.nix system-wide
         # waybar
         # hyprlandPlugins.borders-plus-plus (Disabled due to rendering issues)
         hyprlandPlugins.hypr-dynamic-cursors
@@ -89,18 +90,23 @@ in
         xpipe
         steam-rom-manager
         sonic-cursor # Sonic hyprcursor theme
+        polkit-gnome # Polkit authentication agent for Hyprland
+        xdg-utils # xdg-open and related utilities
+        xdg-user-dirs # Manage XDG user directories
       ];
-      xdg.portal = {
-        extraPortals = with pkgs; [
-          xdg-desktop-portal-gtk
-        ];
-      };
+      # Don't configure xdg.portal here - it's handled by desktop-portals.nix to avoid duplicate services
+      # xdg.portal = {
+      #   extraPortals = with pkgs; [
+      #     xdg-desktop-portal-gtk
+      #   ];
+      # };
 
       wayland.windowManager.hyprland = {
         enable = true;
         # Use flake's Hyprland for consistent ABI with plugins
         package = inputs.hyprland.packages.${pkgs.system}.hyprland;
-        portalPackage = inputs.hyprland.packages.${pkgs.system}.xdg-desktop-portal-hyprland;
+        # Don't set portalPackage here - it's handled by desktop-portals.nix to avoid conflicts
+        # portalPackage = inputs.hyprland.packages.${pkgs.system}.xdg-desktop-portal-hyprland;
         # Disable systemd integration since UWSM handles it
         systemd.enable = false;
         plugins = [
@@ -314,6 +320,10 @@ in
 
           exec-once = [
             "wl-paste --watch cliphist store & disown" # Clipboard history daemon
+            "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 & disown" # Polkit authentication agent
+            "dms & disown" # Noctalia/DMS shell startup
+            "swww-daemon & disown" # Wallpaper daemon
+            "waybar & disown" # Waybar (if enabled)
           ];
 
           env = [
@@ -325,6 +335,14 @@ in
             "ELECTRON_OZONE_PLATFORM_HINT,auto"
             "QT_QPA_PLATFORMTHEME,qt6ct"
             "QT_QPA_PLATFORMTHEME_QT6,qt6ct"
+            "SDL_VIDEODRIVER,wayland" # SDL applications
+            "MOZ_ENABLE_WAYLAND,1" # Firefox
+            "XDG_CURRENT_DESKTOP,Hyprland" # Desktop environment detection
+            "XDG_SESSION_TYPE,wayland" # Session type
+            "WAYLAND_DISPLAY,wayland-1" # Wayland display
+            "_JAVA_AWT_WM_NONREPARENTING,1" # Java applications
+            "GTK_USE_PORTAL,1" # GTK portal integration
+            "NIXOS_OZONE_WL,1" # NixOS ozone Wayland
           ];
 
           general = {

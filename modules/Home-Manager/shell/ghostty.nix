@@ -78,7 +78,7 @@
       copy-on-select = "clipboard";
       custom-shader = [
         #"${config.xdg.configHome}/ghostty/shaders/cursor_rainbow_tapered_boing.glsl"
-        # "${config.xdg.configHome}/ghostty/shaders/starfield-colors.glsl"
+        #"${config.xdg.configHome}/ghostty/shaders/starfield-colors.glsl"
         #"${config.xdg.configHome}/ghostty/shaders/starfield.glsl"
         #"${config.xdg.configHome}/ghostty/shaders/cursor.glsl"
         #"${config.xdg.configHome}/ghostty/shaders/cursor_smear_fade.glsl"
@@ -91,12 +91,13 @@
         #"${config.xdg.configHome}/ghostty/shaders/blaze_sparks.glsl"
         #"${config.xdg.configHome}/ghostty/shaders/glitchy.glsl"
         #"${config.xdg.configHome}/ghostty/shaders/inside-the-matrix.glsl"
-        "${config.xdg.configHome}/ghostty/shaders/matrix-hallway.glsl"
+        #"${config.xdg.configHome}/ghostty/shaders/matrix-hallway.glsl"
         #"${config.xdg.configHome}/ghostty/shaders/sparks-from-fire.glsl"
         #"${config.xdg.configHome}/ghostty/shaders/smoke-from-ghost.glsl"
         #"${config.xdg.configHome}/ghostty/shaders/in-game-crt.glsl"
         #"${config.xdg.configHome}/ghostty/shaders/galaxy.glsl"
         #"${config.xdg.configHome}/ghostty/shaders/retro-terminal.glsl"
+        "${config.xdg.configHome}/ghostty/shaders/cyberpunk.glsl"
       ];
     };
   };

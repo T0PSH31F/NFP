@@ -60,6 +60,13 @@ with lib;
       "d ${config.services-config.media-stack.dataDir}/torrents 0755 ${config.services-config.media-stack.user} ${config.services-config.media-stack.group} -"
       # Fix Prowlarr state directory ownership
       "d /var/lib/prowlarr 0750 ${config.services-config.media-stack.user} ${config.services-config.media-stack.group} -"
+      "d /var/lib/sonarr 0750 ${config.services-config.media-stack.user} ${config.services-config.media-stack.group} -"
+      "d /var/lib/radarr 0750 ${config.services-config.media-stack.user} ${config.services-config.media-stack.group} -"
+      "d /var/lib/lidarr 0750 ${config.services-config.media-stack.user} ${config.services-config.media-stack.group} -"
+      "d /var/lib/readarr 0750 ${config.services-config.media-stack.user} ${config.services-config.media-stack.group} -"
+      "d /var/lib/bazarr 0750 ${config.services-config.media-stack.user} ${config.services-config.media-stack.group} -"
+      "d /var/lib/deluge 0750 ${config.services-config.media-stack.user} ${config.services-config.media-stack.group} -"
+      "d /var/lib/aria2 0750 ${config.services-config.media-stack.user} ${config.services-config.media-stack.group} -"
     ];
 
     # ============================================================================
@@ -150,12 +157,22 @@ with lib;
       enable = true;
     };
 
-    # Prowlarr doesn't have user/group options, override via systemd
-    systemd.services.prowlarr.serviceConfig = {
-      User = lib.mkForce config.services-config.media-stack.user;
-      Group = lib.mkForce config.services-config.media-stack.group;
-      StateDirectory = lib.mkForce "prowlarr";
-      StateDirectoryMode = lib.mkForce "0750";
+    # Fix Prowlarr state directory ownership and permissions
+    systemd.services.prowlarr = {
+      serviceConfig = {
+        User = lib.mkForce config.services-config.media-stack.user;
+        Group = lib.mkForce config.services-config.media-stack.group;
+        StateDirectory = lib.mkForce "prowlarr";
+        StateDirectoryMode = lib.mkForce "0750";
+        # Fix NAMESPACE issue with impermanence
+        PrivateTmp = lib.mkForce false;
+        ProtectSystem = lib.mkForce false;
+        ProtectHome = lib.mkForce false;
+        ReadWritePaths = [ "/var/lib/prowlarr" ];
+      };
+      # Ensure service starts after directory creation
+      after = [ "network.target" "local-fs.target" ];
+      wants = [ "network-online.target" ];
     };
 
     # ============================================================================

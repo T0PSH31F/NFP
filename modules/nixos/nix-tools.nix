@@ -44,7 +44,7 @@ with lib; {
       manix
       optnix
       zsh-nix-shell
-      mcp-nixos
+      # mcp-nixos # Disabled: dependency conflict with fastmcp (needs mcp<1.17.0 but has 1.25.0)
       nil
       nixd
       dix
@@ -73,7 +73,6 @@ with lib; {
 
         # Nom shortcuts
         nb = "nom build";
-        ns = "nom shell";
         ndev = "nom develop";
 
         # Nix helpers

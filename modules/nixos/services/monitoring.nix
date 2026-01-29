@@ -237,11 +237,20 @@ with lib;
     };
 
     # Fix promtail namespace error (conflicts with impermanence bind mounts)
-    systemd.services.promtail.serviceConfig = {
-      PrivateTmp = lib.mkForce false;
-      ProtectSystem = lib.mkForce false;
-      ProtectHome = lib.mkForce false;
-      ReadWritePaths = [ "/var/lib/promtail" ];
+    systemd.services.promtail = {
+      serviceConfig = {
+        PrivateTmp = lib.mkForce false;
+        ProtectSystem = lib.mkForce false;
+        ProtectHome = lib.mkForce false;
+        ReadWritePaths = [ "/var/lib/promtail" ];
+        # Additional fixes for namespace issues
+        TemporaryFileSystem = lib.mkForce "";
+        BindReadOnlyPaths = lib.mkForce "";
+        BindPaths = lib.mkForce "";
+      };
+      # Ensure service starts after network and filesystem
+      after = [ "network.target" "local-fs.target" ];
+      wants = [ "network-online.target" ];
     };
 
     # ============================================================================

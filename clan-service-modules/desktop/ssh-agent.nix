@@ -20,15 +20,18 @@ in
   };
 
   config = mkIf cfg.enable {
+    # Configure SSH client settings
     programs.ssh = {
-      startAgent = true;
+      # Don't use the built-in startAgent to avoid conflicts
+      # We define our own systemd service below for better control
+      startAgent = false;
       agentTimeout = "1h";
       extraConfig = ''
         AddKeysToAgent yes
       '';
     };
 
-    # Ensure ssh-agent is available in user sessions
+    # Custom ssh-agent systemd user service
     systemd.user.services.ssh-agent = {
       description = "SSH Agent";
       wantedBy = [ "default.target" ];

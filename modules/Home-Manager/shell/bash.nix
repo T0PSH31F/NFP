@@ -46,12 +46,12 @@
         export PS1="[nix-shell] $PS1"
       fi
 
-      # Anifetch MOTD - Display system info with neofetch/anifetch
+      # Anifetch MOTD - Display Lain GIF ONLY
       _anifetch_motd() {
-        if command -v anifetch &> /dev/null; then
-          anifetch 2>/dev/null || neofetch 2>/dev/null || true
-        elif command -v neofetch &> /dev/null; then
-          neofetch 2>/dev/null || true
+        local lain_gif="$HOME/.background/Giffees/Lain/oldScreen.gif"
+        if command -v anifetch &> /dev/null && [[ -f "$lain_gif" ]]; then
+          # Display Lain GIF with anifetch (40 width, 20 height, 1 repeat)
+          anifetch "$lain_gif" -r 1 -W 40 -H 20 -c "--symbols wide --fg-only" 2>/dev/null || true
         fi
       }
       # Only show MOTD for interactive shells, not in tmux/screen, and not in VSCode terminal

@@ -80,7 +80,7 @@ nixos-rebuild switch --flake .#newmachine --target-host root@targethost
 
 All options are documented in `default.nix` with inline comments. Major categories:
 
-- **Desktop Environment**: Choose between Omarchy, Caelestia, or Illogical
+- **Desktop Environment**: Choose between Omarchy, Caelestia, or illogical-impulse
 - **Gaming**: Steam, Proton, emulators, performance tools
 - **AI Services**: PostgreSQL, Open WebUI, Qdrant, ChromaDB, LocalAI
 - **Web Services**: Nextcloud, Caddy, Home Assistant, Calibre-Web
