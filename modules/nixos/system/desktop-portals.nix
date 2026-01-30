@@ -21,7 +21,10 @@ in
 
   config = mkIf cfg.enable {
     # Enable polkit for authentication dialogs
-    security.polkit.enable = true;
+    security.polkit = {
+      enable = true;
+      package = pkgs.hyprpolkitagent;
+    };
 
     # XDG Desktop Portal configuration
     xdg.portal = {

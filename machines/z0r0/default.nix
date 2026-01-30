@@ -173,6 +173,7 @@
       yazelix.enable = true;
       keybind-cheatsheet.enable = true;
       pentest.enable = false;
+      vicinae.enable = true;
     };
   };
 
@@ -217,7 +218,7 @@
 
   # Services config (separate namespace for config-only services)
   services-config = {
-    media-stack.enable = true; # Fixed - Prowlarr STATE_DIRECTORY issue resolved
+    #media-stack.enable = true; # Fixed - Prowlarr STATE_DIRECTORY issue resolved
     avahi.enable = true; # mDNS
     monitoring.enable = true; # Fixed - Promtail NAMESPACE issue resolved
     homepage-dashboard.enable = true;

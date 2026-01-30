@@ -238,14 +238,14 @@ with lib;
     };
     users.groups.homepage-dashboard = { };
 
-    # Ensure Homepage data is persisted
-    environment.persistence."/persist" =
-      mkIf (config.services-config.homepage-dashboard.enable && config.system-config.impermanence.enable)
-        {
-          directories = [
-            "/var/lib/homepage-dashboard"
-          ];
-        };
+    # Ensure data is persisted
+
+
+    environment.persistence."/persist" = mkIf config.system-config.impermanence.enable {
+      directories = [
+        "/var/lib/homepage-dashboard"
+      ];
+    };
 
     # Fix for STATE_DIRECTORY failure with impermanence
     # Systemd managing StateDirectory conflicts with impermanence symlinks/bind-mounts

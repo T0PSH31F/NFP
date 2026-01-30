@@ -1,6 +1,7 @@
-{ pkgs, ... }:
+{ pkgs, inputs, ... }:
 {
   imports = [
+    inputs.vicinae.homeManagerModules.default
     ./lf.nix
     ./mcp.nix
     ./zathura.nix

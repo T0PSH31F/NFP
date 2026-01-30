@@ -210,7 +210,7 @@ with lib;
     # Network
     resolved = {
       enable = true;
-      dnssec = "true";
+      dnssec = lib.mkDefault "true";
       domains = [ "~." ];
       fallbackDns = [
         "1.1.1.1"

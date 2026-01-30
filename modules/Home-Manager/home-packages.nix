@@ -39,6 +39,7 @@
     gotree # gt nice tree-view in terminal
     hyperfine # benchmarking
     jq # JSON processor
+    lsd
     lsix # thumbnails in terminal
     ncdu # better du
     procs # better ps
@@ -113,7 +114,10 @@
     calibre # eBooks
     caprine-bin # messenger
     element-desktop # matrix
+    exegol4
     foliate # eBook reader
+    kasasa # Snip and pin useful information to a small floating window
+     # NOTICE! best configured with a keybind/shorcut needs setup! 
     koreader # eBook reader
     kotatogram-desktop # telegram
     libreoffice
@@ -121,9 +125,12 @@
     nextcloud-client
     obsidian # knowledge base
     signal-desktop # messaging
+    silverbullet
+    skate
     thunderbird # email
     vencord # discord
     vesktop # discord
+    windsend-rs # Quickly and securely sync clipboard, transfer files and directories between devices
     yt-dlp # video downloader
     zathura # PDF
     zeal # documentation
@@ -139,6 +146,8 @@
     zellij
 
     # --- Fun & Aesthetics ---
+    asciiquarium-transparent
+    ascii-image-converter
     asciinema # terminal recorder
     blahaj # essential
     cbonsai
@@ -148,6 +157,7 @@
     fortune
     inputs.awww.packages.${pkgs.system}.awww
     lavat
+    lolcat
     neo-cowsay
     neofetch
     sl # steam locomotive

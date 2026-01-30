@@ -248,104 +248,35 @@ with lib;
         BindReadOnlyPaths = lib.mkForce "";
         BindPaths = lib.mkForce "";
       };
-      # Ensure service starts after network and filesystem
-      after = [ "network.target" "local-fs.target" ];
-      wants = [ "network-online.target" ];
     };
 
-    # ============================================================================
-    # GRAFANA - Visualization
-    # ============================================================================
-    services.grafana = {
-      enable = true;
+  # Ensure data is persisted
 
-      settings = {
-        server = {
-          domain = config.services-config.monitoring.domain;
-          http_port = config.services-config.monitoring.grafana.port;
-          http_addr = "0.0.0.0";
-        };
 
-        analytics.reporting_enabled = false;
+  environment.persistence."/persist" = mkIf config.system-config.impermanence.enable {
 
-        # Default admin credentials (change after first login!)
-        security = {
-          admin_user = "admin";
-          admin_password = "admin";
-        };
-      };
 
-      provision = {
-        enable = true;
+    directories = [
 
-        # Data sources
-        datasources.settings.datasources = [
-          # Prometheus
-          {
-            name = "Prometheus";
-            type = "prometheus";
-            access = "proxy";
-            url = "http://localhost:${toString config.services-config.monitoring.prometheus.port}";
-            isDefault = true;
-            jsonData = {
-              timeInterval = "30s";
-            };
-          }
 
-          # Loki
-          {
-            name = "Loki";
-            type = "loki";
-            access = "proxy";
-            url = "http://localhost:${toString config.services-config.monitoring.loki.port}";
-            jsonData = {
-              maxLines = 1000;
-            };
-          }
-        ];
 
-        # Default dashboards
-        dashboards.settings.providers = [
-          {
-            name = "Default";
-            options.path = "/var/lib/grafana/dashboards";
-          }
-        ];
-      };
-    };
+      "/var/lib/prometheus2"
 
-    # Create dashboard directory
-    systemd.tmpfiles.rules = [
-      "d /var/lib/grafana/dashboards 0755 grafana grafana -"
+
+      "/var/lib/loki"
+
+
+      "/var/lib/grafana"
+
+
+      "/var/lib/promtail"
+
+
+
     ];
 
-    # ============================================================================
-    # FIREWALL
-    # ============================================================================
-    networking.firewall.allowedTCPPorts = [
-      config.services-config.monitoring.prometheus.port # Prometheus
-      config.services-config.monitoring.loki.port # Loki
-      config.services-config.monitoring.grafana.port # Grafana
-      9100 # Node exporter
-      9080 # Promtail
-    ];
 
-    # Packages
-    environment.systemPackages = with pkgs; [
-      prometheus # Contains promtool
-      grafana # Grafana CLI
-    ];
+  };
 
-    # Ensure monitoring data is persisted
-    environment.persistence."/persist" =
-      mkIf (config.services-config.monitoring.enable && config.system-config.impermanence.enable)
-        {
-          directories = [
-            "/var/lib/prometheus2"
-            "/var/lib/loki"
-            "/var/lib/grafana"
-            "/var/lib/promtail"
-          ];
-        };
   };
 }

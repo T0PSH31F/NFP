@@ -41,6 +41,10 @@
     git
     pciutils
     usbutils
+    
+    # Container runtime for services
+    docker
+    docker-compose
   ];
 
   # Flatpak Support

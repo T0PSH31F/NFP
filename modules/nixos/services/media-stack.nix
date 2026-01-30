@@ -67,6 +67,20 @@ with lib;
       "d /var/lib/bazarr 0750 ${config.services-config.media-stack.user} ${config.services-config.media-stack.group} -"
       "d /var/lib/deluge 0750 ${config.services-config.media-stack.user} ${config.services-config.media-stack.group} -"
       "d /var/lib/aria2 0750 ${config.services-config.media-stack.user} ${config.services-config.media-stack.group} -"
+      # Ensure aria2 session directory is writable
+      "f /var/lib/aria2/session.gz 0644 ${config.services-config.media-stack.user} ${config.services-config.media-stack.group} -"
+      # Ensure directories are created with correct permissions for impermanence
+      "d /var/lib/aria2 0755 ${config.services-config.media-stack.user} ${config.services-config.media-stack.group} -"
+      "d /var/lib/prowlarr 0755 ${config.services-config.media-stack.user} ${config.services-config.media-stack.group} -"
+      # Additional tmpfiles rules to ensure directories are created before services start
+      "d /var/lib/aria2 0755 ${config.services-config.media-stack.user} ${config.services-config.media-stack.group} -"
+      "d /var/lib/prowlarr 0755 ${config.services-config.media-stack.user} ${config.services-config.media-stack.group} -"
+      "d /var/lib/sonarr 0755 ${config.services-config.media-stack.user} ${config.services-config.media-stack.group} -"
+      "d /var/lib/radarr 0755 ${config.services-config.media-stack.user} ${config.services-config.media-stack.group} -"
+      "d /var/lib/lidarr 0755 ${config.services-config.media-stack.user} ${config.services-config.media-stack.group} -"
+      "d /var/lib/readarr 0755 ${config.services-config.media-stack.user} ${config.services-config.media-stack.group} -"
+      "d /var/lib/bazarr 0755 ${config.services-config.media-stack.user} ${config.services-config.media-stack.group} -"
+      "d /var/lib/deluge 0755 ${config.services-config.media-stack.user} ${config.services-config.media-stack.group} -"
     ];
 
     # ============================================================================
@@ -170,80 +184,56 @@ with lib;
         ProtectHome = lib.mkForce false;
         ReadWritePaths = [ "/var/lib/prowlarr" ];
       };
-      # Ensure service starts after directory creation
-      after = [ "network.target" "local-fs.target" ];
-      wants = [ "network-online.target" ];
     };
 
-    # ============================================================================
-    # LIDARR - Music
-    # ============================================================================
-    services.lidarr = {
-      enable = true;
-      user = config.services-config.media-stack.user;
-      group = config.services-config.media-stack.group;
-    };
+  # Ensure data is persisted
 
-    # ============================================================================
-    # READARR - Books/Comics
-    # ============================================================================
-    services.readarr = {
-      enable = true;
-      user = config.services-config.media-stack.user;
-      group = config.services-config.media-stack.group;
-    };
 
-    # ============================================================================
-    # BAZARR - Subtitles
-    # ============================================================================
-    services.bazarr = {
-      enable = true;
-      user = config.services-config.media-stack.user;
-      group = config.services-config.media-stack.group;
-    };
+  environment.persistence."/persist" = mkIf config.system-config.impermanence.enable {
 
-    # ============================================================================
-    # FIREWALL
-    # ============================================================================
-    networking.firewall.allowedTCPPorts = [
-      8112 # Deluge Web UI
-      6800 # aria2 RPC
-      8989 # Sonarr
-      7878 # Radarr
-      9696 # Prowlarr
-      8686 # Lidarr
-      8787 # Readarr
-      6767 # Bazarr
+
+    directories = [
+
+
+
+      config.services-config.media-stack.dataDir
+
+
+      config.services-config.media-stack.downloadsDir
+
+
+      "/var/lib/deluge"
+
+
+      "/var/lib/aria2"
+
+
+      "/var/lib/sonarr"
+
+
+      "/var/lib/radarr"
+
+
+      "/var/lib/prowlarr"
+
+
+      "/var/lib/lidarr"
+
+
+      "/var/lib/readarr"
+
+
+      "/var/lib/bazarr"
+
+
+      "/var/lib/redis"
+
+
+
     ];
 
-    networking.firewall.allowedUDPPorts = [
-      6881 # Deluge
-      6889 # Deluge
-    ];
 
-    # Packages
-    environment.systemPackages = with pkgs; [
-      deluge
-      aria2
-    ];
+  };
 
-    # Ensure Media Stack data is persisted
-    environment.persistence."/persist" =
-      mkIf (config.services-config.media-stack.enable && config.system-config.impermanence.enable)
-        {
-          directories = [
-            config.services-config.media-stack.dataDir
-            config.services-config.media-stack.downloadsDir
-            "/var/lib/deluge"
-            "/var/lib/aria2"
-            "/var/lib/sonarr"
-            "/var/lib/radarr"
-            "/var/lib/prowlarr"
-            "/var/lib/lidarr"
-            "/var/lib/readarr"
-            "/var/lib/bazarr"
-            "/var/lib/redis"
-          ];
-        };
   };
 }

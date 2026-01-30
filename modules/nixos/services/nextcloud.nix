@@ -82,7 +82,7 @@ with lib;
     ];
 
     # Ensure Nextcloud and DB are persisted
-    environment.persistence."/persist" = mkIf config.system-config.impermanence.enable {
+    environment.persistence."/persist" = mkIf (config.system-config.impermanence.enable or false) {
       directories = [
         config.services.nextcloud-server.dataDir
         # "/var/lib/postgresql"

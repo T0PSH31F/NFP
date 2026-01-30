@@ -10,6 +10,7 @@
     ./niri.nix
 
     # Desktop Shells / Environments
+    ./Noctalia/default.nix
     ./Dankmaterialshell/default.nix
     ./Caelestia-shell/default.nix
     ./Omarchy/default.nix

@@ -52,14 +52,12 @@ with lib;
     # Firewall
     networking.firewall.allowedTCPPorts = [ config.services.calibre-web-app.port ];
 
-    # Ensure Calibre-Web data is persisted
-    environment.persistence."/persist" =
-      mkIf (config.services.calibre-web-app.enable && config.system-config.impermanence.enable)
-        {
-          directories = [
-            config.services.calibre-web-app.dataDir
-            config.services.calibre-web-app.libraryPath
-          ];
-        };
+    # Ensure data is persisted
+    environment.persistence."/persist" = mkIf config.system-config.impermanence.enable {
+      directories = [
+        config.services.calibre-web-app.dataDir
+        config.services.calibre-web-app.libraryPath
+      ];
+    };
   };
 }

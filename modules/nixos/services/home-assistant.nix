@@ -70,13 +70,24 @@ with lib;
       config.services.home-assistant-server.port
     ];
 
-    # Ensure Home Assistant data is persisted
-    environment.persistence."/persist" =
-      mkIf (config.services.home-assistant-server.enable && config.system-config.impermanence.enable)
-        {
-          directories = [
-            "/var/lib/hass"
-          ];
-        };
+  # Ensure data is persisted
+
+
+  environment.persistence."/persist" = mkIf config.system-config.impermanence.enable {
+
+
+    directories = [
+
+
+
+      "/var/lib/hass"
+
+
+
+    ];
+
+
+  };
+
   };
 }

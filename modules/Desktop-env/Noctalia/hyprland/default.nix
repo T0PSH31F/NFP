@@ -13,12 +13,29 @@ in
   # This module is imported when desktop.noctalia.backend = "hyprland"
   
   config = lib.mkIf (cfg.enable && cfg.backend == "hyprland") {
-    # Import keybinds and IPC modules
+    # Enable Hyprland
+    desktop.hyprland.enable = true;
+    
+    # Import IPC module only (keybinds are handled separately)
     home-manager.users.t0psh31f = {
       imports = [
-        ./hyprland/keybinds.nix
-        ./hyprland/ipc.nix
+        ./ipc.nix
       ];
+      
+      # Add Noctalia shell startup to Hyprland
+      wayland.windowManager.hyprland.settings = {
+        layerrule = lib.mkAfter [
+         # Noctalia background layers (frosty glass effect)
+         "noctalia, namespace: noctalia-background-.*, ignore_alpha: 0.5, blur: true, blur_passes: 3, blur_size: 8, blur_popups: true"
+         
+         # Additional Noctalia layers (notifications, OSD, etc.)
+         "noctalia, namespace: noctalia-.*, ignore_alpha: 0.8, blur: true, dim: 0.1"
+       ];
+
+        exec-once = [
+          "noctalia-shell & disown" # Start Noctalia shell
+        ];
+      };
 
       programs.noctalia-shell = {
         enable = true;

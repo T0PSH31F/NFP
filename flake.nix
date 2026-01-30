@@ -62,7 +62,10 @@
       url = "github:justchokingaround/jerry";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    llm-agents.url = "github:numtide/llm-agents.nix";
+    llm-agents = {
+      url = "github:numtide/llm-agents.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     lobster = {
       url = "github:justchokingaround/lobster";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -119,6 +122,11 @@
       url = "github:vicinaehq/vicinae";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    vicinae-extensions = {
+      url = "github:vicinaehq/extensions";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.vicinae.follows = "vicinae";
+    };
   };
 
   outputs =
@@ -128,6 +136,7 @@
       home-manager,
       import-tree,
       nvf,
+      llm-agents,
       ...
     }:
     flake-parts.lib.mkFlake { inherit inputs; } (
@@ -182,6 +191,7 @@
                 statix
                 nix-search-cli
                 git
+                curl
               ];
 
               shellHook = ''

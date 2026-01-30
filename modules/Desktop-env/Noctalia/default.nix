@@ -12,7 +12,7 @@ in
 {
   # Import backend-specific configuration at top level
   imports = [
-    ./hyprland.nix
+    ./hyprland/default.nix
     ./niri/default.nix
   ];
 

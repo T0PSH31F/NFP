@@ -36,21 +36,7 @@ in
       };
     };
 
-    systemd.user.services.vicinae = {
-      description = "Vicinae Launcher";
-      wantedBy = [ "graphical-session.target" ];
-      partOf = [ "graphical-session.target" ];
-      after = [ "graphical-session.target" ];
-
-      serviceConfig = {
-        ExecStart = "${inputs.vicinae.packages.${pkgs.system}.default}/bin/vicinae --server";
-        Restart = "on-failure";
-        RestartSec = 5;
-        Type = "simple";
-        # Prevent uwsm-app.lock conflicts
-        Environment = "UWSM_NO_LOCK=1";
-      };
-    };
+  
 
     # Define Sonic cursor package
     nixpkgs.overlays = [
@@ -63,13 +49,13 @@ in
       home.stateVersion = "25.05";
       # Essential Hyprland dependencies that might not be in the minimal package
       home.packages = with pkgs; [
+        inputs.awww.packages.${pkgs.system}.default
         # xdg-desktop-portal-hyprland is handled by desktop-portals.nix system-wide
         # waybar
         # hyprlandPlugins.borders-plus-plus (Disabled due to rendering issues)
         hyprlandPlugins.hypr-dynamic-cursors
         # hyprlax
         # quickshell - provided by desktop environment modules
-        vicinae
         inputs.danksearch.packages.${pkgs.system}.default # DankSearch
         rofi
         dunst
@@ -90,7 +76,7 @@ in
         xpipe
         steam-rom-manager
         sonic-cursor # Sonic hyprcursor theme
-        polkit-gnome # Polkit authentication agent for Hyprland
+        hyprpolkitagent # Hyprland polkit authentication agent
         xdg-utils # xdg-open and related utilities
         xdg-user-dirs # Manage XDG user directories
       ];
@@ -116,14 +102,13 @@ in
         ];
 
         settings = {
-
           # Source matugen-generated colors for dynamic theming
           source = "~/.config/hypr/colors.conf";
 
           "$mod" = "SUPER";
           "$terminal" = "ghostty";
           "$fileManager" = "nemo-with-extensions";
-          "$browser" = "vivaldi";
+          "$browser" = "brave";
 
           # ============================================================================
           # PLUGIN CONFIGURATION
@@ -163,37 +148,63 @@ in
 
           # Custom keybinds
           bind = lib.mkAfter [
+             # Overview / App Launcher (Super + Space via Vicinae or direct)
+        "SUPER, D, exec, noctalia-shell ipc overview"  # Overview mode[web:page]
+
+        # Control Center (Quick Settings)
+        "SUPER, X, exec, noctalia-shell ipc control-center"  # Toggle Control Center
+
+        # Lock Screen
+        "SUPER, L, exec, noctalia-shell ipc lock"  # Lock screen
+
+        # Logout / Session Menu
+        "SUPER SHIFT, E, exec, noctalia-shell ipc session-menu"  # Session actions
+
+        # Notifications
+        "SUPER SHIFT, N, exec, noctalia-shell ipc notification-center"  # Notification history
+
+        # Brightness / Audio (IPC via noctalia-shell, overrides your dms if preferred)
+        ", XF86MonBrightnessUp, exec, noctalia-shell ipc brightness +5"
+        ", XF86MonBrightnessDown, exec, noctalia-shell ipc brightness -5"
+        ", XF86AudioRaiseVolume, exec, noctalia-shell ipc volume +5"
+        ", XF86AudioLowerVolume, exec, noctalia-shell ipc volume -5"
+        ", XF86AudioMute, exec, noctalia-shell ipc volume mute"
+
+        # Media Controls (if Noctalia handles MPRIS)
+        ", XF86AudioPlay, exec, noctalia-shell ipc media play-pause"
+        ", XF86AudioNext, exec, noctalia-shell ipc media next"
+        ", XF86AudioPrev, exec, noctalia-shell ipc media previous"
+
+        # Screenshot (integrate with Noctalia OSD)
+        ", Print, exec, noctalia-shell ipc screenshot"
+
+        # Workspace / Overview integration
+        "SUPER SHIFT, Tab, exec, noctalia-shell ipc overview"  # Alt-Tab like overview
+      
+
+
             "SUPER, Q, killactive," # Close/kill active window
             "SUPER, C, exec, uwsm app -- code" # Open VSCode
             "SUPER, T, exec, uwsm app -- ghostty" # Terminal
             "SUPER, Return, exec, uwsm app -- ghostty" # Terminal (alternate)
             "SUPER SHIFT, T, exec, uwsm app -- kitty" # Kitty terminal
             "SUPER SHIFT, Return, exec, uwsm app -- warp-terminal" # Warp terminal
-            "SUPER, E, exec, uwsm app -- cosmic-files" # File Manager
-            "SUPER SHIFT, E, exec, uwsm app -- thunar" # File Manager (alternate)
+            "SUPER, E, exec, uwsm app -- thunar" # File Manager
+            "SUPER CTRL, E, exec, uwsm app -- ghostty -e sf"
+            "SUPER SHIFT, E, exec, uwsm app -- kdePackages.dolphin" # File Manager (alternate)
             "SUPER SHIFT, Y, exec, ghostty -e yazi" # TUI File Manager
             "SUPER, M, exec, uwsm app -- spotify" # Music
+         
             # Screenshots (Flameshot)
-            # Full screen
-            "SHIFT, Print, exec, flameshot full --path ~/Pictures/screenshots"
-            # Interactive GUI (Area/Active)
-            "CTRL, Print, exec, flameshot gui --path ~/Pictures/screenshots"
+            "SHIFT, Print, exec, flameshot full --path ~/Pictures/screenshots" # Full screen
+            "CTRL, Print, exec, flameshot gui --path ~/Pictures/screenshots" # Interactive GUI (Area/Active)
             ", Print, exec, flameshot gui --path ~/Pictures/screenshots"
-
-            "SUPER, F, exec, uwsm app -- vivaldi" # Browser (Firefox)
-           
-
-            # DMS Application Launchers
-            "SUPER, Space, exec, dms ipc call hypr toggleOverview" # DMS Overview
-            "SUPER ALT, Space, exec, dms ipc call spotlight toggle" # DMS Spotlight
-            "SUPER, V, exec, dms ipc call clipboard toggle" # DMS Clipboard
-            "SUPER, P, exec, dms ipc call processlist focusOrToggle" # DMS Process list
-            "SUPER, comma, exec, dms ipc call settings focusOrToggle" # DMS Settings
-            "SUPER, N, exec, dms ipc call notifications toggle" # DMS Notifications
-            "SUPER, Y, exec, dms ipc call dankdash wallpaper" # DMS Wallpaper
-            "SUPER, A, exec, dms ipc call spotlight toggle" # DMS Spotlight
-            # DMS Security
-            "SUPER ALT, L, exec, dms ipc call lock lock" # DMS Lock screen
+            
+            # Browsers (Per-DE keybinds)
+            "SUPER, W, exec, uwsm app -- brave" # Brave (default)
+            "SUPER CTRL, W, exec, uwsm app -- librewolf" # Librewolf
+            "SUPER SHIFT, W, exec, uwsm app -- mullvad-browser" # Mullvad
+            "SUPER ALT, W, exec, uwsm app -- dillo" # Dillo+
 
             # Swap windows
             "SUPER SHIFT, left, movewindow, l"
@@ -227,8 +238,8 @@ in
             "SUPER SHIFT, mouse_up, movetoworkspace, +1"
 
             # Fullscreen
-            "SUPER, B, fullscreen, 0"
-            "SUPER SHIFT, B, fullscreen, 1"
+            "SUPER, F, fullscreen, 0"
+            "SUPER SHIFT, F, fullscreen, 1"
 
             # Switching
             "SUPER, 1, workspace, 1"
@@ -295,35 +306,21 @@ in
             "SUPER, mouse:272, movewindow"
             "SUPER, mouse:273, resizewindow"
             "SUPER, mouse:274, movewindow"
-            # "SUPER, Z, movewindow"
-            # "SUPER, mouse_up, resizeactive, relative 0 -20"
-            # "SUPER, mouse_down, resizeactive, relative 0 20"
-            # "SUPER, mouse_left, resizeactive, relative -20 0"
-            # "SUPER, mouse_right, resizeactive, relative 20 0"
           ];
 
-          bindel = [
-            # Audio Controls
-            ", XF86AudioRaiseVolume, exec, dms ipc call audio increment 3"
-            ", XF86AudioLowerVolume, exec, dms ipc call audio decrement 3"
-            # Brightness Controls
-            ", XF86MonBrightnessUp, exec, dms ipc call brightness increment 5"
-            ", XF86MonBrightnessDown, exec, dms ipc call brightness decrement 5"
-          ];
+        
 
           # Lid switch binds for clamshell mode and audio mute
           bindl = [
-            ", XF86AudioMute, exec, dms ipc call audio mute"
             ", switch:on:Lid Switch, exec, hyprctl keyword monitor \"eDP-1, disable\""
             ", switch:off:Lid Switch, exec, hyprctl keyword monitor \"eDP-1, 2560x1600@60, 0x0, 1.6\""
           ];
 
           exec-once = [
             "wl-paste --watch cliphist store & disown" # Clipboard history daemon
-            "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 & disown" # Polkit authentication agent
-            "dms & disown" # Noctalia/DMS shell startup
+            "${pkgs.hyprpolkitagent}/bin/hyprpolkitagent & disown" # Hyprland polkit agent
             "swww-daemon & disown" # Wallpaper daemon
-            "waybar & disown" # Waybar (if enabled)
+            "hyprctl setcursor sonic-hyprcursor 32" # Set Sonic cursor at size 32
           ];
 
           env = [
@@ -364,8 +361,9 @@ in
             # Blur for frosty glass
             blur = {
               enabled = true;
-              size = 8;
-              passes = 3;
+              size = 3;
+              passes = 2;
+              vibrancy = 0.1696;
             };
 
             # Neon shadow glow (dynamic from matugen)
@@ -453,8 +451,6 @@ in
             "specialWorkspace, 1, 2.3, md3_decel, slidefadevert 15%"
           ];
 
-          layerrule = [ ];
-
           # Workspace monitor assignments
           workspace = [
             "1, monitor:DP-2"
@@ -468,6 +464,7 @@ in
             "9, monitor:eDP-1"
             "10, monitor:eDP-1"
           ];
+
         };
       };
 

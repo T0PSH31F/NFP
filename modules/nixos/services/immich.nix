@@ -148,7 +148,7 @@ with lib;
     networking.firewall.allowedTCPPorts = [ config.services.immich-server.port ];
 
     # Ensure Immich data is persisted
-    environment.persistence."/persist" = mkIf config.system-config.impermanence.enable {
+    environment.persistence."/persist" = mkIf (config.system-config.impermanence.enable or false) {
       directories = [
         config.services.immich-server.dataDir
       ];

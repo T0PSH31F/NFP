@@ -18,7 +18,6 @@ in
     home-manager.users.t0psh31f = {
       imports = [
         inputs.caelestia-shell.homeManagerModules.default
-        inputs.vicinae.homeManagerModules.default
       ];
 
       # Caelestia shell with CLI and custom wallpaper directory
@@ -52,13 +51,7 @@ in
             # Caelestia shell controls
             "Ctrl+Alt, Delete, global, caelestia:session" # Session menu
             "Ctrl+Super+Alt, R, exec, qs -c caelestia kill; caelestia shell -d" # Restart shell
-            # Vicinae app launcher
-            "SUPER, A, exec, vicinae toggle" # Super+A to toggle Vicinae
-            "SUPER, Space, exec, vicinae toggle" # Super+Space to toggle Vicinae
-          ];
-
-          # Caelestia launcher via global shortcuts (bind on Super key)
-          bindi = [
+            # Caelestia launcher via global shortcuts
             "Super, Super_L, global, caelestia:launcher"
           ];
 
@@ -83,27 +76,6 @@ in
 
       # Ensure XDG directories are set properly for "Open with..." menus
       xdg.enable = true;
-
-      # Vicinae App Launcher with matugen theming
-      services.vicinae = {
-        enable = true;
-        autoStart = true;
-        settings = {
-          # Disable built-in global hotkey - we use Hyprland keybinds instead
-          globalHotkey.enabled = false;
-
-          # Theme using matugen dynamic colors from wallpaper
-          theme.name = "matugen-dark";
-          font.size = 16;
-          window = {
-            csd = true;
-            opacity = 0.85;
-            rounding = 10;
-          };
-          rootSearch.searchFiles = true;
-          popToRootOnClose = true;
-        };
-      };
     };
   };
 }

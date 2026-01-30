@@ -219,14 +219,27 @@ with lib;
       8448 # Federation port
     ];
 
-    # Ensure Matrix data and DB are persisted
-    environment.persistence."/persist" =
-      mkIf (config.services.matrix-server.enable && config.system-config.impermanence.enable)
-        {
-          directories = [
-            "/var/lib/matrix-synapse"
-            #  "/var/lib/postgresql"
-          ];
-        };
+  # Ensure data is persisted
+
+
+  environment.persistence."/persist" = mkIf config.system-config.impermanence.enable {
+
+
+    directories = [
+
+
+
+      "/var/lib/matrix-synapse"
+
+
+      #  "/var/lib/postgresql"
+
+
+
+    ];
+
+
+  };
+
   };
 }

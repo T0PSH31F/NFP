@@ -34,7 +34,7 @@ with lib;
       };
     };
 
-    # Create necessary directories
+    # Create necessary directories with proper permissions
     systemd.tmpfiles.rules = [
       "d ${config.services.sillytavern-app.dataDir} 0755 root root -"
     ];
@@ -42,13 +42,24 @@ with lib;
     # Firewall
     networking.firewall.allowedTCPPorts = [ config.services.sillytavern-app.port ];
 
-    # Ensure SillyTavern data is persisted
-    environment.persistence."/persist" =
-      mkIf (config.services.sillytavern-app.enable && config.system-config.impermanence.enable)
-        {
-          directories = [
-            config.services.sillytavern-app.dataDir
-          ];
-        };
+  # Ensure data is persisted
+
+
+  environment.persistence."/persist" = mkIf config.system-config.impermanence.enable {
+
+
+    directories = [
+
+
+
+      config.services.sillytavern-app.dataDir
+
+
+
+    ];
+
+
+  };
+
   };
 }

@@ -38,17 +38,17 @@ in
     };
 
     environment.systemPackages = with pkgs; [
-      xdg-desktop-portal-gnome # Niri often uses GNOME or GTK portal
-      fuzzel # Launcher
       mako # Notifications
       swaybg # Wallpaper
-      waybar # Status bar
       kitty # Terminal
     ];
 
     xdg.portal = {
       enable = true;
-      extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+      extraPortals = [ 
+        pkgs.xdg-desktop-portal-gtk
+        pkgs.xdg-desktop-portal-gnome
+         ];
     };
   };
 }

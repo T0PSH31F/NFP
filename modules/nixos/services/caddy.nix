@@ -49,13 +49,11 @@ with lib;
     ];
     networking.firewall.allowedUDPPorts = [ 443 ]; # For QUIC
 
-    # Ensure Caddy data (certificates) are persisted
-    environment.persistence."/persist" =
-      mkIf (config.services.caddy-server.enable && config.system-config.impermanence.enable)
-        {
-          directories = [
-            "/var/lib/caddy"
-          ];
-        };
+    # Ensure data is persisted
+    environment.persistence."/persist" = mkIf config.system-config.impermanence.enable {
+      directories = [
+        "/var/lib/caddy"
+      ];
+    };
   };
 }
