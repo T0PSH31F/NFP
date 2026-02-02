@@ -275,25 +275,6 @@ in
         };
 
     # ============================================================================
-    # SILLYTAVERN - Container-based AI Chat Frontend
-    # ============================================================================
-    virtualisation.oci-containers.containers.sillytavern = mkIf cfg.sillytavern.enable {
-      image = "ghcr.io/sillytavern/sillytavern:latest";
-      ports = [ "${toString cfg.sillytavern.port}:8000" ];
-      volumes = [
-        "${cfg.sillytavern.dataDir}:/home/node/app/data"
-      ];
-      environment = {
-        TZ = "America/Los_Angeles";
-      };
-    };
-
-    # SillyTavern directory setup
-    systemd.tmpfiles.rules = mkIf cfg.sillytavern.enable [
-      "d ${cfg.sillytavern.dataDir} 0755 root root -"
-    ];
-
-    # ============================================================================
     # OLLAMA - Native Local LLM Server
     # ============================================================================
     services.ollama = mkIf cfg.ollama.enable {
@@ -304,11 +285,8 @@ in
 
     # Enable docker/podman for container services
     virtualisation.docker.enable = mkIf (
-      cfg.open-webui.enable
-      || cfg.qdrant.enable
-      || cfg.chromadb.enable
-      || cfg.localai.enable
-      || cfg.sillytavern.enable
+      cfg.open-webui.enable || cfg.qdrant.enable || cfg.chromadb.enable || cfg.localai.enable
+
     ) true;
 
     virtualisation.oci-containers.backend = "docker";
@@ -320,7 +298,7 @@ in
       ++ (optional cfg.qdrant.enable cfg.qdrant.port)
       ++ (optional cfg.chromadb.enable cfg.chromadb.port)
       ++ (optional cfg.localai.enable cfg.localai.port)
-      ++ (optional cfg.sillytavern.enable cfg.sillytavern.port)
+
       ++ (optional cfg.ollama.enable 11434)
     );
 

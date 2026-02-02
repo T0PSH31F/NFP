@@ -8,6 +8,7 @@
   imports = [
     ../../modules/nixos/default.nix
     ../../modules/nixos/system/laptop.nix
+    ../../modules/nixos/hardware/intel-12th-gen.nix
     ../../modules/Home-Manager/Desktop-env/default.nix
     ../../modules/Home-Manager/Desktop-env/Noctalia/default.nix
     ../../modules/users/t0psh31f.nix
@@ -170,7 +171,7 @@
       enable = true;
       # LLM Frontends
       open-webui.enable = true;
-      sillytavern.enable = true; # Moved from sillytavern-app
+      # sillytavern.enable = true; # Moved to Clan Service
       # Local inference
       localai.enable = true;
       ollama.enable = false; # Enable when you have GPU acceleration

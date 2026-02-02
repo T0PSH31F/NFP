@@ -15,6 +15,12 @@ with lib;
       description = "Base directory for media storage";
     };
 
+    enableJellyfin = mkOption {
+      type = types.bool;
+      default = true;
+      description = "Enable Jellyfin media server";
+    };
+
     downloadsDir = mkOption {
       type = types.str;
       default = "/var/lib/media/downloads";
@@ -42,7 +48,12 @@ with lib;
       isSystemUser = true;
       group = config.services-config.media-stack.group;
       home = config.services-config.media-stack.dataDir;
+
       createHome = true;
+      extraGroups = [
+        "video"
+        "render"
+      ]; # For hardware transcoding
     };
 
     users.groups.${config.services-config.media-stack.group} = { };
@@ -66,14 +77,12 @@ with lib;
       "d /var/lib/readarr 0750 ${config.services-config.media-stack.user} ${config.services-config.media-stack.group} -"
       "d /var/lib/bazarr 0750 ${config.services-config.media-stack.user} ${config.services-config.media-stack.group} -"
       "d /var/lib/deluge 0750 ${config.services-config.media-stack.user} ${config.services-config.media-stack.group} -"
-      "d /var/lib/aria2 0750 ${config.services-config.media-stack.user} ${config.services-config.media-stack.group} -"
-      # Ensure aria2 session directory is writable
-      "f /var/lib/aria2/session.gz 0644 ${config.services-config.media-stack.user} ${config.services-config.media-stack.group} -"
+
       # Ensure directories are created with correct permissions for impermanence
-      "d /var/lib/aria2 0755 ${config.services-config.media-stack.user} ${config.services-config.media-stack.group} -"
+
       "d /var/lib/prowlarr 0755 ${config.services-config.media-stack.user} ${config.services-config.media-stack.group} -"
       # Additional tmpfiles rules to ensure directories are created before services start
-      "d /var/lib/aria2 0755 ${config.services-config.media-stack.user} ${config.services-config.media-stack.group} -"
+
       "d /var/lib/prowlarr 0755 ${config.services-config.media-stack.user} ${config.services-config.media-stack.group} -"
       "d /var/lib/sonarr 0755 ${config.services-config.media-stack.user} ${config.services-config.media-stack.group} -"
       "d /var/lib/radarr 0755 ${config.services-config.media-stack.user} ${config.services-config.media-stack.group} -"
@@ -119,31 +128,15 @@ with lib;
     # ============================================================================
     # ARIA2 - Download Manager
     # ============================================================================
-    services.aria2 = {
+
+    # ============================================================================
+    # JELLYFIN - Media Server
+    # ============================================================================
+    services.jellyfin = mkIf (cfg.enable && cfg.enableJellyfin) {
       enable = true;
-
-      settings = {
-        dir = "${config.services-config.media-stack.downloadsDir}/aria2";
-
-        # RPC
-        enable-rpc = true;
-        rpc-listen-port = 6800;
-        rpc-listen-all = true;
-
-        # Performance
-        max-concurrent-downloads = 5;
-        max-connection-per-server = 16;
-        min-split-size = "10M";
-        split = 16;
-
-        # Continue downloads
-        continue = true;
-
-        # Save session
-        save-session = "/var/lib/aria2/session.gz";
-        input-file = "/var/lib/aria2/session.gz";
-        save-session-interval = 60;
-      };
+      user = cfg.user;
+      group = cfg.group;
+      openFirewall = true;
     };
 
     # ============================================================================
@@ -186,54 +179,37 @@ with lib;
       };
     };
 
-  # Ensure data is persisted
+    # Ensure data is persisted
 
+    environment.persistence."/persist" = mkIf config.system-config.impermanence.enable {
 
-  environment.persistence."/persist" = mkIf config.system-config.impermanence.enable {
+      directories = [
 
+        config.services-config.media-stack.dataDir
 
-    directories = [
+        config.services-config.media-stack.downloadsDir
 
+        "/var/lib/jellyfin"
 
+        "/var/lib/deluge"
 
-      config.services-config.media-stack.dataDir
+        "/var/lib/sonarr"
 
+        "/var/lib/radarr"
 
-      config.services-config.media-stack.downloadsDir
+        "/var/lib/prowlarr"
 
+        "/var/lib/lidarr"
 
-      "/var/lib/deluge"
+        "/var/lib/readarr"
 
+        "/var/lib/bazarr"
 
-      "/var/lib/aria2"
+        "/var/lib/redis"
 
+      ];
 
-      "/var/lib/sonarr"
-
-
-      "/var/lib/radarr"
-
-
-      "/var/lib/prowlarr"
-
-
-      "/var/lib/lidarr"
-
-
-      "/var/lib/readarr"
-
-
-      "/var/lib/bazarr"
-
-
-      "/var/lib/redis"
-
-
-
-    ];
-
-
-  };
+    };
 
   };
 }

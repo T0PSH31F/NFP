@@ -46,7 +46,7 @@
     settings = {
       enable = true;
       userName = "T0PSH31F";
-      userEmail = pkgs.lib.mkForce "wrighterik77@gmail.com";
+      userEmail = "106733950+T0PSH31F@users.noreply.github.com";
       init.defaultBranch = "main";
       pull.rebase = false;
       push.autoSetupRemote = true;

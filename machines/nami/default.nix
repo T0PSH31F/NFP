@@ -15,6 +15,7 @@
     ./hardware-configuration.nix
     ./disko.nix
     ../../modules/nixos/default.nix
+    ../../modules/nixos/hardware/intel-7th-gen.nix
     ../../modules/Home-Manager/Desktop-env/default.nix
     ../../modules/users/t0psh31f.nix
     inputs.nixos-hardware.nixosModules.dell-xps-13-9360
@@ -31,6 +32,22 @@
 
     networking.hostName = "nami"; # Set your hostname
     system.stateVersion = "25.05"; # Don't change after initial install
+
+    # Boot Loader Fix
+    boot.loader = {
+      systemd-boot.enable = true;
+      efi = {
+        canTouchEfiVariables = true;
+        efiSysMountPoint = "/boot";
+      };
+    };
+
+    # Networking Fixes (IWD)
+    networking.networkmanager = {
+      enable = true;
+      wifi.backend = "iwd";
+    };
+    networking.wireless.enable = false;
 
     # ============================================================================
     # FEATURE TOGGLES (Dendritic Pattern - Nested Attrsets)
