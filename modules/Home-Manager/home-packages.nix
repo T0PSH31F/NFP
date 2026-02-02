@@ -117,7 +117,7 @@
     exegol4
     foliate # eBook reader
     kasasa # Snip and pin useful information to a small floating window
-     # NOTICE! best configured with a keybind/shorcut needs setup! 
+    # NOTICE! best configured with a keybind/shorcut needs setup!
     koreader # eBook reader
     kotatogram-desktop # telegram
     libreoffice
@@ -155,7 +155,6 @@
     fastfetch
     figlet
     fortune
-    inputs.awww.packages.${pkgs.system}.awww
     lavat
     lolcat
     neo-cowsay

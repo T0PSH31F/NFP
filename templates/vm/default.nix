@@ -8,12 +8,11 @@
 # Build with: nix build .#nixosConfigurations.vm-template.config.system.build.vm
 # Or use nixos-generators: nix build .#images.vm-template
 {
-  config,
-  lib,
   pkgs,
   modulesPath,
   ...
-}: {
+}:
+{
   imports = [
     (modulesPath + "/profiles/qemu-guest.nix")
     ../../modules/system
@@ -30,9 +29,6 @@
     desktopManager.xfce.enable = true;
   };
 
-  # Or use one of our desktop environments
-  # grandlix.desktop.illogical-impulse.enable = true;
-
   # Virtualization guest tools
   services.qemuGuest.enable = true;
   services.spice-vdagentd.enable = true;
@@ -41,7 +37,11 @@
   fileSystems."/mnt/shared" = {
     fsType = "9p";
     device = "shared";
-    options = ["trans=virtio" "version=9p2000.L" "msize=104857600"];
+    options = [
+      "trans=virtio"
+      "version=9p2000.L"
+      "msize=104857600"
+    ];
   };
 
   # Enable SSH for remote access

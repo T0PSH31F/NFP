@@ -23,28 +23,37 @@ in
     # Enable polkit for authentication dialogs
     security.polkit = {
       enable = true;
-      package = pkgs.hyprpolkitagent;
+      # package = pkgs.hyprpolkitagent;
     };
 
     # XDG Desktop Portal configuration
     xdg.portal = {
       enable = true;
       wlr.enable = false; # Disable wlr portal (conflicts with hyprland)
-      
+
       # Don't add xdg-desktop-portal-hyprland here - programs.hyprland adds it automatically
-      extraPortals = with pkgs; [
-        xdg-desktop-portal-gtk
-      ] ++ cfg.extraPortals;
+      extraPortals =
+        with pkgs;
+        [
+          xdg-desktop-portal-gtk
+        ]
+        ++ cfg.extraPortals;
 
       config = {
         common = {
           default = [ "gtk" ];
         };
         hyprland = {
-          default = [ "hyprland" "gtk" ];
+          default = [
+            "hyprland"
+            "gtk"
+          ];
         };
         niri = {
-          default = [ "gnome" "gtk" ];
+          default = [
+            "gnome"
+            "gtk"
+          ];
         };
       };
     };

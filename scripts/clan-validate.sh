@@ -128,22 +128,22 @@ else
 fi
 
 # Check if Noctalia structure exists
-if [ -d "modules/Desktop-env/Noctalia" ]; then
+if [ -d "modules/Home-Manager/Desktop-env/Noctalia" ]; then
     print_status "success" "Noctalia directory structure exists"
     
-    if [ -f "modules/Desktop-env/Noctalia/default.nix" ]; then
+    if [ -f "modules/Home-Manager/Desktop-env/Noctalia/default.nix" ]; then
         print_status "success" "  - Noctalia default.nix exists"
     fi
     
-    if [ -f "modules/Desktop-env/Noctalia/hyprland/keybinds.nix" ]; then
+    if [ -f "modules/Home-Manager/Desktop-env/Noctalia/hyprland/keybinds.nix" ]; then
         print_status "success" "  - Noctalia Hyprland keybinds exist"
     fi
     
-    if [ -f "modules/Desktop-env/Noctalia/hyprland/ipc.nix" ]; then
+    if [ -f "modules/Home-Manager/Desktop-env/Noctalia/hyprland/ipc.nix" ]; then
         print_status "success" "  - Noctalia Hyprland IPC exists"
     fi
     
-    if [ -f "modules/Desktop-env/Noctalia/niri/default.nix" ]; then
+    if [ -f "modules/Home-Manager/Desktop-env/Noctalia/niri/default.nix" ]; then
         print_status "success" "  - Noctalia Niri stub exists"
     fi
 else

@@ -1,7 +1,4 @@
 {
-  config,
-  lib,
-  pkgs,
   ...
 }:
 {
@@ -11,15 +8,15 @@
   imports = [
     ../../modules/nixos/default.nix
     ../../modules/nixos/system/laptop.nix
-    ../../modules/Desktop-env/default.nix
-    ../../modules/Desktop-env/Noctalia/default.nix
+    ../../modules/Home-Manager/Desktop-env/default.nix
+    ../../modules/Home-Manager/Desktop-env/Noctalia/default.nix
     ../../modules/users/t0psh31f.nix
   ];
 
   # ============================================================================
   # HARDWARE CONFIGURATION
   # ============================================================================
-  
+
   # Boot configuration
   boot.initrd.luks.devices."crypted".device =
     "/dev/disk/by-uuid/458b615c-3ac2-4cff-98a2-c8e266bae90f";
@@ -82,67 +79,42 @@
   # ============================================================================
   # FEATURE TOGGLES (Dendritic Pattern - Nested Attrsets)
   # ============================================================================
-  
+
   # System features
   nix-tools.enable = true;
   desktop-portals.enable = true;
 
   # Desktop environments
   desktop = {
-      caelestia = {
-        enable = false;
-        #backend = "hyprland";
-        #backend = "niri"
-        #backend = "both"
-       };
-
-      dankmaterialshell = {
-        enable = false;
-        #backend = "hyprland";
-        #backend = "niri"
-        #backend = "both"
-       };
-
-      illogical-impulse.enable = false;
-
-      noctalia = {
-        enable = true;
-        backend = "hyprland";
-        #backend = "niri"
-        #backend = "both"
-       };
-
-      omarchy = {
-        enable = false;
-        #backend = "hyprland";
-        #backend = "niri"
-        #backend = "both"
-       };
+    noctalia = {
+      enable = true;
+      backend = "hyprland";
+      #backend = "niri"
+      #backend = "both"
     };
-  
- 
-    # Themes
-    themes = {
-      sddm-lainframe.enable = true;
-      sddm-lain.enable = false;
-      sddm-sel = {
-        enable = false;
-        variant = "shaders";
-      };
-      grub-lain.enable = true;
-      plymouth-hellonavi.enable = true;
+  };
+  # Themes
+  themes = {
+    sddm-lainframe.enable = true;
+    sddm-lain.enable = false;
+    sddm-sel = {
+      enable = false;
+      variant = "shaders";
     };
+    grub-lain.enable = true;
+    plymouth-hellonavi.enable = true;
+  };
 
-    # Mobile device support
-    mobile = {
-      android.enable = true;
-      ios.enable = true;
-    };
+  # Mobile device support
+  mobile = {
+    android.enable = true;
+    ios.enable = true;
+  };
 
-    # Gaming & Virtualization
-    gaming.enable = true;
-    virtualization.enable = true;
-    
+  # Gaming & Virtualization
+  gaming.enable = true;
+  virtualization.enable = true;
+
   # Flatpak & AppImage
   flatpak.enable = true;
   programs.appimage-support.enable = true;
@@ -166,7 +138,7 @@
   # ============================================================================
   # HOME-MANAGER CONFIGURATION
   # ============================================================================
-  
+
   home-manager.users.t0psh31f = {
     # Home-Manager programs
     programs = {
@@ -192,14 +164,24 @@
     caddy-server.enable = true;
     n8n-server.enable = true;
 
-    # AI Services
-    sillytavern-app.enable = true;
+    # AI Services - Granular toggles for each AI service
     llm-agents.enable = true;
     ai-services = {
       enable = true;
+      # LLM Frontends
       open-webui.enable = true;
+      sillytavern.enable = true; # Moved from sillytavern-app
+      # Local inference
       localai.enable = true;
+      ollama.enable = false; # Enable when you have GPU acceleration
+      # Vector databases
       chromadb.enable = true;
+      qdrant.enable = false;
+      # Desktop apps (conditional install)
+      lmstudio.enable = true;
+      jan.enable = true;
+      cherry-studio.enable = true;
+      aider.enable = true;
     };
 
     # Media & Cloud
@@ -218,7 +200,7 @@
 
   # Services config (separate namespace for config-only services)
   services-config = {
-    #media-stack.enable = true; # Fixed - Prowlarr STATE_DIRECTORY issue resolved
+    media-stack.enable = false; # DISABLED: Toggle on for *arr suite
     avahi.enable = true; # mDNS
     monitoring.enable = true; # Fixed - Promtail NAMESPACE issue resolved
     homepage-dashboard.enable = true;
@@ -247,7 +229,7 @@
   # ============================================================================
   # SECURITY / ACME
   # ============================================================================
-  
+
   security.acme = {
     acceptTerms = true;
     defaults.email = "admin@grandlix.com";

@@ -8,7 +8,6 @@
 #
 # Build with: nix build .#packages.x86_64-linux.iso
 {
-  config,
   lib,
   pkgs,
   modulesPath,
@@ -21,7 +20,7 @@
 
     # Full Grandlix-Gang modules
     ../../modules/nixos/default.nix
-    ../../modules/Desktop-env/default.nix
+    ../../modules/Home-Manager/Desktop-env/default.nix
 
     # User-specific configuration (shell, home-manager, etc.)
     ../../modules/users/t0psh31f.nix
@@ -39,21 +38,12 @@
     "ntfs"
   ];
 
-  # ISO-specific settings
   networking.hostName = "grandlix-live";
 
-  # ============================================================================
-  # DESKTOP ENVIRONMENT - Dankmaterialshell with Hyprland
-  # ============================================================================
-  desktop.dankmaterialshell = {
+  desktop.noctalia = {
     enable = true;
     backend = "hyprland";
   };
-
-  # Disable other desktop environments
-  desktop.omarchy.enable = false;
-  desktop.caelestia.enable = false;
-  desktop.illogical-impulse.enable = false;
 
   # ============================================================================
   # THEMES
@@ -96,7 +86,7 @@
     dnsutils
     iw
     toybox
-    
+
     # Utilities
     git
     htop
@@ -159,7 +149,6 @@
     "brcmsmac"
     "ssb"
   ];
-
 
   # ============================================================================
   # LIVE USER CONFIGURATION

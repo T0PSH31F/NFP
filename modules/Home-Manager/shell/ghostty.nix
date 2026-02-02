@@ -86,7 +86,7 @@
         #"${config.xdg.configHome}/ghostty/shaders/cursor_smear_rainbow.glsl"
         #"${config.xdg.configHome}/ghostty/shaders/cursor_smear.glsl"
         #"${config.xdg.configHome}/ghostty/shaders/cursor_blaze_tapered.glsl"
-        "${config.xdg.configHome}/ghostty/shaders/cursor_blaze.glsl"
+        "${config.xdg.configHome}/ghostty/shaders/neon.glsl"
         #"${config.xdg.configHome}/ghostty/shaders/cursor_frozen.glsl"
         #"${config.xdg.configHome}/ghostty/shaders/blaze_sparks.glsl"
         #"${config.xdg.configHome}/ghostty/shaders/glitchy.glsl"
@@ -97,7 +97,7 @@
         #"${config.xdg.configHome}/ghostty/shaders/in-game-crt.glsl"
         #"${config.xdg.configHome}/ghostty/shaders/galaxy.glsl"
         #"${config.xdg.configHome}/ghostty/shaders/retro-terminal.glsl"
-        "${config.xdg.configHome}/ghostty/shaders/cyberpunk.glsl"
+        "${config.xdg.configHome}/ghostty/shaders/cursor_trail_neon.glsl"
       ];
     };
   };

@@ -1,4 +1,10 @@
-{ config, lib, pkgs, fetchFromGitHub, ... }:
+# modules/nixos/themes/sddm-lainframe.nix
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   # Package the theme (QT6 + sound)
@@ -10,65 +16,115 @@ let
       owner = "Yangmoooo";
       repo = "lain-sddm-theme";
       rev = "04cc104e470b30e1d12ae9cb94f293ad4effc7f9";
-      sha256 = "0mwadl7a0h4w4imiq8qr4nd2lqbgx7y0hn0pnxggq0hrdh4yxqkk"; 
+      sha256 = "sha256-BTnLdZrF1xxVY07zzj59J2P5/+VbdY0STbkr+/Y5r+A=";
     };
 
-    nativeBuildInputs = [ pkgs.qt6Packages.qttools ];
-    
-    # This is a theme/data package, not an application - don't wrap Qt apps
+    nativeBuildInputs = with pkgs; [
+      qt6.qttools
+      qt6.wrapQtAppsHook
+    ];
+
+    buildInputs = with pkgs; [
+      qt6.qtbase
+      qt6.qtsvg
+      qt6.qtmultimedia
+    ];
+
     dontWrapQtApps = true;
-    
+    dontBuild = true;
+
     installPhase = ''
-      mkdir -p $out/share/sddm/themes
-      cp -r . $out/share/sddm/themes/lain-sddm-theme/
-      
-      # Ensure sounds work (QT6 audio)
-      chmod +x $out/share/sddm/themes/lain-sddm-theme/*.sh 2>/dev/null || true
+      runHook preInstall
+
+      mkdir -p $out/share/sddm/themes/lain-sddm-theme
+      cp -r * $out/share/sddm/themes/lain-sddm-theme/
+
+      # Ensure proper permissions for media files
+      find $out/share/sddm/themes/lain-sddm-theme -type f -name "*.wav" -exec chmod 644 {} \;
+      find $out/share/sddm/themes/lain-sddm-theme -type f -name "*.sh" -exec chmod +x {} \;
+
+      runHook postInstall
     '';
 
     meta = with lib; {
-      description = "Serial Experiments Lain SDDM theme (QT6 fork)";
+      description = "Serial Experiments Lain SDDM theme (QT6 fork with audio)";
       homepage = "https://github.com/Yangmoooo/lain-sddm-theme";
-      license = licenses.mit;  # Adjust if needed
+      license = licenses.mit;
       platforms = platforms.linux;
       maintainers = [ ];
     };
   };
 in
 {
-  options.themes.sddm-lainframe.enable =
-    lib.mkEnableOption "Lain SDDM theme with QT6 + sound support";
+  options.themes.sddm-lainframe = {
+    enable = lib.mkEnableOption "Lain SDDM theme with QT6 + sound support";
+
+    autoLogin = {
+      enable = lib.mkEnableOption "automatic login";
+      user = lib.mkOption {
+        type = lib.types.str;
+        default = "";
+        description = "Username for automatic login";
+      };
+    };
+  };
 
   config = lib.mkIf config.themes.sddm-lainframe.enable {
-    # SDDM + theme package
+    # SDDM configuration
     services.displayManager.sddm = {
       enable = true;
-      wayland.enable = true;  # QT6 Wayland support
+      wayland.enable = true;
       theme = "lain-sddm-theme";
-      extraPackages = [ lain-sddm-theme ];
+      package = pkgs.kdePackages.sddm;
+
+      # Auto-login configuration
+      autoLogin = lib.mkIf config.themes.sddm-lainframe.autoLogin.enable {
+        relogin = true;
+        user = config.themes.sddm-lainframe.autoLogin.user;
+      };
+
+      settings = {
+        Theme = {
+          Current = "lain-sddm-theme";
+          CursorTheme = "Sonic-cursor-hyprcursor";
+          CursorSize = 32;
+        };
+
+        General = {
+          DisplayServer = "wayland";
+          GreeterEnvironment = "QT_WAYLAND_PLATFORM=wayland";
+        };
+      };
     };
 
-    # Audio for welcome.wav (pipewire default)
-    services.pulseaudio.enable = false;
+    # QT6 + Wayland environment for SDDM
+    environment.systemPackages = with pkgs; [
+      lain-sddm-theme
+      qt6.qtwayland
+      qt6.qtmultimedia
+      qt6.qtsvg
+      kdePackages.sddm
+    ];
+
+    # Audio system (PipeWire) - ensure no PulseAudio conflicts
     security.rtkit.enable = true;
     services.pipewire = {
-      enable = true;
+      enable = lib.mkDefault true;
       alsa.enable = true;
       alsa.support32Bit = true;
       pulse.enable = true;
     };
 
-    # QT6 + sound deps for greeter
-    environment.systemPackages = with pkgs; [
-      qt6Packages.qtwayland
-      qt6Packages.qtmultimedia
-      kdePackages.sddm
+    # Ensure sddm user can access audio
+    users.users.sddm.extraGroups = [
+      "audio"
+      "video"
     ];
 
-    # SDDM config for sound
-    environment.etc."sddm.conf.d/lain-theme.conf".text = ''
-      [Theme]
-      Current=lain-sddm-theme
-    '';
+    # Session environment for proper QT/Wayland rendering
+    environment.sessionVariables = {
+      QT_QPA_PLATFORM = "wayland";
+      QT_WAYLAND_DISABLE_WINDOWDECORATION = "1";
+    };
   };
 }

@@ -327,7 +327,7 @@ with lib;
         "--prefer"
         "^(Web Content|chromium|firefox|electron)$" # Prefer killing browsers
         "--avoid"
-        "^(Hyprland|waybar|sshd|systemd)$" # Avoid killing critical
+        "^(Hyprland|quickshell|sshd|systemd)$" # Avoid killing critical
       ];
     };
 

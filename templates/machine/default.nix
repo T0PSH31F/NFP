@@ -7,16 +7,13 @@
 #   4. Add to clan.nix inventory and machines sections
 #   5. Build and deploy!
 {
-  config,
-  lib,
-  pkgs,
-  inputs,
   ...
-}: {
+}:
+{
   imports = [
     ./hardware-configuration.nix
     ../../modules/nixos/default.nix
-    ../../modules/Desktop-env/default.nix
+    ../../modules/Home-Manager/Desktop-env/default.nix
     ../../modules/users/t0psh31f.nix # Change to your user
   ];
 
@@ -35,23 +32,10 @@
   config = {
     # Desktop environments (choose one or enable multiple)
     desktop = {
-      dankmaterialshell = {
-        enable = true;
-        backend = "hyprland"; # "hyprland", "niri", or "both"
-      };
-      omarchy = {
-        enable = false;
-        backend = "hyprland";
-      };
-      caelestia = {
-        enable = false;
-        backend = "hyprland";
-      };
       noctalia = {
-        enable = false;
+        enable = true;
         backend = "hyprland";
       };
-      illogical-impulse.enable = false; # End-4 Hyprland config
     };
 
     # Programs
@@ -79,11 +63,11 @@
     # System tools
     nix-tools.enable = false; # Nix development tools
     desktop-portals.enable = false; # XDG desktop portals
-    
+
     # Gaming & Virtualization
     gaming.enable = false; # Master toggle for all gaming features
     virtualization.enable = false; # Docker, Podman, QEMU/KVM
-    
+
     # Flatpak & AppImage
     flatpak.enable = false;
     programs.appimage-support.enable = false;
@@ -126,7 +110,7 @@
   # Services config (separate namespace)
   services-config = {
     media-stack.enable = false;
-    avahi.enable =e;
+    avahi.enable = false;
     monitoring.enable = false;
   };
 

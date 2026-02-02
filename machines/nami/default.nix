@@ -7,7 +7,6 @@
 #   4. Add to clan.nix inventory and machines sections
 #   5. Build and deploy!
 {
-  config,
   inputs,
   ...
 }:
@@ -16,7 +15,7 @@
     ./hardware-configuration.nix
     ./disko.nix
     ../../modules/nixos/default.nix
-    ../../modules/Desktop-env/default.nix
+    ../../modules/Home-Manager/Desktop-env/default.nix
     ../../modules/users/t0psh31f.nix
     inputs.nixos-hardware.nixosModules.dell-xps-13-9360
   ];
@@ -39,19 +38,10 @@
 
     # Desktop environments
     desktop = {
-      dankmaterialshell = {
+      noctalia = {
         enable = true;
         backend = "hyprland"; # "hyprland", "niri", or "both"
       };
-      omarchy = {
-        enable = false;
-        backend = "hyprland";
-      };
-      caelestia = {
-        enable = false;
-        backend = "hyprland";
-      };
-      illogical-impulse.enable = false; # End-4 Hyprland config
     };
 
     # Themes
@@ -75,7 +65,7 @@
     # Gaming & Virtualization
     gaming.enable = false; # Master toggle for all gaming features
     virtualization.enable = false; # Docker, Podman, QEMU/KVM
-    
+
     # Flatpak & AppImage
     flatpak.enable = false;
     programs.appimage-support.enable = false;
@@ -136,7 +126,7 @@
     # ============================================================================
     # HOME-MANAGER CONFIGURATION
     # ============================================================================
-    
+
     home-manager.users.t0psh31f = {
       # Home-Manager programs
       programs = {

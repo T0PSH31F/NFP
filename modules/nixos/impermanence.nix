@@ -104,8 +104,8 @@ with lib;
           ".config/obs-studio"
           ".config/vesktop"
           ".config/discord"
-          ".config/dank-material-shell" # Settings persistence
           ".config/spicetify"
+          ".config/noctalia"
 
           # Mobile / Sync
           ".kde/share/config/kdeconnect"

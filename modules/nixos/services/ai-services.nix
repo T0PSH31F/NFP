@@ -5,6 +5,9 @@
   ...
 }:
 with lib;
+let
+  cfg = config.services.ai-services;
+in
 {
   options.services.ai-services = {
     enable = mkEnableOption "AI-related services";
@@ -12,7 +15,7 @@ with lib;
     postgresql = {
       enable = mkOption {
         type = types.bool;
-        default = true;
+        default = false;
         description = "Enable PostgreSQL with pgvector and lantern extensions";
       };
 
@@ -76,6 +79,106 @@ with lib;
         type = types.int;
         default = 8000;
         description = "ChromaDB port";
+      };
+    };
+
+    # ============================================================================
+    # SILLYTAVERN - AI Chat Frontend
+    # ============================================================================
+    sillytavern = {
+      enable = mkOption {
+        type = types.bool;
+        default = false;
+        description = "Enable SillyTavern AI chat frontend";
+      };
+
+      port = mkOption {
+        type = types.int;
+        default = 8000;
+        description = "SillyTavern port";
+      };
+
+      dataDir = mkOption {
+        type = types.str;
+        default = "/var/lib/sillytavern";
+        description = "Data directory for SillyTavern";
+      };
+    };
+
+    # ============================================================================
+    # OLLAMA - Local LLM Server
+    # ============================================================================
+    ollama = {
+      enable = mkOption {
+        type = types.bool;
+        default = false;
+        description = "Enable Ollama local LLM server";
+      };
+
+      acceleration = mkOption {
+        type = types.nullOr (
+          types.enum [
+            "cuda"
+            "rocm"
+            false
+          ]
+        );
+        default = null;
+        description = "GPU acceleration (cuda, rocm, or false)";
+      };
+
+      models = mkOption {
+        type = types.listOf types.str;
+        default = [ ];
+        description = "Models to preload";
+        example = [
+          "llama3.2"
+          "codellama"
+        ];
+      };
+    };
+
+    # ============================================================================
+    # LM STUDIO - Local LLM GUI (user-space, just package)
+    # ============================================================================
+    lmstudio = {
+      enable = mkOption {
+        type = types.bool;
+        default = false;
+        description = "Install LM Studio desktop application";
+      };
+    };
+
+    # ============================================================================
+    # JAN - Open-source ChatGPT Alternative
+    # ============================================================================
+    jan = {
+      enable = mkOption {
+        type = types.bool;
+        default = false;
+        description = "Install Jan AI desktop application";
+      };
+    };
+
+    # ============================================================================
+    # CHERRY STUDIO - Desktop LLM Client
+    # ============================================================================
+    cherry-studio = {
+      enable = mkOption {
+        type = types.bool;
+        default = false;
+        description = "Install Cherry Studio desktop LLM client";
+      };
+    };
+
+    # ============================================================================
+    # AIDER - AI Pair Programming CLI
+    # ============================================================================
+    aider = {
+      enable = mkOption {
+        type = types.bool;
+        default = false;
+        description = "Install Aider AI pair programming tool";
       };
     };
   };
@@ -171,23 +274,54 @@ with lib;
           };
         };
 
+    # ============================================================================
+    # SILLYTAVERN - Container-based AI Chat Frontend
+    # ============================================================================
+    virtualisation.oci-containers.containers.sillytavern = mkIf cfg.sillytavern.enable {
+      image = "ghcr.io/sillytavern/sillytavern:latest";
+      ports = [ "${toString cfg.sillytavern.port}:8000" ];
+      volumes = [
+        "${cfg.sillytavern.dataDir}:/home/node/app/data"
+      ];
+      environment = {
+        TZ = "America/Los_Angeles";
+      };
+    };
+
+    # SillyTavern directory setup
+    systemd.tmpfiles.rules = mkIf cfg.sillytavern.enable [
+      "d ${cfg.sillytavern.dataDir} 0755 root root -"
+    ];
+
+    # ============================================================================
+    # OLLAMA - Native Local LLM Server
+    # ============================================================================
+    services.ollama = mkIf cfg.ollama.enable {
+      enable = true;
+      acceleration = cfg.ollama.acceleration;
+      loadModels = cfg.ollama.models;
+    };
+
     # Enable docker/podman for container services
     virtualisation.docker.enable = mkIf (
-      config.services.ai-services.open-webui.enable
-      || config.services.ai-services.qdrant.enable
-      || config.services.ai-services.chromadb.enable
-      || config.services.ai-services.localai.enable
+      cfg.open-webui.enable
+      || cfg.qdrant.enable
+      || cfg.chromadb.enable
+      || cfg.localai.enable
+      || cfg.sillytavern.enable
     ) true;
 
     virtualisation.oci-containers.backend = "docker";
 
     # Firewall rules
-    networking.firewall.allowedTCPPorts = mkIf config.services.ai-services.enable (
-      (optional config.services.ai-services.postgresql.enable config.services.ai-services.postgresql.port)
-      ++ (optional config.services.ai-services.open-webui.enable config.services.ai-services.open-webui.port)
-      ++ (optional config.services.ai-services.qdrant.enable config.services.ai-services.qdrant.port)
-      ++ (optional config.services.ai-services.chromadb.enable config.services.ai-services.chromadb.port)
-      ++ (optional config.services.ai-services.localai.enable config.services.ai-services.localai.port)
+    networking.firewall.allowedTCPPorts = mkIf cfg.enable (
+      (optional cfg.postgresql.enable cfg.postgresql.port)
+      ++ (optional cfg.open-webui.enable cfg.open-webui.port)
+      ++ (optional cfg.qdrant.enable cfg.qdrant.port)
+      ++ (optional cfg.chromadb.enable cfg.chromadb.port)
+      ++ (optional cfg.localai.enable cfg.localai.port)
+      ++ (optional cfg.sillytavern.enable cfg.sillytavern.port)
+      ++ (optional cfg.ollama.enable 11434)
     );
 
     # Ensure data is persisted
@@ -200,19 +334,16 @@ with lib;
     };
 
     environment.systemPackages = with pkgs; [
-     # Frameworks
+      # Frameworks
       crewai # Framework for orchestrating autonomous AI agents
-      # droid # AI agent framework
       fabric-ai # AI-powered workflow framework
       go-hass-agent # Home Assistant agent in Go
-      # letta-code # Framework for stateful LLM agents (formerly MemGPT)
       #task-master-ai # Task automation agent
- 
+
       # Inference
       #gpt4all # Run LLMs locally on consumer hardware
       lmstudio # GUI for running local LLMs
       jan
-      # local-ai # OpenAI-compatible API for local models
       qdrant # Vector database for AI applications
       ramalama # Tool for managing AI models
 
@@ -221,38 +352,18 @@ with lib;
       cherry-studio # Desktop LLM client
       librechat # Open-source AI chat interface
       nextjs-ollama-llm-ui # Web UI for Ollama
-      # pi # Personal AI assistant interface
       # sillytavern # Advanced LLM interface for roleplay
       # windsurf # Agentic IDE
 
       # CLI & TUI
       aider-chat-full # CLI for AI pair programming
       crush # AI-powered command-line tool
-      gemini-cli # Google Gemini CLI
       krillinai # AI agent tool
-      # nanocoder # Small footprint AI coding assistant
-      opencode # AI-powered coding tool
 
       # TTS & STT
       # moshi # Real-time conversational AI
       piper-tts # Local neural text-to-speech engine
       whisper-ctranslate2 # High-performance speech-to-text
-
-      # Open AI Spec
-      # agent-browser # Browser automation for AI agents
-      # openskills # Open specification for AI skills
-      # openspec # Open AI specification tools
-
-      # Claude Ecosystem
-      claude-code # Anthropic's CLI for AI-assisted coding
-      claude-monitor
-      # clawdbot # Claude-powered bot
-      catnip # Claude ecosystem enhancement
-      # ccstatusline # Status line for Claude Code
-      # claude-code-npm # Claude Code NPM package
-      claude-code-router # Routing for Claude Code
-      # claude-plugins # Plugins for Claude assistants
-
     ];
 
   };
