@@ -35,28 +35,42 @@
         searchDownKey = "^N";
       };
       initContent = ''
-        if [[ -r "${config.xdg.cacheHome}/p10k-instant-prompt-''${(%):-%n}.zsh" ]]; then
-            source "${config.xdg.cacheHome}/p10k-instant-prompt-''${(%):-%n}.zsh"
-        fi
+                if [[ -r "${config.xdg.cacheHome}/p10k-instant-prompt-''${(%):-%n}.zsh" ]]; then
+                    source "${config.xdg.cacheHome}/p10k-instant-prompt-''${(%):-%n}.zsh"
+                fi
 
-        source ${./p10k.zsh}
-        bindkey -v
-        export KEYTIMEOUT=1
-        bindkey '^Y' autosuggest-accept
-        bindkey '^E' autosuggest-clear
+                source ${./p10k.zsh}
+                bindkey -v
+                export KEYTIMEOUT=1
+                bindkey '^Y' autosuggest-accept
+                bindkey '^E' autosuggest-clear
 
-        # Anifetch MOTD - Display Lain GIF ONLY
-        _anifetch_motd() {
-          local lain_gif="$HOME/.background/Giffees/Lain/oldScreen.gif"
-          if command -v anifetch &> /dev/null && [[ -f "$lain_gif" ]]; then
-            # Display Lain GIF with anifetch (40 width, 20 height, 1 repeat)
-            anifetch "$lain_gif" -r 1 -W 40 -H 20 -c "--symbols wide --fg-only" 2>/dev/null || true
-          fi
-        }
-        # Only show MOTD for interactive shells, not in tmux/screen, and not in VSCode terminal
-        if [[ $- == *i* ]] && [[ -z "$TMUX" ]] && [[ -z "$STY" ]] && [[ "$TERM_PROGRAM" != "vscode" ]]; then
-          _anifetch_motd
-        fi
+                # Green ASCII MOTD
+                _ascii_motd() {
+                  print -P "%F{green}"
+                  cat << 'EOF'
+        ⣿⣿⣿⣿⣿⠩⠋⠹⢿⣿⠟⣉⡶⢁⣄⡙⠿⣿⣿⣿⡈⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+        ⣿⣓⣿⣿⡵⢟⣰⡶⠆⣡⣤⠙⢁⠉⢩⣤⣾⢻⡻⣸⢏⣄⡛⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+        ⣷⣿⠈⢀⣴⠿⢋⠴⢛⣩⠀⠀⣾⡇⠀⢘⣿⡆⣳⢇⣾⡿⢻⣶⠎⠉⠽⠿⡿⢹⠟⣿⠟⣽⣿⣿⡿⣻⣻⡿⣻⢿⣿⣿⢿⣿⣏⣹⣿⣿
+        ⡿⢋⣴⠋⠁⢨⣴⡆⢻⠃⢰⣼⡷⠃⠀⠩⠙⣗⠟⣼⡿⢡⣿⣷⣴⣞⢁⣠⣴⣤⣌⠙⠘⣿⠛⡚⠺⠾⠾⠿⠩⣚⡽⢷⣿⠃⠠⣾⣿⣿
+        ⡗⠋⠁⣴⠀⡸⡿⣹⡧⠰⠛⠉⠀⠀⠀⠀⢱⢙⢠⣿⣥⣿⣿⣿⣿⣿⡟⣿⣿⣿⡿⣷⣴⡌⠈⡇⣾⠻⣿⡆⡈⠉⡀⡈⠁⠀⠀⠈⣿⣿
+        ⣿⢃⡌⠋⣸⡿⠓⠉⠀⠀⠀⠀⠀⠀⠀⡆⠀⢸⣿⠒⠶⠎⢿⣿⣿⣿⡇⢹⣿⡿⢃⣿⣿⡟⣴⡇⣿⢸⣿⠁⠀⠿⠛⠛⠀⠀⠀⠀⠘⢿
+        ⣋⡼⠛⠀⠀⠀⠀⠀⠀⠀⠀⡄⣰⡄⠰⠀⠀⣼⣿⢠⡈⠓⠜⢿⣿⣿⡇⢸⡏⠀⢣⣾⣿⡇⣿⠁⣾⢸⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠁⠀⠀⠀⠀⠀⠀⠀⡀⢠⣾⠇⣿⣗⡄⢧⠀⣿⣿⣷⡙⠦⠤⠘⢿⣿⣇⡘⣀⣴⣿⣿⣿⡇⠃⠈⠻⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠀⠀⠀⠀⠀⣀⡴⢋⡴⡛⣿⢸⣿⣿⣿⣄⠀⣿⣿⣿⣷⣄⣀⡀⠈⠋⢰⠁⢻⡿⠿⠛⠋⠠⠶⠶⢠⣶⠆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠀⠀⣀⣴⠾⢋⠔⣡⡾⢀⡿⢸⣿⣿⣿⣿⠀⣿⡈⣽⣿⣿⣿⣿⣿⣆⡟⣠⡤⠄⣀⠀⠀⠀⢠⣴⣯⠏⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠐⠊⢉⡀⡄⢠⣾⣿⠃⡼⡅⡀⣀⠂⠈⠁⠀⠙⠣⠈⠻⣿⣿⣿⡿⣸⢱⣿⣷⡘⢿⡿⠱⢋⣸⣿⠇⠀⠀⠀⠀⠀⠀⢀⠀⠀⠀⠀⠀⠀
+        ⣤⣶⣿⡇⢀⣿⣿⡿⠠⢱⡇⣿⣿⣿⣿⡇⢠⢈⢿⣆⢘⡢⣝⣛⠀⠃⣺⣿⣿⣿⡶⠄⠀⢈⣿⠏⠀⠀⠀⠀⠀⠀⠀⡌⠀⠀⠀⠀⠀⠀
+        ⣿⣿⣿⣧⣼⣿⣿⡇⢀⣿⡇⣿⣿⣿⣿⡄⢻⣆⢈⢿⣷⠩⣒⠭⢝⣒⣶⣶⠖⠂⢀⣤⣶⡿⠋⠀⠀⢀⠀⠀⠀⠀⢰⡇⠀⠀⠀⠀⠀⠀
+        ⣿⣿⣿⣿⣿⣿⣿⣷⣾⣿⡇⣿⣿⣿⣿⡇⢸⣿⡄⢎⢻⣷⣌⠙⠓⠂⢠⣴⣶⣿⡿⠟⠉⢀⠀⠀⠐⠈⠀⠀⠀⠀⣾⠀⠀⠀⠀⠀⠀⠀
+        ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⣿⣿⣿⣿⡇⢸⣿⣿⣌⢷⡍⠛⠿⠷⠸⠿⣛⣋⣥⣴⡶⠟⠁⠀⠀⠀⠀⠀⠀⠌⣼⣿⠀⠀⠀⠀⠀⠀⠀
+        EOF
+                  print -P "%f"
+                }
+                # Only show MOTD for interactive shells, not in tmux/screen, and not in VSCode terminal
+                if [[ $- == *i* ]] && [[ -z "$TMUX" ]] && [[ -z "$STY" ]] && [[ "$TERM_PROGRAM" != "vscode" ]]; then
+                  _ascii_motd
+                fi
       '';
 
       #  initExtra = ''

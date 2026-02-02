@@ -183,18 +183,6 @@
                 EOF
                                 echo "Grandlix-Gang NixOS Configuration Development Environment"
                                 echo "=================================================="
-                                echo "Available tools:"
-                                echo "  - clan: Clan-core CLI"
-                                echo "  - nil: Nix language server"
-                                echo "  - nixfmt: Nix formatter"
-                                echo "  - deadnix: Find dead Nix code"
-                                echo "  - statix: Lints and suggestions for Nix"
-                                echo "  - nix-search: Search nixpkgs"
-                                echo ""
-                                echo "Build images:"
-                                echo "  - nix build .#images.iso         # Live ISO"
-                                echo "  - nix build .#images.vm          # VM image"
-                                echo "  - nix build .#images.container   # Container image"
                                 echo ""
               '';
             };
