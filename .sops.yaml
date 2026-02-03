@@ -1,8 +1,10 @@
 keys:
   - &z0r0 age10ght7h8d49cec9tfasr64ls49qxzv3rn6f0du2fzhrfs4a7u3yysajk9gh
+  - &z0r0_host age13ytd3kguxglv2k67mcx298djypxseqx2jkn5vw0zlf2079g28chqw8dm24
 
 creation_rules:
   - path_regex: secrets/.*\.yaml$
     key_groups:
       - age:
           - *z0r0
+          - *z0r0_host
