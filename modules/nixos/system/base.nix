@@ -8,8 +8,13 @@
   # ============================================================================
 
   # Bootloader
-  boot.loader.systemd-boot.enable = true;
+  boot.loader.systemd-boot = {
+    enable = true;
+    configurationLimit = 2; # Aggressive limit to prevent /boot bloat
+  };
   boot.loader.efi.canTouchEfiVariables = true;
+
+  boot.initrd.compressor = "zstd";
 
   # Locale & Time
   time.timeZone = "America/Los_Angeles";
@@ -30,6 +35,15 @@
   services.udisks2.enable = true;
   services.gvfs.enable = true;
 
+  # Speed up builds and slim down system by disabling documentation
+  documentation = {
+    enable = false;
+    nixos.enable = false;
+    man.enable = false;
+    info.enable = false;
+    doc.enable = false;
+  };
+
   # ============================================================================
   # PACKAGES & TOOLS (Minimal System-level)
   # ============================================================================
@@ -41,7 +55,7 @@
     git
     pciutils
     usbutils
-    
+
     # Container runtime for services
     docker
     docker-compose
@@ -62,37 +76,23 @@
   fonts = {
     enableDefaultPackages = true;
     packages = with pkgs; [
-      nerd-fonts.fira-code
+      # User requested Nerd Fonts
       nerd-fonts.jetbrains-mono
-      nerd-fonts.hack
+      nerd-fonts.fira-code
       nerd-fonts.gohufont
-      nerd-fonts.iosevka
-      nerd-fonts.meslo-lg
-      nerd-fonts.caskaydia-cove
-      nerd-fonts.sauce-code-pro
-      nerd-fonts.ubuntu
-      nerd-fonts.ubuntu-mono
-      nerd-fonts.victor-mono
-      nerd-fonts.roboto-mono
-      nerd-fonts.inconsolata
-      nerd-fonts.dejavu-sans-mono
-      powerline-fonts
+
+      inter # Lighter replacement for Google Fonts meta-package
       powerline-symbols
       twemoji-color-font
       material-design-icons
-      material-icons
-      material-symbols
+      source-code-pro
+      source-serif-pro
+      source-sans-pro
       creep
       pixel-code
       tamzen
       tamsyn
-      scientifica
-      source-code-pro
-      source-sans-pro
-      source-serif-pro
       font-awesome
-      font-awesome_5
-      font-awesome_6
     ];
 
     fontconfig = {
@@ -104,8 +104,8 @@
         ];
 
         sansSerif = [
-          "nerd-fonts.fira-code"
-          "Source Sans Pro"
+          "Inter"
+          "FiraCode Nerd Font"
         ];
 
         monospace = [

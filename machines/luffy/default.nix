@@ -37,7 +37,6 @@
       ollama.acceleration = "cuda"; # Nvidia GPU
       sillytavern.enable = false; # Use Clan Service
     };
-    clan.services.ai.sillytavern.enable = true;
 
     # Impermanence
     system-config.impermanence.enable = true;

@@ -16,7 +16,7 @@ let
       owner = "Yangmoooo";
       repo = "lain-sddm-theme";
       rev = "04cc104e470b30e1d12ae9cb94f293ad4effc7f9";
-      sha256 = "sha256-BTnLdZrF1xxVY07zzj59J2P5/+VbdY0STbkr+/Y5r+A=";
+      sha256 = "sha256-c+LuCWwZAvxetxdYCPzpb2EqmiUZIxxrJJxAoA5tilc=";
     };
 
     nativeBuildInputs = with pkgs; [

@@ -5,13 +5,13 @@
   ...
 }:
 {
-  boot.kernelPackages = pkgs.linuxPackages_latest;
+  boot.kernelPackages = lib.mkDefault pkgs.linuxPackages_latest;
 
   hardware.graphics = {
     enable = true;
     extraPackages = with pkgs; [
       intel-media-driver # iHD driver for Gen9+
-      vaapiVdpau
+      libva-vdpau-driver
       libvdpau-va-gl
     ];
   };

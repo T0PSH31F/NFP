@@ -119,6 +119,12 @@
             };
         };
 
+        flake.clan.modules = {
+          desktop = ./clan-service-modules/desktop;
+          media = ./clan-service-modules/media;
+          ai = ./clan-service-modules/ai;
+        };
+
         systems = [ "x86_64-linux" ];
 
         perSystem =

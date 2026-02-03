@@ -4,7 +4,8 @@
   pkgs,
   ...
 }:
-with lib; {
+with lib;
+{
   options.themes.grub-lain = {
     enable = mkEnableOption "Lain GRUB theme";
   };
@@ -13,6 +14,7 @@ with lib; {
     # Use the GRUB 2 boot loader with Lain theme
     boot.loader.grub = {
       enable = true;
+      configurationLimit = 3;
       device = "nodev"; # EFI systems use nodev
       efiSupport = true;
       efiInstallAsRemovable = false;

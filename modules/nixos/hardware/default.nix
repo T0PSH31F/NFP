@@ -210,14 +210,16 @@ with lib;
     # Network
     resolved = {
       enable = true;
-      dnssec = lib.mkDefault "true";
-      domains = [ "~." ];
-      fallbackDns = [
-        "1.1.1.1"
-        "8.8.8.8"
-        "1.0.0.1"
-        "8.8.4.4"
-      ];
+      settings.Resolve = {
+        DNSSEC = lib.mkDefault "true";
+        Domains = [ "~." ];
+        FallbackDNS = [
+          "1.1.1.1"
+          "8.8.8.8"
+          "1.0.0.1"
+          "8.8.4.4"
+        ];
+      };
     };
 
     # Power management

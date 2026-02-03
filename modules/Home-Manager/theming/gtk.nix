@@ -20,7 +20,7 @@
 
     font = {
       name = "Inter";
-      package = pkgs.google-fonts;
+      package = pkgs.inter;
     };
 
     gtk3.extraConfig = {

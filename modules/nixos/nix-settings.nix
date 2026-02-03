@@ -2,7 +2,8 @@
   config,
   lib,
   ...
-}: {
+}:
+{
   nix.settings = {
     # Binary cache substituters for faster package downloads
     extra-substituters = [
@@ -23,8 +24,18 @@
     ];
 
     # Additional Nix settings for better performance
-    experimental-features = ["nix-command" "flakes"];
+    experimental-features = [
+      "nix-command"
+      "flakes"
+    ];
     auto-optimise-store = true;
+  };
+
+  # Automatic Garbage Collection
+  nix.gc = {
+    automatic = true;
+    dates = "daily";
+    options = "--delete-older-than 7d";
   };
 
   # Systemd service configuration (moved out of nix.settings)

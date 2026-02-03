@@ -1,6 +1,6 @@
 {
   imports = [
-    ./clan-service-modules/default.nix
+    # ./clan-service-modules/default.nix # Removed due to class mismatch (clan.service vs clan)
   ];
 
   meta.name = "Grandlix-Gang";
@@ -21,6 +21,26 @@
         ];
         deploy.targetHost = "root@nami.local";
       };
+      luffy = {
+        tags = [
+          "client"
+          "laptop"
+        ];
+        deploy.targetHost = "root@luffy.local";
+      };
+    };
+
+    instances = {
+      sillytavern = {
+        module = {
+          name = "ai";
+          input = "self";
+        };
+        roles.sillytavern.machines = {
+          z0r0 = { };
+          luffy = { };
+        };
+      };
     };
 
   };
@@ -30,6 +50,12 @@
       { ... }:
       {
         imports = [ ./machines/z0r0/default.nix ];
+        clan.services.ai.sillytavern.enable = true;
+      };
+    luffy =
+      { ... }:
+      {
+        imports = [ ./machines/luffy/default.nix ];
         clan.services.ai.sillytavern.enable = true;
       };
     nami =
