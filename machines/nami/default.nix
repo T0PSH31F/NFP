@@ -13,7 +13,7 @@
 {
   imports = [
     ./hardware-configuration.nix
-    ./disko.nix
+    ./disko-config.nix
     ../../modules/nixos/default.nix
     ../../modules/nixos/hardware/intel-7th-gen.nix
     ../../modules/Home-Manager/Desktop-env/default.nix

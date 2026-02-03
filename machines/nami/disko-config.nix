@@ -4,13 +4,13 @@
   disko.devices = {
     disk.main = {
       type = "disk";
-      device = "/dev/sda"; # IMPORTANT: Verify with lsblk on nami!
+      device = "/dev/nvme0n1"; # Standard for Dell XPS 13 9360
       content = {
         type = "gpt";
         partitions = {
           # Boot partition
           boot = {
-            size = "512M";
+            size = "4G";
             type = "EF00";
             content = {
               type = "filesystem";
@@ -20,6 +20,16 @@
                 "defaults"
                 "umask=0077"
               ];
+            };
+          };
+
+          # Swap partition (16GB for 16GB RAM system)
+          swap = {
+            size = "16G";
+            content = {
+              type = "swap";
+              discardPolicy = "both";
+              resumeDevice = true; # Allow hibernation
             };
           };
 

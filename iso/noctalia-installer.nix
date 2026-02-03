@@ -108,7 +108,7 @@
   };
 
   # Installer user setup
-  users.users.nixos = {
+  users.users.t0psh31f = {
     isNormalUser = true;
     extraGroups = [
       "wheel"
