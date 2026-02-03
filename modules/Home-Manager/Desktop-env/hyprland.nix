@@ -36,13 +36,6 @@ in
       };
     };
 
-    # Define Sonic cursor package
-    nixpkgs.overlays = [
-      (final: prev: {
-        sonic-cursor = prev.callPackage ../../../pkgs/sonic-cursor.nix { };
-      })
-    ];
-
     home-manager.users.t0psh31f = {
       home.stateVersion = "25.05";
       # Essential Hyprland dependencies that might not be in the minimal package
@@ -318,14 +311,10 @@ in
             "wl-paste --watch cliphist store & disown" # Clipboard history daemon
             "${pkgs.hyprpolkitagent}/bin/hyprpolkitagent & disown" # Hyprland polkit agent
             "swww-daemon & disown" # Wallpaper daemon
-            "hyprctl setcursor sonic-hyprcursor 32" # Set Sonic cursor at size 32
+            "hyprctl setcursor Sonic 32" # Set Sonic cursor at size 32
           ];
 
           env = [
-            "XCURSOR_SIZE,36"
-            "XCURSOR_THEME,Sonic-cursor-hyprcursor"
-            "HYPRCURSOR_SIZE,36"
-            "HYPRCURSOR_THEME,Sonic-cursor-hyprcursor"
             "QT_QPA_PLATFORM,wayland"
             "ELECTRON_OZONE_PLATFORM_HINT,auto"
             "QT_QPA_PLATFORMTHEME,qt6ct"
@@ -382,6 +371,10 @@ in
             focus_on_activate = true;
             disable_hyprland_logo = true;
             disable_splash_rendering = true;
+          };
+
+          cursor = {
+            no_hardware_cursors = true;
           };
 
           bezier = [

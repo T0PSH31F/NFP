@@ -16,6 +16,10 @@
     impermanence = {
       url = "github:nix-community/impermanence";
     };
+    sops-nix = {
+      url = "github:Mic92/sops-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     anifetch = {
       url = "github:Notenlish/anifetch";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -90,6 +94,11 @@
       llm-agents,
       ...
     }:
+    let
+      themeOverlays = import ./pkgs/overlays.nix;
+      themeOverlay =
+        final: prev: (themeOverlays.sonic-cursor final prev) // (themeOverlays.themes final prev);
+    in
     flake-parts.lib.mkFlake { inherit inputs; } (
       {
         config,
@@ -115,6 +124,7 @@
               config.allowUnfree = true;
               overlays = [
                 inputs.nur.overlays.default
+                themeOverlay
               ];
             };
         };
@@ -134,6 +144,14 @@
             ...
           }:
           {
+            _module.args.pkgs = import inputs.nixpkgs {
+              inherit system;
+              config.allowUnfree = true;
+              overlays = [
+                inputs.nur.overlays.default
+                themeOverlay
+              ];
+            };
             devShells.default = pkgs.mkShell {
               packages = with pkgs; [
                 clan-core.packages.${system}.clan-cli
@@ -207,6 +225,9 @@
                 ];
                 format = "iso";
               };
+
+              sonic-cursor = pkgs.sonic-cursor;
+              lain-sddm-theme = pkgs.lain-sddm-theme;
 
               # # VM Image (QEMU qcow2)
               # vm = inputs.nixos-generators.nixosGenerate {

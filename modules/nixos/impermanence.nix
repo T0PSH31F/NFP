@@ -41,6 +41,7 @@ with lib;
 
         # Virtualization/Containers (System level)
         "/var/lib/libvirt"
+        "/etc/libvirt"
         "/var/lib/docker"
         "/var/lib/podman"
 
@@ -106,6 +107,8 @@ with lib;
           ".config/discord"
           ".config/spicetify"
           ".config/noctalia"
+          ".local/share/noctalia"
+          ".cache/noctalia"
 
           # Mobile / Sync
           ".kde/share/config/kdeconnect"
@@ -172,5 +175,17 @@ with lib;
     systemd.tmpfiles.rules = [
       "d ${config.system-config.impermanence.persistPath} 0755 root root -"
     ];
+
+    # Activation script to ensure persistence dirs exist with correct permissions
+    system.activationScripts.ensurePersistenceDirs = {
+      text = ''
+        mkdir -p /persist/home/t0psh31f/.local/share/noctalia
+        mkdir -p /persist/home/t0psh31f/.cache/noctalia
+        mkdir -p /persist/etc/libvirt
+        chown -R t0psh31f:users /persist/home/t0psh31f/.local/share 2>/dev/null || true
+        chown -R t0psh31f:users /persist/home/t0psh31f/.cache 2>/dev/null || true
+      '';
+      deps = [ ];
+    };
   };
 }

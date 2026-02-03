@@ -3,8 +3,8 @@
   gtk = {
     enable = true;
     cursorTheme = {
-      package = pkgs.callPackage ../../../pkgs/sonic-cursor.nix { };
-      name = "Sonic-cursor-hyprcursor";
+      package = pkgs.sonic-cursor;
+      name = "Sonic";
       size = 32;
     };
 

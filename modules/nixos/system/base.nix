@@ -14,6 +14,12 @@
   };
   boot.loader.efi.canTouchEfiVariables = true;
 
+  boot.blacklistedKernelModules = [
+    "serial_core"
+    "8250"
+    "8250_pci"
+  ];
+
   boot.initrd.compressor = "zstd";
 
   # Locale & Time

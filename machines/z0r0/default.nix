@@ -163,6 +163,7 @@
     ssh-agent.enable = true;
     searxng.enable = true; # Optional: Enable SearxNG metasearch
     pastebin.enable = true; # Optional: Enable PrivateBin
+    harmonia.enable = true; # Binary cache
 
     # Home Automation & Infrastructure
     home-assistant-server.enable = true;

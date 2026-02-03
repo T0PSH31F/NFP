@@ -6,6 +6,7 @@
 {
   imports = [
     inputs.home-manager.nixosModules.home-manager
+    inputs.sops-nix.nixosModules.sops
 
     # System Core
     ./system/base.nix
@@ -50,7 +51,15 @@
   # Force clear nixpkgs config to avoid conflicts with clan-core's external instance
   # The allowUnfree setting is handled in flake.nix via pkgsForSystem
   nixpkgs.config = lib.mkForce { allowUnfree = true; };
-  nixpkgs.overlays = [ inputs.nur.overlays.default ];
+  nixpkgs.overlays =
+    let
+      themeOverlays = import ../../pkgs/overlays.nix;
+    in
+    [
+      inputs.nur.overlays.default
+      themeOverlays.sonic-cursor
+      themeOverlays.themes
+    ];
 
   # Home manager configuration
   home-manager.useGlobalPkgs = true;

@@ -34,6 +34,7 @@
 
     # Theming
     ./theming/gtk.nix
+    ./theming/cursor.nix
 
     # Penetration Testing
     ./pentest

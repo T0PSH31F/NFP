@@ -12,6 +12,7 @@
       "https://nix-community.cachix.org" # Nix community cache
       "https://cuda-maintainers.cachix.org" # CUDA maintainers cache
       "https://hyprland.cachix.org" # Hyprland cache
+      "http://z0r0:5000" # Local cache
     ];
 
     # Trusted public keys for the above caches
@@ -21,6 +22,7 @@
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
       "cuda-maintainers.cachix.org-1:0dq3bujKpuEPMCX6U4WylrUDZ9JyUG0VpVZa7CNq7Ow="
       "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7mC0pu+gNl4u4="
+      "z0r0-cache:+eRJv2OX+1sSi1LP/G3Dm7WhnGxSh3JVpsbeK74aLv0="
     ];
 
     # Additional Nix settings for better performance

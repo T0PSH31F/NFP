@@ -18,5 +18,6 @@
     ./ssh-agent.nix
     ./searxng.nix
     ./pastebin.nix
+    ./harmonia.nix
   ];
 }
