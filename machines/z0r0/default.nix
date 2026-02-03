@@ -1,4 +1,5 @@
 {
+  lib,
   ...
 }:
 {
@@ -19,8 +20,9 @@
   # ============================================================================
 
   # Boot configuration
-  boot.initrd.luks.devices."crypted".device =
-    "/dev/disk/by-uuid/458b615c-3ac2-4cff-98a2-c8e266bae90f";
+  boot.initrd = {
+    luks.devices."crypted".device = "/dev/disk/by-uuid/458b615c-3ac2-4cff-98a2-c8e266bae90f";
+  };
 
   # Filesystems (btrfs subvolumes)
   fileSystems."/" = {
@@ -42,6 +44,7 @@
     device = "/dev/mapper/crypted";
     fsType = "btrfs";
     options = [ "subvol=@persist" ];
+    neededForBoot = true;
   };
   fileSystems."/backup" = {
     device = "/dev/mapper/crypted";
@@ -52,6 +55,7 @@
     device = "/dev/mapper/crypted";
     fsType = "btrfs";
     options = [ "subvol=@home" ];
+    neededForBoot = true;
   };
   fileSystems."/boot" = {
     device = "/dev/disk/by-uuid/E6FA-59AC";

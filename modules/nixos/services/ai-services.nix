@@ -77,7 +77,7 @@ in
 
       port = mkOption {
         type = types.int;
-        default = 8000;
+        default = 8001;
         description = "ChromaDB port";
       };
     };

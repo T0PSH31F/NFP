@@ -14,7 +14,7 @@ with lib;
     # Use the GRUB 2 boot loader with Lain theme
     boot.loader.grub = {
       enable = true;
-      configurationLimit = 3;
+      configurationLimit = 2;
       device = "nodev"; # EFI systems use nodev
       efiSupport = true;
       efiInstallAsRemovable = false;
