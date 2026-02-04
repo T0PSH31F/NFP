@@ -12,6 +12,7 @@
     ./hyprland.nix
     ./spicetify.nix
     ./ghostty.nix
+    ./shikane.nix
   ];
 
   config = lib.mkIf (builtins.elem "desktop" clanTags) {
@@ -32,7 +33,6 @@
       file-roller
 
       # Display/monitor management
-      shikane
       wlr-randr
     ];
 

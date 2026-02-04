@@ -229,7 +229,6 @@ in
 
         exec-once = [
           "noctalia-shell & disown"
-          "shikane & disown"
           "wl-paste --watch cliphist store & disown"
           "${pkgs.hyprpolkitagent}/bin/hyprpolkitagent & disown"
           "swww-daemon & disown"
