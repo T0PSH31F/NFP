@@ -5,6 +5,7 @@
   pkg-config,
   hyprcursor,
   hyprlang,
+  hyprutils,
 }:
 
 stdenv.mkDerivation rec {
@@ -25,6 +26,14 @@ stdenv.mkDerivation rec {
   buildInputs = [
     hyprcursor
     hyprlang
+    hyprutils
+  ];
+
+  # Force pkg-config usage or manual include paths if Makefile is dumb
+  env.NIX_CFLAGS_COMPILE = toString [
+    "-I${lib.getDev hyprcursor}/include"
+    "-I${lib.getDev hyprlang}/include"
+    "-I${lib.getDev hyprutils}/include"
   ];
 
   installPhase = ''
