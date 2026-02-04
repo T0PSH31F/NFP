@@ -135,6 +135,25 @@ in
       services = [
         {
           "Media Services" = flatten [
+            (optional (pathExists "/var/lib/jellyfin") {
+              "Jellyfin" = {
+                icon = "jellyfin.png";
+                href = "http://localhost:8096";
+                description = "Media Server";
+                widget = {
+                  type = "jellyfin";
+                  url = "http://localhost:8096";
+                  key = "{{HOMEPAGE_VAR_JELLYFIN_KEY}}";
+                };
+              };
+            })
+            (optional (isServiceEnabled "calibre-web-app") {
+              "Calibre-Web" = {
+                icon = "calibre-web.png";
+                href = "http://localhost:${getServicePort "calibre-web-app" 8083}";
+                description = "E-Book Library";
+              };
+            })
             (optional (pathExists "/var/lib/sonarr") {
               "Sonarr" = {
                 icon = "sonarr.png";
@@ -237,6 +256,38 @@ in
         }
         {
           "Infrastructure" = flatten [
+            (optional (isServiceEnabled "nextcloud") {
+              "Nextcloud" = {
+                icon = "nextcloud.png";
+                href = "http://localhost:6380";
+                description = "Cloud Storage";
+                widget = {
+                  type = "nextcloud";
+                  url = "http://localhost:6380";
+                  username = "{{HOMEPAGE_VAR_NEXTCLOUD_USERNAME}}";
+                  password = "{{HOMEPAGE_VAR_NEXTCLOUD_PASSWORD}}";
+                };
+              };
+            })
+            (optional (isServiceEnabled "home-assistant-server") {
+              "Home Assistant" = {
+                icon = "home-assistant.png";
+                href = "http://localhost:${getServicePort "home-assistant-server" 8123}";
+                description = "Home Automation";
+                widget = {
+                  type = "homeassistant";
+                  url = "http://localhost:${getServicePort "home-assistant-server" 8123}";
+                  key = "{{HOMEPAGE_VAR_HASS_KEY}}";
+                };
+              };
+            })
+            (optional (isServiceEnabled "searxng") {
+              "SearXNG" = {
+                icon = "searxng.png";
+                href = "http://localhost:${getServicePort "searxng" 8888}";
+                description = "Meta Search Engine";
+              };
+            })
             (optional (pathExists "/var/lib/immich") {
               "Immich" = {
                 icon = "immich.png";
@@ -258,6 +309,13 @@ in
                 description = "Federated Chat";
               };
             })
+            {
+              "Caddy" = {
+                icon = "caddy.png";
+                href = "http://localhost:2019";
+                description = "Web Server";
+              };
+            }
           ];
         }
       ];
