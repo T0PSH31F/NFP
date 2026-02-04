@@ -218,6 +218,15 @@
     matrix-server.enable = true;
     mautrix-bridges.enable = true;
 
+    # Extra Services (User Requested)
+    glances-server.enable = true;
+    filebrowser-app.enable = true;
+    audiobookshelf-app.enable = true;
+    deluge-server.enable = true;
+    transmission-server.enable = true;
+    headscale-server.enable = true;
+    pihole-server.enable = true;
+
     # Service fixes (temporary workarounds)
     aria2.rpcSecretFile = "/etc/aria2-rpc-token";
     deluge.authFile = "/etc/deluge-auth";

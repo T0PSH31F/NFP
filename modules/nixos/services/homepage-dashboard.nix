@@ -107,9 +107,10 @@ in
       widgets = [
         {
           search = {
-            provider = "duckduckgo";
+            provider = "perplexity";
             target = "_blank";
             showSearchSuggestions = true;
+            focus = true;
           };
         }
         {
@@ -118,16 +119,6 @@ in
             memory = true;
             disk = "/";
             uptime = true;
-          };
-        }
-        {
-          datetime = {
-            text_size = "xl";
-            format = {
-              dateStyle = "long";
-              timeStyle = "short";
-              hour12 = false;
-            };
           };
         }
       ];
@@ -152,6 +143,18 @@ in
                 icon = "calibre-web.png";
                 href = "http://localhost:${getServicePort "calibre-web-app" 8083}";
                 description = "E-Book Library";
+              };
+            })
+            (optional (isServiceEnabled "audiobookshelf-app") {
+              "BookLore (Audiobookshelf)" = {
+                icon = "audiobookshelf.png";
+                href = "http://localhost:${getServicePort "audiobookshelf-app" 13378}";
+                description = "Audiobook Server";
+                widget = {
+                  type = "audiobookshelf";
+                  url = "http://localhost:${getServicePort "audiobookshelf-app" 13378}";
+                  key = "{{HOMEPAGE_VAR_AUDIOBOOKSHELF_KEY}}";
+                };
               };
             })
             (optional (pathExists "/var/lib/sonarr") {
@@ -183,6 +186,11 @@ in
                 icon = "prowlarr.png";
                 href = "http://localhost:9696";
                 description = "Indexer Manager";
+                widget = {
+                  type = "prowlarr";
+                  url = "http://localhost:9696";
+                  key = "{{HOMEPAGE_VAR_PROWLARR_KEY}}";
+                };
               };
             })
             (optional (pathExists "/var/lib/bazarr") {
@@ -190,12 +198,53 @@ in
                 icon = "bazarr.png";
                 href = "http://localhost:6767";
                 description = "Subtitle Management";
+                widget = {
+                  type = "bazarr";
+                  url = "http://localhost:6767";
+                  key = "{{HOMEPAGE_VAR_BAZARR_KEY}}";
+                };
+              };
+            })
+            (optional (isServiceEnabled "deluge-server") {
+              "Deluge" = {
+                icon = "deluge.png";
+                href = "http://localhost:${getServicePort "deluge-server" 8113}";
+                description = "Torrent Client";
+                widget = {
+                  type = "deluge";
+                  url = "http://localhost:${getServicePort "deluge-server" 8113}";
+                  password = "{{HOMEPAGE_VAR_DELUGE_PASSWORD}}";
+                };
+              };
+            })
+            (optional (isServiceEnabled "transmission-server") {
+              "Transmission" = {
+                icon = "transmission.png";
+                href = "http://localhost:${getServicePort "transmission-server" 9091}";
+                description = "Torrent Client";
+                widget = {
+                  type = "transmission";
+                  url = "http://localhost:${getServicePort "transmission-server" 9091}";
+                  username = "{{HOMEPAGE_VAR_TRANSMISSION_USERNAME}}";
+                  password = "{{HOMEPAGE_VAR_TRANSMISSION_PASSWORD}}";
+                };
               };
             })
           ];
         }
         {
           "Monitoring" = flatten [
+            (optional (isServiceEnabled "glances-server") {
+              "Glances" = {
+                icon = "glances.png";
+                href = "http://localhost:${getServicePort "glances-server" 61208}";
+                description = "System Monitoring";
+                widget = {
+                  type = "glances";
+                  url = "http://localhost:${getServicePort "glances-server" 61208}";
+                };
+              };
+            })
             (optional (isServiceEnabled "grafana") {
               "Grafana" = {
                 icon = "grafana.png";
@@ -210,11 +259,16 @@ in
                 description = "Metrics Collection";
               };
             })
-            (optional (pathExists "/var/lib/loki") {
-              "Loki" = {
-                icon = "loki.png";
-                href = "http://localhost:3100";
-                description = "Log Aggregation";
+            (optional (isServiceEnabled "pihole-server") {
+              "Pi-hole" = {
+                icon = "pi-hole.png";
+                href = "http://localhost:${getServicePort "pihole-server" 8089}/admin";
+                description = "DNS Ad Blocker";
+                widget = {
+                  type = "pihole";
+                  url = "http://localhost:${getServicePort "pihole-server" 8089}";
+                  key = "{{HOMEPAGE_VAR_PIHOLE_KEY}}";
+                };
               };
             })
           ];
@@ -244,18 +298,17 @@ in
                 description = "Workflow Automation";
               };
             }
-            {
-              "Qdrant" = {
-                icon = "qdrant.png";
-                href = "http://localhost:6333/dashboard";
-                description = "Vector Database";
-                container = "qdrant";
-              };
-            }
           ];
         }
         {
           "Infrastructure" = flatten [
+            (optional (isServiceEnabled "filebrowser-app") {
+              "FileBrowser" = {
+                icon = "filebrowser.png";
+                href = "http://localhost:${getServicePort "filebrowser-app" 8085}";
+                description = "Web File Manager";
+              };
+            })
             (optional (isServiceEnabled "nextcloud") {
               "Nextcloud" = {
                 icon = "nextcloud.png";
@@ -281,6 +334,13 @@ in
                 };
               };
             })
+            (optional (isServiceEnabled "headscale-server") {
+              "Headscale" = {
+                icon = "headscale.png";
+                href = "http://localhost:${getServicePort "headscale-server" 8086}/web";
+                description = "Tailscale Control Server";
+              };
+            })
             (optional (isServiceEnabled "searxng") {
               "SearXNG" = {
                 icon = "searxng.png";
@@ -293,6 +353,11 @@ in
                 icon = "immich.png";
                 href = "http://localhost:2283";
                 description = "Photo Management";
+                widget = {
+                  type = "immich";
+                  url = "http://localhost:2283";
+                  key = "{{HOMEPAGE_VAR_IMMICH_KEY}}";
+                };
               };
             })
             {
@@ -307,6 +372,13 @@ in
                 icon = "matrix.png";
                 href = "http://localhost:8008";
                 description = "Federated Chat";
+              };
+            })
+            (optional (isServiceEnabled "mautrix-bridges") {
+              "Mautrix Bridges" = {
+                icon = "matrix.png";
+                href = "http://localhost:8008/_matrix/static/";
+                description = "Matrix Bridges Status";
               };
             })
             {

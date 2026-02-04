@@ -19,5 +19,6 @@
     ./searxng.nix
     ./pastebin.nix
     ./harmonia.nix
+    ./extras.nix
   ];
 }
