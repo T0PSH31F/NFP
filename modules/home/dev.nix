@@ -10,7 +10,7 @@
     home.packages = with pkgs; [
       # Editor tooling
       neovim
-      vscode
+      # vscode is configured in vscode.nix with vscode-fhs
 
       # CLIs
       httpie

@@ -5,36 +5,21 @@
   ...
 }:
 {
-
   programs.home-manager.enable = true;
 
-  # Shell / prompt
-  programs.zsh = {
-    enable = true;
-    autosuggestion.enable = true;
-    syntaxHighlighting.enable = true;
-  };
+  # Note: ZSH and shell tools are configured in shell.nix
 
   # Basic tools in user profile
   home.packages = with pkgs; [
-    starship
-    eza
-    bat
-    fzf
-    ripgrep
-    fd
-    jq
+    # Yazelix dependencies
+    nushell
+    devenv
   ];
-
-  programs.starship = {
-    enable = true;
-    enableZshIntegration = true;
-  };
 
   # Basic git config
   programs.git = {
     enable = true;
-    userName = "Erik";
-    userEmail = "you@example.com";
+    settings.user.name = "T0PSH31F";
+    settings.user.email = ".com";
   };
 }
