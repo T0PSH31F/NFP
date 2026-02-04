@@ -7,5 +7,5 @@ final: prev: {
   jerry = prev.callPackage ../packages/jerry { };
   lobster = prev.callPackage ../packages/lobster { };
   vicinae = prev.callPackage ../packages/vicinae { };
-  hypr-dynamic-cursors = prev.callPackage ../packages/hypr-dynamic-cursors { };
+  hypr-dynamic-cursors = prev.hyprlandPlugins.hypr-dynamic-cursors;
 }
