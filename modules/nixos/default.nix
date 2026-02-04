@@ -37,8 +37,8 @@
     ./gaming.nix
     ./impermanence.nix
     ./mobile.nix
-    # ./flatpak.nix # Migrated to service-distribution.nix (desktop tag)
-    # ./appimage.nix # Migrated to service-distribution.nix (desktop tag)
+    ./flatpak.nix # Provides flatpak.* custom options
+    ./appimage.nix # Provides programs.appimage-support option
 
     # Themes
     ./themes/sddm-lain.nix

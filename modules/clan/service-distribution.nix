@@ -140,15 +140,8 @@ in
         xwayland.enable = true;
       };
 
-      # UWSM for session management
-      programs.uwsm = {
-        enable = true;
-        waylandCompositors.hyprland = {
-          prettyName = "Hyprland";
-          comment = "Hyprland compositor managed by UWSM";
-          binPath = "${pkgs.hyprland}/bin/Hyprland";
-        };
-      };
+      # UWSM for session management (waylandCompositors defined in packages/desktop/hyprland.nix)
+      programs.uwsm.enable = true;
 
       services.displayManager.sddm = {
         enable = true;
