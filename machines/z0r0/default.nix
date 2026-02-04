@@ -159,6 +159,7 @@
   # ============================================================================
 
   home-manager = {
+    backupFileExtension = "hm-backup";
     extraSpecialArgs = { inherit inputs; };
     users.t0psh31f = {
       imports = [ ../../modules/home ];

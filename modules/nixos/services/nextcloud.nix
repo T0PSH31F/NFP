@@ -72,7 +72,7 @@ with lib;
     # Redis for caching
     services.redis.servers.nextcloud = {
       enable = true;
-      port = 6379;
+      port = 6380;
     };
 
     # Firewall

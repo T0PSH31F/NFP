@@ -30,7 +30,7 @@
   programs.zsh.enable = true;
 
   # Back up existing files that would be clobbered by home-manager
-  home-manager.backupFileExtension = "home-backup";
+  # home-manager.backupFileExtension = "home-backup"; # Moved to machine-specific config
 
   home-manager.users.t0psh31f = {
     imports = [
