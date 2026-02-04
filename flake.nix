@@ -99,9 +99,8 @@
               config.allowUnfree = true;
               overlays = [
                 inputs.nur.overlays.default
-                themeOverlay
+                # desktop overlays moved to modules/nixos/overlays.nix
                 customOverlay
-                desktopOverlay
               ];
             };
         };
@@ -126,9 +125,8 @@
               config.allowUnfree = true;
               overlays = [
                 inputs.nur.overlays.default
-                themeOverlay
+                # desktop overlays moved to modules/nixos/overlays.nix
                 customOverlay
-                desktopOverlay
               ];
             };
             devShells.default = pkgs.mkShell {

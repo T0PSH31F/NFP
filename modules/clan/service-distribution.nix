@@ -6,9 +6,8 @@
 }:
 
 let
-  # Helper function to check if machine has a tag
-  # This uses the clan.tags option defined in tags.nix
-  hasTag = tag: builtins.elem tag config.clan.tags;
+  # Use centralized helper
+  inherit (config.clan.lib) hasTag;
 in
 {
   imports = [
@@ -217,6 +216,31 @@ in
       systemd.services.nix-daemon.serviceConfig = {
         CPUQuota = "800%"; # 8 cores
         MemoryMax = "12G";
+      };
+    })
+    # ======================================================
+    # Base System Services (tag: base - implied for all)
+    # ======================================================
+    # Note: Effectively enabled for all machines via base module logic or here
+    # Tailscale is critical for networking
+    {
+      services.tailscale.enable = true;
+    }
+
+    # ======================================================
+    # Desktop Enhancements (tag: desktop)
+    # ======================================================
+    (lib.mkIf (hasTag "desktop") {
+      # AppImage Support
+      programs.appimage-support.enable = true;
+
+      # Flatpak Support
+      services.flatpak.enable = true;
+      xdg.portal = {
+        enable = true;
+        extraPortals = with pkgs; [
+          xdg-desktop-portal-gtk
+        ];
       };
     })
   ];

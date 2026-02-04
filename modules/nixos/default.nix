@@ -21,7 +21,7 @@
 
     # Packages & Tools
     ./llm-agents.nix
-    ./packages.nix
+    # ./packages.nix # Migrated to packages/ (Refactor Phase 2)
     ./file-managers.nix
     ./nix-tools.nix
     ./nix-settings.nix

@@ -127,7 +127,7 @@
 
   # Flatpak & AppImage
   flatpak.enable = true;
-  programs.appimage-support.enable = true;
+  # programs.appimage-support.enable = true; # Moved to service-distribution.nix
 
   # ============================================================================
   # SYSTEM CONFIGURATION

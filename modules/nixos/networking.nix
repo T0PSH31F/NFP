@@ -91,7 +91,7 @@
       logRefusedConnections = false; # Set to true for debugging
     };
   };
-  services.tailscale.enable = true;
+  # services.tailscale.enable = true; # Moved to service-distribution.nix
 
   # SSH Server Configuration
   # Ensure host keys persist across reboots to prevent "host key changed" warnings

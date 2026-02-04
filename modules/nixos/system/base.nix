@@ -37,9 +37,9 @@
     LC_TIME = "en_US.UTF-8";
   };
 
-  services.tailscale.enable = true;
-  services.udisks2.enable = true;
-  services.gvfs.enable = true;
+  # services.tailscale.enable = true; # Moved to service-distribution.nix
+  # services.udisks2.enable = true; # Moved to service-distribution.nix
+  # services.gvfs.enable = true; # Moved to service-distribution.nix
 
   # Speed up builds and slim down system by disabling documentation
   documentation = {
@@ -67,14 +67,9 @@
     docker-compose
   ];
 
-  # Flatpak Support
-  services.flatpak.enable = true;
-  xdg.portal = {
-    enable = true;
-    extraPortals = with pkgs; [
-      xdg-desktop-portal-gtk
-    ];
-  };
+  # Flatpak Support - Moved to service-distribution.nix (tag: desktop)
+  # services.flatpak.enable = true;
+  # xdg.portal = { ... };
 
   # ============================================================================
   # FONTS

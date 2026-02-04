@@ -29,5 +29,37 @@
 
     iotop
     iftop
+    
+    # System Utilities
+    aria2
+    gparted
+    ntfs3g
+    sops
+    parted
+    exfatprogs
+    btrfs-progs
+
+    # Essentials
+    imagemagick
+    img2pdf
+    poppler-utils
+    qpdf
+    unrar
+    bubblewrap
+    sonic-cursor
   ];
+
+  # Enable nix-ld for running non-NixOS binaries
+  programs.nix-ld.enable = true;
+  programs.nix-ld.libraries = with pkgs; [
+    stdenv.cc.cc.lib
+    zlib
+    fuse3
+    icu
+    nss
+    openssl
+    curl
+    expat
+  ];
+  programs.starship.enable = true;
 }

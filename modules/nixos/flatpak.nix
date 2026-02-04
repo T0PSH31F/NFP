@@ -13,18 +13,20 @@ in
     enable = mkEnableOption "Flatpak package manager";
 
     remotes = mkOption {
-      type = types.listOf (types.submodule {
-        options = {
-          name = mkOption {
-            type = types.str;
-            description = "Name of the Flatpak remote";
+      type = types.listOf (
+        types.submodule {
+          options = {
+            name = mkOption {
+              type = types.str;
+              description = "Name of the Flatpak remote";
+            };
+            location = mkOption {
+              type = types.str;
+              description = "URL of the Flatpak remote";
+            };
           };
-          location = mkOption {
-            type = types.str;
-            description = "URL of the Flatpak remote";
-          };
-        };
-      });
+        }
+      );
       default = [
         {
           name = "flathub";
@@ -81,7 +83,7 @@ in
 
   config = mkIf cfg.enable {
     # Enable Flatpak service
-    services.flatpak.enable = true;
+    # services.flatpak.enable = true; # Moved to service-distribution.nix
 
     # XDG Desktop Portal (required for Flatpak)
     xdg.portal = {
@@ -152,11 +154,15 @@ in
     # Apply overrides
     system.activationScripts.flatpak-overrides = mkIf (cfg.overrides != { }) {
       text = ''
-        ${concatStringsSep "\n" (mapAttrsToList (app: settings: ''
-          ${concatStringsSep "\n" (mapAttrsToList (key: value: ''
-            ${pkgs.flatpak}/bin/flatpak override --system ${app} --${key}=${value} || true
-          '') settings)}
-        '') cfg.overrides)}
+        ${concatStringsSep "\n" (
+          mapAttrsToList (app: settings: ''
+            ${concatStringsSep "\n" (
+              mapAttrsToList (key: value: ''
+                ${pkgs.flatpak}/bin/flatpak override --system ${app} --${key}=${value} || true
+              '') settings
+            )}
+          '') cfg.overrides
+        )}
       '';
     };
   };

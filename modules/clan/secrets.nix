@@ -8,8 +8,8 @@
 
 let
   # Helper function to check if machine has a tag
-  # This uses the clan.tags option defined in tags.nix
-  hasTag = tag: builtins.elem tag config.clan.tags;
+  # This uses the clan.tags option  # Use centralized helper
+  inherit (config.clan.lib) hasTag;
 in
 {
   imports = [

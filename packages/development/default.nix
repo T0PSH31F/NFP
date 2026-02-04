@@ -14,6 +14,10 @@
       cmake
       gnumake
       pkg-config
+      libgcc
+      antigravity-fhs
+      gnumake
+      pkg-config
 
       # VCS / dev tooling
       gitFull

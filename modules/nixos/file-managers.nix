@@ -16,7 +16,7 @@
   };
 
   # Services needed for file managers
-  services.gvfs.enable = true; # Mount, trash, and other functionalities
+  # services.gvfs.enable = true; # Moved to service-distribution.nix
   services.tumbler.enable = true; # Thumbnail support
 
   environment.systemPackages = with pkgs; [

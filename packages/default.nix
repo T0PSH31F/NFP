@@ -8,6 +8,7 @@
     ./pentest/default.nix
     ./gaming/default.nix
     ./server/default.nix
+    ./hardware/default.nix
     # ./ai-ml/default.nix
     # ./media/default.nix
     # ./networking/default.nix

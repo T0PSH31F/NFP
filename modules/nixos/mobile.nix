@@ -4,9 +4,11 @@
   pkgs,
   ...
 }:
-with lib; let
+with lib;
+let
   cfg = config.mobile;
-in {
+in
+{
   options.mobile = {
     android = {
       enable = mkEnableOption "Android device support (ADB, Waydroid)";
@@ -27,7 +29,7 @@ in {
       virtualisation.waydroid.enable = true;
 
       # File Transfer & MTP
-      services.gvfs.enable = true; # Mount, Trash, and other functionalities
+      # services.gvfs.enable = true; # Mount, Trash, and other functionalities
       environment.systemPackages = with pkgs; [
         android-tools # ADB, Fastboot
         jmtpfs # MTP Filesystem
@@ -61,7 +63,8 @@ in {
     (mkIf (cfg.android.enable || cfg.ios.enable) {
       # KDE Connect / GSConnect
       # Allows wireless file transfer, clipboard sync, notifications
-      programs.kdeconnect.enable = true;
+      # programs.kdeconnect.enable = true; # Tag: mobile/laptop?
+      # services.gvfs.enable = true; # Moved to service-distribution.nix
     })
   ];
 }

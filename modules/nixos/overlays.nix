@@ -8,13 +8,25 @@
   config,
   lib,
   pkgs,
+  inputs,
   ...
 }:
 
 let
-  isDesktop =
-    (config.system-profile.role or null) == "desktop" || config.networking.hostName == "z0r0"; # temporary safeguard
+  inherit (config.clan.lib) hasTag;
+
+  # Theme overlays adapter
+  themeOverlays = import ../../overlays/default.nix { inherit inputs; };
+  themeOverlay =
+    final: prev: (themeOverlays.sonic-cursor final prev) // (themeOverlays.themes final prev);
+
+  # Desktop overlay
+  desktopOverlay = import ../../overlays/desktop-packages.nix;
 in
 {
-  # Overlays are now applied centrally in flake.nix
+  # Only apply desktop overlays if the machine has the "desktop" tag
+  nixpkgs.overlays = lib.optionals (hasTag "desktop") [
+    themeOverlay
+    desktopOverlay
+  ];
 }

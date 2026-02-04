@@ -13,7 +13,7 @@
       dedicatedServer.openFirewall = true;
     };
 
-    programs.gamemode.enable = true;
+    # programs.gamemode.enable = true; # Moved to service-distribution.nix
 
     environment.systemPackages = with pkgs; [
       lutris
