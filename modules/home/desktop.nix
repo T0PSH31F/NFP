@@ -27,10 +27,13 @@
     # Desktop GUI helpers for the user
     home.packages = with pkgs; [
       # GUI apps
-      # (You can refine this list later)
       obs-studio
       pavucontrol
       file-roller
+
+      # Display/monitor management
+      shikane
+      wlr-randr
     ];
 
     # Terminal emulator configuration (example: kitty)
