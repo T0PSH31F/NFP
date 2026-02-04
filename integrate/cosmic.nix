@@ -1,0 +1,61 @@
+{ den, styx, ... }:
+{
+  styx.wayland._.cosmic = den.lib.parametric {
+    includes = [
+      styx.wayland._.base
+    ];
+    homeManager =
+      { pkgs, lib, ... }:
+      {
+        gtk.iconTheme = {
+          name = lib.mkForce "Cosmic";
+          package = lib.mkForce pkgs.cosmic-icons;
+        };
+      };
+    nixos =
+      { pkgs, ... }:
+      {
+        nixpkgs.overlays = [
+          (final: prev: {
+            cosmic-session = prev.cosmic-session.overrideAttrs (
+              _: prev': {
+                postPatch = prev'.postPatch + ''
+                  substituteInPlace data/start-cosmic \
+                    --replace-fail 'systemctl --user import-environment ' 'dbus-update-activation-environment --verbose --all --systemd || systemctl --user import-environment #'
+                '';
+              }
+            );
+            networkmanagerapplet = prev.networkmanagerapplet.overrideAttrs {
+              patches = final.fetchpatch {
+                url = "https://github.com/pop-os/network-manager-applet/commit/8af78f7ebfa770f24cf46693cb215c5c22dbacfb.patch";
+                hash = "sha256-Q9oB6s2LDuzoj1jQbC+EARL9CguoacLAdeSlx+KQ+Yw=";
+              };
+            };
+          })
+        ];
+        xdg.portal.xdgOpenUsePortal = true;
+        services = {
+          desktopManager.cosmic.enable = true;
+          displayManager.cosmic-greeter.enable = true;
+          gnome.gnome-keyring.enable = true;
+          geoclue2.enable = true; # expected by cosmic-settings-daemon, shutdown hangs without it
+          geoclue2.enableDemoAgent = false;
+        };
+        environment.variables.COSMIC_DATA_CONTROL_ENABLED = 1;
+        environment.systemPackages = with pkgs; [
+          pwvucontrol
+          overskride
+          loupe
+          celluloid
+          gnome-disk-utility
+          file-roller
+          networkmanagerapplet
+          cosmic-ext-calculator
+          cosmic-ext-tweaks
+          cosmic-player
+          forecast
+          tasks
+        ];
+      };
+  };
+}

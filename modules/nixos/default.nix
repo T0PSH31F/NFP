@@ -22,7 +22,7 @@
     # Packages & Tools
     ./llm-agents.nix
     # ./packages.nix # Migrated to packages/ (Refactor Phase 2)
-    ./file-managers.nix
+    # ./file-managers.nix # Migrated to service-distribution.nix (desktop tag)
     ./nix-tools.nix
     ./nix-settings.nix
 
@@ -37,8 +37,8 @@
     ./gaming.nix
     ./impermanence.nix
     ./mobile.nix
-    ./flatpak.nix
-    ./appimage.nix
+    # ./flatpak.nix # Migrated to service-distribution.nix (desktop tag)
+    # ./appimage.nix # Migrated to service-distribution.nix (desktop tag)
 
     # Themes
     ./themes/sddm-lain.nix

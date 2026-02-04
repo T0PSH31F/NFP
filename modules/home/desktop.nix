@@ -42,7 +42,7 @@
       theme = "Catppuccin-Mocha";
       settings = {
         font_family = "JetBrainsMono Nerd Font";
-        font_size = 11;
+        font_size = 16;
       };
     };
 

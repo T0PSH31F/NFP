@@ -231,7 +231,6 @@ in
           "noctalia-shell & disown"
           "wl-paste --watch cliphist store & disown"
           "${pkgs.hyprpolkitagent}/bin/hyprpolkitagent & disown"
-          "swww-daemon & disown"
           "hyprctl setcursor Sonic 32"
         ];
 

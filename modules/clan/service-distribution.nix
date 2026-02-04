@@ -140,6 +140,16 @@ in
         xwayland.enable = true;
       };
 
+      # UWSM for session management
+      programs.uwsm = {
+        enable = true;
+        waylandCompositors.hyprland = {
+          prettyName = "Hyprland";
+          comment = "Hyprland compositor managed by UWSM";
+          binPath = "${pkgs.hyprland}/bin/Hyprland";
+        };
+      };
+
       services.displayManager.sddm = {
         enable = true;
         wayland.enable = true;
@@ -242,6 +252,34 @@ in
           xdg-desktop-portal-gtk
         ];
       };
+
+      # File Managers
+      programs.thunar = {
+        enable = true;
+        plugins = with pkgs; [
+          thunar-archive-plugin
+          thunar-volman
+          thunar-media-tags-plugin
+        ];
+      };
+      services.tumbler.enable = true; # Thumbnail support
+
+      environment.systemPackages = with pkgs; [
+        # Nemo File Manager
+        nemo-with-extensions
+        nemo-fileroller
+        # Dolphin File Manager (KDE)
+        kdePackages.dolphin
+        kdePackages.dolphin-plugins
+        kdePackages.kio-extras
+        kdePackages.kio-admin
+        # Archive Manager
+        file-roller
+        # Terminal file managers
+        lf
+        yazi
+        superfile
+      ];
     })
   ];
 }
