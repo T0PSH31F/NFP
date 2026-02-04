@@ -104,7 +104,7 @@
   # Auto-login to installer user
   services.displayManager.autoLogin = {
     enable = true;
-    user = "nixos";
+    user = "t0psh31f";
   };
 
   # Installer user setup
@@ -114,7 +114,7 @@
       "wheel"
       "networkmanager"
     ];
-    password = "nixos";
+    hashedPassword = "$6$WbMMiboG5lnMx4Ok$.RCZzi7GUXpt0gqsdgHL3jnke5OgCfdoOpErWxZ9/2oJj/guc5zZRYPBYzcBkV/929cwSIno/4RtW0Rfz8GCy/";
   };
 
   # Allow unfree packages (for some pentest tools)

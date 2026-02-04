@@ -14,9 +14,18 @@
   imports = [
     ./hardware-configuration.nix
     ./disko-config.nix
+    ../../modules/nixos/nix-settings.nix
+    ../../modules/nixos/performance.nix
+    ../../modules/nixos/overlays.nix
+    ../../modules/clan/tags.nix
+    ../../modules/clan/lib.nix
+    ../../modules/clan/metadata.nix
+    ../../modules/clan/service-distribution.nix
+    ../../modules/clan/secrets.nix
+
     ../../modules/nixos/default.nix
     ../../modules/nixos/hardware/intel-7th-gen.nix
-    ../../modules/Home-Manager/Desktop-env/default.nix
+    ../../packages/default.nix
     ../../modules/users/t0psh31f.nix
     inputs.nixos-hardware.nixosModules.dell-xps-13-9360
   ];
@@ -32,6 +41,12 @@
 
     networking.hostName = "nami"; # Set your hostname
     system.stateVersion = "25.05"; # Don't change after initial install
+
+    clan.tags = [
+      "server"
+      "media-server"
+      "download-server"
+    ];
 
     # Boot Loader Fix
     boot.loader = {
@@ -52,14 +67,6 @@
     # ============================================================================
     # FEATURE TOGGLES (Dendritic Pattern - Nested Attrsets)
     # ============================================================================
-
-    # Desktop environments
-    desktop = {
-      noctalia = {
-        enable = true;
-        backend = "hyprland"; # "hyprland", "niri", or "both"
-      };
-    };
 
     # Themes
     themes = {
@@ -93,9 +100,9 @@
 
     services = {
       # Infrastructure
-      home-assistant-server.enable = false;
-      caddy-server.enable = false;
-      sillytavern-app.enable = false;
+      # home-assistant-server.enable = false;
+      # caddy-server.enable = false;
+      # sillytavern-app.enable = false;
       llm-agents.enable = true;
 
       # AI Services
@@ -121,7 +128,7 @@
 
     # Services config (separate namespace)
     services-config = {
-      media-stack.enable = false;
+      # media-stack.enable = false; # Managed by service-distribution.nix via 'media-server' tag
       avahi.enable = false;
       monitoring.enable = false;
     };

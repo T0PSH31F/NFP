@@ -1,6 +1,7 @@
 {
   inputs,
   lib,
+  config,
   ...
 }:
 {
@@ -53,16 +54,21 @@
   nixpkgs.config = lib.mkForce { allowUnfree = true; };
   nixpkgs.overlays =
     let
-      themeOverlays = import ../../pkgs/overlays.nix;
+
     in
     [
       inputs.nur.overlays.default
-      themeOverlays.sonic-cursor
-      themeOverlays.themes
+      (import ../../overlays/default.nix { inherit inputs; }).sonic-cursor
+      (import ../../overlays/default.nix { inherit inputs; }).themes
+      (import ../../overlays/custom-packages.nix)
+      (import ../../overlays/desktop-packages.nix)
     ];
 
   # Home manager configuration
   home-manager.useGlobalPkgs = true;
   home-manager.useUserPackages = true;
-  home-manager.extraSpecialArgs = { inherit inputs; };
+  home-manager.extraSpecialArgs = {
+    inherit inputs;
+    clanTags = config.clan.tags;
+  };
 }

@@ -34,7 +34,8 @@
 
   home-manager.users.t0psh31f = {
     imports = [
-      ../Home-Manager/default.nix
+      ../home
+
     ];
 
     home.stateVersion = "25.05";

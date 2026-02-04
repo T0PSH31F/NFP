@@ -6,7 +6,7 @@
 {
   nixpkgs = {
     overlays = [
-      inputs.anifetch.overlays.anifetch
+      # inputs.anifetch.overlays.anifetch
     ];
   };
 

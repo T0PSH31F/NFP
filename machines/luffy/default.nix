@@ -7,10 +7,19 @@
   imports = [
     # ./hardware-configuration.nix # Disabled until hardware arrives
     ./disko.nix
+    ../../modules/nixos/nix-settings.nix
+    ../../modules/nixos/performance.nix
+    ../../modules/nixos/overlays.nix
+    ../../modules/clan/tags.nix
+    ../../modules/clan/lib.nix
+    ../../modules/clan/metadata.nix
+    ../../modules/clan/service-distribution.nix
+    ../../modules/clan/secrets.nix
+
     ../../modules/nixos/default.nix
     ../../modules/nixos/hardware/nvidia-hybrid.nix
-    ../../modules/Home-Manager/Desktop-env/default.nix
-    ../../modules/Home-Manager/Desktop-env/Noctalia/default.nix
+    ../../packages/default.nix
+
     ../../modules/users/t0psh31f.nix
   ];
 
@@ -18,9 +27,12 @@
     networking.hostName = "luffy";
     system.stateVersion = "25.05";
 
-    # Desktop
-    desktop.noctalia.enable = true;
-    desktop.noctalia.backend = "hyprland";
+    clan.tags = [
+      "desktop"
+      "gaming"
+      "ai-heavy"
+      "nvidia"
+    ];
 
     # Themes
     themes.plymouth-hellonavi.enable = true;
@@ -43,7 +55,7 @@
 
     # Home-Manager
     home-manager.users.t0psh31f = {
-      programs.vicinae.enable = true;
+      # programs.vicinae.enable = true;
     };
   };
 }

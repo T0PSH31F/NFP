@@ -4,23 +4,15 @@
 }:
 
 {
-  services.harmonia = {
-    enable = true;
-    signKeyPath = config.sops.secrets."harmonia/signing-key".path;
-    settings = {
-      bind = "[::]:5000";
-      workers = 4;
-      max_connection_rate = 256;
-      priority = 30;
-    };
-  };
+  # services.harmonia configuration removed to avoid conflict with service-distribution.nix
+  # which handles it via 'binary-cache' tag.
 
   # Open firewall
   networking.firewall.allowedTCPPorts = [ 5000 ];
 
   # SOPS secret for signing key
   sops.secrets."harmonia/signing-key" = {
-    sopsFile = ../../secrets/harmonia.yaml;
+    sopsFile = ../../../secrets/harmonia.yaml;
     owner = "harmonia";
     mode = "0400";
   };

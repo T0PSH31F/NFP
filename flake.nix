@@ -20,32 +20,12 @@
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    anifetch = {
-      url = "github:Notenlish/anifetch";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    hypr-dynamic-cursors = {
-      url = "github:VirtCode/hypr-dynamic-cursors";
-      inputs.hyprland.follows = "hyprland";
-    };
     hyprland = {
       url = "github:hyprwm/Hyprland";
     };
-    hyprland-plugins = {
-      url = "github:hyprwm/hyprland-plugins";
-      inputs.hyprland.follows = "hyprland";
-    };
     import-tree.url = "github:vic/import-tree";
-    jerry = {
-      url = "github:justchokingaround/jerry";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     llm-agents = {
       url = "github:numtide/llm-agents.nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    lobster = {
-      url = "github:justchokingaround/lobster";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nixai = {
@@ -60,27 +40,18 @@
       url = "github:nix-community/nixos-generators";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    noctalia = {
-      url = "github:noctalia-dev/noctalia-shell";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     nur.url = "github:nix-community/NUR";
     nvf = {
       url = "github:NotAShelf/nvf";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    noctalia = {
+      url = "github:noctalia-dev/noctalia-shell";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     spicetify-nix = {
       url = "github:Gerg-L/spicetify-nix";
       inputs.nixpkgs.follows = "nixpkgs";
-    };
-    vicinae = {
-      url = "github:vicinaehq/vicinae";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    vicinae-extensions = {
-      url = "github:vicinaehq/extensions";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.vicinae.follows = "vicinae";
     };
   };
 
@@ -92,12 +63,16 @@
       import-tree,
       nvf,
       llm-agents,
+      noctalia,
+      spicetify-nix,
       ...
     }:
     let
-      themeOverlays = import ./pkgs/overlays.nix;
+      themeOverlays = import ./overlays/default.nix { inherit inputs; };
       themeOverlay =
         final: prev: (themeOverlays.sonic-cursor final prev) // (themeOverlays.themes final prev);
+      customOverlay = import ./overlays/custom-packages.nix;
+      desktopOverlay = import ./overlays/desktop-packages.nix;
     in
     flake-parts.lib.mkFlake { inherit inputs; } (
       {
@@ -125,6 +100,8 @@
               overlays = [
                 inputs.nur.overlays.default
                 themeOverlay
+                customOverlay
+                desktopOverlay
               ];
             };
         };
@@ -150,6 +127,8 @@
               overlays = [
                 inputs.nur.overlays.default
                 themeOverlay
+                customOverlay
+                desktopOverlay
               ];
             };
             devShells.default = pkgs.mkShell {

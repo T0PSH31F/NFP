@@ -1,5 +1,6 @@
 {
   lib,
+  inputs,
   ...
 }:
 {
@@ -8,12 +9,25 @@
   # ============================================================================
   imports = [
     ../../modules/nixos/default.nix
+    ../../modules/nixos/nix-settings.nix
+    ../../modules/nixos/performance.nix
+    ../../modules/nixos/overlays.nix
+    ../../modules/clan/tags.nix
+    ../../modules/clan/lib.nix
+    ../../modules/clan/metadata.nix
+    ../../modules/clan/service-distribution.nix
+    ../../modules/clan/secrets.nix
+    ../../packages/default.nix
     ../../modules/nixos/system/laptop.nix
     ../../modules/nixos/hardware/intel-12th-gen.nix
-    ../../modules/Home-Manager/Desktop-env/default.nix
-    ../../modules/Home-Manager/Desktop-env/Noctalia/default.nix
     ../../modules/users/t0psh31f.nix
   ];
+
+  # ... (middle of file skipped) ...
+
+  # ============================================================================
+  # HOME-MANAGER CONFIGURATION
+  # ============================================================================
 
   # ============================================================================
   # HARDWARE CONFIGURATION
@@ -89,15 +103,6 @@
   nix-tools.enable = true;
   desktop-portals.enable = true;
 
-  # Desktop environments
-  desktop = {
-    noctalia = {
-      enable = true;
-      backend = "hyprland";
-      #backend = "niri"
-      #backend = "both"
-    };
-  };
   # Themes
   themes = {
     sddm-lainframe.enable = true;
@@ -134,23 +139,36 @@
   # Impermanence
   system-config.impermanence.enable = true;
 
-  # Nix settings (optimized for 12th Gen Intel: 4P + 8E = 12 Cores / 16 Threads)
-  nix.settings = {
-    cores = 4; # Cores per build job
-    max-jobs = 4; # Total parallel build jobs (reduced to prevent OOM)
-  };
+  # Tag z0r0 as desktop + AI + build + cache + DB + dev + pentest
+  clan.tags = [
+    "desktop"
+    "laptop"
+    "ai-server"
+    "build-server"
+    "binary-cache"
+    "database"
+    "dev"
+    # "pentest"
+  ];
+
+  # Nix settings are now managed in modules/nixos/nix-settings.nix
+  # z0r0 specific overrides can be added here if needed, but the defaults are 4 jobs / 2 cores.
 
   # ============================================================================
   # HOME-MANAGER CONFIGURATION
   # ============================================================================
 
-  home-manager.users.t0psh31f = {
-    # Home-Manager programs
-    programs = {
-      yazelix.enable = true;
-      keybind-cheatsheet.enable = true;
-      pentest.enable = false;
-      vicinae.enable = true;
+  home-manager = {
+    extraSpecialArgs = { inherit inputs; };
+    users.t0psh31f = {
+      imports = [ ../../modules/home ];
+      # Home-Manager programs
+      # programs = {
+      #   yazelix.enable = true;
+      #   keybind-cheatsheet.enable = true;
+      #   pentest.enable = false;
+      #   vicinae.enable = true;
+      # };
     };
   };
 
@@ -163,7 +181,7 @@
     ssh-agent.enable = true;
     searxng.enable = true; # Optional: Enable SearxNG metasearch
     pastebin.enable = true; # Optional: Enable PrivateBin
-    harmonia.enable = true; # Binary cache
+    # harmonia.enable = true; # Managed by service-distribution.nix via 'binary-cache' tag
 
     # Home Automation & Infrastructure
     home-assistant-server.enable = true;
@@ -179,7 +197,7 @@
       # sillytavern.enable = true; # Moved to Clan Service
       # Local inference
       localai.enable = true;
-      ollama.enable = false; # Enable when you have GPU acceleration
+      # ollama.enable = false; # Managed by service-distribution.nix via 'ai-server' tag
       # Vector databases
       chromadb.enable = true;
       qdrant.enable = false;

@@ -20,13 +20,17 @@
 
     # Full Grandlix-Gang modules
     ../../modules/nixos/default.nix
-    ../../modules/Home-Manager/Desktop-env/default.nix
+    ../../packages/default.nix
 
     # User-specific configuration (shell, home-manager, etc.)
     ../../modules/users/t0psh31f.nix
 
     # Laptop-specific optimizations
     ../../modules/nixos/system/laptop.nix
+
+    # Clan Modules for Tags
+    ../../modules/clan/tags.nix
+    ../../modules/clan/lib.nix
   ];
 
   # Disable ZFS to avoid broken kernel package errors
@@ -40,10 +44,7 @@
 
   networking.hostName = "grandlix-live";
 
-  desktop.noctalia = {
-    enable = true;
-    backend = "hyprland";
-  };
+  clan.tags = [ "desktop" ];
 
   # ============================================================================
   # THEMES

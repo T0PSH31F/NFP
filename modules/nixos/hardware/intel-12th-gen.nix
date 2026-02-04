@@ -16,12 +16,12 @@
     ];
   };
 
-  # Thermal management
-  services.thermald.enable = lib.mkForce true;
+  # Thermal management (Thermald is causing "Temperature check failed" on this hardware)
+  services.thermald.enable = lib.mkForce false;
 
-  # Power management
-  services.auto-cpufreq.enable = lib.mkForce true;
-  services.power-profiles-daemon.enable = lib.mkForce false; # Conflict with auto-cpufreq
+  # Power management (Switching to PPD for better GNOME/KDE integration and stability)
+  services.auto-cpufreq.enable = lib.mkForce false;
+  services.power-profiles-daemon.enable = lib.mkForce true;
 
   # Thunderbolt
   services.hardware.bolt.enable = true;

@@ -1,0 +1,15 @@
+{ ... }:
+
+{
+  imports = [
+    ./core/default.nix
+    ./desktop/default.nix
+    ./development/default.nix
+    ./pentest/default.nix
+    ./gaming/default.nix
+    ./server/default.nix
+    # ./ai-ml/default.nix
+    # ./media/default.nix
+    # ./networking/default.nix
+  ];
+}
