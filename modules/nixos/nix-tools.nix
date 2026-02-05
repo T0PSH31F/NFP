@@ -4,7 +4,8 @@
   pkgs,
   ...
 }:
-with lib; {
+with lib;
+{
   options.nix-tools = {
     enable = mkEnableOption "Nix development and helper tools";
   };
@@ -23,9 +24,11 @@ with lib; {
     # Usage: nom build, nom shell, etc. - prettier build output
     environment.systemPackages = with pkgs; [
       nix-output-monitor # nom command
+      nix-top
       nvd # Nix/NixOS package version diff tool
       nix-tree # Interactive nix dependency tree viewer
       nix-index # Locate packages providing a file
+      nix-ld
       nixfmt-tree
       arion
       nix-top
@@ -46,11 +49,12 @@ with lib; {
       zsh-nix-shell
       # mcp-nixos # Disabled: dependency conflict with fastmcp (needs mcp<1.17.0 but has 1.25.0)
       nil
-      nixd
+      #nixd
       dix
       compose2nix
-    ];
+      comma
 
+    ];
     # Enable nix-index database generation
     programs.command-not-found.enable = false;
     programs.nix-index = {

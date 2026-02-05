@@ -222,42 +222,37 @@ in
       ];
     };
 
-    # Open WebUI - container-based deployment
-    virtualisation.oci-containers.containers.open-webui =
-      mkIf config.services.ai-services.open-webui.enable
-        {
-          image = "ghcr.io/open-webui/open-webui:main";
-          ports = [ "${toString config.services.ai-services.open-webui.port}:8080" ];
-          volumes = [
-            "open-webui:/app/backend/data"
-          ];
-          extraOptions = [
-            "--add-host=host.docker.internal:host-gateway"
-          ];
-        };
-
-    # Qdrant vector database
-    virtualisation.oci-containers.containers.qdrant = mkIf config.services.ai-services.qdrant.enable {
-      image = "qdrant/qdrant:latest";
-      ports = [
-        "${toString config.services.ai-services.qdrant.port}:6333"
-        "6334:6334"
-      ];
-      volumes = [
-        "qdrant_storage:/qdrant/storage"
-      ];
+    # Open WebUI - native NixOS service
+    services.open-webui = mkIf config.services.ai-services.open-webui.enable {
+      enable = true;
+      port = config.services.ai-services.open-webui.port;
+      openFirewall = true;
+      environment = {
+        OLLAMA_API_BASE_URL = "http://localhost:11434";
+        WEBUI_AUTH = "false"; # Disable auth for local use
+      };
     };
 
-    # ChromaDB vector database
-    virtualisation.oci-containers.containers.chromadb =
-      mkIf config.services.ai-services.chromadb.enable
-        {
-          image = "chromadb/chroma:latest";
-          ports = [ "${toString config.services.ai-services.chromadb.port}:8000" ];
-          volumes = [
-            "chromadb_data:/chroma/chroma"
-          ];
+    # Qdrant vector database - native NixOS service
+    services.qdrant = mkIf config.services.ai-services.qdrant.enable {
+      enable = true;
+      settings = {
+        service = {
+          http_port = config.services.ai-services.qdrant.port;
+          grpc_port = 6334;
         };
+        storage = {
+          storage_path = "/var/lib/qdrant/storage";
+        };
+      };
+    };
+
+    # ChromaDB vector database - native NixOS service
+    services.chromadb = mkIf config.services.ai-services.chromadb.enable {
+      enable = true;
+      port = config.services.ai-services.chromadb.port;
+      openFirewall = true;
+    };
 
     # LocalAI
     virtualisation.oci-containers.containers.local-ai =
@@ -279,27 +274,57 @@ in
     # ============================================================================
     services.ollama = mkIf cfg.ollama.enable {
       enable = true;
-      acceleration = cfg.ollama.acceleration;
+      package = pkgs.ollama-vulkan;
+      # acceleration = cfg.ollama.acceleration; # package handles acceleration
       loadModels = cfg.ollama.models;
     };
 
-    # Enable docker/podman for container services
-    virtualisation.docker.enable = mkIf (
-      cfg.open-webui.enable || cfg.qdrant.enable || cfg.chromadb.enable || cfg.localai.enable
+    systemd.services.ollama.serviceConfig.DynamicUser = lib.mkForce false;
 
-    ) true;
+    # Create static user for Ollama since DynamicUser is disabled
+    users.users.ollama = {
+      group = "ollama";
+      isSystemUser = true;
+      description = "Ollama Service User";
+      home = "/var/lib/ollama";
+      createHome = true;
+    };
+    users.groups.ollama = { };
 
-    virtualisation.oci-containers.backend = "docker";
+    systemd.tmpfiles.rules = [
+      "d /var/lib/ollama 0750 ollama ollama -"
+      "d /var/lib/ollama/models 0750 ollama ollama -"
+    ];
 
-    # Firewall rules
+    # Enable docker/podman only for LocalAI (still needs container)
+    virtualisation.docker.enable = mkIf cfg.localai.enable true;
+
+    virtualisation.oci-containers.backend = mkIf cfg.localai.enable "docker";
+
+    # NextJS Ollama LLM UI
+    systemd.services.nextjs-ollama-llm-ui = {
+      description = "NextJS Ollama LLM UI";
+      wantedBy = [ "multi-user.target" ];
+      after = [
+        "network.target"
+        "ollama.service"
+      ];
+      serviceConfig = {
+        ExecStart = "${pkgs.nextjs-ollama-llm-ui}/bin/nextjs-ollama-llm-ui";
+        DynamicUser = true;
+        Environment = [
+          "PORT=3001"
+          "OLLAMA_URL=http://localhost:11434"
+        ];
+      };
+    };
+
+    # Firewall rules (mostly handled by openFirewall options now)
     networking.firewall.allowedTCPPorts = mkIf cfg.enable (
       (optional cfg.postgresql.enable cfg.postgresql.port)
-      ++ (optional cfg.open-webui.enable cfg.open-webui.port)
-      ++ (optional cfg.qdrant.enable cfg.qdrant.port)
-      ++ (optional cfg.chromadb.enable cfg.chromadb.port)
       ++ (optional cfg.localai.enable cfg.localai.port)
-
       ++ (optional cfg.ollama.enable 11434)
+      ++ [ 3001 ] # NextJS UI
     );
 
     # Ensure data is persisted

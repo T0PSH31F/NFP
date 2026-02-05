@@ -40,23 +40,18 @@
           source "${config.xdg.cacheHome}/p10k-instant-prompt-''${(%):-%n}.zsh"
       fi
 
-      source ${./p10k.zsh}
+      source ${./assets/p10k.zsh}
       bindkey -v
       export KEYTIMEOUT=1
       bindkey '^Y' autosuggest-accept
       bindkey '^E' autosuggest-clear
 
-      # Anifetch MOTD - Display system info with neofetch/anifetch
-      _anifetch_motd() {
-        if command -v anifetch &> /dev/null; then
-          anifetch 2>/dev/null || neofetch 2>/dev/null || true
-        elif command -v neofetch &> /dev/null; then
-          neofetch 2>/dev/null || true
-        fi
-      }
-      # Only show MOTD for interactive shells, not in tmux/screen, and not in VSCode terminal
-      if [[ $- == *i* ]] && [[ -z "$TMUX" ]] && [[ -z "$STY" ]] && [[ "$TERM_PROGRAM" != "vscode" ]]; then
-        _anifetch_motd
+      # Grandlix MOTD - Custom Image & Fortune
+      # Grandlix MOTD (Images Removed by request)
+      if command -v anifetch &>/dev/null; then
+        anifetch
+      elif command -v neofetch &>/dev/null; then
+        neofetch
       fi
 
       # Yazelix integration - yzx command
@@ -77,7 +72,7 @@
               echo "  env          - Load Yazelix tools into current shell"
               echo "  help         - Show this help"
               ;;
-            *)
+            *)lib
               echo "Unknown command: $1. Use 'yzx help' for available commands."
               ;;
           esac
@@ -150,9 +145,6 @@
     };
 
     initExtra = ''
-      # Initialize starship prompt
-      eval "$(starship init bash)"
-
       # Initialize zoxide
       eval "$(zoxide init bash)"
 
@@ -164,17 +156,12 @@
         export PS1="[nix-shell] $PS1"
       fi
 
-      # Anifetch MOTD - Display system info with neofetch/anifetch
-      _anifetch_motd() {
-        if command -v anifetch &> /dev/null; then
-          anifetch 2>/dev/null || neofetch 2>/dev/null || true
-        elif command -v neofetch &> /dev/null; then
-          neofetch 2>/dev/null || true
-        fi
-      }
-      # Only show MOTD for interactive shells, not in tmux/screen, and not in VSCode terminal
-      if [[ $- == *i* ]] && [[ -z "$TMUX" ]] && [[ -z "$STY" ]] && [[ "$TERM_PROGRAM" != "vscode" ]]; then
-        _anifetch_motd
+      # Grandlix MOTD - Custom Image & Fortune
+      # Grandlix MOTD (Images Removed by request)
+      if command -v anifetch &>/dev/null; then
+        anifetch
+      elif command -v neofetch &>/dev/null; then
+        neofetch
       fi
     '';
   };
@@ -241,8 +228,25 @@
       ];
     };
 
+    bat.enable = true;
     ripgrep.enable = true;
     jq.enable = true;
     btop.enable = true;
   };
+
+  home.packages = with pkgs; [
+    imagemagick
+    chafa
+    gum
+    lolcat
+    figlet
+    toilet
+    blahaj
+    terminal-parrot
+    neo-cowsay
+    charasay
+    neofetch
+    fortune-kind
+
+  ];
 }

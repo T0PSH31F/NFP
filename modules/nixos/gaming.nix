@@ -4,7 +4,8 @@
   pkgs,
   ...
 }:
-with lib; {
+with lib;
+{
   options.gaming = {
     enable = mkEnableOption "Gaming support with Proton, Lutris, and emulators";
 
@@ -58,7 +59,8 @@ with lib; {
     };
 
     # Gaming packages
-    environment.systemPackages = with pkgs;
+    environment.systemPackages =
+      with pkgs;
       [
         # Wine and Proton alternatives
         lutris
@@ -77,8 +79,8 @@ with lib; {
         # Emulators (consolidated from home-manager)
       ]
       ++ optionals config.gaming.enableEmulators [
-        (retroarch.withCores (cores:
-          with cores; [
+        (retroarch.withCores (
+          cores: with cores; [
             beetle-psx-hw
             snes9x
             genesis-plus-gx
@@ -88,7 +90,8 @@ with lib; {
             ppsspp
             desmume
             mgba
-          ]))
+          ]
+        ))
 
         # Standalone emulators
         bign-handheld-thumbnailer
@@ -122,6 +125,7 @@ with lib; {
     };
 
     # Kernel parameters for gaming
+    boot.kernelModules = [ "ntsync" ];
     boot.kernel.sysctl = {
       "vm.max_map_count" = 2147483642; # For some games and programs
     };
@@ -129,6 +133,11 @@ with lib; {
     # Enable controller support
     hardware.xone.enable = mkDefault true; # Xbox One controller
     hardware.xpadneo.enable = mkDefault true; # Xbox controller Bluetooth
+
+    services = {
+      input-remapper.enable = true;
+      system76-scheduler.enable = true;
+    };
 
     # Firewall rules for gaming
     networking.firewall = {

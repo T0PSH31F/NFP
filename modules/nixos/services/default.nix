@@ -20,5 +20,9 @@
     ./pastebin.nix
     ./harmonia.nix
     ./extras.nix
+    ./adguard.nix
+    ./komga.nix
+    ./your-spotify.nix
+    ./karakeep.nix
   ];
 }

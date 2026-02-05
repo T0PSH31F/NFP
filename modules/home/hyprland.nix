@@ -2,7 +2,6 @@
   config,
   lib,
   pkgs,
-  inputs,
   ...
 }:
 with lib;
@@ -15,11 +14,8 @@ in
   };
 
   config = mkIf cfg.enable {
-
-    # UWSM Configuration for Session Management
-
     home.packages = with pkgs; [
-      hypr-dynamic-cursors
+      hyprlandPlugins.hypr-dynamic-cursors
       rofi
       dunst
       swayimg
@@ -37,36 +33,50 @@ in
       ghostty
       warp-terminal
       nemo-with-extensions
-      xpipe
       steam-rom-manager
-      sonic-cursor
+      rose-pine-hyprcursor
       hyprpolkitagent
       xdg-utils
       xdg-user-dirs
+      gedit
+      pyprland
+      playerctl
+      pywalfox-native
+      qt6Packages.qt6ct
+      nwg-look
+      adw-gtk3
     ];
 
     wayland.windowManager.hyprland = {
       enable = true;
-      package = inputs.hyprland.packages.${pkgs.system}.hyprland;
+      # Use nixpkgs version to ensure plugin compatibility (fixes hypr-dynamic-cursors)
+      # package = inputs.hyprland.packages.${pkgs.system}.hyprland;
       systemd.enable = false;
       plugins = [
-        pkgs.hypr-dynamic-cursors
+        pkgs.hyprlandPlugins.hypr-dynamic-cursors
       ];
 
       settings = {
-        # Source matugen-generated colors for dynamic theming
         source = "~/.config/hypr/colors.conf";
 
         "$mod" = "SUPER";
         "$terminal" = "ghostty";
         "$fileManager" = "nemo-with-extensions";
         "$browser" = "brave";
+        "$ipc" = "noctalia-shell ipc call";
 
         plugin = {
           "dynamic-cursors" = {
             enabled = true;
             mode = "rotate";
             threshold = 2;
+            rotate = {
+              length = "$cursorSize";
+            };
+
+            tilt = {
+              limit = 3000;
+            };
 
             stretch = {
               limit = 3000;
@@ -78,45 +88,61 @@ in
               effects = false;
               ipc = true;
             };
+
+            shaperule = "default, rotate, rotate:offset: $cursorRot";
           };
         };
 
-        # Custom keybinds
+        windowrule = [
+        ];
+
         bind = lib.mkAfter [
-          "SUPER, A, exec, vicinae"
+          "SUPER, A, exec, $ipc launcher toggle"
           "SUPER, Space, exec, vicinae"
 
           "SUPER, D, exec, noctalia-shell ipc overview"
           "SUPER, X, exec, noctalia-shell ipc control-center"
           "SUPER, L, exec, noctalia-shell ipc lock"
-          "SUPER SHIFT, E, exec, noctalia-shell ipc session-menu"
+          "CTRL ALT, Delete, exec, noctalia-shell ipc session-menu"
           "SUPER SHIFT, N, exec, noctalia-shell ipc notification-center"
 
-          ", XF86MonBrightnessUp, exec, noctalia-shell ipc brightness +5"
-          ", XF86MonBrightnessDown, exec, noctalia-shell ipc brightness -5"
-          ", XF86AudioRaiseVolume, exec, noctalia-shell ipc volume +5"
-          ", XF86AudioLowerVolume, exec, noctalia-shell ipc volume -5"
-          ", XF86AudioMute, exec, noctalia-shell ipc volume mute"
-
+          # Media keys handled by bindel/bindl below
           ", XF86AudioPlay, exec, noctalia-shell ipc media play-pause"
           ", XF86AudioNext, exec, noctalia-shell ipc media next"
           ", XF86AudioPrev, exec, noctalia-shell ipc media previous"
+
+          # Custom Media Controls (ALT + Numbers)
+          "ALT, 4, exec, noctalia-shell ipc media previous"
+          "ALT, 5, exec, noctalia-shell ipc media play-pause"
+          "ALT, 6, exec, noctalia-shell ipc media next"
+          "ALT, 7, exec, noctalia-shell ipc volume -3"
+          "ALT, 9, exec, noctalia-shell ipc volume +3"
 
           ", Print, exec, noctalia-shell ipc screenshot"
 
           "SUPER SHIFT, Tab, exec, noctalia-shell ipc overview"
 
           "SUPER, Q, killactive,"
-          "SUPER, C, exec, uwsm app -- code"
+          "SUPER, C, exec, $ipc controlCenter toggle"
+          "SUPER, comma, exec, $ipc settings toggle"
           "SUPER, T, exec, uwsm app -- ghostty"
           "SUPER, Return, exec, uwsm app -- ghostty"
           "SUPER SHIFT, T, exec, uwsm app -- kitty"
           "SUPER SHIFT, Return, exec, uwsm app -- warp-terminal"
           "SUPER, E, exec, uwsm app -- thunar"
           "SUPER CTRL, E, exec, uwsm app -- ghostty -e sf"
-          "SUPER SHIFT, E, exec, uwsm app -- kdePackages.dolphin"
+          "SUPER SHIFT, E, exec, pypr toggle nwglook"
+          "SUPER, Y, exec, ghostty -e nu ~/.config/yazelix/nushell/scripts/core/start_yazelix.nu launch"
           "SUPER SHIFT, Y, exec, ghostty -e yazi"
           "SUPER, M, exec, uwsm app -- spotify"
+
+          # Scratchpads (Pyprland)
+          # Ghostty Dropdown (Alt+T or Alt+Enter)
+          "ALT, T, exec, pypr toggle term"
+          "ALT, Return, exec, pypr toggle term"
+
+          # Gedit Scratchpad (Super+H)
+          "SUPER, H, exec, pypr toggle gedit"
 
           "SHIFT, Print, exec, flameshot full --path ~/Pictures/screenshots"
           "CTRL, Print, exec, flameshot gui --path ~/Pictures/screenshots"
@@ -214,6 +240,9 @@ in
           "SUPER, Equal, splitratio, 0.1"
           "SUPER, Semicolon, splitratio, -0.1"
           "SUPER, Apostrophe, splitratio, 0.1"
+
+          "ALT, 1, exec, playerctl position 2-"
+          "ALT, 3, exec, playerctl position 2+"
         ];
 
         bindm = [
@@ -222,16 +251,24 @@ in
           "SUPER, mouse:274, movewindow"
         ];
 
+        bindel = [
+          ", XF86AudioRaiseVolume, exec, $ipc volume increase"
+          ", XF86AudioLowerVolume, exec, $ipc volume decrease"
+          ", XF86MonBrightnessUp, exec, $ipc brightness increase"
+          ", XF86MonBrightnessDown, exec, $ipc brightness decrease"
+        ];
+
         bindl = [
-          ", switch:on:Lid Switch, exec, hyprctl keyword monitor \"eDP-1, disable\""
-          ", switch:off:Lid Switch, exec, hyprctl keyword monitor \"eDP-1, 2560x1600@60, 0x0, 1.6\""
+          ", XF86AudioMute, exec, $ipc volume muteOutput"
+          # ", switch:on:Lid Switch, exec, hyprctl keyword monitor \"eDP-1, disable\""
+          # ", switch:off:Lid Switch, exec, hyprctl keyword monitor \"eDP-1, 2560x1600@60, 0x0, 1.6\""
         ];
 
         exec-once = [
           "noctalia-shell & disown"
           "wl-paste --watch cliphist store & disown"
           "${pkgs.hyprpolkitagent}/bin/hyprpolkitagent & disown"
-          "hyprctl setcursor Sonic 32"
+          "pypr & disown"
         ];
 
         env = [
@@ -247,6 +284,8 @@ in
           "_JAVA_AWT_WM_NONREPARENTING,1"
           "GTK_USE_PORTAL,1"
           "NIXOS_OZONE_WL,1"
+          "HYPRCURSOR_THEME,rose-pine-hyprcursor"
+          "HYPRCURSOR_SIZE,32"
         ];
 
         general = {
@@ -284,7 +323,7 @@ in
         };
 
         cursor = {
-          no_hardware_cursors = true;
+          # no_hardware_cursors = true;
         };
 
         bezier = [
@@ -337,7 +376,38 @@ in
           "10, monitor:eDP-1"
         ];
       };
+
     };
+
+    xdg.configFile."hypr/hyprland.conf".force = true;
+
+    xdg.configFile."hypr/pyprland.toml".text = ''
+      [pyprland]
+      plugins = ["scratchpads"]
+
+      [scratchpads.term]
+      animation = "fromTop"
+      command = "ghostty --class=ghostty-dropdown"
+      class = "ghostty-dropdown"
+      size = "100% 50%"
+      lazy = true
+
+      [scratchpads.gedit]
+      animation = "fromRight"
+      command = "gedit"
+      class = "gedit"
+      size = "75% 60%"
+      position = "center"
+      lazy = true
+
+      [scratchpads.nwglook]
+      animation = "fromBottom"
+      command = "nwg-look"
+      class = "nwg-look"
+      size = "60% 60%"
+      position = "center"
+      lazy = true
+    '';
 
     xdg.enable = true;
   };

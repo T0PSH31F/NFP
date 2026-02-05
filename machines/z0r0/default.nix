@@ -122,7 +122,7 @@
   };
 
   # Gaming & Virtualization
-  gaming.enable = true;
+  gaming.enable = false;
   virtualization.enable = true;
 
   # Flatpak & AppImage
@@ -164,12 +164,12 @@
     users.t0psh31f = {
       imports = [ ../../modules/home ];
       # Home-Manager programs
-      # programs = {
-      #   yazelix.enable = true;
-      #   keybind-cheatsheet.enable = true;
-      #   pentest.enable = false;
-      #   vicinae.enable = true;
-      # };
+      programs = {
+        yazelix.enable = true;
+        #   keybind-cheatsheet.enable = true;
+        #   pentest.enable = false;
+        vicinae.enable = true;
+      };
     };
   };
 
@@ -221,11 +221,9 @@
     # Extra Services (User Requested)
     glances-server.enable = true;
     filebrowser-app.enable = true;
-    audiobookshelf-app.enable = true;
     deluge-server.enable = true;
     transmission-server.enable = true;
     headscale-server.enable = true;
-    pihole-server.enable = true;
 
     # Service fixes (temporary workarounds)
     aria2.rpcSecretFile = "/etc/aria2-rpc-token";

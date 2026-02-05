@@ -1,6 +1,4 @@
 {
-  config,
-  pkgs,
   lib,
   clanTags,
   ...
@@ -12,7 +10,7 @@
       enableBashIntegration = true;
       enableZshIntegration = true;
       settings = {
-        theme = "catppuccin-mocha";
+        # theme = "catppuccin-mocha";
         font-family = "JetBrainsMono Nerd Font";
         font-size = 16;
         shell-integration-features = true;
@@ -21,9 +19,6 @@
         window-padding-x = 4;
         window-padding-color = "extend";
         window-padding-balance = true;
-
-        # Shader - bloom effect
-        custom-shader = "${pkgs.ghostty}/share/ghostty/shaders/bloom.glsl";
 
         keybind = [
           "ctrl+alt+v=new_split:right"
@@ -36,9 +31,15 @@
           "ctrl+shift+w=close_surface"
           "page_up=scroll_page_fractional:-0.5"
           "page_down=scroll_page_fractional:+0.5"
-          "ctrl+shift+r=reload_config"
         ];
       };
     };
+
+    xdg.configFile."ghostty/config".text = lib.mkAfter ''
+      custom-shader = ${./assets/shaders/neon.glsl}
+      custom-shader = ${./assets/shaders/cursor_trail_neon.glsl}
+    '';
+
+    xdg.configFile."ghostty/config".force = true;
   };
 }

@@ -32,15 +32,6 @@ in
       };
     };
 
-    # Audiobookshelf (BookLore?)
-    audiobookshelf-app = {
-      enable = mkEnableOption "Audiobookshelf server";
-      port = mkOption {
-        type = types.port;
-        default = 13378;
-      };
-    };
-
     # Deluge
     deluge-server = {
       enable = mkEnableOption "Deluge BitTorrent client";
@@ -67,15 +58,6 @@ in
         default = 8086;
       };
     };
-
-    # Pi-hole (Container)
-    pihole-server = {
-      enable = mkEnableOption "Pi-hole DNS blocker";
-      port = mkOption {
-        type = types.port;
-        default = 8089;
-      };
-    };
   };
 
   config = mkMerge [
@@ -87,30 +69,22 @@ in
       };
     })
 
-    # FileBrowser
+    # FileBrowser - Native NixOS service
     (mkIf cfg.filebrowser-app.enable {
       services.filebrowser = {
         enable = true;
-        port = cfg.filebrowser-app.port;
-        # Bind to all interfaces to be accessible
-        address = "0.0.0.0";
-        # Use root directory
+        openFirewall = true;
+        settings = {
+          port = cfg.filebrowser-app.port;
+          address = "0.0.0.0";
+          root = cfg.filebrowser-app.rootDir;
+          # Use subdirectory for database to avoid tmpfiles conflict
+          database = "/var/lib/filebrowser/data/filebrowser.db";
+        };
       };
-      systemd.services.filebrowser.serviceConfig.StateDirectory = "filebrowser";
-      networking.firewall.allowedTCPPorts = [ cfg.filebrowser-app.port ];
+      # Note: Native service handles directory creation automatically
     })
 
-    # Audiobookshelf
-    (mkIf cfg.audiobookshelf-app.enable {
-      services.audiobookshelf = {
-        enable = true;
-        port = cfg.audiobookshelf-app.port;
-        host = "0.0.0.0";
-      };
-      networking.firewall.allowedTCPPorts = [ cfg.audiobookshelf-app.port ];
-    })
-
-    # Deluge
     (mkIf cfg.deluge-server.enable {
       services.deluge = {
         enable = true;
@@ -123,12 +97,24 @@ in
         cfg.deluge-server.port
         58846
       ];
+      # Fix permissions for Deluge state directory
+      systemd.tmpfiles.rules = [
+        "Z /var/lib/deluge 0750 deluge deluge -"
+      ];
+      # Disable DynamicUser to ensure access to /var/lib/deluge owned by static 'deluge' user
+      systemd.services.delugeweb.serviceConfig.DynamicUser = lib.mkForce false;
+      systemd.services.deluged.serviceConfig.DynamicUser = lib.mkForce false;
+      systemd.services.delugeweb.serviceConfig.User = "deluge";
+      systemd.services.delugeweb.serviceConfig.Group = "deluge";
+      systemd.services.deluged.serviceConfig.User = "deluge";
+      systemd.services.deluged.serviceConfig.Group = "deluge";
     })
 
     # Transmission
     (mkIf cfg.transmission-server.enable {
       services.transmission = {
         enable = true;
+        package = pkgs.transmission_4;
         settings = {
           rpc-bind-address = "0.0.0.0";
           rpc-port = cfg.transmission-server.port;
@@ -145,39 +131,31 @@ in
         port = cfg.headscale-server.port;
         address = "0.0.0.0";
         settings = {
-          dns_config.base_domain = "grandlix.net";
+          dns = {
+            base_domain = "grandlix.net";
+            magic_dns = true;
+            nameservers.global = [
+              "1.1.1.1"
+              "1.0.0.1"
+            ];
+          };
           server_url = "http://localhost:${toString cfg.headscale-server.port}";
         };
       };
       networking.firewall.allowedTCPPorts = [ cfg.headscale-server.port ];
-    })
+      # Disable DynamicUser to prevent state directory migration issues
+      systemd.services.headscale.serviceConfig.DynamicUser = lib.mkForce false;
 
-    # Pi-hole (Docker)
-    (mkIf cfg.pihole-server.enable {
-      virtualisation.oci-containers.containers.pihole = {
-        image = "pihole/pihole:latest";
-        ports = [
-          "${toString cfg.pihole-server.port}:80"
-          "53:53/tcp"
-          "53:53/udp"
-        ];
-        environment = {
-          TZ = "America/Los_Angeles";
-        };
-        volumes = [
-          "/var/lib/pihole/etc-pihole:/etc/pihole"
-          "/var/lib/pihole/etc-dnsmasq.d:/etc/dnsmasq.d"
-        ];
+      users.users.headscale = {
+        group = "headscale";
+        isSystemUser = true;
+        home = "/var/lib/headscale";
+        createHome = true;
       };
-      networking.firewall.allowedTCPPorts = [
-        cfg.pihole-server.port
-        53
-      ];
-      networking.firewall.allowedUDPPorts = [ 53 ];
+      users.groups.headscale = { };
 
       systemd.tmpfiles.rules = [
-        "d /var/lib/pihole/etc-pihole 0755 root root -"
-        "d /var/lib/pihole/etc-dnsmasq.d 0755 root root -"
+        "d /var/lib/headscale 0750 headscale headscale -"
       ];
     })
   ];

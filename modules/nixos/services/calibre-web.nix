@@ -28,25 +28,24 @@ with lib;
   };
 
   config = mkIf config.services.calibre-web-app.enable {
-    # Run Calibre-Web as a container
-    virtualisation.oci-containers.containers.calibre-web = {
-      image = "lscr.io/linuxserver/calibre-web:latest";
-      ports = [ "${toString config.services.calibre-web-app.port}:8083" ];
-      volumes = [
-        "${config.services.calibre-web-app.dataDir}:/config"
-        "${config.services.calibre-web-app.libraryPath}:/books"
-      ];
-      environment = {
-        PUID = "1000";
-        PGID = "100";
-        TZ = "America/Los_Angeles";
+    # Native NixOS Calibre-Web service
+    services.calibre-web = {
+      enable = true;
+      listen.port = config.services.calibre-web-app.port;
+      listen.ip = "0.0.0.0";
+      dataDir = config.services.calibre-web-app.dataDir;
+
+      options = {
+        calibreLibrary = config.services.calibre-web-app.libraryPath;
+        enableBookUploading = true;
+        enableBookConversion = true;
       };
     };
 
     # Create necessary directories
     systemd.tmpfiles.rules = [
-      "d ${config.services.calibre-web-app.dataDir} 0755 root root -"
-      "d ${config.services.calibre-web-app.libraryPath} 0755 root root -"
+      "d ${config.services.calibre-web-app.dataDir} 0755 calibre-web calibre-web -"
+      "d ${config.services.calibre-web-app.libraryPath} 0755 calibre-web calibre-web -"
     ];
 
     # Firewall
@@ -55,8 +54,18 @@ with lib;
     # Ensure data is persisted
     environment.persistence."/persist" = mkIf config.system-config.impermanence.enable {
       directories = [
-        config.services.calibre-web-app.dataDir
-        config.services.calibre-web-app.libraryPath
+        {
+          directory = config.services.calibre-web-app.dataDir;
+          user = "calibre-web";
+          group = "calibre-web";
+          mode = "0755";
+        }
+        {
+          directory = config.services.calibre-web-app.libraryPath;
+          user = "calibre-web";
+          group = "calibre-web";
+          mode = "0755";
+        }
       ];
     };
   };

@@ -147,6 +147,9 @@
       "ssb"
     ];
 
+    # Yazelix Integration
+    modules.yazelix.enable = true;
+
     # ============================================================================
     # HOME-MANAGER CONFIGURATION
     # ============================================================================
@@ -154,7 +157,6 @@
     home-manager.users.t0psh31f = {
       # Home-Manager programs
       programs = {
-        yazelix.enable = false;
         keybind-cheatsheet.enable = false;
         pentest.enable = false;
       };

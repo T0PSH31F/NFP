@@ -57,17 +57,8 @@ with lib;
       };
     };
 
-    slack = {
-      enable = mkEnableOption "Mautrix-Slack bridge";
-      port = mkOption {
-        type = types.int;
-        default = 29335;
-        description = "Port for Slack bridge";
-      };
-    };
-
     instagram = {
-      enable = mkEnableOption "Mautrix-Instagram bridge";
+      enable = mkEnableOption "Mautrix-Instagram bridge (via mautrix-meta)";
       port = mkOption {
         type = types.int;
         default = 29330;
@@ -76,11 +67,20 @@ with lib;
     };
 
     facebook = {
-      enable = mkEnableOption "Mautrix-Facebook bridge";
+      enable = mkEnableOption "Mautrix-Facebook bridge (via mautrix-meta)";
       port = mkOption {
         type = types.int;
         default = 29319;
         description = "Port for Facebook bridge";
+      };
+    };
+
+    slack = {
+      enable = mkEnableOption "Mautrix-Slack bridge";
+      port = mkOption {
+        type = types.int;
+        default = 29335;
+        description = "Port for Slack bridge";
       };
     };
 
@@ -113,7 +113,11 @@ with lib;
   };
 
   config = mkIf config.services.mautrix-bridges.enable {
-    # Mautrix-Telegram
+    # ============================================================================
+    # NATIVE NIXOS SERVICES
+    # ============================================================================
+
+    # Mautrix-Telegram (Native)
     services.mautrix-telegram = mkIf config.services.mautrix-bridges.telegram.enable {
       enable = true;
       settings = {
@@ -135,7 +139,7 @@ with lib;
       };
     };
 
-    # Mautrix-WhatsApp
+    # Mautrix-WhatsApp (Native)
     services.mautrix-whatsapp = mkIf config.services.mautrix-bridges.whatsapp.enable {
       enable = true;
       settings = {
@@ -160,7 +164,7 @@ with lib;
       };
     };
 
-    # Mautrix-Signal
+    # Mautrix-Signal (Native)
     services.mautrix-signal = mkIf config.services.mautrix-bridges.signal.enable {
       enable = true;
       settings = {
@@ -182,56 +186,92 @@ with lib;
       };
     };
 
-    # Note: Discord, Slack, Instagram, Facebook, Google Chat, Twitter, and Google Messages
-    # bridges may need to be configured as containers or may not have native NixOS modules yet.
-    # Container-based configuration for these bridges:
-
-    virtualisation.oci-containers.containers = mkMerge [
-      (mkIf config.services.mautrix-bridges.discord.enable {
-        mautrix-discord = {
-          image = "dock.mau.dev/mautrix/discord:latest";
-          ports = [ "${toString config.services.mautrix-bridges.discord.port}:29334" ];
-          volumes = [
-            "/var/lib/mautrix-discord:/data"
-          ];
-          environment = {
-            TZ = "America/Los_Angeles";
+    # Mautrix-Discord (Native)
+    services.mautrix-discord = mkIf config.services.mautrix-bridges.discord.enable {
+      enable = true;
+      settings = {
+        homeserver = {
+          address = config.services.mautrix-bridges.homeserverUrl;
+          domain = config.services.mautrix-bridges.homeserverDomain;
+        };
+        appservice = {
+          address = "http://localhost:${toString config.services.mautrix-bridges.discord.port}";
+          port = config.services.mautrix-bridges.discord.port;
+          database = {
+            type = "postgres";
+            uri = "postgresql:///mautrix-discord?host=/run/postgresql";
           };
         };
-      })
+        bridge = {
+          permissions = {
+            "*" = "relay";
+            ${config.services.mautrix-bridges.homeserverDomain} = "user";
+          };
+        };
+      };
+    };
 
+    # Mautrix-Meta for Instagram (Native)
+    services.mautrix-meta.instances.instagram = mkIf config.services.mautrix-bridges.instagram.enable {
+      enable = true;
+      settings = {
+        homeserver = {
+          address = config.services.mautrix-bridges.homeserverUrl;
+          domain = config.services.mautrix-bridges.homeserverDomain;
+        };
+        appservice = {
+          address = "http://localhost:${toString config.services.mautrix-bridges.instagram.port}";
+          port = config.services.mautrix-bridges.instagram.port;
+          database = {
+            type = "postgres";
+            uri = "postgresql:///mautrix-instagram?host=/run/postgresql";
+          };
+        };
+        bridge = {
+          permissions = {
+            "*" = "relay";
+            ${config.services.mautrix-bridges.homeserverDomain} = "user";
+          };
+        };
+      };
+    };
+
+    # Mautrix-Meta for Facebook (Native)
+    services.mautrix-meta.instances.facebook = mkIf config.services.mautrix-bridges.facebook.enable {
+      enable = true;
+      settings = {
+        homeserver = {
+          address = config.services.mautrix-bridges.homeserverUrl;
+          domain = config.services.mautrix-bridges.homeserverDomain;
+        };
+        appservice = {
+          address = "http://localhost:${toString config.services.mautrix-bridges.facebook.port}";
+          port = config.services.mautrix-bridges.facebook.port;
+          database = {
+            type = "postgres";
+            uri = "postgresql:///mautrix-facebook?host=/run/postgresql";
+          };
+        };
+        bridge = {
+          permissions = {
+            "*" = "relay";
+            ${config.services.mautrix-bridges.homeserverDomain} = "user";
+          };
+        };
+      };
+    };
+
+    # ============================================================================
+    # CONTAINER-BASED SERVICES (No native NixOS modules yet)
+    # ============================================================================
+
+    virtualisation.oci-containers.containers = mkMerge [
       (mkIf config.services.mautrix-bridges.slack.enable {
         mautrix-slack = {
           image = "dock.mau.dev/mautrix/slack:latest";
           ports = [ "${toString config.services.mautrix-bridges.slack.port}:29335" ];
           volumes = [
             "/var/lib/mautrix-slack:/data"
-          ];
-          environment = {
-            TZ = "America/Los_Angeles";
-          };
-        };
-      })
-
-      (mkIf config.services.mautrix-bridges.instagram.enable {
-        mautrix-instagram = {
-          image = "dock.mau.dev/mautrix/instagram:latest";
-          ports = [ "${toString config.services.mautrix-bridges.instagram.port}:29330" ];
-          volumes = [
-            "/var/lib/mautrix-instagram:/data"
-          ];
-          environment = {
-            TZ = "America/Los_Angeles";
-          };
-        };
-      })
-
-      (mkIf config.services.mautrix-bridges.facebook.enable {
-        mautrix-facebook = {
-          image = "dock.mau.dev/mautrix/facebook:latest";
-          ports = [ "${toString config.services.mautrix-bridges.facebook.port}:29319" ];
-          volumes = [
-            "/var/lib/mautrix-facebook:/data"
           ];
           environment = {
             TZ = "America/Los_Angeles";
@@ -279,13 +319,19 @@ with lib;
       })
     ];
 
-    # PostgreSQL databases for native bridges
+    # ============================================================================
+    # POSTGRESQL DATABASES
+    # ============================================================================
+
     services.postgresql = {
       enable = true;
       ensureDatabases =
         (optional config.services.mautrix-bridges.telegram.enable "mautrix-telegram")
         ++ (optional config.services.mautrix-bridges.whatsapp.enable "mautrix-whatsapp")
-        ++ (optional config.services.mautrix-bridges.signal.enable "mautrix-signal");
+        ++ (optional config.services.mautrix-bridges.signal.enable "mautrix-signal")
+        ++ (optional config.services.mautrix-bridges.discord.enable "mautrix-discord")
+        ++ (optional config.services.mautrix-bridges.instagram.enable "mautrix-instagram")
+        ++ (optional config.services.mautrix-bridges.facebook.enable "mautrix-facebook");
 
       ensureUsers =
         (optional config.services.mautrix-bridges.telegram.enable {
@@ -299,31 +345,42 @@ with lib;
         ++ (optional config.services.mautrix-bridges.signal.enable {
           name = "mautrix-signal";
           ensureDBOwnership = true;
+        })
+        ++ (optional config.services.mautrix-bridges.discord.enable {
+          name = "mautrix-discord";
+          ensureDBOwnership = true;
+        })
+        ++ (optional config.services.mautrix-bridges.instagram.enable {
+          name = "mautrix-instagram";
+          ensureDBOwnership = true;
+        })
+        ++ (optional config.services.mautrix-bridges.facebook.enable {
+          name = "mautrix-facebook";
+          ensureDBOwnership = true;
         });
     };
 
     # Create data directories for container-based bridges
     systemd.tmpfiles.rules =
-      (optional config.services.mautrix-bridges.discord.enable "d /var/lib/mautrix-discord 0755 root root -")
-      ++ (optional config.services.mautrix-bridges.slack.enable "d /var/lib/mautrix-slack 0755 root root -")
-      ++ (optional config.services.mautrix-bridges.instagram.enable "d /var/lib/mautrix-instagram 0755 root root -")
-      ++ (optional config.services.mautrix-bridges.facebook.enable "d /var/lib/mautrix-facebook 0755 root root -")
+      (optional config.services.mautrix-bridges.slack.enable "d /var/lib/mautrix-slack 0755 root root -")
       ++ (optional config.services.mautrix-bridges.googlechat.enable "d /var/lib/mautrix-googlechat 0755 root root -")
       ++ (optional config.services.mautrix-bridges.twitter.enable "d /var/lib/mautrix-twitter 0755 root root -")
       ++ (optional config.services.mautrix-bridges.gmessages.enable "d /var/lib/mautrix-gmessages 0755 root root -");
 
-    # Enable Docker for container-based bridges
+    # Enable Docker only for container-based bridges
     virtualisation.docker.enable = mkIf (
-      config.services.mautrix-bridges.discord.enable
-      || config.services.mautrix-bridges.slack.enable
-      || config.services.mautrix-bridges.instagram.enable
-      || config.services.mautrix-bridges.facebook.enable
+      config.services.mautrix-bridges.slack.enable
       || config.services.mautrix-bridges.googlechat.enable
       || config.services.mautrix-bridges.twitter.enable
       || config.services.mautrix-bridges.gmessages.enable
     ) true;
 
-    virtualisation.oci-containers.backend = "docker";
+    virtualisation.oci-containers.backend = mkIf (
+      config.services.mautrix-bridges.slack.enable
+      || config.services.mautrix-bridges.googlechat.enable
+      || config.services.mautrix-bridges.twitter.enable
+      || config.services.mautrix-bridges.gmessages.enable
+    ) "docker";
 
     # Ensure Matrix bridges data is persisted
     environment.persistence."/persist" =
@@ -333,12 +390,11 @@ with lib;
             "/var/lib/mautrix-telegram"
             "/var/lib/mautrix-whatsapp"
             "/var/lib/mautrix-signal"
-            #  "/var/lib/postgresql"
+            "/var/lib/mautrix-discord"
           ]
-          ++ (optional config.services.mautrix-bridges.discord.enable "/var/lib/mautrix-discord")
+          ++ (optional config.services.mautrix-bridges.instagram.enable "/var/lib/mautrix-meta-instagram")
+          ++ (optional config.services.mautrix-bridges.facebook.enable "/var/lib/mautrix-meta-facebook")
           ++ (optional config.services.mautrix-bridges.slack.enable "/var/lib/mautrix-slack")
-          ++ (optional config.services.mautrix-bridges.instagram.enable "/var/lib/mautrix-instagram")
-          ++ (optional config.services.mautrix-bridges.facebook.enable "/var/lib/mautrix-facebook")
           ++ (optional config.services.mautrix-bridges.googlechat.enable "/var/lib/mautrix-googlechat")
           ++ (optional config.services.mautrix-bridges.twitter.enable "/var/lib/mautrix-twitter")
           ++ (optional config.services.mautrix-bridges.gmessages.enable "/var/lib/mautrix-gmessages");

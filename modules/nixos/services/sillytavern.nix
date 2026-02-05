@@ -22,44 +22,26 @@ with lib;
   };
 
   config = mkIf config.services.sillytavern-app.enable {
-    # Run SillyTavern as a container
-    virtualisation.oci-containers.containers.sillytavern = {
-      image = "ghcr.io/sillytavern/sillytavern:latest";
-      ports = [ "${toString config.services.sillytavern-app.port}:8000" ];
-      volumes = [
-        "${config.services.sillytavern-app.dataDir}:/home/node/app/data"
-      ];
-      environment = {
-        TZ = "America/Los_Angeles";
-      };
+    # Native NixOS SillyTavern service
+    services.sillytavern = {
+      enable = true;
+      port = config.services.sillytavern-app.port;
+      listen = true; # Listen on all interfaces
     };
-
-    # Create necessary directories with proper permissions
-    systemd.tmpfiles.rules = [
-      "d ${config.services.sillytavern-app.dataDir} 0755 root root -"
-    ];
 
     # Firewall
     networking.firewall.allowedTCPPorts = [ config.services.sillytavern-app.port ];
 
-  # Ensure data is persisted
-
-
-  environment.persistence."/persist" = mkIf config.system-config.impermanence.enable {
-
-
-    directories = [
-
-
-
-      config.services.sillytavern-app.dataDir
-
-
-
-    ];
-
-
-  };
-
+    # Ensure data is persisted
+    environment.persistence."/persist" = mkIf config.system-config.impermanence.enable {
+      directories = [
+        {
+          directory = "/var/lib/sillytavern";
+          user = "sillytavern";
+          group = "sillytavern";
+          mode = "0755";
+        }
+      ];
+    };
   };
 }

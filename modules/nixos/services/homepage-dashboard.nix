@@ -100,7 +100,7 @@ in
         # Noctalia theme override
         (mkIf cfg.noctalia.enable {
           # Theme colors will be injected via custom CSS
-          customCss = builtins.readFile cfg.noctalia.templatePath;
+          # customCss = builtins.readFile cfg.noctalia.templatePath;
         })
       ];
 
@@ -119,6 +119,16 @@ in
             memory = true;
             disk = "/";
             uptime = true;
+          };
+        }
+        {
+          datetime = {
+            text_size = "xl";
+            format = {
+              dateStyle = "long";
+              timeStyle = "short";
+              hour12 = false;
+            };
           };
         }
       ];
@@ -143,18 +153,6 @@ in
                 icon = "calibre-web.png";
                 href = "http://localhost:${getServicePort "calibre-web-app" 8083}";
                 description = "E-Book Library";
-              };
-            })
-            (optional (isServiceEnabled "audiobookshelf-app") {
-              "BookLore (Audiobookshelf)" = {
-                icon = "audiobookshelf.png";
-                href = "http://localhost:${getServicePort "audiobookshelf-app" 13378}";
-                description = "Audiobook Server";
-                widget = {
-                  type = "audiobookshelf";
-                  url = "http://localhost:${getServicePort "audiobookshelf-app" 13378}";
-                  key = "{{HOMEPAGE_VAR_AUDIOBOOKSHELF_KEY}}";
-                };
               };
             })
             (optional (pathExists "/var/lib/sonarr") {
@@ -205,18 +203,18 @@ in
                 };
               };
             })
-            (optional (isServiceEnabled "deluge-server") {
-              "Deluge" = {
-                icon = "deluge.png";
-                href = "http://localhost:${getServicePort "deluge-server" 8113}";
-                description = "Torrent Client";
-                widget = {
-                  type = "deluge";
-                  url = "http://localhost:${getServicePort "deluge-server" 8113}";
-                  password = "{{HOMEPAGE_VAR_DELUGE_PASSWORD}}";
-                };
-              };
-            })
+            # (optional (isServiceEnabled "deluge-server") {
+            #   "Deluge" = {
+            #     icon = "deluge.png";
+            #     href = "http://localhost:${getServicePort "deluge-server" 8113}";
+            #     description = "Torrent Client";
+            #     widget = {
+            #       type = "deluge";
+            #       url = "http://localhost:${getServicePort "deluge-server" 8113}";
+            #       password = "{{HOMEPAGE_VAR_DELUGE_PASSWORD}}";
+            #     };
+            #   };
+            # })
             (optional (isServiceEnabled "transmission-server") {
               "Transmission" = {
                 icon = "transmission.png";
@@ -228,6 +226,26 @@ in
                   username = "{{HOMEPAGE_VAR_TRANSMISSION_USERNAME}}";
                   password = "{{HOMEPAGE_VAR_TRANSMISSION_PASSWORD}}";
                 };
+              };
+            })
+            (optional (isServiceEnabled "komga") {
+              "Komga" = {
+                icon = "komga.png";
+                href = "http://localhost:25600";
+                description = "Comic/Manga Server";
+                widget = {
+                  type = "komga";
+                  url = "http://localhost:25600";
+                  username = "{{HOMEPAGE_VAR_KOMGA_USERNAME}}";
+                  password = "{{HOMEPAGE_VAR_KOMGA_PASSWORD}}";
+                };
+              };
+            })
+            (optional (pathExists "/var/lib/your-spotify") {
+              "Your Spotify" = {
+                icon = "spotify.png";
+                href = "http://localhost:3457";
+                description = "Spotify Analytics";
               };
             })
           ];
@@ -259,15 +277,23 @@ in
                 description = "Metrics Collection";
               };
             })
-            (optional (isServiceEnabled "pihole-server") {
-              "Pi-hole" = {
-                icon = "pi-hole.png";
-                href = "http://localhost:${getServicePort "pihole-server" 8089}/admin";
-                description = "DNS Ad Blocker";
+            (optional (pathExists "/var/lib/loki") {
+              "Loki" = {
+                icon = "loki.png";
+                href = "http://localhost:3100";
+                description = "Log Aggregation";
+              };
+            })
+            (optional (isServiceEnabled "adguardhome") {
+              "AdGuard Home" = {
+                icon = "adguard-home.png";
+                href = "http://localhost:3000";
+                description = "DNS Filtering";
                 widget = {
-                  type = "pihole";
-                  url = "http://localhost:${getServicePort "pihole-server" 8089}";
-                  key = "{{HOMEPAGE_VAR_PIHOLE_KEY}}";
+                  type = "adguard";
+                  url = "http://localhost:3000";
+                  username = "{{HOMEPAGE_VAR_ADGUARD_USERNAME}}";
+                  password = "{{HOMEPAGE_VAR_ADGUARD_PASSWORD}}";
                 };
               };
             })
@@ -280,7 +306,14 @@ in
                 icon = "openai.png";
                 href = "http://localhost:8080";
                 description = "LLM Interface";
-                container = "open-webui";
+                # Native NixOS service - no container reference
+              };
+            }
+            {
+              "NextJS Ollama UI" = {
+                icon = "openai.png";
+                href = "http://localhost:3001";
+                description = "NextJS LLM UI";
               };
             }
             {
@@ -288,7 +321,7 @@ in
                 icon = "mdi-chat";
                 href = "http://localhost:8000";
                 description = "Character AI Chat";
-                container = "sillytavern";
+                # Native NixOS service - no container reference
               };
             }
             {
@@ -296,6 +329,22 @@ in
                 icon = "n8n.png";
                 href = "http://localhost:5678";
                 description = "Workflow Automation";
+              };
+            }
+            {
+              "Qdrant" = {
+                icon = "qdrant.png";
+                href = "http://localhost:6333/dashboard";
+                description = "Vector Database";
+                # Native NixOS service - no container reference
+              };
+            }
+            {
+              "Karakeep" = {
+                icon = "mdi-bookmark-multiple";
+                href = "http://localhost:3000";
+                description = "Bookmark Manager";
+                # Native NixOS service - no container reference
               };
             }
           ];
@@ -348,7 +397,7 @@ in
                 description = "Meta Search Engine";
               };
             })
-            (optional (pathExists "/var/lib/immich") {
+            (optional (isServiceEnabled "immich") {
               "Immich" = {
                 icon = "immich.png";
                 href = "http://localhost:2283";

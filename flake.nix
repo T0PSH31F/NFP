@@ -4,6 +4,19 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-parts.url = "github:hercules-ci/flake-parts";
+    # ADD THIS - devenv integration
+    devenv = {
+      url = "github:cachix/devenv";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    nix2container = {
+      url = "github:nlewo/nix2container";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    nixpkgs-python = {
+      url = "github:cachix/nixpkgs-python";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     clan-core = {
       url = "git+https://git.clan.lol/clan/clan-core";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -53,18 +66,27 @@
       url = "github:Gerg-L/spicetify-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    yazelix = {
+      url = "github:luccahuguet/yazelix";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
+    };
   };
 
   outputs =
     inputs@{
       flake-parts,
       clan-core,
+      devenv,
+      nix2container,
+      nixpkgs-python,
       home-manager,
       import-tree,
       nvf,
       llm-agents,
       noctalia,
       spicetify-nix,
+      yazelix,
       ...
     }:
     let
@@ -84,6 +106,8 @@
         imports = [
           clan-core.flakeModules.default
           home-manager.flakeModules.home-manager
+          devenv.flakeModule
+          ./devenvs
         ];
 
         clan = {
@@ -186,6 +210,16 @@
                                 echo "Grandlix-Gang NixOS Configuration Development Environment"
                                 echo "=================================================="
                                 echo ""
+                                echo "Available devenv shells:"
+                                echo "  nix develop .#python-ai-agent  - Python AI/automation dev"
+                                echo "  nix develop .#rust-saas        - Rust SaaS development"
+                                echo "  nix develop .#node-automation  - Node.js + n8n automation"
+                                echo "  nix develop .#go-microservice  - Go microservices"
+                                echo "  nix develop .#fullstack        - Combined full-stack"
+                                echo ""
+                                echo "Quick start with direnv:"
+                                echo "  cd ~/projects/my-ai-agent && echo 'use flake ~/Grandlix-Gang#python-ai-agent' > .envrc && direnv allow"
+                                echo ""
               '';
             };
 
@@ -203,68 +237,6 @@
                 format = "iso";
               };
 
-              sonic-cursor = pkgs.sonic-cursor;
-              lain-sddm-theme = pkgs.lain-sddm-theme;
-
-              # # VM Image (QEMU qcow2)
-              # vm = inputs.nixos-generators.nixosGenerate {
-              #   inherit system;
-              #   specialArgs = {inherit inputs;};
-              #   modules = [
-              #     ./templates/vm/default.nix
-              #   ];
-              #   format = "vm";
-              # };
-
-              # # VMware Image
-              # vmware = inputs.nixos-generators.nixosGenerate {
-              #   inherit system;
-              #   specialArgs = {inherit inputs;};
-              #   modules = [
-              #     ./templates/vm/default.nix
-              #   ];
-              #   format = "vmware";
-              # };
-
-              # # VirtualBox Image
-              # virtualbox = inputs.nixos-generators.nixosGenerate {
-              #   inherit system;
-              #   specialArgs = {inherit inputs;};
-              #   modules = [
-              #     ./templates/vm/default.nix
-              #   ];
-              #   format = "virtualbox";
-              # };
-
-              # # Docker Container
-              # docker = inputs.nixos-generators.nixosGenerate {
-              #   inherit system;
-              #   specialArgs = {inherit inputs;};
-              #   modules = [
-              #     ./templates/container/default.nix
-              #   ];
-              #   format = "docker";
-              # };
-
-              # # LXC Container
-              # lxc = inputs.nixos-generators.nixosGenerate {
-              #   inherit system;
-              #   specialArgs = {inherit inputs;};
-              #   modules = [
-              #     ./templates/container/default.nix
-              #   ];
-              #   format = "lxc";
-              # };
-
-              # # Amazon EC2 AMI
-              # amazon = inputs.nixos-generators.nixosGenerate {
-              #   inherit system;
-              #   specialArgs = {inherit inputs;};
-              #   modules = [
-              #     ./templates/vm/default.nix
-              #   ];
-              #   format = "amazon";
-              # };
             };
             checks =
               let

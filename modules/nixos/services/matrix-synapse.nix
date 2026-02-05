@@ -219,27 +219,27 @@ with lib;
       8448 # Federation port
     ];
 
-  # Ensure data is persisted
-
-
-  environment.persistence."/persist" = mkIf config.system-config.impermanence.enable {
-
-
-    directories = [
-
-
-
-      "/var/lib/matrix-synapse"
-
-
-      #  "/var/lib/postgresql"
-
-
-
+    # Allow Nginx to read certificates
+    users.users.nginx.extraGroups = [ "matrix-synapse" ];
+    systemd.tmpfiles.rules = [
+      "z /var/lib/matrix-synapse 0750 matrix-synapse matrix-synapse -"
+      "z /var/lib/matrix-synapse/ssl 0750 matrix-synapse matrix-synapse -"
     ];
+    systemd.services.matrix-synapse.serviceConfig.StateDirectoryMode = "0750";
 
+    # Ensure data is persisted
 
-  };
+    environment.persistence."/persist" = mkIf config.system-config.impermanence.enable {
+
+      directories = [
+
+        "/var/lib/matrix-synapse"
+
+        #  "/var/lib/postgresql"
+
+      ];
+
+    };
 
   };
 }
