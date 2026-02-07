@@ -53,7 +53,7 @@
     p7zip
     unrar
     bubblewrap
-    sonic-cursor
+
   ];
 
   # Enable nix-ld for running non-NixOS binaries

@@ -1,11 +1,13 @@
 {
   pkgs,
+  lib,
   ...
 }:
 {
   # ============================================================================
   # SYSTEM CORE CONFIGURATION
   # ============================================================================
+  nixpkgs.config.allowUnfree = true;
 
   # Bootloader
   boot.loader.systemd-boot = {

@@ -1,0 +1,4 @@
+# Matugen template for Starship
+[character]
+success_symbol = "[➜](bold {{colors.primary.default.hex}})"
+error_symbol = "[✖](bold {{colors.error.default.hex}})"

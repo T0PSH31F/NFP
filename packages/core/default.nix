@@ -29,7 +29,7 @@
 
     iotop
     iftop
-    
+
     # System Utilities
     aria2
     gparted
@@ -46,7 +46,7 @@
     qpdf
     unrar
     bubblewrap
-    sonic-cursor
+
   ];
 
   # Enable nix-ld for running non-NixOS binaries

@@ -1,9 +1,0 @@
-resize_algorithm = none
-hotspot_x = 0.22
-hotspot_y = 0.75
-
-define_size = 32, ul_angle_000.png, 50
-define_size = 32, ul_angle_001.png, 50
-define_size = 32, ul_angle_002.png, 50
-define_size = 32, ul_angle_003.png, 50
-

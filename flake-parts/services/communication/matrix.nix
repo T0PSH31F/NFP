@@ -51,7 +51,7 @@ with lib;
       enable = true;
 
       settings = {
-        server_name = config.services.matrix-server.serverName;
+        server_name = mkDefault config.services.matrix-server.serverName;
 
         listeners = [
           {
@@ -100,7 +100,7 @@ with lib;
 
         # Registration
         enable_registration = config.services.matrix-server.enableRegistration;
-        registration_shared_secret_path = "/var/lib/matrix-synapse/registration_shared_secret";
+        registration_shared_secret_path = mkForce "/var/lib/matrix-synapse/registration_shared_secret";
 
         # Media
         max_upload_size = config.services.matrix-server.maxUploadSize;

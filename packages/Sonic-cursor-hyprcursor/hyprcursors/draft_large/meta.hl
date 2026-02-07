@@ -1,9 +1,0 @@
-resize_algorithm = none
-hotspot_x = 0.50
-hotspot_y = 0.00
-
-define_size = 32, draft_large_000.png, 83
-define_size = 32, draft_large_001.png, 83
-define_size = 32, draft_large_002.png, 83
-define_size = 32, draft_large_003.png, 83
-

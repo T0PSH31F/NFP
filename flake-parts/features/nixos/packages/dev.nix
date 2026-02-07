@@ -19,7 +19,7 @@
 
     # LSPs and formatters
     nil
-    nixfmt-rfc-style
+    nixfmt
 
     # Container tools
     docker

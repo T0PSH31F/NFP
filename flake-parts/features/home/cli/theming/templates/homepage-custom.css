@@ -1,0 +1,183 @@
+/*
+ * Matugen Material You theme for Homepage Dashboard
+ * Place in: /app/config/custom.css (Docker) or ~/.config/homepage/custom.css
+ */
+
+:root {
+    /* Material You color scheme from matugen */
+    --primary: {{colors.primary.default.hex}};
+    --primary-container: {{colors.primary_container.default.hex}};
+    --on-primary: {{colors.on_primary.default.hex}};
+    --on-primary-container: {{colors.on_primary_container.default.hex}};
+    
+    --secondary: {{colors.secondary.default.hex}};
+    --secondary-container: {{colors.secondary_container.default.hex}};
+    --on-secondary: {{colors.on_secondary.default.hex}};
+    
+    --tertiary: {{colors.tertiary.default.hex}};
+    --tertiary-container: {{colors.tertiary_container.default.hex}};
+    
+    --surface: {{colors.surface.default.hex}};
+    --surface-dim: {{colors.surface_dim.default.hex}};
+    --surface-bright: {{colors.surface_bright.default.hex}};
+    --surface-container: {{colors.surface_container.default.hex}};
+    --surface-container-low: {{colors.surface_container_low.default.hex}};
+    --surface-container-high: {{colors.surface_container_high.default.hex}};
+    --surface-container-highest: {{colors.surface_container_highest.default.hex}};
+    
+    --on-surface: {{colors.on_surface.default.hex}};
+    --on-surface-variant: {{colors.on_surface_variant.default.hex}};
+    
+    --outline: {{colors.outline.default.hex}};
+    --outline-variant: {{colors.outline_variant.default.hex}};
+    
+    --error: {{colors.error.default.hex}};
+    --error-container: {{colors.error_container.default.hex}};
+    --on-error: {{colors.on_error.default.hex}};
+}
+
+/* Main background */
+body, #page {
+    background-color: var(--surface) !important;
+    color: var(--on-surface) !important;
+}
+
+/* Service cards/widgets */
+.service, .widget, .card {
+    background-color: var(--surface-container) !important;
+    border-color: var(--outline-variant) !important;
+    color: var(--on-surface) !important;
+}
+
+.service:hover, .widget:hover {
+    background-color: var(--surface-container-high) !important;
+}
+
+/* Service group headers */
+.service-group-header, .group-title {
+    color: var(--primary) !important;
+    border-bottom-color: var(--outline-variant) !important;
+}
+
+/* Service titles */
+.service-title, h1, h2, h3, h4 {
+    color: var(--on-surface) !important;
+}
+
+/* Service descriptions */
+.service-description, .description {
+    color: var(--on-surface-variant) !important;
+}
+
+/* Status indicators */
+.status-healthy, .online {
+    background-color: var(--primary) !important;
+}
+
+.status-warning {
+    background-color: var(--tertiary) !important;
+}
+
+.status-error, .offline {
+    background-color: var(--error) !important;
+}
+
+/* Buttons */
+button, .button, a.button {
+    background-color: var(--primary) !important;
+    color: var(--on-primary) !important;
+    border: none;
+}
+
+button:hover, .button:hover {
+    background-color: var(--primary-container) !important;
+    color: var(--on-primary-container) !important;
+}
+
+/* Search box */
+.search-box, input[type="search"], input[type="text"] {
+    background-color: var(--surface-container-high) !important;
+    border-color: var(--outline) !important;
+    color: var(--on-surface) !important;
+}
+
+.search-box:focus, input:focus {
+    border-color: var(--primary) !important;
+    outline-color: var(--primary) !important;
+}
+
+/* Links */
+a {
+    color: var(--primary) !important;
+}
+
+a:hover {
+    color: var(--secondary) !important;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    background-color: var(--surface-container) !important;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: var(--outline) !important;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: var(--primary) !important;
+}
+
+/* Info cards */
+.info-card, .info-widget {
+    background-color: var(--surface-container-low) !important;
+    border-left: 3px solid var(--primary) !important;
+}
+
+/* Grid layout containers */
+.grid-container, .service-grid {
+    gap: 1rem;
+}
+
+/* Icons */
+.icon, svg {
+    color: var(--primary) !important;
+}
+
+/* Footer */
+footer {
+    background-color: var(--surface-container) !important;
+    color: var(--on-surface-variant) !important;
+    border-top: 1px solid var(--outline-variant) !important;
+}
+
+/* Bookmarks */
+.bookmark-card {
+    background-color: var(--surface-container-high) !important;
+    border: 1px solid var(--outline-variant) !important;
+}
+
+.bookmark-card:hover {
+    border-color: var(--primary) !important;
+    transform: translateY(-2px);
+    transition: all 0.3s ease;
+}
+
+/* Clock widget */
+.clock-widget {
+    color: var(--on-surface) !important;
+}
+
+.clock-time {
+    color: var(--primary) !important;
+}
+
+/* Weather widget */
+.weather-widget {
+    background-color: var(--surface-container) !important;
+    border: 1px solid var(--outline-variant) !important;
+}
+
+.weather-temp {
+    color: var(--primary) !important;
+}

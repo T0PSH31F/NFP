@@ -20,24 +20,24 @@
         ];
         deploy.targetHost = "root@z0r0.local";
       };
-      nami = {
-        tags = [
-          "server"
-          "media-server"
-          "download-server"
-        ];
-        deploy.targetHost = "root@nami.local";
-      };
-      luffy = {
-        tags = [
-          "desktop"
-          "laptop"
-          "gaming"
-          "ai-heavy"
-          "nvidia"
-        ];
-        deploy.targetHost = "root@luffy.local";
-      };
+      # nami = {
+      #   tags = [
+      #     "server"
+      #     "media-server"
+      #     "download-server"
+      #   ];
+      #   deploy.targetHost = "root@nami.local";
+      # };
+      # luffy = {
+      #   tags = [
+      #     "desktop"
+      #     "laptop"
+      #     "gaming"
+      #     "ai-heavy"
+      #     "nvidia"
+      #   ];
+      #   deploy.targetHost = "root@luffy.local";
+      # };
     };
 
     instances = {
@@ -48,11 +48,10 @@
         };
         roles.sillytavern.machines = {
           z0r0 = { };
-          luffy = { };
+          # luffy = { };
         };
       };
     };
-
   };
 
   machines = {
@@ -62,16 +61,16 @@
       ];
       clan.services.ai.sillytavern.enable = true;
     };
-    luffy = {
-      imports = [
-        ./machines/luffy/default.nix
-      ];
-      clan.services.ai.sillytavern.enable = true;
-    };
-    nami = {
-      imports = [
-        ./machines/nami/default.nix
-      ];
-    };
+    # luffy = {
+    #   imports = [
+    #     ./machines/luffy/default.nix
+    #   ];
+    #   clan.services.ai.sillytavern.enable = true;
+    # };
+    # nami = {
+    #   imports = [
+    #     ./machines/nami/default.nix
+    #   ];
+    # };
   };
 }

@@ -1,4 +1,3 @@
-
 { pkgs, ... }:
 {
   environment.systemPackages = with pkgs; [
@@ -11,7 +10,7 @@
 
     # Downloaders
     yt-dlp
-    transmission
+    transmission_4
     deluge
 
     # Streaming tools

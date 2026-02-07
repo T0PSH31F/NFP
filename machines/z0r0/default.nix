@@ -75,6 +75,7 @@
       enable = false;
       variant = "shaders";
     };
+
     grub-lain.enable = true;
     plymouth-hellonavi.enable = true;
   };

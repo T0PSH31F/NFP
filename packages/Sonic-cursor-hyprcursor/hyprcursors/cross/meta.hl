@@ -1,9 +1,0 @@
-resize_algorithm = none
-hotspot_x = 0.12
-hotspot_y = 0.12
-
-define_size = 32, cross_000.png, 50
-define_size = 32, cross_001.png, 50
-define_size = 32, cross_002.png, 50
-define_size = 32, cross_003.png, 50
-

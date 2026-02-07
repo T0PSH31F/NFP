@@ -1,9 +1,0 @@
-resize_algorithm = none
-hotspot_x = 0.75
-hotspot_y = 0.75
-
-define_size = 32, ne-resize_000.png, 50
-define_size = 32, ne-resize_001.png, 50
-define_size = 32, ne-resize_002.png, 50
-define_size = 32, ne-resize_003.png, 50
-

@@ -1,0 +1,41 @@
+# Matugen Material You theme for Delta
+[delta "matugen"]
+    syntax-theme = base16
+    
+    # Main colors
+    minus-style = "syntax {{colors.error_container.default.hex}}"
+    minus-emph-style = "syntax {{colors.error.default.hex}}"
+    plus-style = "syntax {{colors.primary_container.default.hex}}"
+    plus-emph-style = "syntax {{colors.primary.default.hex}}"
+    
+    # Line numbers
+    line-numbers-minus-style = "{{colors.error.default.hex}}"
+    line-numbers-plus-style = "{{colors.primary.default.hex}}"
+    line-numbers-left-style = "{{colors.outline.default.hex}}"
+    line-numbers-right-style = "{{colors.outline.default.hex}}"
+    line-numbers-zero-style = "{{colors.outline_variant.default.hex}}"
+    
+    # File headers
+    file-style = "{{colors.secondary.default.hex}} bold"
+    file-decoration-style = "{{colors.secondary.default.hex}} ul"
+    
+    # Commit decoration
+    commit-decoration-style = "{{colors.tertiary.default.hex}} box"
+    commit-style = "{{colors.tertiary.default.hex}} bold"
+    
+    # Hunk headers
+    hunk-header-style = "file line-number syntax"
+    hunk-header-decoration-style = "{{colors.primary.default.hex}} box"
+    
+    # General styling
+    zero-style = "syntax"
+    whitespace-error-style = "{{colors.error.default.hex}} reverse"
+    
+    # Side-by-side view
+    side-by-side = true
+    line-numbers = true
+    
+    # Misc
+    navigate = true
+    hyperlinks = true
+    hyperlinks-file-link-format = "file://{path}:{line}"

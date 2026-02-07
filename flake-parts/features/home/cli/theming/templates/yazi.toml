@@ -1,0 +1,4 @@
+# Matugen template for Yazi
+[manager]
+fg = "{{colors.on_surface.default.hex}}"
+bg = "{{colors.surface.default.hex}}"

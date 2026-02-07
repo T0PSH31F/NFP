@@ -161,20 +161,20 @@
     # NEXTCLOUD SERVER (via NCPS)
     # ==========================================================================
 
-    instances.nextcloud-server = {
-      module = {
-        name = "ncps";
-        input = "clan-core";
-      };
-      roles.server = {
-        machines.z0r0 = {
-          # Only on z0r0
-          settings = {
-            domain = "cloud.grandlix.local";
-            adminEmail = "admin@grandlix.com";
-          };
-        };
-      };
-    };
+    # instances.nextcloud-server = {
+    #   module = {
+    #     name = "ncps";
+    #     input = "clan-core";
+    #   };
+    #   roles.server = {
+    #     machines.z0r0 = {
+    #       # Only on z0r0
+    #       settings = {
+    #         domain = "cloud.grandlix.local";
+    #         adminEmail = "admin@grandlix.com";
+    #       };
+    #     };
+    #   };
+    # };
   };
 }

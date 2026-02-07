@@ -40,5 +40,8 @@
     home.stateVersion = "25.05";
     home.username = "t0psh31f";
     home.homeDirectory = "/home/t0psh31f";
+
+    # Enable the new CLI environment
+    programs.cli-environment.enable = true;
   };
 }

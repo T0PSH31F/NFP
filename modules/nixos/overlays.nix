@@ -17,8 +17,7 @@ let
 
   # Theme overlays adapter
   themeOverlays = import ../../overlays/default.nix { inherit inputs; };
-  themeOverlay =
-    final: prev: (themeOverlays.sonic-cursor final prev) // (themeOverlays.themes final prev);
+  themeOverlay = final: prev: { };
 
   # Desktop overlay
   desktopOverlay = import ../../overlays/desktop-packages.nix;

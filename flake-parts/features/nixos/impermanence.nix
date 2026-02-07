@@ -38,10 +38,11 @@ with lib;
         "/etc/NetworkManager/system-connections"
 
         # AI services
-        "/var/lib/ollama"
-        "/var/lib/localai"
-        "/var/lib/chromadb"
-        "/var/lib/qdrant"
+        # AI services - Migrated to services/ai/ai-services.nix
+        # "/var/lib/ollama"
+        "/var/lib/localai" # Keep if not causing conflict
+        "/var/lib/chromadb" # Keep if not causing conflict
+        # "/var/lib/qdrant"
 
         # Databases
         "/var/lib/postgresql"
@@ -49,23 +50,28 @@ with lib;
         "/var/lib/redis"
 
         # Communication
-        "/var/lib/matrix-synapse"
+        # Communication
+        # "/var/lib/matrix-synapse"
 
         # Cloud & Storage
-        "/var/lib/nextcloud"
+        # Cloud & Storage
+        # "/var/lib/nextcloud"
 
         # Home automation
         "/var/lib/home-assistant"
 
         # Automation
-        "/var/lib/n8n"
+        # Automation
+        # "/var/lib/n8n"
 
         # Web servers
-        "/var/lib/caddy"
+        # Web servers
+        # "/var/lib/caddy"
 
         # Media services
-        "/var/lib/immich"
-        "/var/lib/calibre-web"
+        # Media services
+        # "/var/lib/immich"
+        # "/var/lib/calibre-web"
         "/var/lib/jellyfin"
         "/var/lib/plex"
 
@@ -89,7 +95,8 @@ with lib;
         "/var/lib/harmonia"
 
         # Monitoring
-        "/var/lib/grafana"
+        # Monitoring
+        # "/var/lib/grafana"
         "/var/lib/prometheus"
 
         # Containers

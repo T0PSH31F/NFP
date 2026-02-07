@@ -1,9 +1,0 @@
-resize_algorithm = none
-hotspot_x = 0.12
-hotspot_y = 0.12
-
-define_size = 32, plus_000.png, 50
-define_size = 32, plus_001.png, 50
-define_size = 32, plus_002.png, 50
-define_size = 32, plus_003.png, 50
-

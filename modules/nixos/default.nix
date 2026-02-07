@@ -58,8 +58,8 @@
     in
     [
       inputs.nur.overlays.default
-      (import ../../overlays/default.nix { inherit inputs; }).sonic-cursor
-      (import ../../overlays/default.nix { inherit inputs; }).themes
+
+      # (import ../../overlays/default.nix { inherit inputs; }).themes
       (import ../../overlays/custom-packages.nix)
       (import ../../overlays/desktop-packages.nix)
     ];

@@ -26,7 +26,7 @@ with lib;
         version = "1.0";
 
         # Use local LainGrubTheme directory
-        src = ./LainGrubTheme;
+        src = ../../modules/nixos/themes/LainGrubTheme;
 
         installPhase = ''
           mkdir -p $out

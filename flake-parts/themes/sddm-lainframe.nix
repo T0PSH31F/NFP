@@ -25,7 +25,7 @@
     services.displayManager.sddm = {
       enable = true;
       wayland.enable = true;
-      theme = "lain-sddm-theme";
+      # theme = "lain-sddm-theme";
       package = pkgs.kdePackages.sddm;
 
       # Auto-login configuration
@@ -35,8 +35,8 @@
       };
 
       extraPackages = with pkgs; [
-        lain-sddm-theme
-        sonic-cursor
+        # pkgs.lain-sddm-theme
+
         qt6.qtwayland
         qt6.qtmultimedia
         qt6.qtsvg
@@ -44,8 +44,8 @@
 
       settings = {
         Theme = {
-          Current = "lain-sddm-theme";
-          CursorTheme = "Sonic";
+          Current = "breeze";
+          CursorTheme = "Adwaita";
           CursorSize = 32;
         };
 
@@ -58,8 +58,8 @@
 
     # QT6 + Wayland environment for SDDM
     environment.systemPackages = with pkgs; [
-      lain-sddm-theme
-      sonic-cursor
+      # pkgs.lain-sddm-theme
+
       qt6.qtwayland
       qt6.qtmultimedia
       qt6.qtsvg

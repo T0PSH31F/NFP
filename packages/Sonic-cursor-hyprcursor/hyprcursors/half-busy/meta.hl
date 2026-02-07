@@ -1,9 +1,0 @@
-resize_algorithm = none
-hotspot_x = 0.00
-hotspot_y = 0.00
-
-define_size = 32, half-busy_000.png, 50
-define_size = 32, half-busy_001.png, 50
-define_size = 32, half-busy_002.png, 50
-define_size = 32, half-busy_003.png, 50
-
