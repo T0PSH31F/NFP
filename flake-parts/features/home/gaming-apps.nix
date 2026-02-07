@@ -1,10 +1,12 @@
 {
   pkgs,
   lib,
-  clanTags,
-  host, # Assuming host is passed or available, otherwise remove if unused in this specific file context, but user had it in gamescope args.
+  osConfig,
   ...
 }:
+let
+  clanTags = osConfig.clan.core.tags or [ ];
+in
 {
   config = lib.mkIf (builtins.elem "gaming" clanTags) {
     home.packages = with pkgs; [

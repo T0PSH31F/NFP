@@ -1,9 +1,12 @@
 {
   pkgs,
   lib,
-  clanTags,
+  osConfig,
   ...
 }:
+let
+  clanTags = osConfig.clan.core.tags or [ ];
+in
 {
   config = lib.mkIf (builtins.elem "desktop" clanTags) {
     home.packages = [ pkgs.shikane ];

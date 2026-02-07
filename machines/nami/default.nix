@@ -14,17 +14,23 @@
     # Hardware configuration (Dell XPS 13, Intel 7th gen)
     ./hardware.nix
 
+    # Home Manager
+    inputs.home-manager.nixosModules.home-manager
+
+    ../../modules/clan/lib.nix
+
     # Core system modules from flake-parts
     ../../flake-parts/system
     ../../flake-parts/themes
     ../../flake-parts/features/nixos
 
     # Clan modules
-    ../../modules/clan/tags.nix
-    ../../modules/clan/lib.nix
-    ../../modules/clan/metadata.nix
-    ../../modules/clan/service-distribution.nix
-    ../../modules/clan/secrets.nix
+    # Clan modules replaced by clan-core
+    # ../../modules/clan/tags.nix
+    # ../../modules/clan/lib.nix
+    # ../../modules/clan/metadata.nix
+    # ../../modules/clan/service-distribution.nix
+    # ../../modules/clan/secrets.nix
 
     # User configuration
     ../../modules/users/t0psh31f.nix
@@ -44,15 +50,6 @@
   system.stateVersion = "25.05";
 
   # ============================================================================
-  # CLAN TAGS - Drives service distribution
-  # ============================================================================
-  clan.tags = [
-    "server"
-    "media-server"
-    "download-server"
-  ];
-
-  # ============================================================================
   # FEATURE TOGGLES
   # ============================================================================
 
@@ -64,6 +61,9 @@
     plymouth-hellonavi.enable = true;
   };
 
+  # Portals
+  desktop.portals.enable = false;
+
   # Mobile device support
   mobile = {
     android.enable = false;
@@ -72,7 +72,6 @@
 
   # System tools
   nix-tools.enable = false;
-  desktop-portals.enable = false;
 
   # Gaming & Virtualization
   gaming.enable = false;
@@ -118,7 +117,8 @@
   # ============================================================================
   # YAZELIX INTEGRATION
   # ============================================================================
-  modules.yazelix.enable = true;
+  # DISABLED: Yazelix flake missing homeManagerModules
+  # modules.yazelix.enable = true;
 
   # ============================================================================
   # HOME-MANAGER CONFIGURATION
@@ -127,7 +127,7 @@
     backupFileExtension = "hm-backup";
     extraSpecialArgs = { inherit inputs; };
     users.t0psh31f = {
-      imports = [ ../../modules/home ];
+      imports = [ ../../flake-parts/features/home ];
       programs = {
         keybind-cheatsheet.enable = false;
         pentest.enable = false;

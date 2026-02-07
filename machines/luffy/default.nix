@@ -13,21 +13,25 @@
   imports = [
     # Hardware configuration (Disko, Nvidia hybrid)
     ./hardware.nix
+    # Home Manager
+    inputs.home-manager.nixosModules.home-manager
+    ../../modules/clan/lib.nix
 
     # Core system modules from flake-parts
     ../../flake-parts/system
     ../../flake-parts/themes
     ../../flake-parts/desktop
     ../../flake-parts/features/nixos
-    ../../flake-parts/features/home
+
     ../../flake-parts/services/ai
 
     # Clan modules
-    ../../modules/clan/tags.nix
-    ../../modules/clan/lib.nix
-    ../../modules/clan/metadata.nix
-    ../../modules/clan/service-distribution.nix
-    ../../modules/clan/secrets.nix
+    # Clan modules replaced by clan-core
+    # ../../modules/clan/tags.nix
+    # ../../modules/clan/lib.nix
+    # ../../modules/clan/metadata.nix
+    # ../../modules/clan/service-distribution.nix
+    # ../../modules/clan/secrets.nix
 
     # User configuration
     ../../modules/users/t0psh31f.nix
@@ -42,17 +46,6 @@
   # ============================================================================
   networking.hostName = "luffy";
   system.stateVersion = "25.05";
-
-  # ============================================================================
-  # CLAN TAGS - Drives service distribution
-  # ============================================================================
-  clan.tags = [
-    "desktop"
-    "laptop"
-    "gaming"
-    "ai-heavy"
-    "nvidia"
-  ];
 
   # ============================================================================
   # FEATURE TOGGLES
@@ -88,7 +81,7 @@
     backupFileExtension = "hm-backup";
     extraSpecialArgs = { inherit inputs; };
     users.t0psh31f = {
-      imports = [ ../../modules/home ];
+      imports = [ ../../flake-parts/features/home ];
       # programs.vicinae.enable = true;
     };
   };

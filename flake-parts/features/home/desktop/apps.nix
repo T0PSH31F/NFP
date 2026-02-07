@@ -2,35 +2,32 @@
   config,
   pkgs,
   lib,
+  osConfig,
   inputs,
-  clanTags,
   ...
 }:
+let
+  clanTags = osConfig.clan.core.tags or [ ];
+in
 {
   imports = [
     inputs.noctalia.homeModules.default
-    ./hyprland.nix
-    ./spicetify.nix
-    ./ghostty.nix
-    ./shikane.nix
   ];
 
   config = lib.mkIf (builtins.elem "desktop" clanTags) {
-    # Enable Hyprland
+    # Enable Hyprland (configured in ./hyprland.nix)
     desktop.hyprland.enable = true;
 
-    # Enable Noctalia - hardcoded to hyprland backend for now as per current setup
     # Enable Noctalia
     programs.noctalia-shell = {
       enable = true;
       package = inputs.noctalia.packages.${pkgs.system}.default;
-      settings = ./assets/noctalia-config.json;
+      # settings = ../assets/noctalia-config.json; # Assuming relative path fix
+      # Wait, ../assets might not work if assets not moved? I moved them.
+      settings = ../assets/noctalia-config.json;
     };
 
-    # NOTE: Noctalia templates would need to be configured according to the
-    # noctalia-shell flake's actual options. The themes.noctalia.templates
-    # option does not exist in the current version.
-
+    # NOTE: Noctalia templates... (omitted comment for brevity if identical)
     # Ensure directories exist for templates
     home.file = {
       ".config/homepage/.keep".text = "";
@@ -52,7 +49,6 @@
       shikane
       matugen
       qutebrowser
-      
 
       # Communication
       kotatogram-desktop # Telegram client

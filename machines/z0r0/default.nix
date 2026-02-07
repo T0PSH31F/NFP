@@ -14,6 +14,12 @@
     # Hardware configuration (LUKS, filesystems, swap)
     ./hardware.nix
 
+    # Home Manager
+    inputs.home-manager.nixosModules.home-manager
+
+    # Legacy Clan Lib (required for packages/ modules)
+    ../../modules/clan/lib.nix
+
     # Machine now managed by clan inventory for services
     # See: flake-parts/clan-inventory.nix for service instances
 
@@ -23,18 +29,18 @@
     ../../flake-parts/themes
     ../../flake-parts/desktop
     ../../flake-parts/features/nixos
-    ../../flake-parts/features/home
+
     ../../flake-parts/services/ai
     ../../flake-parts/services/media
     ../../flake-parts/services/infrastructure
     ../../flake-parts/services/communication
 
-    # Clan modules (still in old location for now)
-    ../../modules/clan/tags.nix
-    ../../modules/clan/lib.nix
-    ../../modules/clan/metadata.nix
-    ../../modules/clan/service-distribution.nix
-    ../../modules/clan/secrets.nix
+    # Clan modules replaced by clan-core and clan-inventory.nix
+    # ../../modules/clan/tags.nix
+    # ../../modules/clan/lib.nix
+    # ../../modules/clan/metadata.nix
+    # ../../modules/clan/service-distribution.nix
+    # ../../modules/clan/secrets.nix
 
     # User configuration
     ../../modules/users/t0psh31f.nix
@@ -53,20 +59,6 @@
   # ============================================================================
   networking.hostName = "z0r0";
   system.stateVersion = "25.05";
-
-  # ============================================================================
-  # CLAN TAGS - Drives service distribution
-  # ============================================================================
-  clan.tags = [
-    "desktop"
-    "laptop"
-    "ai-server"
-    "build-server"
-    "binary-cache"
-    "database"
-    "dev"
-    # "pentest"
-  ];
 
   # ============================================================================
   # FEATURE TOGGLES
@@ -174,13 +166,16 @@
     backupFileExtension = "hm-backup";
     extraSpecialArgs = { inherit inputs; };
     users.t0psh31f = {
-      imports = [ ../../modules/home ];
-      programs = {
-        yazelix.enable = true;
-        vicinae.enable = true;
-      };
+      imports = [
+        ../../flake-parts/features/home
+      ];
+      # modules.yazelix.enable = true; # INVALID HERE
     };
   };
+
+  # Enable Yazelix System Module
+  # DISABLED: The yazelix flake input is missing homeManagerModules attribute causing build failure.
+  # modules.yazelix.enable = true;
 
   # ============================================================================
   # ENVIRONMENT CONFIGURATION

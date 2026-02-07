@@ -13,7 +13,7 @@
 }:
 
 let
-  inherit (config.clan.lib) hasTag;
+  hasTag = tag: builtins.elem tag (config.clan.core.tags or [ ]);
 
   # Theme overlays adapter
   themeOverlays = import ../../overlays/default.nix { inherit inputs; };

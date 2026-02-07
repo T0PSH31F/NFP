@@ -2,6 +2,7 @@
   config,
   lib,
   pkgs,
+  osConfig,
   ...
 }:
 with lib;
@@ -10,7 +11,11 @@ let
 in
 {
   options.desktop.hyprland = {
-    enable = mkEnableOption "Hyprland Desktop Environment";
+    enable = mkOption {
+      type = types.bool;
+      default = builtins.elem "desktop" (osConfig.clan.core.tags or [ ]);
+      description = "Enable Hyprland Desktop Environment";
+    };
   };
 
   config = mkIf cfg.enable {

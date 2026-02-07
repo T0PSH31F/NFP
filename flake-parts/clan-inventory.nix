@@ -166,7 +166,7 @@
         name = "ncps";
         input = "clan-core";
       };
-      roles.default = {
+      roles.server = {
         machines.z0r0 = {
           # Only on z0r0
           settings = {

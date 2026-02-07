@@ -5,5 +5,10 @@
     ./dev-tools.nix
     ./pentest-tools.nix
     ./gaming-apps.nix
+    ./desktop
+    ./core.nix
+    ./shell.nix
+    ./vscode.nix
+    ./spicetify.nix
   ];
 }

@@ -3,10 +3,11 @@
   pkgs,
   lib,
   inputs,
-  clanTags,
+  osConfig,
   ...
 }:
 let
+  clanTags = osConfig.clan.core.tags or [ ];
   spicePkgs = inputs.spicetify-nix.legacyPackages.${pkgs.system};
 in
 {

@@ -34,8 +34,7 @@
 
   home-manager.users.t0psh31f = {
     imports = [
-      ../home
-
+      ../../flake-parts/features/home
     ];
 
     home.stateVersion = "25.05";
