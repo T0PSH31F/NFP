@@ -40,7 +40,7 @@
     ../../modules/nixos/overlays.nix
 
     # Additional modules not yet migrated
-    ../../modules/nixos/yazelix.nix
+    # ../../modules/nixos/yazelix.nix
   ];
 
   # ============================================================================

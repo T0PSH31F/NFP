@@ -5,18 +5,7 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-parts.url = "github:hercules-ci/flake-parts";
     # ADD THIS - devenv integration
-    devenv = {
-      url = "github:cachix/devenv";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    nix2container = {
-      url = "github:nlewo/nix2container";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    nixpkgs-python = {
-      url = "github:cachix/nixpkgs-python";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+
     clan-core = {
       url = "git+https://git.clan.lol/clan/clan-core";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -66,27 +55,21 @@
       url = "github:Gerg-L/spicetify-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    yazelix = {
-      url = "github:luccahuguet/yazelix/1d251ead9676b7f7385ee390f322f600a84b34c3";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.home-manager.follows = "home-manager";
-    };
+
   };
 
   outputs =
     inputs@{
       flake-parts,
       clan-core,
-      devenv,
-      nix2container,
-      nixpkgs-python,
+
       home-manager,
       import-tree,
       nvf,
       llm-agents,
       noctalia,
       spicetify-nix,
-      yazelix,
+
       ...
     }:
     let
