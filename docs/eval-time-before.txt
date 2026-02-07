@@ -1,0 +1,7 @@
+warning: Git tree '/home/t0psh31f/Clan/Grandlix-Gang' is dirty
+error:
+       … while updating the lock file of flake 'git+file:///home/t0psh31f/Clan/Grandlix-Gang'
+
+       … while updating the flake input 'yazelix'
+
+       error: path '«github:luccahuguet/yazelix/284eff105ba7269f1474a5ba223116698da775e7»/flake.nix' does not exist

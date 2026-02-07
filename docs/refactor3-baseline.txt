@@ -1,0 +1,2 @@
+14
+Baseline: 14 files in root
