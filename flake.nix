@@ -67,7 +67,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     yazelix = {
-      url = "github:luccahuguet/yazelix";
+      url = "github:luccahuguet/yazelix/1d251ead9676b7f7385ee390f322f600a84b34c3";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
     };
@@ -216,18 +216,13 @@
                 ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠛⠛⠿⠿⣿⣿⣿⣿⣿⣿⣿⣯⣭⣤⣀⣀⠀⠀⠀⣰⣿⣿⠍⣿⣿⣿⣿⣿⣿⣿⣿⣿
                 ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣠⣤⣶⣶⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣶⣿⣿⣶⣿⣿⣿⣿⣿⣿⣿⣿⣿
                 EOF
-                                echo "Grandlix-Gang NixOS Configuration Development Environment"
-                                echo "=================================================="
+                                echo "Grandlix-Gang NixOS Configuration"
+                                echo "==================================="
                                 echo ""
-                                echo "Available devenv shells:"
-                                echo "  nix develop .#python-ai-agent  - Python AI/automation dev"
-                                echo "  nix develop .#rust-saas        - Rust SaaS development"
-                                echo "  nix develop .#node-automation  - Node.js + n8n automation"
-                                echo "  nix develop .#go-microservice  - Go microservices"
-                                echo "  nix develop .#fullstack        - Combined full-stack"
+                                echo "NOTE: Development environments have been moved to T0PSH31F/grandlix-devenvs"
                                 echo ""
-                                echo "Quick start with direnv:"
-                                echo "  cd ~/projects/my-ai-agent && echo 'use flake ~/Grandlix-Gang#python-ai-agent' > .envrc && direnv allow"
+                                echo "Quick start:"
+                                echo "  nix develop github:T0PSH31F/grandlix-devenvs#python-ai-agent"
                                 echo ""
               '';
             };
