@@ -129,10 +129,19 @@
             };
         };
 
+        # Register clan services from new structure
         flake.clan.modules = {
-          desktop = ./clan-service-modules/desktop;
-          media = ./clan-service-modules/media;
-          ai = ./clan-service-modules/ai;
+          # AI services
+          ai = ./clan-services/sillytavern/module.nix;
+
+          # Desktop/Infrastructure services bundle
+          desktop = ./clan-services/homepage-dashboard/module.nix;
+
+          # Media services
+          media = ./clan-services/aria2/module.nix;
+
+          # Binary cache
+          binary-cache = ./clan-services/binary-cache/module.nix;
         };
 
         systems = [ "x86_64-linux" ];
