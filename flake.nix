@@ -66,11 +66,13 @@
       url = "github:Gerg-L/spicetify-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    yazelix = {
-      url = "github:luccahuguet/yazelix";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.home-manager.follows = "home-manager";
-    };
+    # TEMPORARILY DISABLED: yazelix upstream removed flake.nix
+    # See docs/yazelix-integration-issue.md for details and solutions
+    # yazelix = {
+    #   url = "github:luccahuguet/yazelix/main";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    #   inputs.home-manager.follows = "home-manager";
+    # };
   };
 
   outputs =
@@ -86,7 +88,7 @@
       llm-agents,
       noctalia,
       spicetify-nix,
-      yazelix,
+      # yazelix, # Disabled - see docs/yazelix-integration-issue.md
       ...
     }:
     let
