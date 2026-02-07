@@ -40,7 +40,6 @@
     ../../modules/nixos/overlays.nix
 
     # Additional modules not yet migrated
-    # ../../modules/nixos/yazelix.nix
   ];
 
   # ============================================================================
@@ -115,12 +114,6 @@
   };
 
   # ============================================================================
-  # YAZELIX INTEGRATION
-  # ============================================================================
-  # DISABLED: Yazelix flake missing homeManagerModules
-  # modules.yazelix.enable = true;
-
-  # ============================================================================
   # HOME-MANAGER CONFIGURATION
   # ============================================================================
   home-manager = {
@@ -129,6 +122,7 @@
     users.t0psh31f = {
       imports = [ ../../flake-parts/features/home ];
       programs = {
+        cli-environment.enable = true;
         keybind-cheatsheet.enable = false;
         pentest.enable = false;
       };

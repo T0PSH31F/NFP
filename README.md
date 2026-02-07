@@ -75,19 +75,20 @@ sudo nixos-rebuild switch --flake .#luffy
 ## Configuration Structure
 
 ```
-├── flake.nix              # Main flake
+├── flake.nix              # Main flake (flake-parts based)
 ├── clan.nix               # Clan inventory
-├── modules/
-│   ├── desktop/           # Desktop environments
-│   ├── system/            # System modules
-│   ├── users/             # User configs
-│   └── home-manager/      # Home-manager modules
+├── flake-parts/           # Dendritic module organization
+│   ├── features/          # System and Home features
+│   │   ├── nixos/         # NixOS modules (impermanence, etc.)
+│   │   └── home/          # Home-Manager modules (hyprland, cli, etc.)
+│   ├── services/          # Multi-host service definitions
+│   └── hardware/          # Reusable hardware profiles
+├── clan-services/         # Role-based service bundles
 └── machines/
-    ├── luffy/             # Primary laptop (192.168.1.182)
-    └── z0r0/              # Secondary laptop (192.168.1.159)
+    ├── luffy/             # Primary laptop
+    ├── z0r0/              # Workstation
+    └── nami/              # Development server
 ```
-
-## Desktop Environments
 
 Toggle in `machines/<name>/default.nix`:
 - **Omarchy** - Hyprland with Material Design
@@ -95,6 +96,32 @@ Toggle in `machines/<name>/default.nix`:
 - **Illogical Impulse** - End-4's Hyprland dotfiles
 
 Only enable **one** at a time.
+
+## CLI Environment
+
+A comprehensive, portable terminal environment module that provides a complete CLI/TUI workflow.
+
+### Features
+- **Helix**: Modern modal editor with LSP support
+- **Yazi**: Fast TUI file manager
+- **Zellij**: Terminal multiplexer (yazelix-style)
+- **Zsh**: Feature-rich shell with extensive configuration
+- **Modern CLI Tools**: `eza`, `bat`, `ripgrep`, `fd`, `fzf`, `zoxide`, `delta`, etc.
+
+### Usage
+Enable in your machine config:
+```nix
+programs.cli-environment = {
+  enable = true;
+  enableYazelix = true;
+};
+```
+
+**Key Bindings:**
+- `Space + e` (in Helix) - Open Yazi file manager
+- `Ctrl + F` (in Shell) - FZF directory jump
+- `Ctrl + E` (in Shell) - FZF file search and edit
+- `yazelix` (Command) - Start full environment in Zellij
 
 ## Documentation
 

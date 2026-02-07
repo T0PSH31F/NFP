@@ -24,7 +24,6 @@
     # ./packages.nix # Migrated to packages/ (Refactor Phase 2)
     # ./file-managers.nix # Migrated to service-distribution.nix (desktop tag)
     ./nix-tools.nix
-    ./yazelix.nix
     ./nix-settings.nix
 
     # Networking

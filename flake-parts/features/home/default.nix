@@ -7,6 +7,7 @@
     ./gaming-apps.nix
     ./desktop
     ./core.nix
+    ./cli-environment.nix
     ./shell.nix
     ./vscode.nix
     ./spicetify.nix

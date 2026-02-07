@@ -50,7 +50,6 @@
     ../../modules/nixos/overlays.nix
 
     # Additional modules not yet migrated
-    # ../../modules/nixos/yazelix.nix
     ../../modules/nixos/nix-tools.nix
   ];
 
@@ -169,7 +168,7 @@
       imports = [
         ../../flake-parts/features/home
       ];
-      # modules.yazelix.enable = true; # INVALID HERE
+      programs.cli-environment.enable = true;
     };
   };
 

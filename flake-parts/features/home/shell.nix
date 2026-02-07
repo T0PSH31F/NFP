@@ -53,48 +53,10 @@
         neofetch
       fi
 
-      # Yazelix integration - yzx command
-      if [[ -f "$HOME/.config/yazelix/nushell/scripts/core/start_yazelix.nu" ]]; then
-        yzx() {
-          case "$1" in
-            launch)
-              shift
-              nu ~/.config/yazelix/nushell/scripts/core/start_yazelix.nu "$@"
-              ;;
-            env)
-              cd ~/.config/yazelix && devenv shell
-              ;;
-            help)
-              echo "yzx commands:"
-              echo "  launch       - Launch Yazelix in new terminal"
-              echo "  launch --here - Launch Yazelix in current terminal"
-              echo "  env          - Load Yazelix tools into current shell"
-              echo "  help         - Show this help"
-              ;;
-            *)lib
-              echo "Unknown command: $1. Use 'yzx help' for available commands."
-              ;;
-          esac
-        }
-      fi
+      # Yazelix integration is now handled by programs.cli-environment
     '';
 
     shellAliases = {
-      e = "hx .";
-      vi = "hx";
-      vim = "hx";
-      cat = "bat";
-      ps = "procs";
-      l = "lsd -l";
-      ll = "lsd -la";
-      diff = "delta";
-      serve = "miniserve";
-      fm = "yazi";
-      gg = "lazygit";
-      ".." = "cd ..";
-      "..." = "cd ../..";
-      "...." = "cd ../../..";
-      "....." = "cd ../../../..";
       # Nix package search with fzf (nix-search-tv)
       ns = "nix-search-tv print | fzf --preview 'nix-search-tv preview {}' --scheme history";
       # SSH keyscan helper
