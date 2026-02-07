@@ -14,6 +14,9 @@
     # Hardware configuration (LUKS, filesystems, swap)
     ./hardware.nix
 
+    # Machine now managed by clan inventory for services
+    # See: flake-parts/clan-inventory.nix for service instances
+
     # Core system modules from flake-parts
     ../../flake-parts/system
     ../../flake-parts/hardware

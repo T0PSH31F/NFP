@@ -28,117 +28,210 @@ with lib;
     environment.persistence.${config.system-config.impermanence.persistPath} = {
       hideMounts = true;
 
-      # System directories to persist
       directories = [
+        # System directories
+        "/var/lib/systemd"
         "/var/lib/nixos"
-        "/var/lib/systemd/coredump"
-
-        # Database
-        "/var/lib/postgresql"
-
-        # Network
+        "/var/log"
+        
+        # Network configuration
         "/etc/NetworkManager/system-connections"
-
-        # Virtualization/Containers (System level)
+        
+        # AI services
+        "/var/lib/ollama"
+        "/var/lib/localai"
+        "/var/lib/chromadb"
+        "/var/lib/qdrant"
+        
+        # Databases
+        "/var/lib/postgresql"
+        "/var/lib/mysql"
+        "/var/lib/redis"
+        
+        # Communication
+        "/var/lib/matrix-synapse"
+        
+        # Cloud & Storage
+        "/var/lib/nextcloud"
+        
+        # Home automation
+        "/var/lib/home-assistant"
+        
+        # Automation
+        "/var/lib/n8n"
+        
+        # Web servers
+        "/var/lib/caddy"
+        
+        # Media services
+        "/var/lib/immich"
+        "/var/lib/calibre-web"
+        "/var/lib/jellyfin"
+        "/var/lib/plex"
+        
+        # Download clients
+        "/var/lib/deluge"
+        "/var/lib/transmission"
+        "/var/lib/aria2"
+        
+        # *arr suite
+        "/var/lib/sonarr"
+        "/var/lib/radarr"
+        "/var/lib/lidarr"
+        "/var/lib/readarr"
+        "/var/lib/prowlarr"
+        
+        # VPN & networking
+        "/var/lib/headscale"
+        "/var/lib/tailscale"
+        
+        # Binary cache
+        "/var/lib/harmonia"
+        
+        # Monitoring
+        "/var/lib/grafana"
+        "/var/lib/prometheus"
+        
+        # Containers
+        "/var/lib/docker"
+        "/var/lib/containers"
+        "/var/lib/podman"
+        
+        # Virtualization
         "/var/lib/libvirt"
         "/etc/libvirt"
-        "/var/lib/docker"
-        "/var/lib/podman"
-
-        # SSH daemon keys
+        
+        # SSH daemon
         "/etc/ssh"
       ];
-
-      # Individual files to persist
-      # Note: /etc/machine-id is managed separately (symlink to /.host-etc/machine-id)
-      # If you need impermanence to manage it, remove the symlink first
+      
       files = [
-        "/etc/nix/id_rsa"
+        # Machine identity
+        "/etc/machine-id"
+        
+        # SOPS age key
+        "/var/lib/sops-nix/key.txt"
       ];
-
-      # User-specific persistence (handled separately)
+      
+      # Per-user persistence
       users.t0psh31f = {
         directories = [
-          # User Data
-          "Agents"
+          # Projects and work
           "Clan"
+          "projects"
           "Documents"
           "Downloads"
-          "Music"
-          "NixOS"
           "Pictures"
-          "Projects"
+          "Videos"
+          "Music"
+          
+          # Configuration
+          ".config"
+          ".local"
+          
+          # SSH & GPG
+          ".ssh"
+          ".gnupg"
+          
+          # Development caches
+          ".cache"
+          
+          # Browser profiles (if needed)
+          ".mozilla"
+          ".config/chromium"
+          
+          # VS Code / editors
+          ".vscode"
+          ".config/Code"
+          
+          # Shell history & state
+          ".local/share/fish"
+          ".local/share/zsh"
+          
+          # AI tool data
+          ".ollama"
+          ".config/cherry-studio"
+          ".config/lmstudio"
+
+          # Legacy/Custom User Data (Preserved)
+          "Agents"
+          "NixOS"
           "Public"
           "Templates"
-          "Videos"
-
-          # Custom User Data
           "Games"
           "Flatpaks"
           "Appimages"
           "Notes"
-
-          # Configs & State
           ".icons"
           ".themes"
           ".cursors"
-          ".ssh"
-          ".gnupg"
           ".pki"
-          ".mozilla"
           ".thunderbird"
-          ".background" # Wallpaper storage
+          ".background" 
           ".antigravity"
-          ".cache"
           ".gemini"
           ".kodi"
-          ".vscode"
-
-          # Specific App Configs (Add more as needed)
-          ".config/ghostty"
-          ".config/sops"
-          ".config/Signal"
-          ".config/TelegramDesktop"
-          ".config/Antigravity"
-          ".config/mcp"
-          ".config/Bitwarden"
-          ".config/obs-studio"
-          ".config/vesktop"
-          ".config/discord"
-          ".config/spicetify"
-          ".config/noctalia"
-          ".local/share/noctalia"
-          ".cache/noctalia"
-
-          # Mobile / Sync
-          ".kde/share/config/kdeconnect"
-          ".config/kdeconnect"
-
-          # Application data
-          ".var/app" # Flatpak
+          ".var/app"
         ];
-
+        
         files = [
+          # Shell history
           ".bash_history"
           ".zsh_history"
+          
+          # Git configuration
+          ".gitconfig"
           "facter.json"
         ];
       };
     };
 
-    # ============================================================================
-    # BTRFS ROOT & HOME WITH SNAPSHOT ROLLBACK
-    # ============================================================================
-    # Both / and /home are handled by disko.nix (@root and @home subvolumes)
-    # The postDeviceCommands below will roll them back on each boot
-    # This provides full impermanence (determinate builds)
-
-    # Btrfs snapshot rollback for impermanence (Systemd Initrd Version)
-    boot.initrd.systemd.services.rollback = {
-      description = "Rollback BTRFS root and home snapshots";
-      wantedBy = [ "initrd.target" ];
-      after = [ "initrd-root-device.target" ];
-      before = [ "sysroot.mount" ];
+    # Ensure proper permissions for service directories
+    systemd.tmpfiles.rules = [
+      # AI services
+      "d /persist/var/lib/ollama 0750 ollama ollama"
+      "d /persist/var/lib/localai 0750 localai localai"
+      "d /persist/var/lib/chromadb 0750 chromadb chromadb"
+      
+      # Databases
+      "d /persist/var/lib/postgresql 0750 postgres postgres"
+      "d /persist/var/lib/redis 0750 redis redis"
+      
+      # Communication
+      "d /persist/var/lib/matrix-synapse 0750 matrix-synapse matrix-synapse"
+      
+      # Cloud
+      "d /persist/var/lib/nextcloud 0750 nextcloud nextcloud"
+      
+      # Home Assistant
+      "d /persist/var/lib/home-assistant 0750 hass hass"
+      
+      # n8n
+      "d /persist/var/lib/n8n 0750 n8n n8n"
+      
+      # Web server
+      "d /persist/var/lib/caddy 0750 caddy caddy"
+      
+      # Media
+      "d /persist/var/lib/immich 0750 immich immich"
+      "d /persist/var/lib/calibre-web 0750 calibre-web calibre-web"
+      
+      # Downloads
+      "d /persist/var/lib/deluge 0750 deluge deluge"
+      "d /persist/var/lib/transmission 0750 transmission transmission"
+      "d /persist/var/lib/aria2 0750 aria2 aria2"
+      
+      # Binary cache
+      "d /persist/var/lib/harmonia 0750 harmonia harmonia"
+      
+      # Containers
+      "d /persist/var/lib/docker 0710 root root"
+      
+      # User home persistence
+      "d /persist/home/t0psh31f 0700 t0psh31f users"
+      "d /persist/home/t0psh31f/.ssh 0700 t0psh31f users"
+      "d /persist/home/t0psh31f/.gnupg 0700 t0psh31f users"
+    ];
       unitConfig.DefaultDependencies = "no";
       serviceConfig.Type = "oneshot";
       script = ''

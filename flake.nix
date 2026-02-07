@@ -106,8 +106,8 @@
         imports = [
           clan-core.flakeModules.default
           home-manager.flakeModules.home-manager
-          devenv.flakeModule
-          ./devenvs
+          # Devenv module removed - see grandlix-devenvs repo
+          ./flake-parts/clan-inventory.nix
         ];
 
         clan = {
