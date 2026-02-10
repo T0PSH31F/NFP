@@ -1,36 +1,50 @@
-{ pkgs, ... }:
+# flake-parts/features/nixos/packages/dev.nix
 {
-  environment.systemPackages = with pkgs; [
-    # Version control
-    git
-    gh
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+let
+  hasTag = tag: builtins.elem tag (config.clan.core.tags or [ ]);
+in
+{
+  config = lib.mkIf (hasTag "dev") {
+    environment.systemPackages = with pkgs; [
+      # Compilers & build tools
+      antigravity-fhs
+      binutils
+      cmake
+      gcc
+      gnumake
+      libgcc
+      pkg-config
 
-    # Build tools
-    gnumake
-    cmake
+      # Debugging
+      gdb
+      valgrind
 
-    # Compilers/interpreters
-    gcc
-    python311
-    nodejs_22
-    go
-    rustc
-    cargo
+      # Dev environments
+      devenv
+      direnv
 
-    # LSPs and formatters
-    nil
-    nixfmt
+      # Languages
+      nodePackages.npm
+      nodePackages.yarn
+      nodejs
+      poetry
+      typescript
+      uv
 
-    # Container tools
-    docker
-    docker-compose
+      # VCS / dev tooling
+      gh
+      git-lfs
+      gitFull
+    ];
 
-    # Database clients
-    postgresql_16
-    sqlite
-
-    # API testing
-    postman
-    insomnia
-  ];
+    programs.direnv = {
+      enable = true;
+      nix-direnv.enable = true;
+    };
+  };
 }

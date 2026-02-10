@@ -1,7 +1,9 @@
+# flake-parts/desktop/hyprland.nix
 {
   config,
   lib,
   pkgs,
+  inputs,
   ...
 }:
 let
@@ -11,13 +13,27 @@ in
   config = lib.mkIf (hasTag "desktop") {
     programs.hyprland = {
       enable = true;
+      package = inputs.hyprland.packages.${pkgs.system}.hyprland;
+      withUWSM = true;
       xwayland.enable = true;
     };
 
-    # Hints for apps to use Wayland
-    environment.sessionVariables.NIXOS_OZONE_WL = "1";
+    programs.uwsm = {
+      enable = true;
+      waylandCompositors = {
+        hyprland = {
+          prettyName = "Hyprland";
+          comment = "Hyprland compositor managed by UWSM";
+          binPath = "/run/current-system/sw/bin/Hyprland";
+        };
+      };
+    };
 
-    # Ensure greetd/display manager starts?
-    # Usually handled by display-manager.nix or similar.
+    # Re-enable portal configuration from portals.nix
+    xdg.portal = {
+      enable = true;
+      extraPortals = [ pkgs.xdg-desktop-portal-hyprland ];
+      config.common.default = "*";
+    };
   };
 }

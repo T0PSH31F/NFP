@@ -279,22 +279,26 @@ in
       loadModels = cfg.ollama.models;
     };
 
-    systemd.services.ollama.serviceConfig.DynamicUser = lib.mkForce false;
+    # Ollama Service Customization (only when enabled)
+    systemd.services.ollama = mkIf cfg.ollama.enable {
+      serviceConfig.DynamicUser = lib.mkForce false;
+    };
 
-    # Create static user for Ollama since DynamicUser is disabled
-    users.users.ollama = {
+    # Create static user for Ollama (only when enabled)
+    users.users.ollama = mkIf cfg.ollama.enable {
       group = "ollama";
       isSystemUser = true;
       description = "Ollama Service User";
       home = "/var/lib/ollama";
       createHome = true;
     };
-    users.groups.ollama = { };
+    users.groups.ollama = mkIf cfg.ollama.enable { };
 
-    systemd.tmpfiles.rules = [
-      "d /var/lib/ollama 0750 ollama ollama -"
-      "d /var/lib/ollama/models 0750 ollama ollama -"
-    ];
+    systemd.tmpfiles.rules =
+      (optional cfg.ollama.enable "d /var/lib/ollama 0750 ollama ollama -")
+      ++ (optional cfg.ollama.enable "d /var/lib/ollama/models 0750 ollama ollama -")
+      ++ (optional cfg.localai.enable "d /persist/var/lib/localai 0750 localai localai") # Moved here for consistency
+      ++ (optional cfg.chromadb.enable "d /persist/var/lib/chromadb 0750 chromadb chromadb");
 
     # Enable docker/podman only for LocalAI (still needs container)
     virtualisation.docker.enable = mkIf cfg.localai.enable true;

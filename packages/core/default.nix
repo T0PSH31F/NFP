@@ -3,63 +3,65 @@
 {
   # Core tools: loaded on all systems, regardless of tags
   environment.systemPackages = with pkgs; [
-    vim
-    wget
-    curl
-    git
-    htop
-    tmux
-    btop
-
-    pciutils
-    usbutils
-    psmisc
-    lsof
-    file
-    which
-    tree
-
-    ripgrep
-    fd
-    jq
-
-    unzip
-    zip
-    p7zip
-
-    iotop
-    iftop
-
-    # System Utilities
-    aria2
-    gparted
-    ntfs3g
-    sops
-    parted
-    exfatprogs
-    btrfs-progs
-
     # Essentials
+    bubblewrap
     imagemagick
     img2pdf
     poppler-utils
     qpdf
     unrar
-    bubblewrap
 
+    # Monitoring
+    btop
+    htop
+    iftop
+    iotop
+
+    # Network Tools
+    curl
+    wget
+
+    # System Basics
+    git
+    lsof
+    pciutils
+    psmisc
+    tmux
+    usbutils
+    vim
+    which
+
+    # System/Disk Tools
+    aria2
+    btrfs-progs
+    exfatprogs
+    gparted
+    ntfs3g
+    parted
+    sops
+
+    # Utilities
+    fd
+    file
+    jq
+    p7zip
+    ripgrep
+    tree
+    unzip
+    zip
   ];
 
   # Enable nix-ld for running non-NixOS binaries
   programs.nix-ld.enable = true;
   programs.nix-ld.libraries = with pkgs; [
-    stdenv.cc.cc.lib
-    zlib
+    curl
+    expat
     fuse3
     icu
     nss
     openssl
-    curl
-    expat
+    stdenv.cc.cc.lib
+    zlib
   ];
   programs.starship.enable = true;
 }

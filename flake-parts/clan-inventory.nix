@@ -1,4 +1,4 @@
-{ inputs, ... }:
+{ ... }:
 {
   # Clan Inventory - Service Instance Definitions
   # Using official clan-core modules for standardized deployment
@@ -8,22 +8,6 @@
     # ADMIN & SSH ACCESS
     # ==========================================================================
 
-    instances.admin-access = {
-      module = {
-        name = "admin";
-        input = "clan-core";
-      };
-      roles.default = {
-        tags.all = { }; # Deploy to all machines
-        settings = {
-          allowedKeys = {
-            t0psh31f = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBqbW9FmXJYRYJWgYzQY2gYQmMqvBYvWgMy0YJmN6QKz t0psh31f@z0r0";
-          };
-          certificateSearchDomains = [ "grandlix.local" ];
-        };
-      };
-    };
-
     instances.sshd-cluster = {
       module = {
         name = "sshd";
@@ -32,11 +16,29 @@
       roles.server = {
         tags.all = { }; # All machines are SSH servers
         settings = {
+          authorizedKeys = {
+            "mykey" =
+              "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEFDNnynMbFWatSFdANzbJ8iiEKL7+9ZpDaMLrWRQjyH user@host";
+          };
           certificate.searchDomains = [ "grandlix.local" ];
         };
       };
       roles.client = {
         tags.all = { }; # All machines are SSH clients
+      };
+    };
+
+    instances.root-user = {
+      module = {
+        name = "users";
+        input = "clan-core";
+      };
+      roles.default = {
+        tags.all = { };
+        settings = {
+          user = "root";
+          prompt = false; # Set to false to auto-generate password
+        };
       };
     };
 
@@ -59,11 +61,13 @@
             "wheel"
             "networkmanager"
             "video"
+            "audio"
             "input"
             "docker"
             "libvirtd"
             "media"
             "podman"
+            "i2c"
           ];
         };
       };

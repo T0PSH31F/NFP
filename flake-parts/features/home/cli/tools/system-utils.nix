@@ -12,31 +12,31 @@ in
 {
   config = lib.mkIf cfg.enable {
     home.packages = with pkgs; [
-      gping
       bottom
-      htop
       fastfetch
-      neofetch # classic neofetch
-      pciutils
-      usbutils
+      gping
+      htop
       lsof
-      tree
+      pciutils
       psmisc
+      tree
+      usbutils
 
-      # Image tools (needed for fzf preview)
-      imagemagick
+      # Image tools
       chafa
+      imagemagick
 
       # CLI Fun & Utilities
+      blahaj
+      charasay
+      figlet
+      fortune-kind
       gum
       lolcat
-      figlet
-      toilet
-      blahaj
-      terminal-parrot
       neo-cowsay
-      charasay
-      fortune-kind
+      neofetch # classic neofetch
+      terminal-parrot
+      toilet
     ];
   };
 }

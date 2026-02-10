@@ -1,19 +1,16 @@
-# flake-parts/services/infrastructure/default.nix
-# Infrastructure and system services
+{ ... }:
 {
   imports = [
-    ./caddy.nix
-    ./home-assistant.nix
-    ./n8n.nix
-    ./nextcloud.nix
-    ./harmonia.nix
-    ./monitoring.nix
-    ./homepage-dashboard.nix
-    ./adguard.nix
-    ./searxng.nix
-    ./pastebin.nix
     ./avahi.nix
+    ./caddy.nix
+    ./filebrowser.nix
+    ./glances.nix
+    ./harmonia.nix
+    ./headscale.nix
+    ./home-assistant.nix
+    ./homepage-dashboard.nix
+    ./monitoring.nix
+    ./nextcloud.nix
     ./ssh-agent.nix
-    ./extras.nix
   ];
 }

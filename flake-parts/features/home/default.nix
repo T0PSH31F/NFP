@@ -2,13 +2,13 @@
 # Home Manager feature toggles - user-level tools and applications
 {
   imports = [
-    ./dev-tools.nix
-    ./pentest-tools.nix
-    ./gaming-apps.nix
-    ./desktop
-    ./core.nix
     ./cli
-    ./vscode.nix
+    ./core.nix
+    ./desktop
+    ./dev-tools.nix
+    ./gaming-apps.nix
+    ./pentest-tools.nix
     ./spicetify.nix
+    ./vscode.nix
   ];
 }

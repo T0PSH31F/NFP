@@ -62,7 +62,7 @@ in
     };
 
     # Custom shell functions
-    programs.zsh.initExtra = lib.mkIf cfg.shells.zsh.enable ''
+    programs.zsh.initContent = lib.mkIf cfg.shells.zsh.enable ''
       # Project navigation
       proj() {
         local project_dir="$HOME/projects"

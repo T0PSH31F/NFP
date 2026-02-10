@@ -1,36 +1,40 @@
-{ pkgs, ... }:
+# flake-parts/features/nixos/packages/desktop.nix
 {
-  environment.systemPackages = with pkgs; [
-    # Browsers
-    firefox
-    chromium
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+let
+  hasTag = tag: builtins.elem tag (config.clan.core.tags or [ ]);
+in
+{
+  config = lib.mkIf (hasTag "desktop") {
+    environment.systemPackages = with pkgs; [
+      # Browsers
+      brave
+      firefox
+      librewolf
 
-    # Communication
-    thunderbird
+      # Custom desktop tools
+      jerry
+      lobster
 
-    # File managers
-    nautilus
+      # File managers
+      thunar
 
-    # Media players
-    vlc
-    mpv
+      # Launchers
+      wofi
 
-    # Image viewers/editors
-    gimp
-    inkscape
+      # Terminals
+      kitty
 
-    # Office suite
-    libreoffice-fresh
-
-    # PDF viewers
-    evince
-    zathura
-
-    # Screenshot tools
-    flameshot
-
-    # Terminal emulators (if not using Ghostty exclusively)
-    alacritty
-    kitty
-  ];
+      # Wayland / clipboard / screenshot
+      grim
+      slurp
+      swappy
+      wf-recorder
+      wl-clipboard
+    ];
+  };
 }

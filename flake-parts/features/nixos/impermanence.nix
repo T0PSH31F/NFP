@@ -118,6 +118,14 @@ with lib;
 
         # SOPS age key
         "/var/lib/sops-nix/key.txt"
+
+        # User and group database files (CRITICAL for password persistence)
+        "/etc/passwd"
+        "/etc/shadow"
+        "/etc/group"
+        "/etc/gshadow"
+        "/etc/subuid"
+        "/etc/subgid"
       ];
 
       # Per-user persistence

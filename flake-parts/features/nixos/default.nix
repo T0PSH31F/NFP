@@ -2,12 +2,14 @@
 # NixOS feature toggles - optional system functionality
 {
   imports = [
+    ./appimage.nix
+    ./desktop
+    ./flatpak.nix
     ./gaming.nix
-    ./virtualization.nix
     ./impermanence.nix
     ./mobile-support.nix
-    ./flatpak.nix
-    ./appimage.nix
+    ./packages
     ./performance.nix
+    ./virtualization.nix
   ];
 }

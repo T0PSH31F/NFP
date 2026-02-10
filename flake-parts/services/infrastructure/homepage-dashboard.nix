@@ -21,12 +21,15 @@ let
     else
       toString default;
 
-  # Check if service is enabled
+  # Check if service is enabled - with additional safety
   isServiceEnabled =
     service:
-    hasAttr service config.services
-    && hasAttr "enable" config.services.${service}
-    && config.services.${service}.enable;
+    (hasAttr service config.services)
+    && (hasAttr "enable" config.services.${service})
+    && (config.services.${service}.enable == true);
+
+  # Safe pathExists wrapper to prevent evaluation errors
+  safePathExists = path: builtins.pathExists path || false;
 in
 {
   options.services-config.homepage-dashboard = {
@@ -136,7 +139,7 @@ in
       services = [
         {
           "Media Services" = flatten [
-            (optional (pathExists "/var/lib/jellyfin") {
+            (optional (safePathExists "/var/lib/jellyfin") {
               "Jellyfin" = {
                 icon = "jellyfin.png";
                 href = "http://localhost:8096";
@@ -155,7 +158,7 @@ in
                 description = "E-Book Library";
               };
             })
-            (optional (pathExists "/var/lib/sonarr") {
+            (optional (safePathExists "/var/lib/sonarr") {
               "Sonarr" = {
                 icon = "sonarr.png";
                 href = "http://localhost:8989";
@@ -167,7 +170,7 @@ in
                 };
               };
             })
-            (optional (pathExists "/var/lib/radarr") {
+            (optional (safePathExists "/var/lib/radarr") {
               "Radarr" = {
                 icon = "radarr.png";
                 href = "http://localhost:7878";
@@ -179,7 +182,7 @@ in
                 };
               };
             })
-            (optional (pathExists "/var/lib/prowlarr") {
+            (optional (safePathExists "/var/lib/prowlarr") {
               "Prowlarr" = {
                 icon = "prowlarr.png";
                 href = "http://localhost:9696";
@@ -191,7 +194,7 @@ in
                 };
               };
             })
-            (optional (pathExists "/var/lib/bazarr") {
+            (optional (safePathExists "/var/lib/bazarr") {
               "Bazarr" = {
                 icon = "bazarr.png";
                 href = "http://localhost:6767";
@@ -241,7 +244,7 @@ in
                 };
               };
             })
-            (optional (pathExists "/var/lib/your-spotify") {
+            (optional (safePathExists "/var/lib/your-spotify") {
               "Your Spotify" = {
                 icon = "spotify.png";
                 href = "http://localhost:3457";
@@ -277,7 +280,7 @@ in
                 description = "Metrics Collection";
               };
             })
-            (optional (pathExists "/var/lib/loki") {
+            (optional (safePathExists "/var/lib/loki") {
               "Loki" = {
                 icon = "loki.png";
                 href = "http://localhost:3100";
@@ -416,7 +419,7 @@ in
                 description = "Container Management";
               };
             }
-            (optional (pathExists "/var/lib/matrix-synapse") {
+            (optional (safePathExists "/var/lib/matrix-synapse") {
               "Matrix Synapse" = {
                 icon = "matrix.png";
                 href = "http://localhost:8008";
@@ -470,10 +473,16 @@ in
       serviceConfig = {
         StateDirectory = mkForce [ ];
         ReadWritePaths = [ "/var/lib/homepage-dashboard" ];
+        Restart = "on-failure";
+        RestartSec = "5s";
       };
 
       # Ensure Docker socket access
-      after = [ "docker.socket" ];
+      after = [
+        "docker.socket"
+        "network-online.target"
+      ];
+      wants = [ "network-online.target" ];
       requires = mkIf config.virtualisation.docker.enable [ "docker.socket" ];
     };
 

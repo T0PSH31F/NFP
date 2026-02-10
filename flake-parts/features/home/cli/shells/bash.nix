@@ -21,11 +21,9 @@ in
         fi
 
         # Grandlix MOTD (Images Removed by request)
-        if command -v anifetch &>/dev/null; then
-          anifetch
-        elif command -v neofetch &>/dev/null; then
-          neofetch
-        fi
+        #if command -v neofetch &>/dev/null; then
+        #  neofetch
+        #fi
       '';
     };
   };

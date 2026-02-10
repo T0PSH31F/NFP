@@ -2,7 +2,6 @@
 {
   config,
   lib,
-  pkgs,
   ...
 }:
 
@@ -17,7 +16,7 @@ in
     };
 
     # Start yazelix-style environment command
-    programs.zsh.initExtra = lib.mkIf cfg.shells.zsh.enable ''
+    programs.zsh.initContent = lib.mkIf cfg.shells.zsh.enable ''
       yazelix() {
         if command -v zellij &> /dev/null; then
           zellij --layout compact

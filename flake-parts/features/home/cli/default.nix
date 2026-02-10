@@ -6,24 +6,25 @@ let
 in
 {
   imports = [
-    ./theming/matugen.nix
+    ./editors/fallbacks.nix
+    ./editors/helix.nix
+    ./file-managers/alternatives.nix
+    ./file-managers/yazi.nix
+    ./integrations/keybindings.nix
+    ./integrations/yazelix-style.nix
+    ./multiplexers/tmux.nix
+    ./multiplexers/zellij.nix
+    ./prompt/starship.nix
+    ./shells/bash.nix
     ./shells/common.nix
     ./shells/zsh.nix
-    ./shells/bash.nix
-    ./editors/helix.nix
-    ./editors/fallbacks.nix
-    ./file-managers/yazi.nix
-    ./file-managers/alternatives.nix
-    ./multiplexers/zellij.nix
-    ./multiplexers/tmux.nix
-    ./tools/modern-utils.nix
-    ./tools/git.nix
+    ./theming/matugen.nix
     ./tools/fzf.nix
+    ./tools/git.nix
+    ./tools/gpg.nix
+    ./tools/modern-utils.nix
     ./tools/nix-tools.nix
     ./tools/system-utils.nix
-    ./integrations/yazelix-style.nix
-    ./integrations/keybindings.nix
-    ./prompt/starship.nix
   ];
 
   options.programs.cli-environment = {

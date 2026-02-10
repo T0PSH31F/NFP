@@ -2,7 +2,6 @@
 {
   config,
   lib,
-  pkgs,
   ...
 }:
 
@@ -16,7 +15,7 @@ in
     # fzf-powered directory navigation (Ctrl+F)
     # fzf-powered file opening in helix (Ctrl+E)
 
-    programs.zsh.initExtra = lib.mkIf cfg.shells.zsh.enable ''
+    programs.zsh.initContent = lib.mkIf cfg.shells.zsh.enable ''
       # fzf-powered directory navigation
       fzf-cd() {
         local dir

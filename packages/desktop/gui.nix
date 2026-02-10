@@ -25,7 +25,6 @@
       thunar
 
       # Custom desktop tools from overlay
-      anifetch
       jerry
       lobster
       # vicinae # Build failing due to network fetch (glaze dependency)

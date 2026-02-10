@@ -95,7 +95,6 @@ in
       curl
       jq
       # For Python nodes
-      python3
     ];
 
     # Optional: Add a systemd service for health monitoring

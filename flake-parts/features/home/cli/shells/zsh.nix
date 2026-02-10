@@ -1,7 +1,6 @@
 # flake-parts/features/home/cli/shells/zsh.nix
 {
   config,
-  pkgs,
   lib,
   ...
 }:
@@ -13,7 +12,7 @@ in
   config = lib.mkIf (cfg.enable && cfg.shells.zsh.enable) {
     programs.zsh = {
       enable = true;
-      dotDir = ".config/zsh";
+      dotDir = "${config.xdg.configHome}/zsh";
       enableVteIntegration = true;
       autocd = true;
       enableCompletion = true;
@@ -44,7 +43,7 @@ in
         searchDownKey = "^N";
       };
 
-      initExtra = ''
+      initContent = ''
                 # p10k instant prompt
                 if [[ -r "${config.xdg.cacheHome}/p10k-instant-prompt-''${(%):-%n}.zsh" ]]; then
                     source "${config.xdg.cacheHome}/p10k-instant-prompt-''${(%):-%n}.zsh"

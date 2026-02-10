@@ -4,13 +4,12 @@
   pkgs,
   ...
 }:
-with lib;
 {
   options.themes.grub-lain = {
-    enable = mkEnableOption "Lain GRUB theme";
+    enable = lib.mkEnableOption "Lain GRUB theme";
   };
 
-  config = mkIf config.themes.grub-lain.enable {
+  config = lib.mkIf config.themes.grub-lain.enable {
     # Use the GRUB 2 boot loader with Lain theme
     boot.loader.grub = {
       enable = true;
@@ -25,8 +24,13 @@ with lib;
         pname = "lain-grub-theme";
         version = "1.0";
 
-        # Use local LainGrubTheme directory
-        src = ../../modules/nixos/themes/LainGrubTheme;
+        # Use fetchFromGitHub for reproducibility
+        src = pkgs.fetchFromGitHub {
+          owner = "uiriansan";
+          repo = "LainGrubTheme";
+          rev = "main"; # Use main branch as default
+          sha256 = "117872vbaj19ynnjf4j49zs7cf5z3d6xk1jdiha49wbnaai0sg40";
+        };
 
         installPhase = ''
           mkdir -p $out

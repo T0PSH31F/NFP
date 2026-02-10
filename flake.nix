@@ -2,28 +2,29 @@
   description = "Grandlix-Gang NixOS Configuration";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    flake-parts.url = "github:hercules-ci/flake-parts";
-    # ADD THIS - devenv integration
-
     clan-core = {
       url = "git+https://git.clan.lol/clan/clan-core";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-parts.follows = "flake-parts";
     };
+    flake-parts.url = "github:hercules-ci/flake-parts";
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    impermanence = {
-      url = "github:nix-community/impermanence";
-    };
-    sops-nix = {
-      url = "github:Mic92/sops-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     hyprland = {
       url = "github:hyprwm/Hyprland";
+    };
+    hyprland-plugins = {
+      url = "github:hyprwm/hyprland-plugins";
+      inputs.hyprland.follows = "hyprland";
+    };
+    hyprspace = {
+      url = "github:KZDKM/Hyprspace";
+      inputs.hyprland.follows = "hyprland";
+    };
+    impermanence = {
+      url = "github:nix-community/impermanence";
     };
     import-tree.url = "github:vic/import-tree";
     llm-agents = {
@@ -38,46 +39,45 @@
       url = "github:numtide/nixos-facter-modules";
     };
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
-    nixos-generators = {
-      url = "github:nix-community/nixos-generators";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    nur.url = "github:nix-community/NUR";
-    nvf = {
-      url = "github:NotAShelf/nvf";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     noctalia = {
       url = "github:noctalia-dev/noctalia-shell";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    sops-nix = {
+      url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     spicetify-nix = {
       url = "github:Gerg-L/spicetify-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
+    vicinae = {
+      url = "github:vicinaehq/vicinae";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    vicinae-extensions = {
+      url = "github:vicinaehq/extensions";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
     inputs@{
-      flake-parts,
       clan-core,
-
+      flake-parts,
       home-manager,
+      hyprland-plugins,
+      hyprspace,
       import-tree,
-      nvf,
       llm-agents,
       noctalia,
       spicetify-nix,
+      vicinae,
+      vicinae-extensions,
 
       ...
     }:
-    let
-      themeOverlays = import ./overlays/default.nix { inherit inputs; };
-      themeOverlay = final: prev: { };
-      customOverlay = import ./overlays/custom-packages.nix;
-      desktopOverlay = import ./overlays/desktop-packages.nix;
-    in
     flake-parts.lib.mkFlake { inherit inputs; } (
       {
         config,
@@ -88,7 +88,6 @@
         imports = [
           clan-core.flakeModules.default
           home-manager.flakeModules.home-manager
-          # Devenv module removed - see grandlix-devenvs repo
           ./flake-parts/clan-inventory.nix
         ];
 
@@ -103,10 +102,9 @@
             import inputs.nixpkgs {
               localSystem = system;
               config.allowUnfree = true;
-              overlays = [
-                inputs.nur.overlays.default
-                # desktop overlays moved to modules/nixos/overlays.nix
-                customOverlay
+              overrides = [
+                # custom/desktop overlays are handled in flake-parts/system/overlays.nix
+                (import ./overlays/custom-packages.nix)
               ];
             };
         };
@@ -139,26 +137,33 @@
               inherit system;
               config.allowUnfree = true;
               overlays = [
-                inputs.nur.overlays.default
-                # desktop overlays moved to modules/nixos/overlays.nix
-                customOverlay
+                (import ./overlays/custom-packages.nix)
               ];
             };
+            packages.iso =
+              (inputs.nixpkgs.lib.nixosSystem {
+                inherit system;
+                specialArgs = { inherit inputs; };
+                modules = [
+                  ./templates/iso/default.nix
+                ];
+              }).config.system.build.isoImage;
+
             devShells.default = pkgs.mkShell {
               packages = with pkgs; [
                 clan-core.packages.${system}.clan-cli
-                nil
-                nixfmt-tree
-                nixel
-                nix-top
-                nix-fast-build
-                nixpkgs-pytools
-                nixfmt
-                deadnix
-                statix
-                nix-search-cli
-                git
                 curl
+                deadnix
+                git
+                nil
+                nix-fast-build
+                nix-search-cli
+                nix-top
+                nixel
+                nixfmt
+                nixfmt-tree
+                nixpkgs-pytools
+                statix
               ];
 
               shellHook = ''
@@ -209,21 +214,7 @@
               '';
             };
 
-            # Image generation outputs using nixos-generators
-            # Temporarily commented out to fix base configuration first
-            # Uncomment after base system builds successfully
-            packages = {
-              # # Live ISO
-              iso = inputs.nixos-generators.nixosGenerate {
-                system = system;
-                specialArgs = { inherit inputs; };
-                modules = [
-                  ./templates/iso/default.nix
-                ];
-                format = "iso";
-              };
-
-            };
+            # Image generation outputs using nixos-generators removed
             checks =
               let
                 theme-tests = import ./tests/themes.nix {

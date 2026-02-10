@@ -1,10 +1,14 @@
-# flake-parts/services/media/default.nix
-# Media server and library management services
+{ ... }:
 {
   imports = [
-    ./media-stack.nix
+    ./adguard.nix
     ./calibre-web.nix
+    ./deluge.nix
     ./immich.nix
     ./komga.nix
+    ./media-stack.nix
+    ./pastebin.nix
+    ./searxng.nix
+    ./transmission.nix
   ];
 }

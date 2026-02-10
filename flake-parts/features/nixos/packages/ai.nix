@@ -1,15 +1,17 @@
-{ pkgs, ... }:
+# flake-parts/features/nixos/packages/ai.nix
 {
-  environment.systemPackages = with pkgs; [
-    # AI/ML tools
-    ollama
-
-    # Python ML stack (if not using devenv)
-    python311Packages.torch
-    python311Packages.transformers
-    python311Packages.langchain
-
-    # AI assistants/interfaces
-    # (note: many are services, not packages)
-  ];
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+let
+  hasTag = tag: builtins.elem tag (config.clan.core.tags or [ ]);
+in
+{
+  config = lib.mkIf (hasTag "ai-server") {
+    environment.systemPackages = with pkgs; [
+      ollama
+    ];
+  };
 }

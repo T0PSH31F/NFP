@@ -1,11 +1,6 @@
 # Live ISO Configuration
 #
 # Creates a bootable Live ISO with Grandlix-Gang configuration
-# Useful for:
-# - Installation media
-# - Recovery systems
-# - Demonstrations
-#
 # Build with: nix build .#packages.x86_64-linux.iso
 {
   lib,
@@ -18,99 +13,65 @@
   imports = [
     (modulesPath + "/installer/cd-dvd/installation-cd-minimal.nix")
 
-    # Full Grandlix-Gang modules
-    ../../modules/nixos/default.nix
-    ../../packages/default.nix
+    # Required external modules
+    inputs.clan-core.nixosModules.clanCore
+    inputs.sops-nix.nixosModules.sops
 
-    # User-specific configuration (shell, home-manager, etc.)
-    ../../modules/users/t0psh31f.nix
+    # New flake-parts based system core
+    ../../flake-parts/desktop
+    ../../flake-parts/features/nixos
+    ../../flake-parts/hardware
+    ../../flake-parts/system
+    ../../flake-parts/themes
 
-    # Laptop-specific optimizations
-    ../../modules/nixos/system/laptop.nix
+    # Use specialized user config for ISO
+    ../../flake-parts/users/t0psh31f.nix
+  ];
 
-    # Clan Modules for Tags
-    ../../modules/clan/tags.nix
-    ../../modules/clan/lib.nix
+  # Clan core settings for ISO
+  clan.core.settings.directory = "/etc/clan";
+  clan.core.settings.machine.name = "grandlix-live";
+  clan.core.tags = [
+    "desktop"
+    "laptop"
   ];
 
   # Disable ZFS to avoid broken kernel package errors
   boot.supportedFilesystems = lib.mkForce [
     "btrfs"
-    "vfat"
     "exfat"
     "ext4"
     "ntfs"
+    "vfat"
   ];
 
   networking.hostName = "grandlix-live";
 
-  clan.tags = [ "desktop" ];
-
   # ============================================================================
   # THEMES
   # ============================================================================
-  # Match z0r0's premium theme setup
   themes.sddm-sel = {
     enable = true;
     variant = "shaders";
   };
-  themes.sddm-lain.enable = lib.mkForce false;
   themes.plymouth-hellonavi.enable = true;
 
-  # ============================================================================
-  # RESOURCE LIMITS (Prevent OOM during install)
-  # ============================================================================
-  nix.settings.cores = 4;
-  nix.settings.max-jobs = 4;
-
-  # ============================================================================
+  # THEMES
   # ESSENTIAL INSTALLATION TOOLS
   # ============================================================================
   environment.systemPackages = with pkgs; [
-    # Installers
+    # ESSENTIAL INSTALLATION TOOLS
     calamares
-    gparted
     disko
+    gparted
+    hyprpolkitagent
     inputs.clan-core.packages.${pkgs.system}.clan-cli
 
-    # Editors
-    vim
-    nano
-    helix
-
-    # Network tools
-    networkmanager
-    wpa_supplicant
+    # Networking
     iwd
-    wget
-    curl
-    dnsutils
-    iw
     toybox
 
-    # Utilities
-    git
-    htop
-    tree
-    lsd
-    gotree
-    hyprpolkitagent
-    eza
-    bat
-    toybox
-    ripgrep
-    antigravity-fhs # User requested
-    thunar # User requested
-    thunar-volman
-    thunar-archive-plugin
-
-    # Disk tools
-    parted
-    ntfs3g
-    exfatprogs
-    btrfs-progs
-
-    # Terminal
+    # Terminals
     ghostty
     kitty
   ];
@@ -123,12 +84,11 @@
     wifi.backend = "iwd";
   };
   networking.wireless.iwd.enable = true;
-  networking.wireless.enable = lib.mkForce false; # Disable to use NetworkManager
+  networking.wireless.enable = lib.mkForce false;
 
   # ============================================================================
   # REPOSITORY INCLUSION
   # ============================================================================
-  # Include a clean copy of the configuration repository
   environment.etc."Grandlix-Gang".source = inputs.self;
 
   # ============================================================================
@@ -139,22 +99,9 @@
     settings.PermitRootLogin = "yes";
   };
 
-  services-config.avahi.enable = true;
-  services.llm-agents.enable = true;
-
-  # Internet fixes for Dell laptops
-  services.resolved.dnssec = "false";
-  boot.blacklistedKernelModules = [
-    "b43"
-    "bcma"
-    "brcmsmac"
-    "ssb"
-  ];
-
   # ============================================================================
   # LIVE USER CONFIGURATION
   # ============================================================================
-  # Set a default password for live user and root for fallback convenience
   users.users.nixos = {
     initialHashedPassword = lib.mkForce "$6$o5YE7K.oDW2Ow8iK$xxFnhKRYuM1EOaoQoyaV6VjsqkkVMf1hX/g9snl4nW1SjFFtREwmZljaOuU7H1IDsTueQIqcicGksJ34AO3Mj0";
   };
@@ -162,9 +109,7 @@
     initialHashedPassword = lib.mkForce "$6$o5YE7K.oDW2Ow8iK$xxFnhKRYuM1EOaoQoyaV6VjsqkkVMf1hX/g9snl4nW1SjFFtREwmZljaOuU7H1IDsTueQIqcicGksJ34AO3Mj0";
   };
 
-  # ============================================================================
   # ISO IMAGE SETTINGS
-  # ============================================================================
   isoImage = {
     squashfsCompression = "zstd";
     makeEfiBootable = true;

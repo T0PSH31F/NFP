@@ -1,11 +1,19 @@
 # flake-parts/hardware/default.nix
-# Hardware support modules - CPU, audio, Bluetooth, etc.
+# Hardware support modules
+{ ... }:
 {
   imports = [
-    ./intel.nix
-    ./intel-12th-gen.nix
     ./amd.nix
     ./audio.nix
     ./bluetooth.nix
+    ./common.nix
+    ./intel-12th-gen.nix
+    ./intel-7th-gen.nix
+    ./intel.nix
+    ./laptop.nix
+    ./nvidia-hybrid.nix
+    ./nvidia.nix
+    ./razer.nix
+    ./touchpad.nix
   ];
 }

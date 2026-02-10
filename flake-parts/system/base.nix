@@ -1,9 +1,18 @@
 {
   pkgs,
-  lib,
+  inputs,
   ...
 }:
 {
+  imports = [
+    inputs.home-manager.nixosModules.home-manager
+  ];
+
+  home-manager = {
+    useGlobalPkgs = true;
+    useUserPackages = true;
+  };
+
   # ============================================================================
   # SYSTEM CORE CONFIGURATION
   # ============================================================================
@@ -12,14 +21,14 @@
   # Bootloader
   boot.loader.systemd-boot = {
     enable = true;
-    configurationLimit = 2; # Aggressive limit to prevent /boot bloat
+    configurationLimit = 5; # Aggressive limit to prevent /boot bloat
   };
   boot.loader.efi.canTouchEfiVariables = true;
 
   boot.blacklistedKernelModules = [
-    "serial_core"
     "8250"
     "8250_pci"
+    "serial_core"
   ];
 
   boot.initrd.compressor = "zstd";
@@ -39,11 +48,6 @@
     LC_TIME = "en_US.UTF-8";
   };
 
-  # services.tailscale.enable = true; # Moved to service-distribution.nix
-  # services.udisks2.enable = true; # Moved to service-distribution.nix
-  # services.gvfs.enable = true; # Moved to service-distribution.nix
-
-  # Speed up builds and slim down system by disabling documentation
   documentation = {
     enable = false;
     nixos.enable = false;
@@ -57,75 +61,28 @@
   # ============================================================================
   environment.systemPackages = with pkgs; [
     # Boot/System essentials
+    btop
+    curl
+    fd
+    git
+    gotree
+    htop
+    jq
+    p7zip
+    pciutils
+    ripgrep
+    tmux
+    tree
+    unzip
+    usbutils
     vim
     wget
-    curl
-    git
-    pciutils
-    usbutils
+    zip
 
     # Container runtime for services
     docker
     docker-compose
   ];
 
-  # Flatpak Support - Moved to service-distribution.nix (tag: desktop)
-  # services.flatpak.enable = true;
-  # xdg.portal = { ... };
-
-  # ============================================================================
-  # FONTS
-  # ============================================================================
-  fonts = {
-    enableDefaultPackages = true;
-    packages = with pkgs; [
-      # User requested Nerd Fonts
-      nerd-fonts.jetbrains-mono
-      nerd-fonts.fira-code
-      nerd-fonts.gohufont
-
-      inter # Lighter replacement for Google Fonts meta-package
-      powerline-symbols
-      twemoji-color-font
-      material-design-icons
-      source-code-pro
-      source-serif-pro
-      source-sans-pro
-      creep
-      pixel-code
-      tamzen
-      tamsyn
-      font-awesome
-    ];
-
-    fontconfig = {
-      enable = true;
-      defaultFonts = {
-        serif = [
-          "pixel-code"
-          "Source Serif Pro"
-        ];
-
-        sansSerif = [
-          "Inter"
-          "FiraCode Nerd Font"
-        ];
-
-        monospace = [
-          "JetBrainsMono Nerd Font"
-          "FiraCode Nerd Font"
-          "Source Code Pro"
-        ];
-
-        emoji = [
-          "material-design-icons"
-          "material-icons"
-          "material-symbols"
-          "powerline-symbols"
-          "twemoji-color-font"
-        ];
-
-      };
-    };
-  };
+  programs.zsh.enable = true;
 }

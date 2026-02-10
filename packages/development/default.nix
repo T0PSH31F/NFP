@@ -29,9 +29,6 @@
       direnv
 
       # Languages
-      python3
-      python3Packages.pip
-      python3Packages.virtualenv
       poetry
       uv
       nodejs

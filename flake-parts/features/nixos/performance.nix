@@ -40,7 +40,7 @@
   };
 
   # Boot optimization
-  boot.initrd.systemd.enable = lib.mkDefault true;
+  boot.initrd.systemd.enable = lib.mkForce true;
   boot.initrd.compressor = lib.mkDefault "zstd";
   boot.initrd.compressorArgs = lib.mkDefault [
     "-19"
@@ -55,6 +55,10 @@
   boot.tmp.useTmpfs = lib.mkDefault true;
   boot.tmp.tmpfsSize = lib.mkDefault "4G";
   boot.tmp.cleanOnBoot = lib.mkDefault true;
+  # Explicitly enable dbus-broker (modern performance-oriented dbus implementation)
+  # This prevents deployment failure when switching from a system that already has it.
+  services.dbus.implementation = "broker";
+
   # Explicitly disable conflicting power services
   services.thermald.enable = lib.mkForce false;
   services.auto-cpufreq.enable = lib.mkForce false;

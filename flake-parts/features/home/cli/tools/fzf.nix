@@ -2,7 +2,6 @@
 {
   config,
   lib,
-  pkgs,
   ...
 }:
 
@@ -23,7 +22,7 @@ in
     };
 
     # Source Matugen theme if enabled
-    programs.zsh.initExtra = lib.mkIf (cfg.shells.zsh.enable && cfg.theming.enable) ''
+    programs.zsh.initContent = lib.mkIf (cfg.shells.zsh.enable && cfg.theming.enable) ''
       # Source FZF matugen theme
       [ -f ~/.config/fzf/matugen.conf ] && source ~/.config/fzf/matugen.conf
     '';

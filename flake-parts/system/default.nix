@@ -5,5 +5,11 @@
     ./base.nix
     ./nix-settings.nix
     ./networking.nix
+    ./nix-tools.nix
+    ./clan-lib.nix
+    ./fonts.nix
+    ./overlays.nix
+    ./stability.nix
+    ./core-programs.nix
   ];
 }

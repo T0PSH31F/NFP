@@ -1,8 +1,9 @@
 {
   imports = [
+    ./apps.nix
+    ./ghostty.nix
     ./hyprland.nix
     ./shikane.nix
-    ./ghostty.nix
-    ./apps.nix
+    ./vicinae.nix
   ];
 }

@@ -11,11 +11,11 @@
       enableDefaultPackages = lib.mkForce false;
 
       packages = with pkgs; [
-        nerd-fonts.jetbrains-mono
-        nerd-fonts.fira-code
-        inter
         font-awesome
+        inter
         material-design-icons
+        nerd-fonts.fira-code
+        nerd-fonts.jetbrains-mono
         noto-fonts-color-emoji
       ];
 

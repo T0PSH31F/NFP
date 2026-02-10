@@ -2,8 +2,6 @@
 # Main configuration for z0r0 laptop
 # Hardware-specific config in ./hardware.nix
 {
-  lib,
-  inputs,
   ...
 }:
 {
@@ -14,16 +12,7 @@
     # Hardware configuration (LUKS, filesystems, swap)
     ./hardware.nix
 
-    # Home Manager
-    inputs.home-manager.nixosModules.home-manager
-
-    # Legacy Clan Lib (required for packages/ modules)
-    ../../modules/clan/lib.nix
-
-    # Machine now managed by clan inventory for services
-    # See: flake-parts/clan-inventory.nix for service instances
-
-    # Core system modules from flake-parts
+    # Core system modules from flake-parts (includes base, nix-settings, networking, nix-tools, clan-lib, fonts, overlays)
     ../../flake-parts/system
     ../../flake-parts/hardware
     ../../flake-parts/themes
@@ -35,22 +24,8 @@
     ../../flake-parts/services/infrastructure
     ../../flake-parts/services/communication
 
-    # Clan modules replaced by clan-core and clan-inventory.nix
-    # ../../modules/clan/tags.nix
-    # ../../modules/clan/lib.nix
-    # ../../modules/clan/metadata.nix
-    # ../../modules/clan/service-distribution.nix
-    # ../../modules/clan/secrets.nix
-
-    # User configuration
-    ../../modules/users/t0psh31f.nix
-
-    # Packages and overlays
-    ../../packages/default.nix
-    ../../modules/nixos/overlays.nix
-
-    # Additional modules not yet migrated
-    ../../modules/nixos/nix-tools.nix
+    # User configuration (HM + user-specific system settings)
+    ../../flake-parts/users/t0psh31f.nix
   ];
 
   # ============================================================================
@@ -69,10 +44,8 @@
 
   # Themes
   themes = {
-    sddm-lainframe.enable = true;
-    sddm-lain.enable = false;
     sddm-sel = {
-      enable = false;
+      enable = true;
       variant = "shaders";
     };
 
@@ -159,23 +132,7 @@
   # ============================================================================
   sops.age.keyFile = "/home/t0psh31f/.config/sops/age/keys.txt";
 
-  # ============================================================================
-  # HOME-MANAGER CONFIGURATION
-  # ============================================================================
-  home-manager = {
-    backupFileExtension = "hm-backup";
-    extraSpecialArgs = { inherit inputs; };
-    users.t0psh31f = {
-      imports = [
-        ../../flake-parts/features/home
-      ];
-      programs.cli-environment.enable = true;
-    };
-  };
-
-  # Enable Yazelix System Module
-  # DISABLED: The yazelix flake input is missing homeManagerModules attribute causing build failure.
-  # modules.yazelix.enable = true;
+  # Home-manager basic settings are now in flake-parts/users/t0psh31f.nix
 
   # ============================================================================
   # ENVIRONMENT CONFIGURATION

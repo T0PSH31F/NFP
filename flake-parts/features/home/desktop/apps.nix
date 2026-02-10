@@ -23,12 +23,9 @@ in
       enable = true;
       package = inputs.noctalia.packages.${pkgs.system}.default;
       # settings = ../assets/noctalia-config.json; # Assuming relative path fix
-      # Wait, ../assets might not work if assets not moved? I moved them.
       settings = ../assets/noctalia-config.json;
     };
 
-    # NOTE: Noctalia templates... (omitted comment for brevity if identical)
-    # Ensure directories exist for templates
     home.file = {
       ".config/homepage/.keep".text = "";
       ".config/BraveSoftware/Brave-Browser/Default/User StyleSheets/.keep".text = "";
@@ -93,7 +90,7 @@ in
     gtk = {
       enable = true;
       theme = {
-        name = "Adwaita-dark";
+        name = "adw-gtk3-dark";
         package = pkgs.adw-gtk3;
       };
       iconTheme = {

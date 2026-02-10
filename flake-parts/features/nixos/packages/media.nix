@@ -1,19 +1,22 @@
-{ pkgs, ... }:
+# flake-parts/features/nixos/packages/media.nix
 {
-  environment.systemPackages = with pkgs; [
-    # Media servers/downloaders
-    # (most are services, not packages)
-
-    # Media processing
-    ffmpeg-full
-    imagemagick
-
-    # Downloaders
-    yt-dlp
-    transmission_4
-    deluge
-
-    # Streaming tools
-    obs-studio
-  ];
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+let
+  hasTag = tag: builtins.elem tag (config.clan.core.tags or [ ]);
+in
+{
+  config = lib.mkIf (hasTag "media-server") {
+    environment.systemPackages = with pkgs; [
+      deluge
+      ffmpeg-full
+      imagemagick
+      obs-studio
+      transmission_4
+      yt-dlp
+    ];
+  };
 }

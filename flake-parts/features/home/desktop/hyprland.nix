@@ -3,11 +3,115 @@
   lib,
   pkgs,
   osConfig,
+  inputs,
   ...
 }:
 with lib;
 let
   cfg = config.desktop.hyprland;
+
+  hypr-keybind-cheatsheet = pkgs.writeShellScriptBin "hypr-keybind-cheatsheet" ''
+      #!/usr/bin/env bash
+      CHEATSHEET="
+    📱 LAUNCHERS & SHELL
+    ─────────────────────────────────────────
+    Super + A                  Noctalia Launcher
+    Super + Space              Vicinae Launcher (Fast)
+    Super                      Hyprspace Overview (Workspaces)
+    Super + X                  Control Center
+    Super + Comma              Settings
+    Super + L                  Lock Screen
+    Ctrl + Alt + Del           Session Menu
+    Super + Shift + N          Notification Center
+    Super + /                  This Cheatsheet
+
+    🪟 WINDOW MANAGEMENT
+    ─────────────────────────────────────────
+    Super + Q                  Kill Active Window
+    Super + F                  Fullscreen
+    Super + Shift + F          Maximize
+    Super + Arrows             Move Focus
+    Super + Shift + Arrows     Move Window
+    Super + Mouse (Left)       Move Window
+    Super + Mouse (Right)      Resize Window
+    Super + -/=                Split Ratio
+    Alt + Tab                  Cycle Windows
+
+    🖥️ WORKSPACES
+    ─────────────────────────────────────────
+    Super + 1-9/0              Switch to Workspace
+    Super + Shift + 1-9/0      Move to Workspace
+    Super + Alt + 1-9/0        Move Silently
+    Super + Ctrl + Left/Right  Previous/Next Workspace
+    Super + Mouse Wheel        Scroll Workspaces
+    Super + Shift + S          Toggle Special Workspace
+
+    🎮 SCRATCHPADS
+    ─────────────────────────────────────────
+    Alt + T or Alt + Enter     Ghostty Dropdown Terminal
+    Super + H                  Gedit Scratchpad
+    Super + Shift + E          nwg-look GTK Themes
+
+    🚀 APPLICATIONS
+    ─────────────────────────────────────────
+    Super + T or Return        Ghostty Terminal
+    Super + Shift + T          Kitty Terminal
+    Super + Shift + Return     Warp Terminal
+    Super + W                  Brave Browser
+    Super + Ctrl + W           LibreWolf Browser
+    Super + Shift + W          Mullvad Browser
+    Super + E                  Thunar File Manager
+    Super + Ctrl + E           SuperFile (Terminal)
+    Super + Y                  Yazelix Editor
+    Super + Shift + Y          Yazi File Browser
+    Super + M                  Spotify
+
+    🎨 YAZELIX EDITOR
+    ─────────────────────────────────────────
+    Within Yazelix:
+    Space                      Command Palette
+    Space + f                  Find Files
+    Space + /                  Search in Files
+    Space + b                  Buffer List
+    Space + w                  Save File
+    Space + q                  Quit
+    Ctrl + h/j/k/l             Navigate Splits
+    g + d                      Go to Definition
+    g + r                      Find References
+    Space + e                  File Explorer Toggle
+    Space + g                  Git Status
+
+    📸 SCREENSHOTS
+    ─────────────────────────────────────────
+    Print                      Noctalia Screenshot
+    Shift + Print              Flameshot Full Screen
+    Ctrl + Print               Flameshot GUI
+
+    🎵 MEDIA CONTROLS
+    ─────────────────────────────────────────
+    Alt + 4                    Previous Track
+    Alt + 5                    Play/Pause
+    Alt + 6                    Next Track
+    Alt + 1                    Rewind 2s
+    Alt + 3                    Forward 2s
+    Alt + 7                    Volume Down
+    Alt + 9                    Volume Up
+    XF86 Media Keys            Also Supported
+
+    💡 HINTS
+    ─────────────────────────────────────────
+    • Hyprspace (Super) shows all workspaces
+    • Vicinae is faster for app launching
+    • Noctalia provides system integration
+    • Use scratchpads for quick access
+    • Yazelix is Helix-based modal editor
+    "
+      echo "$CHEATSHEET" | ${pkgs.rofi-wayland}/bin/rofi -dmenu \
+        -p "Hyprland Keybinds" \
+        -theme-str 'window {width: 55%; height: 90%;}' \
+        -theme-str 'listview {columns: 1;}' \
+        -theme-str 'element-text {font: "monospace 9";}'
+  '';
 in
 {
   options.desktop.hyprland = {
@@ -20,45 +124,47 @@ in
 
   config = mkIf cfg.enable {
     home.packages = with pkgs; [
-      hyprlandPlugins.hypr-dynamic-cursors
-      rofi
-      dunst
-      swayimg
-      swaynotificationcenter
-      libnotify
-      wl-clipboard
-      grim
-      slurp
+      adw-gtk3
       cliphist
-      swww
-      hueadm
-      hue-plus
-      openhue-cli
-      kitty
-      ghostty
-      warp-terminal
-      nemo-with-extensions
-      steam-rom-manager
-      rose-pine-hyprcursor
-      hyprpolkitagent
-      xdg-utils
-      xdg-user-dirs
+      dunst
       gedit
-      pyprland
+      ghostty
+      grim
+      hue-plus
+      hueadm
+      hypr-keybind-cheatsheet
+      hyprpolkitagent
+      inputs.hyprland-plugins.packages.${pkgs.system}.hypr-dynamic-cursors
+      inputs.hyprspace.packages.${pkgs.system}.Hyprspace
+      kitty
+      libnotify
+      nemo-with-extensions
+      nwg-look
+      openhue-cli
       playerctl
+      pyprland
       pywalfox-native
       qt6Packages.qt6ct
-      nwg-look
-      adw-gtk3
+      rofi
+      rose-pine-hyprcursor
+      slurp
+      steam-rom-manager
+      swayimg
+      swaynotificationcenter
+      swww
+      warp-terminal
+      wl-clipboard
+      xdg-user-dirs
+      xdg-utils
     ];
 
     wayland.windowManager.hyprland = {
       enable = true;
-      # Use nixpkgs version to ensure plugin compatibility (fixes hypr-dynamic-cursors)
-      # package = inputs.hyprland.packages.${pkgs.system}.hyprland;
+      package = inputs.hyprland.packages.${pkgs.system}.hyprland;
       systemd.enable = false;
       plugins = [
-        pkgs.hyprlandPlugins.hypr-dynamic-cursors
+        inputs.hyprland-plugins.packages.${pkgs.system}.hypr-dynamic-cursors
+        inputs.hyprspace.packages.${pkgs.system}.Hyprspace
       ];
 
       settings = {
@@ -96,6 +202,32 @@ in
 
             shaperule = "default, rotate, rotate:offset: $cursorRot";
           };
+
+          overview = {
+            centerAligned = true;
+            hideBackgroundLayers = true;
+            hideTopLayers = true;
+            hideOverlayLayers = false;
+            showNewWorkspace = true;
+            showEmptyWorkspace = false;
+            showSpecialWorkspace = true;
+            exitOnClick = true;
+            switchOnDrop = true;
+            exitOnSwitch = false;
+            drawActiveWorkspace = true;
+            reverseSwipe = true;
+            workspaceMargin = 15;
+            reservedArea = 96;
+            panelColor = "rgba(0, 0, 0, 0.7)";
+            panelBorderColor = "rgba(255, 255, 255, 0.5)";
+            activeWorkspaceColor = "rgba(242, 143, 173, 0.3)";
+            inactiveWorkspaceColor = "rgba(87, 82, 104, 0.3)";
+            dragAlpha = 0.3;
+            workspaceActiveBackground = "rgba(49, 50, 68, 1)";
+            workspaceInactiveBackground = "rgba(31, 32, 46, 1)";
+            workspaceActiveBorder = "rgba(242, 143, 173, 1)";
+            workspaceInactiveBorder = "rgba(87, 82, 104, 1)";
+          };
         };
 
         windowrule = [
@@ -104,8 +236,9 @@ in
         bind = lib.mkAfter [
           "SUPER, A, exec, $ipc launcher toggle"
           "SUPER, Space, exec, vicinae"
+          "SUPER, SUPER_L, overview:toggle"
+          "SUPER, slash, exec, hypr-keybind-cheatsheet"
 
-          "SUPER, D, exec, noctalia-shell ipc overview"
           "SUPER, X, exec, noctalia-shell ipc control-center"
           "SUPER, L, exec, noctalia-shell ipc lock"
           "CTRL ALT, Delete, exec, noctalia-shell ipc session-menu"
@@ -122,8 +255,6 @@ in
           "ALT, 6, exec, noctalia-shell ipc media next"
           "ALT, 7, exec, noctalia-shell ipc volume -3"
           "ALT, 9, exec, noctalia-shell ipc volume +3"
-
-          ", Print, exec, noctalia-shell ipc screenshot"
 
           "SUPER SHIFT, Tab, exec, noctalia-shell ipc overview"
 
