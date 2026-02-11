@@ -144,6 +144,10 @@ in
       input_path = '~/.config/matugen/templates/waybar.css'
       output_path = '~/.config/waybar/colors.css'
       post_hook = 'pkill -SIGUSR2 waybar'
+
+      [templates.vivid]
+      input_path = '~/.config/matugen/templates/vivid.yml'
+      output_path = '~/.config/matugen/vivid.yml'
     '';
   };
 }

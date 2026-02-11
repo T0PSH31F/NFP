@@ -1,0 +1,24 @@
+Error while executing:$ clan select 'clanInternals.?secrets.?age.?plugins'
+$ clan select 'clanInternals.inventoryClass.relativeDirectory'
+$ clan select 'clanInternals.machines.x86_64-linux.{z0r0}.config.clan.core.vars.generators.*.{share,dependencies,prompts,validationHash}'
+$ clan select 'clanInternals.machines.x86_64-linux.{z0r0}.config.clan.core.vars.generators.*.files.*.{secret,deploy,owner,group,mode,neededFor}'
+$ clan select 'clanInternals.machines.x86_64-linux.{z0r0}.config.clan.core.?sops.?defaultGroups'
+$ clan select 'clanInternals.machines.x86_64-linux.{z0r0}.config.clan.core.vars.settings.publicModule'
+$ clan select 'clanInternals.machines.x86_64-linux.{z0r0}.config.clan.core.vars.settings.secretModule'
+$ clan select 'clanInternals.machines.x86_64-linux.{z0r0}.config.clan.core.vars.?sops.?secretUploadDirectory'
+$ clan select 'clanInternals.machines.x86_64-linux.{z0r0}.config.clan.core.vars.?password-store.?passCommand'
+$ clan select 'clanInternals.machines.x86_64-linux.{z0r0}.config.clan.core.vars.?password-store.?secretLocation'
+$ clan select 'clanInternals.machines.x86_64-linux.{z0r0}.config.clan.deployment.requireExplicitUpdate'
+$ clan select 'clanInternals.machines.x86_64-linux.{z0r0}.config.system.clan.deployment.nixosMobileWorkaround'
+  Reason: The option `Programs' does not exist. Definition values:
+       - In `/nix/store/802vypijafpv4dg3zbz3q83ybzmbwbny-source/flake-parts/features/nixos/virtualization.nix':
+           {
+             _type = "if";
+             condition = true;
+             content = {
+               extra-container = {
+           ...
+
+       Did you mean `programs', `fonts' or `jobs'?
+
+Return Code: 1. Use flag '--debug' to see full nix trace.

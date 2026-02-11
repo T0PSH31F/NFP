@@ -119,13 +119,10 @@ with lib;
         # SOPS age key
         "/var/lib/sops-nix/key.txt"
 
-        # User and group database files (CRITICAL for password persistence)
+        # User and group database files
         "/etc/passwd"
         "/etc/shadow"
         "/etc/group"
-        "/etc/gshadow"
-        "/etc/subuid"
-        "/etc/subgid"
       ];
 
       # Per-user persistence
@@ -195,61 +192,23 @@ with lib;
           ".bash_history"
           ".zsh_history"
 
-          # Git configuration
-          ".gitconfig"
+          # facter.json
           "facter.json"
         ];
       };
     };
 
     # Ensure proper permissions for service directories
+    # Only create directories for services that are actually enabled on this machine
     systemd.tmpfiles.rules = [
-      # AI services
-      "d /persist/var/lib/ollama 0750 ollama ollama"
-      "d /persist/var/lib/localai 0750 localai localai"
-      "d /persist/var/lib/chromadb 0750 chromadb chromadb"
-
-      # Databases
-      "d /persist/var/lib/postgresql 0750 postgres postgres"
-      "d /persist/var/lib/redis 0750 redis redis"
-
-      # Communication
-      "d /persist/var/lib/matrix-synapse 0750 matrix-synapse matrix-synapse"
-
-      # Cloud
-      "d /persist/var/lib/nextcloud 0750 nextcloud nextcloud"
-
-      # Home Assistant
-      "d /persist/var/lib/home-assistant 0750 hass hass"
-
-      # n8n
-      "d /persist/var/lib/n8n 0750 n8n n8n"
-
-      # Web server
-      "d /persist/var/lib/caddy 0750 caddy caddy"
-
-      # Media
-      "d /persist/var/lib/immich 0750 immich immich"
-      "d /persist/var/lib/calibre-web 0750 calibre-web calibre-web"
-
-      # Downloads
-      "d /persist/var/lib/deluge 0750 deluge deluge"
-      "d /persist/var/lib/transmission 0750 transmission transmission"
-      "d /persist/var/lib/aria2 0750 aria2 aria2"
-
-      # Binary cache
-      "d /persist/var/lib/harmonia 0750 harmonia harmonia"
-
-      # Containers
-      "d /persist/var/lib/docker 0710 root root"
+      # Core persistence directory
+      "d ${config.system-config.impermanence.persistPath} 0755 root root -"
 
       # User home persistence
       "d /persist/home/t0psh31f 0700 t0psh31f users"
       "d /persist/home/t0psh31f/.ssh 0700 t0psh31f users"
       "d /persist/home/t0psh31f/.gnupg 0700 t0psh31f users"
 
-      # Root persistence directory
-      "d ${config.system-config.impermanence.persistPath} 0755 root root -"
     ];
 
     # ============================================================================

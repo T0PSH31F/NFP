@@ -87,6 +87,7 @@ in
       hyperfine
       tealdeer
       trash-cli
+      trippy
     ];
   };
 }

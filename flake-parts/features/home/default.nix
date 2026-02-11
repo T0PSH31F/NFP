@@ -5,6 +5,7 @@
     ./cli
     ./core.nix
     ./desktop
+    ./documents/default.nix
     ./dev-tools.nix
     ./gaming-apps.nix
     ./pentest-tools.nix

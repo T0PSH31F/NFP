@@ -35,6 +35,10 @@ in
       swappy
       wf-recorder
       wl-clipboard
+
+      # Icons
+      candy-icons
+      hicolor-icon-theme
     ];
   };
 }

@@ -10,6 +10,5 @@
     ./fonts.nix
     ./overlays.nix
     ./stability.nix
-    ./core-programs.nix
   ];
 }

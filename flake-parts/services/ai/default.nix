@@ -4,7 +4,6 @@
   imports = [
     ./ai-services.nix
     ./llm-agents.nix
-    ./n8n.nix
     ./sillytavern.nix
   ];
 }

@@ -3,17 +3,26 @@
 { ... }:
 {
   imports = [
-    ./amd.nix
-    ./audio.nix
-    ./bluetooth.nix
+    # Base
     ./common.nix
+
+    # CPU (Intel or AMD)
+    ./amd.nix
     ./intel-12th-gen.nix
     ./intel-7th-gen.nix
     ./intel.nix
-    ./laptop.nix
+
+    # GPU (AMD, Intel, Nvidia)
     ./nvidia-hybrid.nix
     ./nvidia.nix
+
+    # Peripheral (Audio, Bluetooth, Controller)
+    ./audio.nix
+    ./bluetooth.nix
     ./razer.nix
+
+    # Device (Desktop, Laptop, Touchscreen)
+    ./laptop.nix
     ./touchpad.nix
   ];
 }

@@ -1,7 +1,14 @@
-# Live ISO Configuration
+# Live ISO Configuration (The "Going-Merry" Blueprint)
 #
-# Creates a bootable Live ISO with Grandlix-Gang configuration
-# Build with: nix build .#packages.x86_64-linux.iso
+# This template creates a bootable Live ISO with the Grandlix-Gang configuration.
+# Use it for initial installations, system recovery, or showing off your setup.
+#
+# Build:
+#   nix build .#packages.x86_64-linux.iso
+#
+# Burn to USB:
+#   dd if=result/iso/Going-Merry.iso of=/dev/sdX bs=4M status=progress conv=fsync
+#
 {
   lib,
   pkgs,
@@ -18,7 +25,6 @@
     inputs.sops-nix.nixosModules.sops
 
     # New flake-parts based system core
-    ../../flake-parts/desktop
     ../../flake-parts/features/nixos
     ../../flake-parts/hardware
     ../../flake-parts/system
@@ -30,7 +36,7 @@
 
   # Clan core settings for ISO
   clan.core.settings.directory = "/etc/clan";
-  clan.core.settings.machine.name = "grandlix-live";
+  clan.core.settings.machine.name = "Going-Merry";
   clan.core.tags = [
     "desktop"
     "laptop"
@@ -45,7 +51,7 @@
     "vfat"
   ];
 
-  networking.hostName = "grandlix-live";
+  networking.hostName = "Going-Merry";
 
   # ============================================================================
   # THEMES
@@ -110,6 +116,8 @@
   };
 
   # ISO IMAGE SETTINGS
+  image.fileName = "Going-Merry";
+
   isoImage = {
     squashfsCompression = "zstd";
     makeEfiBootable = true;

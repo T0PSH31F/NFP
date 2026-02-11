@@ -25,6 +25,7 @@ in
     ./tools/modern-utils.nix
     ./tools/nix-tools.nix
     ./tools/system-utils.nix
+    ./vivid.nix
   ];
 
   options.programs.cli-environment = {
@@ -72,5 +73,11 @@ in
 
   config = lib.mkIf cfg.enable {
     programs.cli-environment.theming.matugen.enable = cfg.theming.enable;
+
+    programs.vivid.matugen = {
+      enable = true;
+      outputColorMode = "24-bit";
+      # matugenIntegration is implied by enabling this module
+    };
   };
 }

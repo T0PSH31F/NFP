@@ -5,119 +5,149 @@
 #   2. Edit machines/newmachine/default.nix with your settings
 #   3. Generate hardware config: nixos-generate-config --root /mnt --show-hardware-config > machines/newmachine/hardware-configuration.nix
 #   4. Add to clan.nix inventory and machines sections
-#   5. Build and deploy!
+#   5. Build and deploy! (clan machines update newmachine)
+
 {
+  config,
+  pkgs,
+  lib,
+  inputs,
   ...
 }:
+
 {
   imports = [
     ./hardware-configuration.nix
-    ../../modules/nixos/default.nix
-    ../../modules/Home-Manager/Desktop-env/default.nix
-    ../../modules/users/t0psh31f.nix # Change to your user
+
+    # Core system setup (includes basic packages, networking, etc.)
+    ../../flake-parts/system
+
+    # Feature toggles (Dendritic Pattern)
+    ../../flake-parts/features/nixos
+
+    # Theming system
+    ../../flake-parts/themes
   ];
 
   # ============================================================================
-  # BASIC CONFIGURATION
+  # CLAN INVENTORY & TAGS
+  # ============================================================================
+  # Tags control automatic feature activation and role assignment in clan-inventory.nix
+  clan.core.tags = [
+    # "desktop"      # Enables Hyprland, GUI apps, fonts
+    # "laptop"       # Enables power management, touchpad, wifi
+    # "server"       # Headless server optimizations
+    # "ai-server"    # Enables Ollama and AI tools
+    # "media-server" # Enables Arr suite and media tools
+    # "dev"          # Enables compilers and dev tools
+    # "gaming"       # Enables Steam and emulators
+    # "nvidia"       # Enables Nvidia drivers (hardware/nvidia.nix required)
+    # "amd"          # Enables AMD optimizations
+  ];
+
+  # ============================================================================
+  # BASIC MACHINE SETTINGS
   # ============================================================================
 
-  networking.hostName = "CHANGEME"; # Set your hostname
-
+  networking.hostName = "CHANGEME"; # Set your hostname here for local files
   system.stateVersion = "25.05"; # Don't change after initial install
 
   # ============================================================================
-  # FEATURE TOGGLES (Dendritic Pattern - Nested Attrsets)
+  # NIXOS FEATURE TOGGLES
   # ============================================================================
 
-  config = {
-    # Desktop environments (choose one or enable multiple)
-    desktop = {
-      noctalia = {
-        enable = true;
-        backend = "hyprland";
-      };
-    };
+  # Impermanence (Ephemeral Root)
+  system-config.impermanence = {
+    enable = false;
+    persistPath = "/persist";
+  };
 
-    # Programs
-    programs = {
-      yazelix.enable = false; # Yazi + Helix integration
-      keybind-cheatsheet.enable = false; # Super+B keybind overlay
-      pentest.enable = false; # Penetration testing tools
-    };
+  # Gaming support
+  gaming = {
+    enable = false;
+    enableSteam = true;
+    enableGamemode = true;
+    enableEmulators = false;
+  };
 
-    # Themes
-    themes = {
-      sddm-lain.enable = false;
-      sddm-sel.enable = false;
-      grub-lain.enable = false;
-      plymouth-matrix.enable = false;
-      plymouth-hellonavi.enable = false;
-    };
+  # Virtualization (QEMU, Docker, Podman)
+  virtualization.enable = false;
 
-    # Mobile device support
-    mobile = {
-      android.enable = false;
-      ios.enable = false;
-    };
+  # Flatpak
+  flatpak = {
+    enable = false;
+    # packages = [ "com.discordapp.Discord" ];
+  };
 
-    # System tools
-    nix-tools.enable = false; # Nix development tools
-    desktop-portals.enable = false; # XDG desktop portals
+  # AppImage support
+  programs.appimage-support.enable = false;
 
-    # Gaming & Virtualization
-    gaming.enable = false; # Master toggle for all gaming features
-    virtualization.enable = false; # Docker, Podman, QEMU/KVM
-
-    # Flatpak & AppImage
-    flatpak.enable = false;
-    programs.appimage-support.enable = false;
+  # Mobile Device Support
+  mobile = {
+    android.enable = false;
+    ios.enable = false;
   };
 
   # ============================================================================
-  # SERVICE TOGGLES (Dendritic Pattern - Nested Attrsets)
+  # SERVICE TOGGLES
   # ============================================================================
 
+  # AI Services (Comprehensive Suite)
+  services.ai-services = {
+    enable = false;
+    ollama.enable = false;
+    open-webui.enable = false;
+    sillytavern.enable = false;
+    postgresql.enable = false; # For vector DBs
+    qdrant.enable = false;
+    chromadb.enable = false;
+    localai.enable = false;
+    jan.enable = false;
+    cherry-studio.enable = false;
+    aider.enable = false;
+  };
+
+  # Infrastructure Services
+  services-config = {
+    homepage-dashboard.enable = false;
+    monitoring.enable = false;
+    avahi.enable = true; # Local network discovery
+    media-stack.enable = false; # Arr suite (Sonarr, Radarr, etc.)
+  };
+
+  # Communication & Media Services
   services = {
-    # Desktop services
-    ssh-agent.enable = false;
-
-    # AI & LLM
-    llm-agents.enable = false;
-
-    # Infrastructure
-    home-assistant-server.enable = false;
-    caddy-server.enable = false;
-    sillytavern-app.enable = false;
-
-    # AI Services
-    ai-services = {
-      enable = false; # Enables PostgreSQL vector DB
-      # open-webui.enable = false;
-      # localai.enable = false;
-      # chromadb.enable = false;
-    };
-
-    # Media & Cloud
-    immich-server.enable = false;
-    calibre-web-app.enable = false;
-    nextcloud-server.enable = false;
-
-    # Communication
     matrix-server.enable = false;
     mautrix-bridges.enable = false;
-  };
-
-  # Services config (separate namespace)
-  services-config = {
-    media-stack.enable = false;
-    avahi.enable = false;
-    monitoring.enable = false;
+    immich-server.enable = false;
+    nextcloud-server.enable = false;
+    calibre-web-app.enable = false;
+    ssh-agent.enable = true;
   };
 
   # ============================================================================
-  # ADDITIONAL FEATURES
+  # HOME MANAGER / USER CONFIGURATION
   # ============================================================================
 
-  # services.flatpak.enable = false;
-  # programs.appimage.enable = false;
+  # User activation in flake-parts/users/t0psh31f.nix handles most things,
+  # but you can override or add specific per-machine user settings here.
+
+  home-manager.users.t0psh31f =
+    { config, ... }:
+    {
+      # Desktop Environment Toggles
+      desktop = {
+        hyprland.enable = builtins.elem "desktop" (config.osConfig.clan.core.tags or [ ]);
+        vicinae.enable = builtins.elem "desktop" (config.osConfig.clan.core.tags or [ ]);
+      };
+
+      # CLI Environment Toggles
+      programs.cli-environment = {
+        enable = true;
+        theming.enable = true;
+        modernTools.enable = true;
+        nixTools.enable = true;
+        shells.zsh.enable = true;
+      };
+    };
 }

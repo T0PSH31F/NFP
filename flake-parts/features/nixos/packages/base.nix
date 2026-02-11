@@ -27,7 +27,7 @@
     which
 
     # Development basics
-    git
+    # git (Installed via gitFull in dev-packages or other suites)
 
     # Disk management
     btrfs-progs

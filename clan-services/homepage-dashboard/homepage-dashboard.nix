@@ -23,5 +23,5 @@
   };
 
   # Import the actual module
-  imports = [ ../modules/nixos/services/homepage-dashboard.nix ];
+  imports = [ ../../flake-parts/services/infrastructure/homepage-dashboard.nix ];
 }

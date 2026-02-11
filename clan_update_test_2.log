@@ -1,0 +1,854 @@
+[z0r0] copying 0 paths...
+[z0r0] $ export NIX_SSHOPTS=-A; nixos-rebuild switch --show-trace --option keep-going true --option accept-flake-config true -L --flake /nix/store/6jbc2ffh9zmrh6cdn8cy5dyj1gj1yxdl-source#z0r0 --fast --build-host 
+[z0r0] nixos-rebuild: warning: --fast is deprecated, use --no-reexec instead
+[z0r0] building the system configuration...
+[z0r0] these 72 derivations will be built:
+[z0r0]   /nix/store/03rsarvc9z3fiy1rizy6pn31zfr261xs-services.yaml.drv
+[z0r0]   /nix/store/fd6c1bdsk09rzid9ylw77s5hix9psxyf-ld-library-path.drv
+[z0r0]   /nix/store/rkc3b7511gbd09hjqd67mzdl2my0i0l3-sddm-wrapped.drv
+[z0r0]   /nix/store/2qqy677fvmwylyx3b3hjcr8p05q1wnam-system-path.drv
+[z0r0]   /nix/store/jl0pminc6bx5qq03kf0fb959iivnfa6l-dbus-1.drv
+[z0r0]   /nix/store/7wh58w579qr1s2r5skb222yy75jx42vf-X-Restart-Triggers-dbus-broker.drv
+[z0r0]   /nix/store/09g9ifvjqy19gyrqqisy824fc6iwvp9h-unit-dbus-broker.service.drv
+[z0r0]   /nix/store/249r09rci0758xbgnc0pwjd6g3h132j0-ensure-all-wrappers-paths-exist.drv
+[z0r0]   /nix/store/s82axjxpib8wzilgap9vx84xqsdbby2w-unbindOrUnlink-persist-etc-subuid.drv
+[z0r0]   /nix/store/2bl1qm4f84bkdisrawlxs7g26wg0glaq-unit-persist-persist-etc-subuid.service.drv
+[z0r0]   /nix/store/4ps8wd2b5r41banx4girp4r9xlmbb267-dummy-xdg-mime-dirs1.drv
+[z0r0]   /nix/store/967da42izgzhj1g4diclpknn9wknq3q9-dummy-xdg-mime-dirs2.drv
+[z0r0]   /nix/store/l143phw6skxxj5n0armfgm5jb76y43h1-dummy-fc-dir2.drv
+[z0r0]   /nix/store/xiwm87nav7cfsmqhnk55hwwqm05p2v15-hm-session-vars.sh.drv
+[z0r0]   /nix/store/xk6nlhmyg7yvfsdv7sailziyxn5mix7l-dummy-fc-dir1.drv
+[z0r0]   /nix/store/3zyy0jpbq73p6bf4kkby1fdz3swish9n-home-manager-path.drv
+[z0r0]   /nix/store/4r0hcssxx8ygif7yiz1xm7k6n3krn1k7-activation-script.drv
+[z0r0]   /nix/store/9ndg2b0xalxygxvi3fjyvjmqndb9nf19-gpg-agent-ssh.socket.drv
+[z0r0]   /nix/store/ah4l67h4qc9l7w016n3d18yycma01qgs-hm_fontconfigconf.d10hmfonts.conf.drv
+[z0r0]   /nix/store/mvn9s21fgzz006nww5bjhy1fjl2r2snc-hm_.configzsh.zshrc.drv
+[z0r0]   /nix/store/nd7lxjpjyycyyxhdqavf8w6y8g6x8pzk-hm_.configzsh.zshenv.drv
+[z0r0]   /nix/store/s3j8an88j6vps60cy455yv765xaqz9ic-manifest.json.drv
+[z0r0]   /nix/store/r34664vbhxnnpwg2plb0g4zizj8rc0pc-sops-nix-user.drv
+[z0r0]   /nix/store/pfsl4i0pksbdr449f3igds0d311aybqv-sops-nix.service.drv
+[z0r0]   /nix/store/s4q509c46hkya1aivfya99hhkgy65l9d-hm_homet0psh31f.gnupggpgagent.conf.drv
+[z0r0]   /nix/store/qcl2qyjx4w95sf4kpis5qi6p05lw7sf4-home-manager-files.drv
+[z0r0]   /nix/store/vvam5qw33wld3iqrs4g54zqsla4mc44f-home-manager-generation.drv
+[z0r0]   /nix/store/2yxqdaylk4qdh2rdajxdsgd4q4z5jl7f-unit-home-manager-t0psh31f.service.drv
+[z0r0]   /nix/store/ig421d2q6ma9d96dv7g3cqsgkqaav9rr-unbindOrUnlink-persist-etc-gshadow.drv
+[z0r0]   /nix/store/4hcf42wixsxgr6x09gvjbcamw6pn7hcn-unit-persist-persist-etc-gshadow.service.drv
+[z0r0]   /nix/store/65c2psflyfcvb6xfz84v4fhkwswff6z8-user-environment.drv
+[z0r0]   /nix/store/6zvn1xvrdhzvj8a2h874dv8d9d9vysgk-X-Restart-Triggers-polkit.drv
+[z0r0]   /nix/store/9yhvkz4z9x55hi3qml1m30px5knkn08c-unbindOrUnlink-persist-etc-shadow.drv
+[z0r0]   /nix/store/7pmxmn5kjv28dp5gy2xg4xxd5di9x1vr-unit-persist-persist-etc-shadow.service.drv
+[z0r0]   /nix/store/h9kmgxs54gpb8zdwg6jgakin1dxfxmmy-nix.conf.drv
+[z0r0]   /nix/store/844121xa3ai2n3fm9dkg6bahs93ir16s-X-Restart-Triggers-nix-daemon.drv
+[z0r0]   /nix/store/91ggy8vmc4rbsk1b5r05z52jl4ir66km-unit-systemd-networkd-wait-online.service-disabled.drv
+[z0r0]   /nix/store/9f1671qjqzddvp9a514nfgs0y3p5skwr-boot.json.drv
+[z0r0]   /nix/store/9fhidvc2s4w2x46f0gdrr1hcxqys56x9-unit-NetworkManager-wait-online.service-disabled.drv
+[z0r0]   /nix/store/q3i0nnq0d3qkdpnacqpyglplsmn58s27-unbindOrUnlink-persist-etc-subgid.drv
+[z0r0]   /nix/store/a6v0qbzljp99bfdf39njab2nhnp5biwq-unit-persist-persist-etc-subgid.service.drv
+[z0r0]   /nix/store/bd8wafl9i2807fp1rnhfc833ahn3fbc3-unit-pipewire-pulse.socket-disabled.drv
+[z0r0]   /nix/store/dsb91zj119x7fp5xmrhz8y3m1simxzjl-unit-pipewire-pulse.service-disabled.drv
+[z0r0]   /nix/store/fnhl1vacvwy5hkhyrz1yazpsc6zhjw4z-unit-polkit.service.drv
+[z0r0]   /nix/store/jl96q29wmab4za1bs9kwywznj487l62q-nixos-tmpfiles.d.drv
+[z0r0]   /nix/store/w9qa4amn50vb4454lqx13zzvkpygh0s5-tmpfiles.d.drv
+[z0r0]   /nix/store/nd7sffvvaff8bqrk1v0nv6v0mj5ckhd2-X-Restart-Triggers-systemd-tmpfiles-resetup.drv
+[z0r0]   /nix/store/hb194gccfyjz2qnz7cl7577jpf55dfc8-unit-systemd-tmpfiles-resetup.service.drv
+[z0r0]   /nix/store/j0j6fkckw695sdp6vg6gqxd6a18v6i7r-unit-pipewire.service-disabled.drv
+[z0r0]   /nix/store/lbnqc47iaxvjis4v4c0jdw5ksdxy94cl-unit-pipewire.socket-disabled.drv
+[z0r0]   /nix/store/mm1h6xaic71vfqm3h7vgx1jz9s3b41lp-unit-systemd-udev-settle.service-disabled.drv
+[z0r0]   /nix/store/ycsc27c8fq4hj5plcjwk7cxn3qr5n3nx-unbindOrUnlink-persist-etc-group.drv
+[z0r0]   /nix/store/mzbwj05s3zl12ryjskdrijncr7a79qjl-unit-persist-persist-etc-group.service.drv
+[z0r0]   /nix/store/r3k4ij8f2m103ifshik4mk3g6xr7v595-uni
+[z0r0] t-wireplumber.service-disabled.drv
+[z0r0]   /nix/store/sh8s56p6hg85n36gxwrz1gk95cy98ly2-unit-nix-daemon.service.drv
+[z0r0]   /nix/store/f43vn9w3yq4xspnqjpwdzlz5ndrd7hjv-unbindOrUnlink-persist-etc-passwd.drv
+[z0r0]   /nix/store/swd6jyvf22hkwvrd3jqv3ybfyb1k83y8-unit-persist-persist-etc-passwd.service.drv
+[z0r0]   /nix/store/vyh3q64gjiyrswaclf3ymy6zvp4f174n-unit-dbus-broker.service.drv
+[z0r0]   /nix/store/zq258kpvyms2dx468mlw3imwbsm2a8qx-unit-homepage-dashboard.service.drv
+[z0r0]   /nix/store/9nz0d07k8db4j2f333sh9gsiiy065rma-system-units.drv
+[z0r0]   /nix/store/izmkqv63kfkr6nsah295dsnz8pir1qk3-users-groups.json.drv
+[z0r0]   /nix/store/bf7h7vlxh27i5lk38cgrsqqpvcfb9c5r-dry-activate.drv
+[z0r0]   /nix/store/bjnhaf7mcgd8dvd7jap4vv399zxmacyj-persistence-persist-files.drv
+[z0r0]   /nix/store/hiqyvcic19zjvh2i3ga48fdnxl5ysydz-widgets.yaml.drv
+[z0r0]   /nix/store/hqqp39j96bgnnnqgvmkgp8jkgicriry0-postgresql-configfile-check.drv
+[z0r0]   /nix/store/jpad3vgkzw4fpmr7g9pmdfyc5zra351k-user-units.drv
+[z0r0]   /nix/store/ny5hdj0f5wg593h1qgvz4xdy57rb49fb-etc.drv
+[z0r0]   /nix/store/ydv529n3p80nhrfskbanf9p8idaksciz-persistence-run-create-directories.drv
+[z0r0]   /nix/store/rv6676725vblh1y8ywpbh2pnqi5cc1jl-activate.drv
+[z0r0]   /nix/store/sfnsx59b4w6r34kpln00w137s4xks77h-check-sshd-config.drv
+[z0r0]   /nix/store/sq8cnnz9jx89i72fyxfr85iav6kkqy2c-stage-2-init.sh.drv
+[z0r0]   /nix/store/zz1lag9vilwdw9sgs3lwc6myz9r61f0v-nixos-system-z0r0-26.05.20260204.00c21e4.drv
+[z0r0] these 26 paths will be fetched (258.95 MiB download, 1419.72 MiB unpacked):
+[z0r0]   /nix/store/mjklayc16gsfggpmic4j51n38aahcv4b-flatpak-1.16.2-man
+[z0r0]   /nix/store/bi1bc5aj3bbbnhbdx58prwb3ldmkhrw2-gcr-3.41.2
+[z0r0]   /nix/store/bnfvs2x0r5ygknjwhy9i5jv5p406pmr4-gst-libav-1.26.5-dev
+[z0r0]   /nix/store/kvz15fn46p6v9q4m1xhssp52xg16gmx9-gst-plugins-bad-1.26.5-dev
+[z0r0]   /nix/store/9p9284fss90pqdihapcc90cwbambw7pa-gst-plugins-base-1.26.5-dev
+[z0r0]   /nix/store/gi8lzxpif7mpv8z42rl2ahjmk3lx6xkn-gst-plugins-good-1.26.5-dev
+[z0r0]   /nix/store/f6b08p1wlc55yp862j0n77ybl0g57dfn-gstreamer-1.26.5-dev
+[z0r0]   /nix/store/pgi3a9z6mxjfgbr0j0gbbwhprbji027v-gstreamer-vaapi-1.26.5-dev
+[z0r0]   /nix/store/0bqgqav4bzhvqzwi25ap8kcz8vfjlfc6-pinentry-gnome3-1.3.2
+[z0r0]   /nix/store/cy2p0hk97kwmgp8b6cl5l715r5py06b7-pipewire-1.4.9-dev
+[z0r0]   /nix/store/bm1b89ms4p5p8kxmp48lpm2mib1p5cf6-podman-5.7.0-man
+[z0r0]   /nix/store/k435qbsb53n9j737hxpxx3fw7kxciaw1-postgresql-user-clauses-check
+[z0r0]   /nix/store/qhxg6s0rvh95lmdv0p1y4x19cysrqcv8-python3.13-rich-argparse-1.7.1
+[z0r0]   /nix/store/vx2a3d01191f1qahg700jzm9yi5l83j6-python3.13-tomlkit-0.12.5
+[z0r0]   /nix/store/8nzsl5z7xv5g7h949crnx369c5zq95ln-python3.13-u-msgpack-python-2.8.0
+[z0r0]   /nix/store/pqyqb84ks8x212x5cjbgv89n0lpwv4z2-qt5compat-6.10.1-dev
+[z0r0]   /nix/store/046sq0d7rr7kna3qailg1d63xps8242s-qtmultimedia-6.10.1-dev
+[z0r0]   /nix/store/755nyvvsjhjiklq199c9mlw2hlxbbhaz-qtquick3d-6.10.1-dev
+[z0r0]   /nix/store/kv7a1fjldknfga88qzx4s50rcs2sw7jw-qtwayland-6.10.1-dev
+[z0r0]   /nix/store/2br4a442x3zvbipgf4687shhxvx8jq8h-remarshal-0.17.1
+[z0r0]   /nix/store/i7d9bxsmr02cp8jxyyrdfrj6lfppms7g-solaar-1.1.16-udev
+[z0r0]   /nix/store/ixh8azd95mban2lvcxakmkp76wb2n0j1-spice-gtk-0.42-man
+[z0r0]   /nix/store/hpm1g5141zdy6bj5884labzvrcd1kn9k-udisks-2.11.0-man
+[z0r0]   /nix/store/47kyp7l4424knns0p5ps44pl9kqc7shc-virtio-win-0.1.285-1
+[z0r0]   /nix/store/s2viv9njv9n9fd5ny92h11pf1pg6rvlz-win-spice-0.21
+[z0r0]   /nix/store/18ymgzyabklmf31wdwfpnvcbjv4cnqj8-wrap-qt6-apps-hook
+[z0r0] copying path '/nix/store/k435qbsb53n9j737hxpxx3fw7kxciaw1-postgresql-user-clauses-check' from 'https://cache.nixos.org'...
+[z0r0] copying path '/nix/store/mjklayc16gsfggpmic4j51n38aahcv4b-flatpak-1.16.2-man' from 'https://cache.nixos.org'...
+[z0r0] copying path '/nix/store/bm1b89ms4p5p8kxmp48lpm2mib1p5cf6-podman-5.7.0-man' from 'https://cache.nixos.org'...
+[z0r0] copying path '/nix/store/i7d9bxsmr02cp8jxyyrdfrj6lfppms7g-solaar-1.1.16-udev' from 'https://cache.nixos.org'...
+[z0r0] copying path '/nix/store/ixh8azd95mban2lvcxakmkp76wb2n0j1-spice-gtk-0.42-man' from 'https://cache.nixos.org'...
+[z0r0] copying path '/nix/store/hpm1g5141zdy6bj5884labzvrcd1kn9k-udisks-2.11.0-man' from 'https://cache.nixos.org'...
+[z0r0] copying path '/nix/store/s2viv9njv9n9fd5ny92h11pf1pg6rvlz-win-spice-0.21' from 'https://cache.nixos.org'...
+[z0r0] copying path '/nix/store/47kyp7l4424knns0p5ps44pl9kqc7shc-virtio-win-0.1.285-1' from 'https://cache.nixos.org'...
+[z0r0] building '/nix/store/9f1671qjqzddvp9a514nfgs0y3p5skwr-boot.json.drv'...
+[z0r0] building '/nix/store/sq8cnnz9jx89i72fyxfr85iav6kkqy2c-stage-2-init.sh.drv'...
+[z0r0] warning: download buffer is full; consider increasing the 'download-buffer-size' setting
+[z0r0] building '/nix/store/sfnsx59b4w6r34kpln00w137s4xks77h-check-sshd-config.drv'...
+[z0r0] building '/nix/store/249r09rci0758xbgnc0pwjd6g3h132j0-ensure-all-wrappers-paths-exist.drv'...
+[z0r0] copying path '/nix/store/bnfvs2x0r5ygknjwhy9i5jv5p406pmr4-gst-libav-1.26.5-dev' from 'https://cache.nixos.org'...
+[z0r0] copying path '/nix/store/gi8lzxpif7mpv8z42rl2ahjmk3lx6xkn-gst-plugins-good-1.26.5-dev' from 'https://cache.nixos.org'...
+[z0r0] copying path '/nix/store/f6b08p1wlc55yp862j0n77ybl0g57dfn-gstreamer-1.26.5-dev' from 'https://cache.nixos.org'...
+[z0r0] copying path '/nix/store/kv7a1fjldknfga88qzx4s50rcs2sw7jw-qtwayland-6.10.1-dev' from 'https://cache.nixos.org'...
+[z0r0] copying path '/nix/store/18ymgzyabklmf31wdwfpnvcbjv4cnqj8-wrap-qt6-apps-hook' from 'https://cache.nixos.org'...
+[z0r0] copying path '/nix/store/pqyqb84ks8x212x5cjbgv89n0lpwv4z2-qt5compat-6.10.1-dev' from 'https://cache.nixos.org'...
+[z0r0] copying path '/nix/store/kvz15fn46p6v9q4m1xhssp52xg16gmx9-gst-plugins-bad-1.26.5-dev' from 'https://cache.nixos.org'...
+[z0r0] copying path '/nix/store/pgi3a9z6mxjfgbr0j0gbbwhprbji027v-gstreamer-vaapi-1.26.5-dev' from 'https://cache.nixos.org'...
+[z0r0] stage> Running phase: patchPhase
+[z0r0] stage> Running phase: updateAutotoolsGnuConfigScriptsPhase
+[z0r0] stage> Running phase: configurePhase
+[z0r0] stage> no configure script, doing nothing
+[z0r0] stage> Running phase: buildPhase
+[z0r0] stage> Running phase: checkPhase
+[z0r0] stage> Running phase: installPhase
+[z0r0] stage> no Makefile or custom installPhase, doing nothing
+[z0r0] stage> Running phase: fixupPhase
+[z0r0] stage> shrinking RPATHs of ELF executables and libraries in /nix/store/xpk4l8dy26yh3jxwnrl837adii9rpm5c-stage-2-init.sh
+[z0r0] stage> checking for references to /build/ in /nix/store/xpk4l8dy26yh3jxwnrl837adii9rpm5c-stage-2-init.sh...
+[z0r0] stage> patching script interpreter paths in /nix/store/xpk4l8dy26yh3jxwnrl837adii9rpm5c-stage-2-init.sh
+[z0r0] copying path '/nix/store/bi1bc5aj3bbbnhbdx58prwb3ldmkhrw2-gcr-3.41.2' from 'https://cache.nixos.org'...
+[z0r0] copying path '/nix/store/qhxg6s0rvh95lmdv0p1y4x19cysrqcv8-python3.13-rich-argparse-1.7.1' from 'https://cache.nixos.org'...
+[z0r0] copying path '/nix/store/cy2p0hk97kwmgp8b6cl5l715r5py06b7-pipewire-1.4.9-dev' from 'https://cache.nixos.org'...
+[z0r0] copying path '/nix/store/vx2a3d01191f1qahg700jzm9yi5l83j6-python3.13-tomlkit-0.12.5' from 'https://cache.nixos.org'...
+[z0r0] copying path '/nix/store/8nzsl5z7xv5g7h949crnx369c5zq95ln-python3.13-u-msgpack-python-2.8.0' from 'https://cache.nixos.org'...
+[z0r0] copying path '/nix/store/755nyvvsjhjiklq199c9mlw2hlxbbhaz-qtquick3d-6.10.1-dev' from 'https://cache.nixos.org'...
+[z0r0] building '/nix/store/4r0hcssxx8ygif7yiz1xm7k6n3krn1k7-activation-script.drv'...
+[z0r0] building '/nix/store/xk6nlhmyg7yvfsdv7sailziyxn5mix7l-dummy-fc-dir1.drv'...
+[z0r0] ensure-all-wrappers-paths-exist> Checking that Nix store paths of all wrapped programs exist... OK
+[z0r0] building '/nix/store/l143phw6skxxj5n0armfgm5jb76y43h1-dummy-fc-dir2.drv'...
+[z0r0] building '/nix/store/4ps8wd2b5r41banx4girp4r9xlmbb267-dummy-xdg-mime-dirs1.drv'...
+[z0r0] building '/nix/store/967da42izgzhj1g4diclpknn9wknq3q9-dummy-xdg-mime-dirs2.drv'...
+[z0r0] building '/nix/store/9ndg2b0xalxygxvi3fjyvjmqndb9nf19-gpg-agent-ssh.socket.drv'...
+[z0r0] building '/nix/store/xiwm87nav7cfsmqhnk55hwwqm05p2v15-hm-session-vars.sh.drv'...
+[z0r0] building '/nix/store/mvn9s21fgzz006nww5bjhy1fjl2r2snc-hm_.configzsh.zshrc.drv'...
+[z0r0] building '/nix/store/fd6c1bdsk09rzid9ylw77s5hix9psxyf-ld-library-path.drv'...
+[z0r0] building '/nix/store/s3j8an88j6vps60cy455yv765xaqz9ic-manifest.json.drv'...
+[z0r0] building '/nix/store/h9kmgxs54gpb8zdwg6jgakin1dxfxmmy-nix.conf.drv'...
+[z0r0] building '/nix/store/jl96q29wmab4za1bs9kwywznj487l62q-nixos-tmpfiles.d.drv'...
+[z0r0] ld-library-path> created 159 symlinks in user environment
+[z0r0] nix.conf> Validating generated nix.conf
+[z0r0] building '/nix/store/nd7lxjpjyycyyxhdqavf8w6y8g6x8pzk-hm_.configzsh.zshenv.drv'...
+[z0r0] building '/nix/store/3zyy0jpbq73p6bf4kkby1fdz3swish9n-home-manager-path.drv'...
+[z0r0] building '/nix/store/bjnhaf7mcgd8dvd7jap4vv399zxmacyj-persistence-persist-files.drv'...
+[z0r0] building '/nix/store/ydv529n3p80nhrfskbanf9p8idaksciz-persistence-run-create-directories.drv'...
+[z0r0] home-manager-path> created 1634 symlinks in user environment
+[z0r0] copying path '/nix/store/9p9284fss90pqdihapcc90cwbambw7pa-gst-plugins-base-1.26.5-dev' from 'https://cache.nixos.org'...
+[z0r0] copying path '/nix/store/2br4a442x3zvbipgf4687shhxvx8jq8h-remarshal-0.17.1' from 'https://cache.nixos.org'...
+[z0r0] copying path '/nix/store/0bqgqav4bzhvqzwi25ap8kcz8vfjlfc6-pinentry-gnome3-1.3.2' from 'https://cache.nixos.org'...
+[z0r0] building '/nix/store/844121xa3ai2n3fm9dkg6bahs93ir16s-X-Restart-Triggers-nix-daemon.drv'...
+[z0r0] building '/nix/store/hqqp39j96bgnnnqgvmkgp8jkgicriry0-postgresql-configfile-check.drv'...
+[z0r0] building '/nix/store/r34664vbhxnnpwg2plb0g4zizj8rc0pc-sops-nix-user.drv'...
+[z0r0] building '/nix/store/w9qa4amn50vb4454lqx13zzvkpygh0s5-tmpfiles.d.drv'...
+[z0r0] building '/nix/store/ycsc27c8fq4hj5plcjwk7cxn3qr5n3nx-unbindOrUnlink-persist-etc-group.drv'...
+[z0r0] postgresql-configfile-check> 2026-02-11 04:51:12.486 GMT [5] LOG:  skipping missing configuration file "/nix/store/xalry7pnfycc41fc55j8djdmpry6zdxb-postgresql.conf/postgresql.auto.conf"
+[z0r0] building '/nix/store/ah4l67h4qc9l7w016n3d18yycma01qgs-hm_fontconfigconf.d10hmfonts.conf.drv'...
+[z0r0] building '/nix/store/ig421d2q6ma9d96dv7g3cqsgkqaav9rr-unbindOrUnlink-persist-etc-gshadow.drv'...
+[z0r0] building '/nix/store/nd7sffvvaff8bqrk1v0nv6v0mj5ckhd2-X-Restart-Triggers-systemd-tmpfiles-resetup.drv'...
+[z0r0] building '/nix/store/pfsl4i0pksbdr449f3igds0d311aybqv-sops-nix.service.drv'...
+[z0r0] building '/nix/store/f43vn9w3yq4xspnqjpwdzlz5ndrd7hjv-unbindOrUnlink-persist-etc-passwd.drv'...
+[z0r0] copying path '/nix/store/046sq0d7rr7kna3qailg1d63xps8242s-qtmultimedia-6.10.1-dev' from 'https://cache.nixos.org'...
+[z0r0] building '/nix/store/9yhvkz4z9x55hi3qml1m30px5knkn08c-unbindOrUnlink-persist-etc-shadow.drv'...
+[z0r0] building '/nix/store/q3i0nnq0d3qkdpnacqpyglplsmn58s27-unbindOrUnlink-persist-etc-subgid.drv'...
+[z0r0] building '/nix/store/s82axjxpib8wzilgap9vx84xqsdbby2w-unbindOrUnlink-persist-etc-subuid.drv'...
+[z0r0] building '/nix/store/s4q509c46hkya1aivfya99hhkgy65l9d-hm_homet0psh31f.gnupggpgagent.conf.drv'...
+[z0r0] building '/nix/store/03rsarvc9z3fiy1rizy6pn31zfr261xs-services.yaml.drv'...
+[z0r0] building '/nix/store/9fhidvc2s4w2x46f0gdrr1hcxqys56x9-unit-NetworkManager-wait-online.service-disabled.drv'...
+[z0r0] building '/nix/store/zq258kpvyms2dx468mlw3imwbsm2a8qx-unit-homepage-dashboard.service.drv'...
+[z0r0] building '/nix/store/sh8s56p6hg85n36gxwrz1gk95cy98ly2-unit-nix-daemon.service.drv'...
+[z0r0] building '/nix/store/qcl2qyjx4w95sf4kpis5qi6p05lw7sf4-home-manager-files.drv'...
+[z0r0] building '/nix/store/mzbwj05s3zl12ryjskdrijncr7a79qjl-unit-persist-persist-etc-group.service.drv'...
+[z0r0] building '/nix/store/4hcf42wixsxgr6x09gvjbcamw6pn7hcn-unit-persist-persist-etc-gshadow.service.drv'...
+[z0r0] building '/nix/store/swd6jyvf22hkwvrd3jqv3ybfyb1k83y8-unit-persist-persist-etc-passwd.service.drv'...
+[z0r0] building '/nix/store/7pmxmn5kjv28dp5gy2xg4xxd5di9x1vr-unit-persist-persist-etc-shadow.service.drv'...
+[z0r0] building '/nix/store/a6v0qbzljp99bfdf39njab2nhnp5biwq-unit-persist-persist-etc-subgid.service.drv'...
+[z0r0] building '/nix/store/2bl1qm4f84bkdisrawlxs7g26wg0glaq-unit-persist-persist-etc-subuid.service.drv'...
+[z0r0] building '/nix/store/dsb91zj119x7fp5xmrhz8y3m1simxzjl-unit-pipewire-pulse.service-disabled.drv'...
+[z0r0] building '/nix/store/vvam5qw33wld3iqrs4g54zqsla4mc44f-home-manager-generation.drv'...
+[z0r0] building '/nix/store/bd8wafl9i2807fp1rnhfc833ahn3fbc3-unit-pipewire-pulse.socket-disabled.drv'...
+[z0r0] building '/nix/store/j0j6fkckw695sdp6vg6gqxd6a18v6i7r-unit-pipewire.service-disabled.drv'...
+[z0r0] building '/nix/store/lbnqc47iaxvjis4v4c0jdw5ksdxy94cl-unit-pipewire.socket-disabled.drv'...
+[z0r0] building '/nix/store/91ggy8vmc4rbsk1b5r05z52jl4ir66km-unit-systemd-networkd-wait-online.service-disabled.drv'...
+[z0r0] building '/nix/store/hb194gccfyjz2qnz7cl7577jpf55dfc8-unit-systemd-tmpfiles-resetup.service.drv'...
+[z0r0] building '/nix/store/2yxqdaylk4qdh2rdajxdsgd4q4z5jl7f-unit-home-manager-t0psh31f.service.drv'...
+[z0r0] building '/nix/store/mm1h6xaic71vfqm3h7vgx1jz9s3b41lp-unit-systemd-udev-settle.service-disabled.drv'...
+[z0r0] building '/nix/store/r3k4ij8f2m103ifshik4mk3g6xr7v595-unit-wireplumber.service-disabled.drv'...
+[z0r0] building '/nix/store/rkc3b7511gbd09hjqd67mzdl2my0i0l3-sddm-wrapped.drv'...
+[z0r0] building '/nix/store/65c2psflyfcvb6xfz84v4fhkwswff6z8-user-environment.drv'...
+[z0r0] building '/nix/store/izmkqv63kfkr6nsah295dsnz8pir1qk3-users-groups.json.drv'...
+[z0r0] user-environment> created 316 symlinks in user environment
+[z0r0] building '/nix/store/hiqyvcic19zjvh2i3ga48fdnxl5ysydz-widgets.yaml.drv'...
+[z0r0] building '/nix/store/bf7h7vlxh27i5lk38cgrsqqpvcfb9c5r-dry-activate.drv'...
+[z0r0] building '/nix/store/2qqy677fvmwylyx3b3hjcr8p05q1wnam-system-path.drv'...
+[z0r0] system-path> pkgs.buildEnv warning: colliding subpath (ignored): `/nix/store/a8mapvrhrzw6ahgb7iv72h3jbm5ghwdy-git-minimal-2.52.0/bin/git' and `/nix/store/ipwndaag56mm8g8gn8j98z0jvn8x4mk1-git-2.52.0/bin/git'
+[z0r0] system-path> pkgs.buildEnv warning: colliding subpath (ignored): `/nix/store/a8mapvrhrzw6ahgb7iv72h3jbm5ghwdy-git-minimal-2.52.0/bin/git-cvsserver' and `/nix/store/ipwndaag56mm8g8gn8j98z0jvn8x4mk1-git-2.52.0/bin/git-cvsserver'
+[z0r0] system-path> pkgs.buildEnv warning: colliding subpath (ignored): `/nix/store/a8mapvrhrzw6ahgb7iv72h3jbm5ghwdy-git-minimal-2.52.0/bin/git-shell' and `/nix/store/ipwndaag56mm8g8gn8j98z0jvn8x4mk1-git-2.52.0/bin/git-shell'
+[z0r0] system-path> pkgs.buildEnv warning: colliding subpath (ignored): `/nix/store/a8mapvrhrzw6ahgb7iv72h3jbm5ghwdy-git-minimal-2.52.0/bin/scalar' and `/nix/store/ipwndaag56mm8g8gn8j98z0jvn8x4mk1-git-2.52.0/bin/scalar'
+[z0r0] system-path> pkgs.buildEnv warning: colliding subpath (ignored): `/nix/store/a8mapvrhrzw6ahgb7iv72h3jbm5ghwdy-git-minimal-2.52.0/bin/git-http-backend' and `/nix/store/ipwndaag56mm8g8gn8j98z0jvn8x4mk1-git-2.52.0/bin/git-http-backend'
+[z0r0] system-path> pkgs.buildEnv warning: colliding subpath (ignored): `/nix/store/a8mapvrhrzw6ahgb7iv72h3jbm5ghwdy-git-minimal-2.52.0/bin/git-jump' and `/nix/store/ipwndaag56mm8g8gn8j98z0jvn8x4mk1-git-2.52.0/bin/git-jump'
+[z0r0] system-path> pkgs.buildEnv warning: colliding subpath (ignored): `/nix/store/a8mapvrhrzw6ahgb7iv72h3jbm5ghwdy-git-minimal-2.52.0/bin/git-receive-pack' and `/nix/store/ipwndaag56mm8g8gn8j98z0jvn8x4mk1-git-2.52.0/bin/git-receive-pack'
+[z0r0] system-path> pkgs.buildEnv warning: colliding subpath (ignored): `/nix/store/a8mapvrhrzw6ahgb7iv72h3jbm5ghwdy-git-minimal-2.52.0/bin/git-upload-archive' and `/nix/store/ipwndaag56mm8g8gn8j98z0jvn8x4mk1-git-2.52.0/bin/git-upload-archive'
+[z0r0] system-path> pkgs.buildEnv warning: colliding subpath (ignored): `/nix/store/a8mapvrhrzw6ahgb7iv72h3jbm5ghwdy-git-minimal-2.52.0/bin/git-upload-pack' and `/nix/store/ipwndaag56mm8g8gn8j98z0jvn8x4mk1-git-2.52.0/bin/git-upload-pack'
+[z0r0] system-path> pkgs.buildEnv warning: colliding subpath (ignored): `/nix/store/a8mapvrhrzw6ahgb7iv72h3jbm5ghwdy-git-minimal-2.52.0/share/bash-completion/completions/git' and `/nix/store/ipwndaag56mm8g8gn8j98z0jvn8x4mk1-git-2.52.0/share/bash-completion/completions/git'
+[z0r0] system-path> pkgs.buildEnv warning: colliding subpath (ignored): `/nix/store/a8mapvrhrzw6ahgb7iv72h3jbm5ghwdy-git-minimal-2.52.0/share/bash-completion/completions/git-prompt.sh' and `/nix/store/ipwndaag56mm8g8gn8j98z0jvn8x4mk1-git-2.52.0/share/bash-completion/completions/git-prompt.sh'
+[z0r0] system-path> pkgs.buildEnv warning: colliding subpath (ignored): `/nix/store/ywgdxdrmngwycgfmb78lgjhap9r7lvb1-ccusage-opencode-18.0.5/bin/prompt-BQYGIhSp.js' and `/nix/store/zsazv1bpjil5bvv2cqwbjqaykchpg8xd-ccusage-amp-18.0.5/bin/prompt-BQYGIhSp.js'
+[z0r0] system-path> pkgs.buildEnv warning: colliding subpath (ignored): `/nix/store/wwxk8gdfcc5gvnzfx60qzqps2w7cadhj-crush-0.36.0/bin/crush' and `/nix/store/kr3fy9jy551w960w0qak0gj2sgs8vrdg-crush-0.39.3/bin/crush'
+[z0r0] system-path> pkgs.buildEnv warning: colliding subpath (ignored): `/nix/store/fjkq335gijzksy8ii44w5vkpi4gz8slw-heimdall-2.2.2/bin/heimdall' and `/nix/store/h54854nkpw15irl99kiz94dwx89254f2-heimdall-2.2.2/bin/heimdall'
+[z0r0] system-path> pkgs.buildEnv warning: colliding subpath (ignored): `/nix/store/v9j5cm1ylac4ndsmwbb266jwc07swfi7-nixos-rebuild-ng-26.05/share/zsh/site-functions/_nixos-rebuild' and `/nix/store/cpg3xx0bwfazfzv6y115dv7hpwxy3s04-nix-zsh-completions-0.5.1/share/zsh/site-functions/_nixos-rebuild'
+[z0r0] system-path> created 5073 symlinks in user environment
+[z0r0] building '/nix/store/6zvn1xvrdhzvj8a2h874dv8d9d9vysgk-X-Restart-Triggers-polkit.drv'...
+[z0r0] building '/nix/store/jl0pminc6bx5qq03kf0fb959iivnfa6l-dbus-1.drv'...
+[z0r0] building '/nix/store/fnhl1vacvwy5hkhyrz1yazpsc6zhjw4z-unit-polkit.service.drv'...
+[z0r0] building '/nix/store/7wh58w579qr1s2r5skb222yy75jx42vf-X-Restart-Triggers-dbus-broker.drv'...
+[z0r0] building '/nix/store/09g9ifvjqy19gyrqqisy824fc6iwvp9h-unit-dbus-broker.service.drv'...
+[z0r0] building '/nix/store/vyh3q64gjiyrswaclf3ymy6zvp4f174n-unit-dbus-broker.service.drv'...
+[z0r0] building '/nix/store/jpad3vgkzw4fpmr7g9pmdfyc5zra351k-user-units.drv'...
+[z0r0] building '/nix/store/9nz0d07k8db4j2f333sh9gsiiy065rma-system-units.drv'...
+[z0r0] building '/nix/store/ny5hdj0f5wg593h1qgvz4xdy57rb49fb-etc.drv'...
+[z0r0] building '/nix/store/rv6676725vblh1y8ywpbh2pnqi5cc1jl-activate.drv'...
+[z0r0] building '/nix/store/zz1lag9vilwdw9sgs3lwc6myz9r61f0v-nixos-system-z0r0-26.05.20260204.00c21e4.drv'...
+[z0r0] Checking switch inhibitors...
+[z0r0]  done
+[z0r0] updating GRUB 2 menu...
+[z0r0] Warning: os-prober will be executed to detect other bootable partitions.
+[z0r0] Its output will be used to detect bootable binaries on them and create new boot entries.
+[z0r0] lsblk: /dev/mapper/no*[0-9]: not a block device
+[z0r0] lsblk: /dev/mapper/block*[0-9]: not a block device
+[z0r0] lsblk: /dev/mapper/devices*[0-9]: not a block device
+[z0r0] lsblk: /dev/mapper/found*[0-9]: not a block device
+[z0r0] stopping the following units: homepage-dashboard.service, systemd-tmpfiles-resetup.service
+[z0r0] activating the configuration...
+[z0r0] sops-install-secrets: Imported /etc/ssh/ssh_host_rsa_key as GPG key with fingerprint c576c8aff22db243fad1e5e867226987eda97c6f
+[z0r0] sops-install-secrets: Imported /etc/ssh/ssh_host_ed25519_key as age key with fingerprint age13ytd3kguxglv2k67mcx298djypxseqx2jkn5vw0zlf2079g28chqw8dm24
+[z0r0] removing group ‘ollama’
+[z0r0] removing user ‘ollama’
+[z0r0] setting up /etc...
+[z0r0] A file already exists at /etc/machine-id!
+[z0r0] A file already exists at /etc/passwd!
+[z0r0] A file already exists at /etc/shadow!
+[z0r0] A file already exists at /etc/group!
+[z0r0] A file already exists at /etc/subuid!
+[z0r0] A file already exists at /etc/subgid!
+[z0r0] A file already exists at /home/t0psh31f/.gitconfig!
+[z0r0] Activation script snippet 'persist-files' failed (1)
+[z0r0] sops-install-secrets: Imported /etc/ssh/ssh_host_rsa_key as GPG key with fingerprint c576c8aff22db243fad1e5e867226987eda97c6f
+[z0r0] sops-install-secrets: Imported /etc/ssh/ssh_host_ed25519_key as age key with fingerprint age13ytd3kguxglv2k67mcx298djypxseqx2jkn5vw0zlf2079g28chqw8dm24
+[z0r0] Failed to run activate script
+[z0r0] reloading user units for t0psh31f...
+[z0r0] reloading user units for root...
+[z0r0] restarting sysinit-reactivation.target
+[z0r0] reloading the following units: dbus-broker.service
+[z0r0] restarting the following units: nix-daemon.service, polkit.service
+[z0r0] starting the following units:
+[z0r0] homepage-dashboard.service, systemd-tmpfiles-resetup.service
+[z0r0] the following new units were started: persist-persist-etc-gshadow.service
+[z0r0] warning: the following units failed: home-manager-t0psh31f.service, nginx.service, persist-persist-etc-group.service, persist-persist-etc-machine\x2did.service, persist-persist-etc-passwd.service, persist-persist-etc-shadow.service, persist-persist-etc-subgid.service, persist-persist-etc-subuid.service, persist-persist-home-t0psh31f-.gitconfig.service, var-lib-chromadb.mount
+[z0r0] × home-manager-t0psh31f.service - Home Manager environment for t0psh31f
+[z0r0]      Loaded: loaded (/etc/systemd/system/home-manager-t0psh31f.service; enabled; preset: ignored)
+[z0r0]      Active: failed (Result: exit-code) since Tue 2026-02-10 20:52:43 PST; 3min 44s ago
+[z0r0]    Duration: 5h 2min 12.886s
+[z0r0]  Invocation: e1257f9bbbd0412ca73221fd67199a49
+[z0r0]     Process: 2928907 ExecStart=/nix/store/qbdws702kbaxsgrlh2j2gkdn96gdbf6a-hm-setup-env /nix/store/z11rjxihnw0w2p4ypfdd0p9bxgv77vs9-home-manager-generation (code=exited, status=1/FAILURE)
+[z0r0]    Main PID: 2928907 (code=exited, status=1/FAILURE)
+[z0r0]          IP: 0B in, 0B out
+[z0r0]          IO: 14.5M read, 0B written
+[z0r0]    Mem peak: 38.8M
+[z0r0]         CPU: 1.565s
+[z0r0] 
+[z0r0] Feb 10 20:52:42 z0r0 hm-activate-t0psh31f[2928907]: Activating createGpgHomedir
+[z0r0] Feb 10 20:52:42 z0r0 hm-activate-t0psh31f[2928907]: Activating linkGeneration
+[z0r0] Feb 10 20:52:42 z0r0 hm-activate-t0psh31f[2928907]: Creating home file links in /home/t0psh31f
+[z0r0] Feb 10 20:52:43 z0r0 hm-activate-t0psh31f[2928907]: Activating batCache
+[z0r0] Feb 10 20:52:43 z0r0 hm-activate-t0psh31f[2929375]: No themes were found in '/home/t0psh31f/.config/bat/themes', using the default set
+[z0r0] Feb 10 20:52:43 z0r0 hm-activate-t0psh31f[2929375]: [bat error]: error finding all the files in a directory: IO error for operation on /home/t0psh31f/.config/bat/syntaxes/ghostty.sublime-syntax: No such file or directory (os error 2)
+[z0r0] Feb 10 20:52:43 z0r0 systemd[1]: home-manager-t0psh31f.service: Main process exited, code=exited, status=1/FAILURE
+[z0r0] Feb 10 20:52:43 z0r0 systemd[1]: home-manager-t0psh31f.service: Failed with result 'exit-code'.
+[z0r0] Feb 10 20:52:43 z0r0 systemd[1]: Failed to start Home Manager environment for t0psh31f.
+[z0r0] Feb 10 20:52:43 z0r0 systemd[1]: home-manager-t0psh31f.service: Consumed 1.565s CPU time, 38.8M memory peak, 14.5M read from disk.
+[z0r0] 
+[z0r0] × nginx.service - Nginx Web Server
+[z0r0]      Loaded: loaded (/etc/systemd/system/nginx.service; enabled; preset: ignored)
+[z0r0]      Active: failed (Result: exit-code) since Tue 2026-02-10 20:53:34 PST; 2min 54s ago
+[z0r0]  Invocation: 8fdc753e0cdd4178abb417632d6aa609
+[z0r0]     Process: 2931738 ExecStartPre=/nix/store/825dr5yvihl7dbjm21sqqjq24km6683m-unit-script-nginx-pre-start/bin/nginx-pre-start (code=exited, status=1/FAILURE)
+[z0r0]          IP: 0B in, 0B out
+[z0r0]          IO: 0B read, 0B written
+[z0r0]    Mem peak: 4.4M
+[z0r0]         CPU: 333ms
+[z0r0] 
+[z0r0] Feb 10 20:53:34 z0r0 systemd[1]: nginx.service: Scheduled restart job, restart counter is at 5.
+[z0r0] Feb 10 20:53:34 z0r0 systemd[1]: nginx.service: Start request repeated too quickly.
+[z0r0] Feb 10 20:53:34 z0r0 systemd[1]: nginx.service: Failed with result 'exit-code'.
+[z0r0] Feb 10 20:53:34 z0r0 systemd[1]: Failed to start Nginx Web Server.
+[z0r0] 
+[z0r0] × persist-persist-etc-group.service - Bind mount or link /persist/etc/group to /etc/group
+[z0r0]      Loaded: loaded (/etc/systemd/system/persist-persist-etc-group.service; enabled; preset: ignored)
+[z0r0]      Active: failed (Result: exit-code) since Tue 2026-02-10 20:52:41 PST; 3min 48s ago
+[z0r0]  Invocation: c8d70042d14045b7945a59f283bc6659
+[z0r0]     Process: 2928820 ExecStart=/nix/store/awqdnshdva4kn3jjkhis99ry1xk1hskj-persistence-mount-file /etc/group /persist/etc/group auto  (code=exited, status=1/FAILURE)
+[z0r0]    Main PID: 2928820 (code=exited, status=1/FAILURE)
+[z0r0]          IP: 0B in, 0B out
+[z0r0]          IO: 0B read, 0B written
+[z0r0]    Mem peak: 1.9M
+[z0r0]         CPU: 33ms
+[z0r0] 
+[z0r0] Feb 10 20:52:41 z0r0 systemd[1]: Starting Bind mount or link /persist/etc/group to /etc/group...
+[z0r0] Feb 10 20:52:41 z0r0 awqdnshdva4kn3jjkhis99ry1xk1hskj-persistence-mount-file[2928820]: A file already exists at /etc/group!
+[z0r0] Feb 10 20:52:41 z0r0 systemd[1]: persist-persist-etc-group.service: Main process exited, code=exited, status=1/FAILURE
+[z0r0] Feb 10 20:52:41 z0r0 systemd[1]: persist-persist-etc-group.service: Failed with result 'exit-code'.
+[z0r0] Feb 10 20:52:41 z0r0 systemd[1]: Failed to start Bind mount or link /persist/etc/group to /etc/group.
+[z0r0] 
+[z0r0] × persist-persist-etc-machine\x2did.service - Bind mount or link /persist/etc/machine-id to /etc/machine-id
+[z0r0]      Loaded: loaded (/etc/systemd/system/persist-persist-etc-machine\x2did.service; enabled; preset: ignored)
+[z0r0]      Active: failed (Result: exit-code) since Tue 20
+[z0r0] 26-02-10 20:52:41 PST; 3min 48s ago
+[z0r0]  Invocation: a565e4b63f624c788d81013845793716
+[z0r0]     Process: 2928823 ExecStart=/nix/store/awqdnshdva4kn3jjkhis99ry1xk1hskj-persistence-mount-file /etc/machine-id /persist/etc/machine-id auto  (code=exited, status=1/FAILURE)
+[z0r0]    Main PID: 2928823 (code=exited, status=1/FAILURE)
+[z0r0]          IP: 0B in, 0B out
+[z0r0]          IO: 0B read, 0B written
+[z0r0]    Mem peak: 2M
+[z0r0]         CPU: 33ms
+[z0r0] 
+[z0r0] Feb 10 20:52:41 z0r0 systemd[1]: Starting Bind mount or link /persist/etc/machine-id to /etc/machine-id...
+[z0r0] Feb 10 20:52:41 z0r0 awqdnshdva4kn3jjkhis99ry1xk1hskj-persistence-mount-file[2928823]: A file already exists at /etc/machine-id!
+[z0r0] Feb 10 20:52:41 z0r0 systemd[1]: persist-persist-etc-machine\x2did.service: Main process exited, code=exited, status=1/FAILURE
+[z0r0] Feb 10 20:52:41 z0r0 systemd[1]: persist-persist-etc-machine\x2did.service: Failed with result 'exit-code'.
+[z0r0] Feb 10 20:52:41 z0r0 systemd[1]: Failed to start Bind mount or link /persist/etc/machine-id to /etc/machine-id.
+[z0r0] 
+[z0r0] × persist-persist-etc-passwd.service - Bind mount or link /persist/etc/passwd to /etc/passwd
+[z0r0]      Loaded: loaded (/etc/systemd/system/persist-persist-etc-passwd.service; enabled; preset: ignored)
+[z0r0]      Active: failed (Result: exit-code) since Tue 2026-02-10 20:52:41 PST; 3min 48s ago
+[z0r0]  Invocation: 49c8d6f778af415d8d780aa06017979d
+[z0r0]     Process: 2928825 ExecStart=/nix/store/awqdnshdva4kn3jjkhis99ry1xk1hskj-persistence-mount-file /etc/passwd /persist/etc/passwd auto  (code=exited, status=1/FAILURE)
+[z0r0]    Main PID: 2928825 (code=exited, status=1/FAILURE)
+[z0r0]          IP: 0B in, 0B out
+[z0r0]          IO: 0B read, 0B written
+[z0r0]    Mem peak: 1.7M
+[z0r0]         CPU: 30ms
+[z0r0] 
+[z0r0] Feb 10 20:52:41 z0r0 systemd[1]: Starting Bind mount or link /persist/etc/passwd to /etc/passwd...
+[z0r0] Feb 10 20:52:41 z0r0 awqdnshdva4kn3jjkhis99ry1xk1hskj-persistence-mount-file[2928825]: A file already exists at /etc/passwd!
+[z0r0] Feb 10 20:52:41 z0r0 systemd[1]: persist-persist-etc-passwd.service: Main process exited, code=exited, status=1/FAILURE
+[z0r0] Feb 10 20:52:41 z0r0 systemd[1]: persist-persist-etc-passwd.service: Failed with result 'exit-code'.
+[z0r0] Feb 10 20:52:41 z0r0 systemd[1]: Failed to start Bind mount or link /persist/etc/passwd to /etc/passwd.
+[z0r0] 
+[z0r0] × persist-persist-etc-shadow.service - Bind mount or link /persist/etc/shadow to /etc/shadow
+[z0r0]      Loaded: loaded (/etc/systemd/system/persist-persist-etc-shadow.service; enabled; preset: ignored)
+[z0r0]      Active: failed (Result: exit-code) since Tue 2026-02-10 20:52:41 PST; 3min 48s ago
+[z0r0]  Invocation: 733d13a05d9840f5bba1bd65286de151
+[z0r0]     Process: 2928827 ExecStart=/nix/store/awqdnshdva4kn3jjkhis99ry1xk1hskj-persistence-mount-file /etc/shadow /persist/etc/shadow auto  (code=exited, status=1/FAILURE)
+[z0r0]    Main PID: 2928827 (code=exited, status=1/FAILURE)
+[z0r0]          IP: 0B in, 0B out
+[z0r0]          IO: 0B read, 0B written
+[z0r0]    Mem peak: 1.7M
+[z0r0]         CPU: 35ms
+[z0r0] 
+[z0r0] Feb 10 20:52:41 z0r0 systemd[1]: Starting Bind mount or link /persist/etc/shadow to /etc/shadow...
+[z0r0] Feb 10 20:52:41 z0r0 awqdnshdva4kn3jjkhis99ry1xk1hskj-persistence-mount-file[2928827]: A file already exists at /etc/shadow!
+[z0r0] Feb 10 20:52:41 z0r0 systemd[1]: persist-persist-etc-shadow.service: Main process exited, code=exited, status=1/FAILURE
+[z0r0] Feb 10 20:52:41 z0r0 systemd[1]: persist-persist-etc-shadow.service: Failed with result 'exit-code'.
+[z0r0] Feb 10 20:52:41 z0r0 systemd[1]: Failed to start Bind mount or link /persist/etc/shadow to /etc/shadow.
+[z0r0] 
+[z0r0] × persist-persist-etc-subgid.service - Bind mount or link /persist/etc/subgid to /etc/subgid
+[z0r0]      Loaded: loaded (/etc/systemd/system/persist-persist-etc-subgid.service; enabled; preset: ignored)
+[z0r0]      Active: failed (Result: exit-code) since Tue 2026-02-10 20:52:41 PST; 3min 49s ago
+[z0r0]  Invocation: 4aad5a557b074a0eba596dc28dc557ac
+[z0r0]     Process: 2928830 ExecStart=/nix/store/awqdnshdva4kn3jjkhis99ry1xk1hskj-persistence-mount-file /etc/subgid /persist/etc/subgid auto  (code=exited, status=1/FAILURE)
+[z0r0]    Main PID: 2928830 (code=exited, status=1/FAILURE)
+[z0r0]          IP: 0B in, 0B out
+[z0r0]          IO: 0B read, 0B written
+[z0r0]    Mem peak: 1.7M
+[z0r0]         CPU: 33ms
+[z0r0] 
+[z0r0] Feb 10 20:52:41 z0r0 systemd[1]: Starting Bind mount or lin
+[z0r0] k /persist/etc/subgid to /etc/subgid...
+[z0r0] Feb 10 20:52:41 z0r0 awqdnshdva4kn3jjkhis99ry1xk1hskj-persistence-mount-file[2928830]: A file already exists at /etc/subgid!
+[z0r0] Feb 10 20:52:41 z0r0 systemd[1]: persist-persist-etc-subgid.service: Main process exited, code=exited, status=1/FAILURE
+[z0r0] Feb 10 20:52:41 z0r0 systemd[1]: persist-persist-etc-subgid.service: Failed with result 'exit-code'.
+[z0r0] Feb 10 20:52:41 z0r0 systemd[1]: Failed to start Bind mount or link /persist/etc/subgid to /etc/subgid.
+[z0r0] 
+[z0r0] × persist-persist-etc-subuid.service - Bind mount or link /persist/etc/subuid to /etc/subuid
+[z0r0]      Loaded: loaded (/etc/systemd/system/persist-persist-etc-subuid.service; enabled; preset: ignored)
+[z0r0]      Active: failed (Result: exit-code) since Tue 2026-02-10 20:52:41 PST; 3min 49s ago
+[z0r0]  Invocation: 66ae3effbc10428a93318714356dbc4c
+[z0r0]     Process: 2928833 ExecStart=/nix/store/awqdnshdva4kn3jjkhis99ry1xk1hskj-persistence-mount-file /etc/subuid /persist/etc/subuid auto  (code=exited, status=1/FAILURE)
+[z0r0]    Main PID: 2928833 (code=exited, status=1/FAILURE)
+[z0r0]          IP: 0B in, 0B out
+[z0r0]          IO: 0B read, 0B written
+[z0r0]    Mem peak: 1.7M
+[z0r0]         CPU: 34ms
+[z0r0] 
+[z0r0] Feb 10 20:52:41 z0r0 systemd[1]: Starting Bind mount or link /persist/etc/subuid to /etc/subuid...
+[z0r0] Feb 10 20:52:41 z0r0 awqdnshdva4kn3jjkhis99ry1xk1hskj-persistence-mount-file[2928833]: A file already exists at /etc/subuid!
+[z0r0] Feb 10 20:52:41 z0r0 systemd[1]: persist-persist-etc-subuid.service: Main process exited, code=exited, status=1/FAILURE
+[z0r0] Feb 10 20:52:41 z0r0 systemd[1]: persist-persist-etc-subuid.service: Failed with result 'exit-code'.
+[z0r0] Feb 10 20:52:41 z0r0 systemd[1]: Failed to start Bind mount or link /persist/etc/subuid to /etc/subuid.
+[z0r0] 
+[z0r0] × persist-persist-home-t0psh31f-.gitconfig.service - Bind mount or link /persist/home/t0psh31f/.gitconfig to /home/t0psh31f/.gitconfig
+[z0r0]      Loaded: loaded (/etc/systemd/system/persist-persist-home-t0psh31f-.gitconfig.service; enabled; preset: ignored)
+[z0r0]      Active: failed (Result: exit-code) since Tue 2026-02-10 20:52:41 PST; 3min 49s ago
+[z0r0]  Invocation: 39f32209ce284d059599f2faad6d77ec
+[z0r0]     Process: 2928837 ExecStart=/nix/store/awqdnshdva4kn3jjkhis99ry1xk1hskj-persistence-mount-file /home/t0psh31f/.gitconfig /persist/home/t0psh31f/.gitconfig auto  (code=exited, status=1/FAILURE)
+[z0r0]    Main PID: 2928837 (code=exited, status=1/FAILURE)
+[z0r0]          IP: 0B in, 0B out
+[z0r0]          IO: 0B read, 0B written
+[z0r0]    Mem peak: 1.8M
+[z0r0]         CPU: 33ms
+[z0r0] 
+[z0r0] Feb 10 20:52:41 z0r0 systemd[1]: Starting Bind mount or link /persist/home/t0psh31f/.gitconfig to /home/t0psh31f/.gitconfig...
+[z0r0] Feb 10 20:52:41 z0r0 awqdnshdva4kn3jjkhis99ry1xk1hskj-persistence-mount-file[2928837]: A file already exists at /home/t0psh31f/.gitconfig!
+[z0r0] Feb 10 20:52:41 z0r0 systemd[1]: persist-persist-home-t0psh31f-.gitconfig.service: Main process exited, code=exited, status=1/FAILURE
+[z0r0] Feb 10 20:52:41 z0r0 systemd[1]: persist-persist-home-t0psh31f-.gitconfig.service: Failed with result 'exit-code'.
+[z0r0] Feb 10 20:52:41 z0r0 systemd[1]: Failed to start Bind mount or link /persist/home/t0psh31f/.gitconfig to /home/t0psh31f/.gitconfig.
+[z0r0] 
+[z0r0] × var-lib-chromadb.mount - /var/lib/chromadb
+[z0r0]      Loaded: loaded (/etc/systemd/system/var-lib-chromadb.mount; enabled; preset: ignored)
+[z0r0]      Active: failed (Result: resources)
+[z0r0]  Invocation: 9de691d5e9d7494cb3350acf7d78abb5
+[z0r0]       Where: /var/lib/chromadb
+[z0r0]        What: /persist/var/lib/chromadb
+[z0r0] 
+[z0r0] Feb 08 00:14:23 z0r0 systemd[1]: Failed to mount /var/lib/chromadb.
+[z0r0] Feb 08 00:14:23 z0r0 systemd[1]: var-lib-chromadb.mount: Mount path /var/lib/chromadb is not canonical (contains a symlink).
+[z0r0] Feb 08 00:14:23 z0r0 systemd[1]: var-lib-chromadb.mount: Failed with result 'resources'.
+[z0r0] Feb 08 00:14:23 z0r0 systemd[1]: Failed to mount /var/lib/chromadb.
+[z0r0] Feb 10 20:52:41 z0r0 systemd[1]: var-lib-chromadb.mount: Mount path /var/lib/chromadb is not canonical (contains a symlink).
+[z0r0] Feb 10 20:52:41 z0r0 systemd[1]: var-lib-chromadb.mount: Failed with result 'resources'.
+[z0r0] Feb 10 20:52:41 z0r0 systemd[1]: Failed to mount /var/lib/chromadb.
+[z0r0] Feb 10 20:52:41 z0r0 systemd[1]: var-lib-chromadb.mount: Mount path /var/lib/chromadb is not canoni
+[z0r0] cal (contains a symlink).
+[z0r0] Feb 10 20:52:41 z0r0 systemd[1]: var-lib-chromadb.mount: Failed with result 'resources'.
+[z0r0] Feb 10 20:52:41 z0r0 systemd[1]: Failed to mount /var/lib/chromadb.
+[z0r0] Command 'systemd-run -E LOCALE_ARCHIVE -E NIXOS_INSTALL_BOOTLOADER -E NIXOS_NO_CHECK --collect --no-ask-password --pipe --quiet --service-type=exec --unit=nixos-rebuild-switch-to-configuration /nix/store/34jrfl2hz4z3nps2qxbp063r570jznwh-nixos-system-z0r0-26.05.20260204.00c21e4/bin/switch-to-configuration switch' returned non-zero exit status 4.
+[z0r0] $ export NIX_SSHOPTS=-A; nixos-rebuild switch --show-trace --option keep-going true --option accept-flake-config true -L --flake /nix/store/6jbc2ffh9zmrh6cdn8cy5dyj1gj1yxdl-source#z0r0 --fast --build-host 
+[z0r0] nixos-rebuild: warning: --fast is deprecated, use --no-reexec instead
+[z0r0] building the system configuration...
+[z0r0] Checking switch inhibitors...
+[z0r0]  done
+[z0r0] updating GRUB 2 menu...
+[z0r0] Warning: os-prober will be executed to detect other bootable partitions.
+[z0r0] Its output will be used to detect bootable binaries on them and create new boot entries.
+[z0r0] lsblk: /dev/mapper/no*[0-9]: not a block device
+[z0r0] lsblk: /dev/mapper/block*[0-9]: not a block device
+[z0r0] lsblk: /dev/mapper/devices*[0-9]: not a block device
+[z0r0] lsblk: /dev/mapper/found*[0-9]: not a block device
+[z0r0] activating the configuration...
+[z0r0] sops-install-secrets: Imported /etc/ssh/ssh_host_rsa_key as GPG key with fingerprint c576c8aff22db243fad1e5e867226987eda97c6f
+[z0r0] sops-install-secrets: Imported /etc/ssh/ssh_host_ed25519_key as age key with fingerprint age13ytd3kguxglv2k67mcx298djypxseqx2jkn5vw0zlf2079g28chqw8dm24
+[z0r0] setting up /etc...
+[z0r0] A file already exists at /etc/machine-id!
+[z0r0] A file already exists at /etc/passwd!
+[z0r0] A file already exists at /etc/shadow!
+[z0r0] A file already exists at /etc/group!
+[z0r0] A file already exists at /etc/subuid!
+[z0r0] A file already exists at /etc/subgid!
+[z0r0] A file already exists at /home/t0psh31f/.gitconfig!
+[z0r0] Activation script snippet 'persist-files' failed (1)
+[z0r0] sops-install-secrets: Imported /etc/ssh/ssh_host_rsa_key as GPG key with fingerprint c576c8aff22db243fad1e5e867226987eda97c6f
+[z0r0] sops-install-secrets: Imported /etc/ssh/ssh_host_ed25519_key as age key with fingerprint age13ytd3kguxglv2k67mcx298djypxseqx2jkn5vw0zlf2079g28chqw8dm24
+[z0r0] Failed to run activate script
+[z0r0] reloading user units for t0psh31f...
+[z0r0] reloading user units for root...
+[z0r0] restarting sysinit-reactivation.target
+[z0r0] the following new units were started: libvirtd.service, NetworkManager-dispatcher.service
+[z0r0] warning: the following units failed: home-manager-t0psh31f.service, persist-persist-etc-group.service, persist-persist-etc-machine\x2did.service, persist-persist-etc-passwd.service, persist-persist-etc-shadow.service, persist-persist-etc-subgid.service, persist-persist-etc-subuid.service, persist-persist-home-t0psh31f-.gitconfig.service, var-lib-chromadb.mount
+[z0r0] × home-manager-t0psh31f.service - Home Manager environment for t0psh31f
+[z0r0]      Loaded: loaded (/etc/systemd/system/home-manager-t0psh31f.service; enabled; preset: ignored)
+[z0r0]      Active: failed (Result: exit-code) since Tue 2026-02-10 20:56:56 PST; 6s ago
+[z0r0]    Duration: 5h 2min 12.886s
+[z0r0]  Invocation: f22902bae0ac41099b57b638978b8567
+[z0r0]     Process: 2944551 ExecStart=/nix/store/qbdws702kbaxsgrlh2j2gkdn96gdbf6a-hm-setup-env /nix/store/z11rjxihnw0w2p4ypfdd0p9bxgv77vs9-home-manager-generation (code=exited, status=1/FAILURE)
+[z0r0]    Main PID: 2944551 (code=exited, status=1/FAILURE)
+[z0r0]          IP: 0B in, 0B out
+[z0r0]          IO: 14.2M read, 0B written
+[z0r0]    Mem peak: 38.6M
+[z0r0]         CPU: 1.680s
+[z0r0] 
+[z0r0] Feb 10 20:56:55 z0r0 hm-activate-t0psh31f[2944551]: Activating createGpgHomedir
+[z0r0] Feb 10 20:56:55 z0r0 hm-activate-t0psh31f[2944551]: Activating linkGeneration
+[z0r0] Feb 10 20:56:55 z0r0 hm-activate-t0psh31f[2944551]: Creating home file links in /home/t0psh31f
+[z0r0] Feb 10 20:56:56 z0r0 hm-activate-t0psh31f[2944551]: Activating batCache
+[z0r0] Feb 10 20:56:56 z0r0 hm-activate-t0psh31f[2945080]: No themes were found in '/home/t0psh31f/.config/bat/themes', using the default set
+[z0r0] Feb 10 20:56:56 z0r0 hm-activate-t0psh31f[2945080]: [bat error]: error finding all the files in a directory: IO error for operation on /home/t0psh31f/.config/bat/syntaxes/ghostty.sublime-syntax: No such file or directory (os error 2)
+[z0r0] Feb 10 20:56:56 z0r0 systemd[1]: home-manager-t0psh31f.service: Main process exited, code=exited, status=1/FAILURE
+[z0r0] Feb 10 20:56:56 z0r0 systemd[1]: home-manager-t0psh31f.service: Failed with result 'exit-code'.
+[z0r0] Feb 10 20:56:56 z0r0 systemd[1]: Failed to start Home Manager environment for t0psh31f.
+[z0r0] Feb 10 20:56:56 z0r0 systemd[1]: home-manager-t0psh31f.service: Consumed 1.680s CPU time, 38.6M memory peak, 14.2M read from disk.
+[z0r0] 
+[z0r0] × persist-persist-etc-group.service - Bind mount or link /persist/etc/group to /etc/group
+[z0r0]      Loaded: loaded (/etc/systemd/system/persist-persist-etc-group.service; enabled; preset: ignored)
+[z0r0]      Active: failed (Result: exit-code) since Tue 2026-02-10 20:56:55 PST; 9s ago
+[z0r0]  Invocation: a004e358046b43f7a4085f70412bf535
+[z0r0]     Process: 2944650 ExecStart=/nix/store/awqdnshdva4kn3jjkhis99ry1xk1hskj-persistence-mount-file /etc/group /persist/etc/group auto  (code=exited, status=1/FAILURE)
+[z0r0]    Main PID: 2944650 (code=exited, status=1/FAILURE)
+[z0r0]          IP: 0B in, 0B out
+[z0r0]          IO: 0B read, 0B written
+[z0r0]    Mem peak: 2M
+[z0r0]         CPU: 30ms
+[z0r0] 
+[z0r0] Feb 10 20:56:55 z0r0 systemd[1]: Starting Bind mount or link /persist/etc/group to /etc/group...
+[z0r0] Feb 10 20:56:55 z0r0 awqdnshdva4kn3jjkhis99ry1xk1hskj-persistence-mount-file[2944650]: A file already exists at /etc/group!
+[z0r0] Feb 10 20:56:55 z0r0 systemd[1]: persist-persist-etc-group.service: Main process exited, code=exited, status=1/FAILURE
+[z0r0] Feb 10 20:56:55 z0r0 systemd[1]: persist-persist-etc-group.service: Failed with result 'exit-code'.
+[z0r0] Feb 10 20:56:55 z0r0 systemd[1]: Failed to start Bind mount or link /persist/etc/group to /etc/group.
+[z0r0] 
+[z0r0] × persist-persist-etc-machine\x2did.service - Bind mount or link /persist/etc/machine-id to /etc/machine-id
+[z0r0]      Loaded: loaded (/etc/systemd/system/persist-persist-etc-machine\x2did.service; enabled; preset: ignored)
+[z0r0]      Active: failed (Result: exit-code) since Tue 2026-02-10 20:56:55 PST; 9s ago
+[z0r0]  Invocation: e0ac3db6d1494c7ebba3c46c859844ed
+[z0r0]     Process: 2944654 ExecStart=/nix/store/awqdnshdva4kn3jjkhis99ry1xk1hskj-persistence-mount-file /etc/machine-id /persist/etc/machine-id auto  (code=exited, status=1/FAILURE)
+[z0r0]    Main PID: 2944654 (code=exited, status=1/FAILURE)
+[z0r0]          IP: 0B in, 0B out
+[z0r0]          IO: 0B read, 0B written
+[z0r0]    Mem peak: 2M
+[z0r0]         CPU: 32ms
+[z0r0] 
+[z0r0] Feb 10 20:56:55 z0r0 systemd[1]: Starting Bind mount or link /persist/etc/machine-id to /etc/machine-id...
+[z0r0] Feb 10 20:56:55 z0r0 awqdnshdva4kn3jjkhis99ry1xk1hskj-persistence-mount-file[2944654]: A file already exists at /etc/machine-id!
+[z0r0] Feb 10 20:56:55 z0r0 systemd[1]: persist-persist-etc-machine\x2did.service: Main process exited, code=exited, status=1/FAILURE
+[z0r0] Feb 10 20:56:55 z0r0 systemd[1]: persist-persist-etc-machine\x2did.service: Failed with
+[z0r0]  result 'exit-code'.
+[z0r0] Feb 10 20:56:55 z0r0 systemd[1]: Failed to start Bind mount or link /persist/etc/machine-id to /etc/machine-id.
+[z0r0] 
+[z0r0] × persist-persist-etc-passwd.service - Bind mount or link /persist/etc/passwd to /etc/passwd
+[z0r0]      Loaded: loaded (/etc/systemd/system/persist-persist-etc-passwd.service; enabled; preset: ignored)
+[z0r0]      Active: failed (Result: exit-code) since Tue 2026-02-10 20:56:55 PST; 10s ago
+[z0r0]  Invocation: baef713d497342aca7d392cf5f621ce8
+[z0r0]     Process: 2944673 ExecStart=/nix/store/awqdnshdva4kn3jjkhis99ry1xk1hskj-persistence-mount-file /etc/passwd /persist/etc/passwd auto  (code=exited, status=1/FAILURE)
+[z0r0]    Main PID: 2944673 (code=exited, status=1/FAILURE)
+[z0r0]          IP: 0B in, 0B out
+[z0r0]          IO: 0B read, 0B written
+[z0r0]    Mem peak: 2M
+[z0r0]         CPU: 31ms
+[z0r0] 
+[z0r0] Feb 10 20:56:55 z0r0 systemd[1]: Starting Bind mount or link /persist/etc/passwd to /etc/passwd...
+[z0r0] Feb 10 20:56:55 z0r0 awqdnshdva4kn3jjkhis99ry1xk1hskj-persistence-mount-file[2944673]: A file already exists at /etc/passwd!
+[z0r0] Feb 10 20:56:55 z0r0 systemd[1]: persist-persist-etc-passwd.service: Main process exited, code=exited, status=1/FAILURE
+[z0r0] Feb 10 20:56:55 z0r0 systemd[1]: persist-persist-etc-passwd.service: Failed with result 'exit-code'.
+[z0r0] Feb 10 20:56:55 z0r0 systemd[1]: Failed to start Bind mount or link /persist/etc/passwd to /etc/passwd.
+[z0r0] 
+[z0r0] × persist-persist-etc-shadow.service - Bind mount or link /persist/etc/shadow to /etc/shadow
+[z0r0]      Loaded: loaded (/etc/systemd/system/persist-persist-etc-shadow.service; enabled; preset: ignored)
+[z0r0]      Active: failed (Result: exit-code) since Tue 2026-02-10 20:56:55 PST; 10s ago
+[z0r0]  Invocation: 8cc0f9c8406c452cb21fb011f828893e
+[z0r0]     Process: 2944604 ExecStart=/nix/store/awqdnshdva4kn3jjkhis99ry1xk1hskj-persistence-mount-file /etc/shadow /persist/etc/shadow auto  (code=exited, status=1/FAILURE)
+[z0r0]    Main PID: 2944604 (code=exited, status=1/FAILURE)
+[z0r0]          IP: 0B in, 0B out
+[z0r0]          IO: 0B read, 0B written
+[z0r0]    Mem peak: 2M
+[z0r0]         CPU: 33ms
+[z0r0] 
+[z0r0] Feb 10 20:56:55 z0r0 systemd[1]: Starting Bind mount or link /persist/etc/shadow to /etc/shadow...
+[z0r0] Feb 10 20:56:55 z0r0 awqdnshdva4kn3jjkhis99ry1xk1hskj-persistence-mount-file[2944604]: A file already exists at /etc/shadow!
+[z0r0] Feb 10 20:56:55 z0r0 systemd[1]: persist-persist-etc-shadow.service: Main process exited, code=exited, status=1/FAILURE
+[z0r0] Feb 10 20:56:55 z0r0 systemd[1]: persist-persist-etc-shadow.service: Failed with result 'exit-code'.
+[z0r0] Feb 10 20:56:55 z0r0 systemd[1]: Failed to start Bind mount or link /persist/etc/shadow to /etc/shadow.
+[z0r0] 
+[z0r0] × persist-persist-etc-subgid.service - Bind mount or link /persist/etc/subgid to /etc/subgid
+[z0r0]      Loaded: loaded (/etc/systemd/system/persist-persist-etc-subgid.service; enabled; preset: ignored)
+[z0r0]      Active: failed (Result: exit-code) since Tue 2026-02-10 20:56:55 PST; 10s ago
+[z0r0]  Invocation: d520f5dd031c4d5aa795d72716e26734
+[z0r0]     Process: 2944682 ExecStart=/nix/store/awqdnshdva4kn3jjkhis99ry1xk1hskj-persistence-mount-file /etc/subgid /persist/etc/subgid auto  (code=exited, status=1/FAILURE)
+[z0r0]    Main PID: 2944682 (code=exited, status=1/FAILURE)
+[z0r0]          IP: 0B in, 0B out
+[z0r0]          IO: 0B read, 0B written
+[z0r0]    Mem peak: 2M
+[z0r0]         CPU: 30ms
+[z0r0] 
+[z0r0] Feb 10 20:56:55 z0r0 systemd[1]: Starting Bind mount or link /persist/etc/subgid to /etc/subgid...
+[z0r0] Feb 10 20:56:55 z0r0 awqdnshdva4kn3jjkhis99ry1xk1hskj-persistence-mount-file[2944682]: A file already exists at /etc/subgid!
+[z0r0] Feb 10 20:56:55 z0r0 systemd[1]: persist-persist-etc-subgid.service: Main process exited, code=exited, status=1/FAILURE
+[z0r0] Feb 10 20:56:55 z0r0 systemd[1]: persist-persist-etc-subgid.service: Failed with result 'exit-code'.
+[z0r0] Feb 10 20:56:55 z0r0 systemd[1]: Failed to start Bind mount or link /persist/etc/subgid to /etc/subgid.
+[z0r0] 
+[z0r0] × persist-persist-etc-subuid.service - Bind mount or link /persist/etc/subuid to /etc/subuid
+[z0r0]      Loaded: loaded (/etc/systemd/system/persist-persist-etc-subuid.service; enabled; preset: ignored)
+[z0r0]      Active: failed (Result: exit-code) since Tue 2026-02-10 20:56:55 PST; 10s ago
+[z0r0]  Invocation: 1c277370571944bda6c4ede0220ebf4f
+[z0r0]     Process: 2944610 ExecStart=/nix/store/awqdnshdva4kn3jjkh
+[z0r0] is99ry1xk1hskj-persistence-mount-file /etc/subuid /persist/etc/subuid auto  (code=exited, status=1/FAILURE)
+[z0r0]    Main PID: 2944610 (code=exited, status=1/FAILURE)
+[z0r0]          IP: 0B in, 0B out
+[z0r0]          IO: 0B read, 0B written
+[z0r0]    Mem peak: 1.7M
+[z0r0]         CPU: 30ms
+[z0r0] 
+[z0r0] Feb 10 20:56:55 z0r0 systemd[1]: Starting Bind mount or link /persist/etc/subuid to /etc/subuid...
+[z0r0] Feb 10 20:56:55 z0r0 awqdnshdva4kn3jjkhis99ry1xk1hskj-persistence-mount-file[2944610]: A file already exists at /etc/subuid!
+[z0r0] Feb 10 20:56:55 z0r0 systemd[1]: persist-persist-etc-subuid.service: Main process exited, code=exited, status=1/FAILURE
+[z0r0] Feb 10 20:56:55 z0r0 systemd[1]: persist-persist-etc-subuid.service: Failed with result 'exit-code'.
+[z0r0] Feb 10 20:56:55 z0r0 systemd[1]: Failed to start Bind mount or link /persist/etc/subuid to /etc/subuid.
+[z0r0] 
+[z0r0] × persist-persist-home-t0psh31f-.gitconfig.service - Bind mount or link /persist/home/t0psh31f/.gitconfig to /home/t0psh31f/.gitconfig
+[z0r0]      Loaded: loaded (/etc/systemd/system/persist-persist-home-t0psh31f-.gitconfig.service; enabled; preset: ignored)
+[z0r0]      Active: failed (Result: exit-code) since Tue 2026-02-10 20:56:55 PST; 10s ago
+[z0r0]  Invocation: 99af1046c81b4207930151b82897a571
+[z0r0]     Process: 2944616 ExecStart=/nix/store/awqdnshdva4kn3jjkhis99ry1xk1hskj-persistence-mount-file /home/t0psh31f/.gitconfig /persist/home/t0psh31f/.gitconfig auto  (code=exited, status=1/FAILURE)
+[z0r0]    Main PID: 2944616 (code=exited, status=1/FAILURE)
+[z0r0]          IP: 0B in, 0B out
+[z0r0]          IO: 0B read, 0B written
+[z0r0]    Mem peak: 1.7M
+[z0r0]         CPU: 31ms
+[z0r0] 
+[z0r0] Feb 10 20:56:55 z0r0 systemd[1]: Starting Bind mount or link /persist/home/t0psh31f/.gitconfig to /home/t0psh31f/.gitconfig...
+[z0r0] Feb 10 20:56:55 z0r0 awqdnshdva4kn3jjkhis99ry1xk1hskj-persistence-mount-file[2944616]: A file already exists at /home/t0psh31f/.gitconfig!
+[z0r0] Feb 10 20:56:55 z0r0 systemd[1]: persist-persist-home-t0psh31f-.gitconfig.service: Main process exited, code=exited, status=1/FAILURE
+[z0r0] Feb 10 20:56:55 z0r0 systemd[1]: persist-persist-home-t0psh31f-.gitconfig.service: Failed with result 'exit-code'.
+[z0r0] Feb 10 20:56:55 z0r0 systemd[1]: Failed to start Bind mount or link /persist/home/t0psh31f/.gitconfig to /home/t0psh31f/.gitconfig.
+[z0r0] 
+[z0r0] × var-lib-chromadb.mount - /var/lib/chromadb
+[z0r0]      Loaded: loaded (/etc/systemd/system/var-lib-chromadb.mount; enabled; preset: ignored)
+[z0r0]      Active: failed (Result: resources)
+[z0r0]  Invocation: d4965c14dc404feeb692e64eb5f3c38b
+[z0r0]       Where: /var/lib/chromadb
+[z0r0]        What: /persist/var/lib/chromadb
+[z0r0] 
+[z0r0] Feb 10 20:52:41 z0r0 systemd[1]: Failed to mount /var/lib/chromadb.
+[z0r0] Feb 10 20:52:41 z0r0 systemd[1]: var-lib-chromadb.mount: Mount path /var/lib/chromadb is not canonical (contains a symlink).
+[z0r0] Feb 10 20:52:41 z0r0 systemd[1]: var-lib-chromadb.mount: Failed with result 'resources'.
+[z0r0] Feb 10 20:52:41 z0r0 systemd[1]: Failed to mount /var/lib/chromadb.
+[z0r0] Feb 10 20:56:55 z0r0 systemd[1]: var-lib-chromadb.mount: Mount path /var/lib/chromadb is not canonical (contains a symlink).
+[z0r0] Feb 10 20:56:55 z0r0 systemd[1]: var-lib-chromadb.mount: Failed with result 'resources'.
+[z0r0] Feb 10 20:56:55 z0r0 systemd[1]: Failed to mount /var/lib/chromadb.
+[z0r0] Feb 10 20:56:55 z0r0 systemd[1]: var-lib-chromadb.mount: Mount path /var/lib/chromadb is not canonical (contains a symlink).
+[z0r0] Feb 10 20:56:55 z0r0 systemd[1]: var-lib-chromadb.mount: Failed with result 'resources'.
+[z0r0] Feb 10 20:56:55 z0r0 systemd[1]: Failed to mount /var/lib/chromadb.
+[z0r0] Command 'systemd-run -E LOCALE_ARCHIVE -E NIXOS_INSTALL_BOOTLOADER -E NIXOS_NO_CHECK --collect --no-ask-password --pipe --quiet --service-type=exec --unit=nixos-rebuild-switch-to-configuration /nix/store/34jrfl2hz4z3nps2qxbp063r570jznwh-nixos-system-z0r0-26.05.20260204.00c21e4/bin/switch-to-configuration switch' returned non-zero exit status 4.
+[z0r0] failed with error: 
+=================================== Command ====================================
+ssh \
+    root@z0r0.local \
+    -A -o \
+    ControlMaster=auto \
+    -o ControlPersist=1m \
+    -o ControlPath=/tmp/nix-shell.d4NdLa/clan-sshrkq9_m_p/socket \
+    -- bash \
+    -c ''"'"'export NIX_SSHOPTS=-A; exec "$@"'"'"'' \
+    -- 'nixos-rebuild switch --show-trace --option keep-going true --option accept-flake-config true -L --flake '"'"'/nix/store/6jbc2ffh9zmrh6cdn8cy5dyj1gj1yxdl-source#z0r0'"'"' --fast --build-host '"'"''"'"''
+==================================== Stdout ====================================
+sops-install-secrets: Imported /etc/ssh/ssh_host_rsa_key as GPG key with fingerprint c576c8aff22db243fad1e5e867226987eda97c6f
+setting up /etc...
+Activation script snippet 'persist-files' failed (1)
+sops-install-secrets: Imported /etc/ssh/ssh_host_rsa_key as GPG key with fingerprint c576c8aff22db243fad1e5e867226987eda97c6f
+× home-manager-t0psh31f.service - Home Manager environment for t0psh31f
+     Loaded: loaded (/etc/systemd/system/home-manager-t0psh31f.service; enabled; preset: ignored)
+     Active: failed (Result: exit-code) since Tue 2026-02-10 20:56:56 PST; 6s ago
+   Duration: 5h 2min 12.886s
+ Invocation: f22902bae0ac41099b57b638978b8567
+    Process: 2944551 ExecStart=/nix/store/qbdws702kbaxsgrlh2j2gkdn96gdbf6a-hm-setup-env /nix/store/z11rjxihnw0w2p4ypfdd0p9bxgv77vs9-home-manager-generation (code=exited, status=1/FAILURE)
+   Main PID: 2944551 (code=exited, status=1/FAILURE)
+         IP: 0B in, 0B out
+         IO: 14.2M read, 0B written
+   Mem peak: 38.6M
+        CPU: 1.680s
+
+Feb 10 20:56:55 z0r0 hm-activate-t0psh31f[2944551]: Activating createGpgHomedir
+Feb 10 20:56:55 z0r0 hm-activate-t0psh31f[2944551]: Activating linkGeneration
+Feb 10 20:56:55 z0r0 hm-activate-t0psh31f[2944551]: Creating home file links in /home/t0psh31f
+Feb 10 20:56:56 z0r0 hm-activate-t0psh31f[2944551]: Activating batCache
+Feb 10 20:56:56 z0r0 hm-activate-t0psh31f[2945080]: No themes were found in '/home/t0psh31f/.config/bat/themes', using the default set
+Feb 10 20:56:56 z0r0 hm-activate-t0psh31f[2945080]: [bat error]: error finding all the files in a directory: IO error for operation on /home/t0psh31f/.config/bat/syntaxes/ghostty.sublime-syntax: No such file or directory (os error 2)
+Feb 10 20:56:56 z0r0 systemd[1]: home-manager-t0psh31f.service: Main process exited, code=exited, status=1/FAILURE
+Feb 10 20:56:56 z0r0 systemd[1]: home-manager-t0psh31f.service: Failed with result 'exit-code'.
+Feb 10 20:56:56 z0r0 systemd[1]: Failed to start Home Manager environment for t0psh31f.
+Feb 10 20:56:56 z0r0 systemd[1]: home-manager-t0psh31f.service: Consumed 1.680s CPU time, 38.6M memory peak, 14.2M read from disk.
+
+× persist-persist-etc-group.service - Bind mount or link /persist/etc/group to /etc/group
+     Loaded: loaded (/etc/systemd/system/persist-persist-etc-group.service; enabled; preset: ignored)
+     Active: failed (Result: exit-code) since Tue 2026-02-10 20:56:55 PST; 9s ago
+ Invocation: a004e358046b43f7a4085f70412bf535
+    Process: 2944650 ExecStart=/nix/store/awqdnshdva4kn3jjkhis99ry1xk1hskj-persistence-mount-file /etc/group /persist/etc/group auto  (code=exited, status=1/FAILURE)
+   Main PID: 2944650 (code=exited, status=1/FAILURE)
+         IP: 0B in, 0B out
+         IO: 0B read, 0B written
+   Mem peak: 2M
+        CPU: 30ms
+
+Feb 10 20:56:55 z0r0 systemd[1]: Starting Bind mount or link /persist/etc/group to /etc/group...
+Feb 10 20:56:55 z0r0 awqdnshdva4kn3jjkhis99ry1xk1hskj-persistence-mount-file[2944650]: A file already exists at /etc/group!
+Feb 10 20:56:55 z0r0 systemd[1]: persist-persist-etc-group.service: Main process exited, code=exited, status=1/FAILURE
+Feb 10 20:56:55 z0r0 systemd[1]: persist-persist-etc-group.service: Failed with result 'exit-code'.
+Feb 10 20:56:55 z0r0 systemd[1]: Failed to start Bind mount or link /persist/etc/group to /etc/group.
+
+× persist-persist-etc-machine\x2did.service - Bind mount or link /persist/etc/machine-id to /etc/machine-id
+     Loaded: loaded (/etc/systemd/system/persist-persist-etc-machine\x2did.service; enabled; preset: ignored)
+     Active: failed (Result: exit-code) since Tue 2026-02-10 20:56:55 PST; 9s ago
+ Invocation: e0ac3db6d1494c7ebba3c46c859844ed
+    Process: 2944654 ExecStart=/nix/store/awqdnshdva4kn3jjkhis99ry1xk1hskj-persistence-mount-file /etc/machine-id /persist/etc/machine-id auto  (code=exited, status=1/FAILURE)
+   Main PID: 2944654 (code=exited, status=1/FAILURE)
+         IP: 0B in, 0B out
+         IO: 0B read, 0B written
+   Mem peak: 2M
+        CPU: 32ms
+
+Feb 10 20:56:55 z0r0 systemd[1]: Starting Bind mount or link /persist/etc/machine-id to /etc/machine-id...
+Feb 10 20:56:55 z0r0 awqdnshdva4kn3jjkhis99ry1xk1hskj-persistence-mount-file[2944654]: A file already exists at /etc/machine-id!
+Feb 10 20:56:55 z0r0 systemd[1]: persist-persist-etc-machine\x2did.service: Main process exited, code=exited, status=1/FAILURE
+Feb 10 20:56:55 z0r0 systemd[1]: persist-persist-etc-machine\x2did.service: Failed with result 'exit-code'.
+Feb 10 20:56:55 z0r0 systemd[1]: Failed to start Bind mount or link /persist/etc/machine-id to /etc/machine-id.
+
+× persist-persist-etc-passwd.service - Bind mount or link /persist/etc/passwd to /etc/passwd
+     Loaded: loaded (/etc/systemd/system/persist-persist-etc-passwd.service; enabled; preset: ignored)
+     Active: failed (Result: exit-code) since Tue 2026-02-10 20:56:55 PST; 10s ago
+ Invocation: baef713d497342aca7d392cf5f621ce8
+    Process: 2944673 ExecStart=/nix/store/awqdnshdva4kn3jjkhis99ry1xk1hskj-persistence-mount-file /etc/passwd /persist/etc/passwd auto  (code=exited, status=1/FAILURE)
+   Main PID: 2944673 (code=exited, status=1/FAILURE)
+         IP: 0B in, 0B out
+         IO: 0B read, 0B written
+   Mem peak: 2M
+        CPU: 31ms
+
+Feb 10 20:56:55 z0r0 systemd[1]: Starting Bind mount or link /persist/etc/passwd to /etc/passwd...
+Feb 10 20:56:55 z0r0 awqdnshdva4kn3jjkhis99ry1xk1hskj-persistence-mount-file[2944673]: A file already exists at /etc/passwd!
+Feb 10 20:56:55 z0r0 systemd[1]: persist-persist-etc-passwd.service: Main process exited, code=exited, status=1/FAILURE
+Feb 10 20:56:55 z0r0 systemd[1]: persist-persist-etc-passwd.service: Failed with result 'exit-code'.
+Feb 10 20:56:55 z0r0 systemd[1]: Failed to start Bind mount or link /persist/etc/passwd to /etc/passwd.
+
+× persist-persist-etc-shadow.service - Bind mount or link /persist/etc/shadow to /etc/shadow
+     Loaded: loaded (/etc/systemd/system/persist-persist-etc-shadow.service; enabled; preset: ignored)
+     Active: failed (Result: exit-code) since Tue 2026-02-10 20:56:55 PST; 10s ago
+ Invocation: 8cc0f9c8406c452cb21fb011f828893e
+    Process: 2944604 ExecStart=/nix/store/awqdnshdva4kn3jjkhis99ry1xk1hskj-persistence-mount-file /etc/shadow /persist/etc/shadow auto  (code=exited, status=1/FAILURE)
+   Main PID: 2944604 (code=exited, status=1/FAILURE)
+         IP: 0B in, 0B out
+         IO: 0B read, 0B written
+   Mem peak: 2M
+        CPU: 33ms
+
+Feb 10 20:56:55 z0r0 systemd[1]: Starting Bind mount or link /persist/etc/shadow to /etc/shadow...
+Feb 10 20:56:55 z0r0 awqdnshdva4kn3jjkhis99ry1xk1hskj-persistence-mount-file[2944604]: A file already exists at /etc/shadow!
+Feb 10 20:56:55 z0r0 systemd[1]: persist-persist-etc-shadow.service: Main process exited, code=exited, status=1/FAILURE
+Feb 10 20:56:55 z0r0 systemd[1]: persist-persist-etc-shadow.service: Failed with result 'exit-code'.
+Feb 10 20:56:55 z0r0 systemd[1]: Failed to start Bind mount or link /persist/etc/shadow to /etc/shadow.
+
+× persist-persist-etc-subgid.service - Bind mount or link /persist/etc/subgid to /etc/subgid
+     Loaded: loaded (/etc/systemd/system/persist-persist-etc-subgid.service; enabled; preset: ignored)
+     Active: failed (Result: exit-code) since Tue 2026-02-10 20:56:55 PST; 10s ago
+ Invocation: d520f5dd031c4d5aa795d72716e26734
+    Process: 2944682 ExecStart=/nix/store/awqdnshdva4kn3jjkhis99ry1xk1hskj-persistence-mount-file /etc/subgid /persist/etc/subgid auto  (code=exited, status=1/FAILURE)
+   Main PID: 2944682 (code=exited, status=1/FAILURE)
+         IP: 0B in, 0B out
+         IO: 0B read, 0B written
+   Mem peak: 2M
+        CPU: 30ms
+
+Feb 10 20:56:55 z0r0 systemd[1]: Starting Bind mount or link /persist/etc/subgid to /etc/subgid...
+Feb 10 20:56:55 z0r0 awqdnshdva4kn3jjkhis99ry1xk1hskj-persistence-mount-file[2944682]: A file already exists at /etc/subgid!
+Feb 10 20:56:55 z0r0 systemd[1]: persist-persist-etc-subgid.service: Main process exited, code=exited, status=1/FAILURE
+Feb 10 20:56:55 z0r0 systemd[1]: persist-persist-etc-subgid.service: Failed with result 'exit-code'.
+Feb 10 20:56:55 z0r0 systemd[1]: Failed to start Bind mount or link /persist/etc/subgid to /etc/subgid.
+
+× persist-persist-etc-subuid.service - Bind mount or link /persist/etc/subuid to /etc/subuid
+     Loaded: loaded (/etc/systemd/system/persist-persist-etc-subuid.service; enabled; preset: ignored)
+     Active: failed (Result: exit-code) since Tue 2026-02-10 20:56:55 PST; 10s ago
+ Invocation: 1c277370571944bda6c4ede0220ebf4f
+    Process: 2944610 ExecStart=/nix/store/awqdnshdva4kn3jjkhis99ry1xk1hskj-persistence-mount-file /etc/subuid /persist/etc/subuid auto  (code=exited, status=1/FAILURE)
+   Main PID: 2944610 (code=exited, status=1/FAILURE)
+         IP: 0B in, 0B out
+         IO: 0B read, 0B written
+   Mem peak: 1.7M
+        CPU: 30ms
+
+Feb 10 20:56:55 z0r0 systemd[1]: Starting Bind mount or link /persist/etc/subuid to /etc/subuid...
+Feb 10 20:56:55 z0r0 awqdnshdva4kn3jjkhis99ry1xk1hskj-persistence-mount-file[2944610]: A file already exists at /etc/subuid!
+Feb 10 20:56:55 z0r0 systemd[1]: persist-persist-etc-subuid.service: Main process exited, code=exited, status=1/FAILURE
+Feb 10 20:56:55 z0r0 systemd[1]: persist-persist-etc-subuid.service: Failed with result 'exit-code'.
+Feb 10 20:56:55 z0r0 systemd[1]: Failed to start Bind mount or link /persist/etc/subuid to /etc/subuid.
+
+× persist-persist-home-t0psh31f-.gitconfig.service - Bind mount or link /persist/home/t0psh31f/.gitconfig to /home/t0psh31f/.gitconfig
+     Loaded: loaded (/etc/systemd/system/persist-persist-home-t0psh31f-.gitconfig.service; enabled; preset: ignored)
+     Active: failed (Result: exit-code) since Tue 2026-02-10 20:56:55 PST; 10s ago
+ Invocation: 99af1046c81b4207930151b82897a571
+    Process: 2944616 ExecStart=/nix/store/awqdnshdva4kn3jjkhis99ry1xk1hskj-persistence-mount-file /home/t0psh31f/.gitconfig /persist/home/t0psh31f/.gitconfig auto  (code=exited, status=1/FAILURE)
+   Main PID: 2944616 (code=exited, status=1/FAILURE)
+         IP: 0B in, 0B out
+         IO: 0B read, 0B written
+   Mem peak: 1.7M
+        CPU: 31ms
+
+Feb 10 20:56:55 z0r0 systemd[1]: Starting Bind mount or link /persist/home/t0psh31f/.gitconfig to /home/t0psh31f/.gitconfig...
+Feb 10 20:56:55 z0r0 awqdnshdva4kn3jjkhis99ry1xk1hskj-persistence-mount-file[2944616]: A file already exists at /home/t0psh31f/.gitconfig!
+Feb 10 20:56:55 z0r0 systemd[1]: persist-persist-home-t0psh31f-.gitconfig.service: Main process exited, code=exited, status=1/FAILURE
+Feb 10 20:56:55 z0r0 systemd[1]: persist-persist-home-t0psh31f-.gitconfig.service: Failed with result 'exit-code'.
+Feb 10 20:56:55 z0r0 systemd[1]: Failed to start Bind mount or link /persist/home/t0psh31f/.gitconfig to /home/t0psh31f/.gitconfig.
+
+× var-lib-chromadb.mount - /var/lib/chromadb
+     Loaded: loaded (/etc/systemd/system/var-lib-chromadb.mount; enabled; preset: ignored)
+     Active: failed (Result: resources)
+ Invocation: d4965c14dc404feeb692e64eb5f3c38b
+      Where: /var/lib/chromadb
+       What: /persist/var/lib/chromadb
+
+Feb 10 20:52:41 z0r0 systemd[1]: Failed to mount /var/lib/chromadb.
+Feb 10 20:52:41 z0r0 systemd[1]: var-lib-chromadb.mount: Mount path /var/lib/chromadb is not canonical (contains a symlink).
+Feb 10 20:52:41 z0r0 systemd[1]: var-lib-chromadb.mount: Failed with result 'resources'.
+Feb 10 20:52:41 z0r0 systemd[1]: Failed to mount /var/lib/chromadb.
+Feb 10 20:56:55 z0r0 systemd[1]: var-lib-chromadb.mount: Mount path /var/lib/chromadb is not canonical (contains a symlink).
+Feb 10 20:56:55 z0r0 systemd[1]: var-lib-chromadb.mount: Failed with result 'resources'.
+Feb 10 20:56:55 z0r0 systemd[1]: Failed to mount /var/lib/chromadb.
+Feb 10 20:56:55 z0r0 systemd[1]: var-lib-chromadb.mount: Mount path /var/lib/chromadb is not canonical (contains a symlink).
+Feb 10 20:56:55 z0r0 systemd[1]: var-lib-chromadb.mount: Failed with result 'resources'.
+Feb 10 20:56:55 z0r0 systemd[1]: Failed to mount /var/lib/chromadb.
+
+==================================== Stderr ====================================
+nixos-rebuild: warning: --fast is deprecated, use --no-reexec instead
+building the system configuration...
+Checking switch inhibitors... done
+updating GRUB 2 menu...
+Warning: os-prober will be executed to detect other bootable partitions.
+Its output will be used to detect bootable binaries on them and create new boot entries.
+lsblk: /dev/mapper/no*[0-9]: not a block device
+lsblk: /dev/mapper/block*[0-9]: not a block device
+lsblk: /dev/mapper/devices*[0-9]: not a block device
+lsblk: /dev/mapper/found*[0-9]: not a block device
+activating the configuration...
+sops-install-secrets: Imported /etc/ssh/ssh_host_ed25519_key as age key with fingerprint age13ytd3kguxglv2k67mcx298djypxseqx2jkn5vw0zlf2079g28chqw8dm24
+A file already exists at /etc/machine-id!
+A file already exists at /etc/passwd!
+A file already exists at /etc/shadow!
+A file already exists at /etc/group!
+A file already exists at /etc/subuid!
+A file already exists at /etc/subgid!
+A file already exists at /home/t0psh31f/.gitconfig!
+sops-install-secrets: Imported /etc/ssh/ssh_host_ed25519_key as age key with fingerprint age13ytd3kguxglv2k67mcx298djypxseqx2jkn5vw0zlf2079g28chqw8dm24
+Failed to run activate script
+reloading user units for t0psh31f...
+reloading user units for root...
+restarting sysinit-reactivation.target
+the following new units were started: libvirtd.service, NetworkManager-dispatcher.service
+warning: the following units failed: home-manager-t0psh31f.service, persist-persist-etc-group.service, persist-persist-etc-machine\x2did.service, persist-persist-etc-passwd.service, persist-persist-etc-shadow.service, persist-persist-etc-subgid.service, persist-persist-etc-subuid.service, persist-persist-home-t0psh31f-.gitconfig.service, var-lib-chromadb.mount
+Command 'systemd-run -E LOCALE_ARCHIVE -E NIXOS_INSTALL_BOOTLOADER -E NIXOS_NO_CHECK --collect --no-ask-password --pipe --quiet --service-type=exec --unit=nixos-rebuild-switch-to-configuration /nix/store/34jrfl2hz4z3nps2qxbp063r570jznwh-nixos-system-z0r0-26.05.20260204.00c21e4/bin/switch-to-configuration switch' returned non-zero exit status 4.
+
+Return Code: 4
+
+1 hosts failed with an error. Check the logs above

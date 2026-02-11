@@ -364,7 +364,7 @@ in
 
       # CLI & TUI
       aider-chat-full # CLI for AI pair programming
-      crush # AI-powered command-line tool
+      # crush (Provided by llm-agents.nix)
       krillinai # AI agent tool
 
       # TTS & STT

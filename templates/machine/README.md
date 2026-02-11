@@ -1,99 +1,81 @@
-# Machine Template README
+# Machine Template Guide
 
-## Creating a New Machine
+This template is the primary way to add a new permanent machine (laptop, desktop, or server) to the Grandlix-Gang fleet.
 
-### Step 1: Copy the Template
+## Quick Setup (5 Minutes)
+
+### 1. Create Machine Directory
+Choose a unique name for your machine (e.g., `sunny`, `GOING-MERRY`) and copy the template:
 ```bash
-cp -r templates/machine machines/newmachine
-cd machines/newmachine
+cp -r templates/machine machines/MY_MACHINE_NAME
+cd machines/MY_MACHINE_NAME
 ```
 
-### Step 2: Generate Hardware Configuration
+### 2. Update Basic Config
+Edit `default.nix`:
+*   Change `networking.hostName = "CHANGEME";` to your actual machine name.
+*   Configure your `clan.core.tags` (e.g., `["desktop" "laptop" "gaming"]`).
+*   Toggle any specific features you want (e.g., `gaming.enable = true`).
 
-For a physical machine or during installation:
+### 3. Generate Hardware Info
+If you are on the actual target machine:
 ```bash
 nixos-generate-config --root /mnt --show-hardware-config > hardware-configuration.nix
 ```
 
-Or use clan's facter (if the machine is already running NixOS):
-```bash
-clan facts generate newmachine
-```
+### 4. Register in Clan Inventory
+Edit `clan.nix` at the repository root:
 
-### Step 3: Edit Configuration
-
-Edit `default.nix`:
-1. Change `networking.hostName` to your machine name
-2. Choose your desktop environment
-3. Enable desired services and features
-4. Update user imports if needed
-
-### Step 4: Add to Clan Inventory
-
-Edit `clan.nix` at the root of the repository:
-
-```nix
-{
-  inventory = {
-    machines = {
-      # ... existing machines ...
-      newmachine = {
-        tags = ["client" "desktop"];  # or ["server"], etc.
-        deploy.targetHost = "root@192.168.1.XXX";
-      };
+1.  Add the machine to `inventory.machines`:
+    ```nix
+    inventory.machines.MY_MACHINE_NAME = {
+      tags = [ "desktop" "laptop" ]; # Match what you put in default.nix
+      deploy.targetHost = "root@MY_MACHINE_IP_OR_HOSTNAME";
     };
-  };
+    ```
 
-  machines = {
-    # ... existing machines ...
-    newmachine = {...}: {
-      imports = [./machines/newmachine/default.nix];
+2.  Import the machine config in `machines`:
+    ```nix
+    machines.MY_MACHINE_NAME = {
+      imports = [ ./machines/MY_MACHINE_NAME/default.nix ];
     };
-  };
-}
-```
+    ```
 
-### Step 5: Build and Deploy
+## Post-Setup Actions
 
-Test build:
+### Generate Variables (Sops/SSH)
 ```bash
-nix build .#nixosConfigurations.newmachine.config.system.build.toplevel
+clan vars generate MY_MACHINE_NAME
 ```
 
-Build VM for testing:
+### Installation
+If installing from an ISO:
 ```bash
-nixos-rebuild build-vm --flake .#newmachine
-./result/bin/run-newmachine-vm
+# On your build machine
+clan machines install MY_MACHINE_NAME --target-host root@ISO_IP
 ```
 
-Deploy to target machine:
+### Updates
 ```bash
-clan machines install newmachine
+clan machines update MY_MACHINE_NAME
 ```
 
-Or traditional nixos-rebuild:
-```bash
-nixos-rebuild switch --flake .#newmachine --target-host root@targethost
-```
+## Advanced Customization
 
-## Configuration Options
+### The Dendritic Pattern
+We use a nested attribute set pattern for toggling features.
+*   `system-config.*` - High-level system behavior (like Impermanence).
+*   `services-config.*` - Infrastructure bundles.
+*   `services.ai-services.*` - Granular AI tool toggles.
+*   `home-manager.users.t0psh31f.desktop.*` - User-space GUI toggles.
 
-All options are documented in `default.nix` with inline comments. Major categories:
+### Adding Machine-Specific Secrets
+To add secrets just for this machine, create a `secrets.yaml` in your machine directory and ensure it's imported in your `default.nix` via `sops-nix`.
 
-- **Desktop Environment**: Choose between Omarchy, Caelestia, or illogical-impulse
-- **Gaming**: Steam, Proton, emulators, performance tools
-- **AI Services**: PostgreSQL, Open WebUI, Qdrant, ChromaDB, LocalAI
-- **Web Services**: Nextcloud, Caddy, Home Assistant, Calibre-Web
-- **Communication**: Matrix, Mautrix bridges (10 platforms), Immich
-- **System Compatibility**: AppImage, Flatpak
-- **Themes**: SDDM Lain, GRUB Lain, Plymouth Matrix
-
-## Tags Reference
-
-Common tags for machines:
-- `client` - Desktop/laptop for end-user
-- `server` - Server machine
-- `laptop` - Portable device
-- `desktop` - Stationary workstation
-- `vm` - Virtual machine
-- `container` - Container instance
+## Tags Cheat Sheet
+*   `desktop`: Enables video drivers, Hyprland, fonts, and GUI apps.
+*   `laptop`: Includes `desktop` + battery management and touchpad support.
+*   `server`: Minimal headless setup with server-grade optimizations.
+*   `ai-server`: Installs CUDA/ROCm and local LLM runners.
+*   `gaming`: Sets up Steam, Proton-GE, and emulators.
+*   `nvidia`: Triggers Nvidia proprietary driver installation.

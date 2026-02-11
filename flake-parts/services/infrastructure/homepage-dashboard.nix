@@ -65,7 +65,7 @@ in
 
       settings = mkMerge [
         {
-          title = "Grandlix Dashboard";
+          title = "Nix Flake Pirates Dashboard";
           favicon = "https://raw.githubusercontent.com/gethomepage/homepage/main/public/homepage.png";
 
           # Base theme (will be overridden by Noctalia if enabled)
@@ -110,7 +110,7 @@ in
       widgets = [
         {
           search = {
-            provider = "perplexity";
+            provider = "duckduckgo";
             target = "_blank";
             showSearchSuggestions = true;
             focus = true;
@@ -139,7 +139,7 @@ in
       services = [
         {
           "Media Services" = flatten [
-            (optional (safePathExists "/var/lib/jellyfin") {
+            (optional (isServiceEnabled "jellyfin") {
               "Jellyfin" = {
                 icon = "jellyfin.png";
                 href = "http://localhost:8096";
@@ -158,7 +158,7 @@ in
                 description = "E-Book Library";
               };
             })
-            (optional (safePathExists "/var/lib/sonarr") {
+            (optional (isServiceEnabled "sonarr") {
               "Sonarr" = {
                 icon = "sonarr.png";
                 href = "http://localhost:8989";
@@ -170,7 +170,7 @@ in
                 };
               };
             })
-            (optional (safePathExists "/var/lib/radarr") {
+            (optional (isServiceEnabled "radarr") {
               "Radarr" = {
                 icon = "radarr.png";
                 href = "http://localhost:7878";
@@ -182,7 +182,7 @@ in
                 };
               };
             })
-            (optional (safePathExists "/var/lib/prowlarr") {
+            (optional (isServiceEnabled "prowlarr") {
               "Prowlarr" = {
                 icon = "prowlarr.png";
                 href = "http://localhost:9696";
@@ -194,7 +194,7 @@ in
                 };
               };
             })
-            (optional (safePathExists "/var/lib/bazarr") {
+            (optional (isServiceEnabled "bazarr") {
               "Bazarr" = {
                 icon = "bazarr.png";
                 href = "http://localhost:6767";
@@ -244,7 +244,7 @@ in
                 };
               };
             })
-            (optional (safePathExists "/var/lib/your-spotify") {
+            (optional (isServiceEnabled "your-spotify") {
               "Your Spotify" = {
                 icon = "spotify.png";
                 href = "http://localhost:3457";
@@ -258,11 +258,12 @@ in
             (optional (isServiceEnabled "glances-server") {
               "Glances" = {
                 icon = "glances.png";
-                href = "http://localhost:${getServicePort "glances-server" 61208}";
+                href = "http://127.0.0.1:${getServicePort "glances-server" 61208}";
                 description = "System Monitoring";
                 widget = {
                   type = "glances";
-                  url = "http://localhost:${getServicePort "glances-server" 61208}";
+                  url = "http://127.0.0.1:${getServicePort "glances-server" 61208}";
+                  version = 4;
                 };
               };
             })
@@ -280,7 +281,7 @@ in
                 description = "Metrics Collection";
               };
             })
-            (optional (safePathExists "/var/lib/loki") {
+            (optional (isServiceEnabled "loki") {
               "Loki" = {
                 icon = "loki.png";
                 href = "http://localhost:3100";
@@ -364,11 +365,11 @@ in
             (optional (isServiceEnabled "nextcloud") {
               "Nextcloud" = {
                 icon = "nextcloud.png";
-                href = "http://localhost:6380";
+                href = "https://${config.services.nextcloud-server.hostName}";
                 description = "Cloud Storage";
                 widget = {
                   type = "nextcloud";
-                  url = "http://localhost:6380";
+                  url = "https://${config.services.nextcloud-server.hostName}";
                   username = "{{HOMEPAGE_VAR_NEXTCLOUD_USERNAME}}";
                   password = "{{HOMEPAGE_VAR_NEXTCLOUD_PASSWORD}}";
                 };
@@ -409,6 +410,7 @@ in
                   type = "immich";
                   url = "http://localhost:2283";
                   key = "{{HOMEPAGE_VAR_IMMICH_KEY}}";
+                  version = 2;
                 };
               };
             })
@@ -419,7 +421,7 @@ in
                 description = "Container Management";
               };
             }
-            (optional (safePathExists "/var/lib/matrix-synapse") {
+            (optional (isServiceEnabled "matrix-synapse") {
               "Matrix Synapse" = {
                 icon = "matrix.png";
                 href = "http://localhost:8008";

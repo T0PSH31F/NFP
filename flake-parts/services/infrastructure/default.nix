@@ -1,6 +1,7 @@
 { ... }:
 {
   imports = [
+    ./adguard.nix
     ./avahi.nix
     ./caddy.nix
     ./filebrowser.nix
@@ -10,7 +11,10 @@
     ./home-assistant.nix
     ./homepage-dashboard.nix
     ./monitoring.nix
+    ./n8n.nix
     ./nextcloud.nix
+    ./pastebin.nix
+    ./searxng.nix
     ./ssh-agent.nix
   ];
 }

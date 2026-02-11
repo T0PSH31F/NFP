@@ -34,8 +34,7 @@ in
         android-tools # ADB, Fastboot
         jmtpfs # MTP Filesystem
         scrcpy # Screen mirroring
-        heimdall # Samsung Galaxy flashing tool
-        heimdall-gui # GUI for Heimdall
+        heimdall-gui # GUI for Heimdall (provides CLI tools as well)
       ];
 
       # User permissions

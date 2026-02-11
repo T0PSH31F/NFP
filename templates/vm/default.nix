@@ -1,39 +1,46 @@
 # VM Configuration Template
+# Suitable for testing and trial runs in QEMU.
 #
-# This creates a lightweight VM configuration suitable for:
-# - Testing configurations
-# - Development environments
-# - Temporary instances
-#
-# Build with: nix build .#nixosConfigurations.vm-template.config.system.build.vm
-# Or use nixos-generators: nix build .#images.vm-template
+# Usage:
+#   1. Copy this template: cp -r templates/vm machines/test-vm
+#   2. Build VM: nixos-rebuild build-vm --flake .#test-vm
+#   3. Run VM: ./result/bin/run-test-vm-vm
+
 {
   pkgs,
+  lib,
   modulesPath,
   ...
 }:
+
 {
   imports = [
     (modulesPath + "/profiles/qemu-guest.nix")
-    ../../modules/system
-    ../../modules/users/t0psh31f.nix
+
+    # Standard system core
+    ../../flake-parts/system
+    ../../flake-parts/features/nixos
   ];
 
   # VM-optimized settings
   networking.hostName = "grandlix-vm";
 
-  # Enable minimal desktop for GUI testing
-  services.xserver = {
-    enable = true;
-    displayManager.lightdm.enable = true;
-    desktopManager.xfce.enable = true;
-  };
+  # Hardware acceleration in VM (optional)
+  hardware.graphics.enable = true;
 
   # Virtualization guest tools
   services.qemuGuest.enable = true;
   services.spice-vdagentd.enable = true;
 
-  # Shared folder support
+  # Display Manager for testing GUI features
+  # (Enable 'desktop' tag in clan.nix or set options below)
+
+  clan.core.tags = [
+    "desktop"
+    "vm"
+  ];
+
+  # shared folder setup for QEMU
   fileSystems."/mnt/shared" = {
     fsType = "9p";
     device = "shared";
@@ -44,39 +51,15 @@
     ];
   };
 
-  # Enable SSH for remote access
-  services.openssh = {
-    enable = true;
-    settings.PermitRootLogin = "yes";
-  };
-
-  # Faster boot in VMs
-  boot.loader.timeout = 1;
-  boot.loader.grub = {
-    enable = true;
-    device = "/dev/vda"; # For VirtIO disk
-  };
-
-  # Basic packages for testing
-  environment.systemPackages = with pkgs; [
-    vim
-    git
-    htop
-    wget
-    curl
-  ];
-
-  # Enable features you want to test
-  gaming.enable = false;
-  services.ai-services.enable = false;
-  programs.appimage-support.enable = true;
-  services.flatpak-support.enable = true;
-
-  # Auto-login for easy testing (INSECURE - only for VMs!)
+  # Auto-login for easy testing
   services.displayManager.autoLogin = {
     enable = true;
     user = "t0psh31f";
   };
+
+  # Faster boot settings
+  boot.loader.timeout = 1;
+  boot.loader.grub.device = "/dev/vda";
 
   system.stateVersion = "25.05";
 }

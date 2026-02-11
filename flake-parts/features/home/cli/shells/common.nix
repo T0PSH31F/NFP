@@ -41,12 +41,16 @@ in
       "....." = "cd ../../../..";
 
       # Nix shortcuts
-      nrs = "sudo nixos-rebuild switch --flake ~/Clan/Grandlix-Gang";
-      nrt = "sudo nixos-rebuild test --flake ~/Clan/Grandlix-Gang";
+      nrs = "sudo nixos-rebuild switch --flake ~/Clan/NFP";
+      nrt = "sudo nixos-rebuild test --flake ~/Clan/NFP";
       nfc = "nix flake check";
       nfu = "nix flake update";
 
-      # Clan machine management
+      # Clan / NFP machine management
+      nfp = "clan";
+      nfpu = "clan machines update";
+      nfps = "clan secrets";
+      nfpg = "clan vars generate";
       cbuild = "clan machines build";
       cupdate = "clan machines update";
 
@@ -71,7 +75,7 @@ in
         fi
       }
 
-      clan() {
+      clandir() {
         local clan_dir="$HOME/Clan"
         if [[ -d "$clan_dir" ]]; then
           cd "$clan_dir/$1" 2>/dev/null || cd "$clan_dir"

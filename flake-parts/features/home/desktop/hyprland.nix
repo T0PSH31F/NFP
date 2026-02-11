@@ -106,7 +106,7 @@ let
     • Use scratchpads for quick access
     • Yazelix is Helix-based modal editor
     "
-      echo "$CHEATSHEET" | ${pkgs.rofi-wayland}/bin/rofi -dmenu \
+      echo "$CHEATSHEET" | ${pkgs.rofi}/bin/rofi -dmenu \
         -p "Hyprland Keybinds" \
         -theme-str 'window {width: 55%; height: 90%;}' \
         -theme-str 'listview {columns: 1;}' \
@@ -134,7 +134,7 @@ in
       hueadm
       hypr-keybind-cheatsheet
       hyprpolkitagent
-      inputs.hyprland-plugins.packages.${pkgs.system}.hypr-dynamic-cursors
+      inputs.hypr-dynamic-cursors.packages.${pkgs.system}.hypr-dynamic-cursors
       inputs.hyprspace.packages.${pkgs.system}.Hyprspace
       kitty
       libnotify
@@ -163,7 +163,7 @@ in
       package = inputs.hyprland.packages.${pkgs.system}.hyprland;
       systemd.enable = false;
       plugins = [
-        inputs.hyprland-plugins.packages.${pkgs.system}.hypr-dynamic-cursors
+        inputs.hypr-dynamic-cursors.packages.${pkgs.system}.hypr-dynamic-cursors
         inputs.hyprspace.packages.${pkgs.system}.Hyprspace
       ];
 

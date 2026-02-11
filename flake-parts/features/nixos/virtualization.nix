@@ -4,12 +4,16 @@
   pkgs,
   ...
 }:
-with lib; {
+with lib;
+{
   options.virtualization = {
     enable = mkEnableOption "Virtualization support (QEMU/KVM, Docker, Podman)";
   };
 
   config = mkIf config.virtualization.enable {
+    programs.extra-container = {
+      enable = true;
+    };
     # Enable virtualization
     virtualisation = {
       # Enable libvirtd for QEMU/KVM
@@ -70,6 +74,7 @@ with lib; {
       # OCI tools
       buildah
       skopeo
+      nixos-shell
     ];
   };
 }

@@ -81,6 +81,9 @@ in
       # Store optimization
       auto-optimise-store = lib.mkDefault true;
 
+      # CRITICAL: Fix "download buffer is full" warnings for large files
+      download-buffer-size = lib.mkDefault 134217728; # 128MB (Default is 64MB)
+
       # Keep some free disk space thresholds (bytes)
       min-free = lib.mkForce 1073741824; # 1GiB
       max-free = lib.mkForce 5368709120; # 5GiB

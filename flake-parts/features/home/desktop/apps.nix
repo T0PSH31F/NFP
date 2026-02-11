@@ -58,7 +58,7 @@ in
       spotdl # Spotify downloader
 
       # Productivity
-      obsidian # Knowledge base / notes
+      # Productivity
       lsd
     ];
 
@@ -94,8 +94,8 @@ in
         package = pkgs.adw-gtk3;
       };
       iconTheme = {
-        name = "Sweet-Rainbow";
-        package = pkgs.sweet-folders;
+        name = "candy-icons";
+        package = pkgs.candy-icons;
       };
     };
   };

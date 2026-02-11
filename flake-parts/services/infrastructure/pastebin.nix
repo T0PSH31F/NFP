@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   cfg = config.services.pastebin;
@@ -6,7 +11,7 @@ in
 {
   options.services.pastebin = {
     enable = lib.mkEnableOption "PrivateBin pastebin service";
-    
+
     port = lib.mkOption {
       type = lib.types.port;
       default = 8080;
@@ -55,8 +60,7 @@ in
     };
 
     # Nginx reverse proxy (optional)
-    services.nginx = {
-      enable = lib.mkDefault true;
+    services.nginx = lib.mkIf (config.services.nginx.enable or false) {
       virtualHosts."paste.local" = {
         locations."/" = {
           proxyPass = "http://127.0.0.1:${toString cfg.port}";

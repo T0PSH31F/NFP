@@ -16,7 +16,6 @@
     ../../flake-parts/system
     ../../flake-parts/hardware
     ../../flake-parts/themes
-    ../../flake-parts/desktop
     ../../flake-parts/features/nixos
 
     ../../flake-parts/services/ai
@@ -131,8 +130,6 @@
   # SOPS SECRETS
   # ============================================================================
   sops.age.keyFile = "/home/t0psh31f/.config/sops/age/keys.txt";
-
-  # Home-manager basic settings are now in flake-parts/users/t0psh31f.nix
 
   # ============================================================================
   # ENVIRONMENT CONFIGURATION

@@ -25,6 +25,7 @@
     {
       imports = [
         inputs.sops-nix.homeManagerModules.sops
+        inputs.vicinae.homeManagerModules.default
         ../features/home
       ];
 
@@ -74,6 +75,9 @@
 
       # Enable the new CLI environment
       programs.cli-environment.enable = true;
+
+      # Enable Documents & Publishing suite
+      home-config.documents.enable = true;
     };
 
 }

@@ -15,6 +15,10 @@
     hyprland = {
       url = "github:hyprwm/Hyprland";
     };
+    hypr-dynamic-cursors = {
+      url = "github:VirtCode/hypr-dynamic-cursors";
+      inputs.hyprland.follows = "hyprland";
+    };
     hyprland-plugins = {
       url = "github:hyprwm/hyprland-plugins";
       inputs.hyprland.follows = "hyprland";
@@ -67,6 +71,7 @@
       clan-core,
       flake-parts,
       home-manager,
+      hypr-dynamic-cursors,
       hyprland-plugins,
       hyprspace,
       import-tree,
@@ -203,7 +208,7 @@
                 ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠛⠛⠿⠿⣿⣿⣿⣿⣿⣿⣿⣯⣭⣤⣀⣀⠀⠀⠀⣰⣿⣿⠍⣿⣿⣿⣿⣿⣿⣿⣿⣿
                 ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣠⣤⣶⣶⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣶⣿⣿⣶⣿⣿⣿⣿⣿⣿⣿⣿⣿
                 EOF
-                                echo "Grandlix-Gang NixOS Configuration"
+                                echo "Nix Flake Pirates Configuration"
                                 echo "==================================="
                                 echo ""
                                 echo "NOTE: Development environments have been moved to T0PSH31F/grandlix-devenvs"
