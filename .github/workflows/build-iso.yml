@@ -1,0 +1,59 @@
+name: Build Going-Merry ISO
+
+on:
+  workflow_dispatch:  # Manual trigger from GitHub UI
+  push:
+    paths:
+      - 'templates/iso/**'
+      - 'flake-parts/**'
+      - 'flake.nix'
+      - 'flake.lock'
+    branches: [main]
+
+jobs:
+  build-iso:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+
+    steps:
+      - name: Free disk space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: true
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: true
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
+        with:
+          extra-conf: |
+            experimental-features = nix-command flakes
+            accept-flake-config = true
+
+      - name: Setup Nix cache
+        uses: DeterminateSystems/magic-nix-cache-action@main
+
+      - name: Check disk space
+        run: df -h
+
+      - name: Build ISO
+        run: |
+          nix build .#packages.x86_64-linux.iso --no-link --print-out-paths | tee iso-path.txt
+          ISO_DIR=$(cat iso-path.txt)
+          echo "ISO_PATH=$(ls ${ISO_DIR}/iso/*.iso)" >> $GITHUB_ENV
+          echo "ISO built: $(ls -lh ${ISO_DIR}/iso/*.iso)"
+
+      - name: Upload ISO artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Going-Merry-ISO
+          path: ${{ env.ISO_PATH }}
+          retention-days: 7
+          compression-level: 0  # Already compressed with zstd squashfs
