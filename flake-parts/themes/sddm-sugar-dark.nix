@@ -1,5 +1,6 @@
 # flake-parts/themes/sddm-sugar-dark.nix
-# SDDM Sugar Dark theme with matugen color integration and background image
+# SDDM Sugar Dark theme with build-time matugen color extraction
+# Colors are generated from the background image using Material You algorithm
 # Reference: https://github.com/MarianArlt/sddm-sugar-dark
 {
   config,
@@ -10,6 +11,29 @@
 with lib;
 let
   cfg = config.themes.sddm-sugar-dark;
+
+  # Extract Material You colors from background image at build time
+  matugen-colors = pkgs.runCommand "matugen-sddm-colors" {
+    nativeBuildInputs = [ pkgs.matugen pkgs.jq ];
+  } ''
+    COLORS=$(matugen image "${cfg.background}" \
+      --json hex --dry-run --mode ${cfg.matugen.scheme} 2>/dev/null)
+
+    mkdir -p $out
+    echo "$COLORS" | jq -r '.colors.primary.${cfg.matugen.scheme}' > $out/theme_color
+    echo "$COLORS" | jq -r '.colors.tertiary.${cfg.matugen.scheme}' > $out/accent_color
+    echo "$COLORS" | jq -r '.colors.surface.${cfg.matugen.scheme}' > $out/surface_color
+    echo "$COLORS" | jq -r '.colors.on_surface.${cfg.matugen.scheme}' > $out/on_surface_color
+  '';
+
+  # Resolve colors: matugen-extracted or user-specified
+  themeColor = if cfg.matugen.enable && cfg.background != ""
+    then builtins.readFile "${matugen-colors}/surface_color"
+    else cfg.themeColor;
+
+  accentColor = if cfg.matugen.enable && cfg.background != ""
+    then builtins.readFile "${matugen-colors}/accent_color"
+    else cfg.accentColor;
 
   # Build a patched version of the theme with custom theme.conf
   sddm-sugar-dark-custom = pkgs.stdenv.mkDerivation {
@@ -29,36 +53,31 @@ let
       # Copy all theme files
       cp -r * $out/share/sddm/themes/sugar-dark/
 
-      # Overwrite theme.conf with our customized version
-      cat > $out/share/sddm/themes/sugar-dark/theme.conf << 'CONF'
+      ${optionalString (cfg.background != "") ''
+        # Copy custom background into the theme directory
+        cp "${cfg.background}" $out/share/sddm/themes/sugar-dark/background_custom
+      ''}
+
+      # Write customized theme.conf
+      cat > $out/share/sddm/themes/sugar-dark/theme.conf << EOF
       [General]
-      Background="${cfg.background}"
+      Background="${if cfg.background != "" then "background_custom" else ""}"
       ScaleImageCropped=${boolToString cfg.scaleImageCropped}
       ScreenWidth=${toString cfg.screenWidth}
       ScreenHeight=${toString cfg.screenHeight}
 
-      # Colors - overridden by matugen template if enabled
-      ThemeColor="${cfg.themeColor}"
-      AccentColor="${cfg.accentColor}"
+      ThemeColor="${removeSuffix "\n" themeColor}"
+      AccentColor="${removeSuffix "\n" accentColor}"
 
-      # Layout
       RoundCorners=${toString cfg.roundCorners}
       ScreenPadding=${toString cfg.screenPadding}
 
-      # Typography
       Font="${cfg.font}"
       FontSize=${optionalString (cfg.fontSize != null) (toString cfg.fontSize)}
 
-      # Session
       ForceLastUser=true
       ForcePasswordFocus=true
-      CONF
-
-      ${optionalString (cfg.background != "" && builtins.pathExists cfg.background) ''
-        # Copy custom background into the theme directory
-        cp "${cfg.background}" $out/share/sddm/themes/sugar-dark/background_custom
-        sed -i 's|Background=".*"|Background="background_custom"|' $out/share/sddm/themes/sugar-dark/theme.conf
-      ''}
+      EOF
     '';
   };
 in
@@ -66,13 +85,32 @@ in
   options.themes.sddm-sugar-dark = {
     enable = mkEnableOption "SDDM Sugar Dark theme";
 
+    matugen = {
+      enable = mkOption {
+        type = types.bool;
+        default = true;
+        description = ''
+          Extract theme colors from the background image using matugen (Material You).
+          When enabled, ThemeColor uses the surface color and AccentColor uses the
+          tertiary color from the generated palette. Runs at build time — deterministic,
+          no runtime overhead.
+        '';
+      };
+
+      scheme = mkOption {
+        type = types.enum [ "dark" "light" ];
+        default = "dark";
+        description = "Color scheme variant to extract from the background image";
+      };
+    };
+
     background = mkOption {
       type = types.str;
       default = "";
       description = ''
         Path to background image. Supports JPEG, PNG, GIF, BMP, TIFF.
         Leave empty to use the theme default.
-        Can be an absolute path (e.g. "/persist/wallpapers/login.jpg").
+        When matugen is enabled, colors are also extracted from this image.
       '';
     };
 
@@ -132,7 +170,6 @@ in
   };
 
   config = mkIf cfg.enable {
-    # Assertion: Only one SDDM theme can be enabled at a time
     assertions = [
       {
         assertion = !(config.themes.sddm-sel.enable or false);
@@ -153,7 +190,6 @@ in
       ];
     };
 
-    # Enable sound at login screen
     security.rtkit.enable = true;
     services.pipewire = {
       enable = true;
@@ -162,7 +198,6 @@ in
       pulse.enable = true;
     };
 
-    # Install theme to system
     environment.systemPackages = [
       sddm-sugar-dark-custom
     ];
