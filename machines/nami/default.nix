@@ -25,6 +25,7 @@
   # ============================================================================
   networking.hostName = "nami";
   system.stateVersion = "25.05";
+  clan.core.tags = [ "desktop" "laptop" ];
 
   # ============================================================================
   # FEATURE TOGGLES
@@ -36,10 +37,7 @@
 
   # Themes - match z0r0 for consistency
   themes = {
-    sddm-sel = {
-      enable = true;
-      variant = "shaders";
-    };
+    sddm-sugar-dark.enable = true;
     grub-lain.enable = true;
     plymouth-hellonavi.enable = true;
   };
@@ -61,22 +59,7 @@
   system-config.impermanence.enable = false;
 
   # ============================================================================
-  # SERVICES - Minimal for initial setup
-  # ============================================================================
-  services = {
-    ssh-agent.enable = true;
-  };
-
-  # ============================================================================
   # SOPS SECRETS
   # ============================================================================
   sops.age.keyFile = "/home/t0psh31f/.config/sops/age/keys.txt";
-
-  # ============================================================================
-  # SECURITY / ACME
-  # ============================================================================
-  security.acme = {
-    acceptTerms = true;
-    defaults.email = "admin@grandlix.com";
-  };
 }

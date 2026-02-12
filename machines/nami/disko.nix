@@ -4,7 +4,7 @@
 #          passwordFile=/tmp/secret.key for initial install
 #
 # Before install: echo -n "your-luks-password" > /tmp/secret.key
-{ config, ... }:
+{ ... }:
 {
   disko.devices = {
     disk.main = {
