@@ -45,6 +45,7 @@
   themes = {
     sddm-sugar-dark = {
       enable = true;
+      background = "${./../../assets/sddm_background/the-world-of-one-piece_800.gif}";
     };
 
     grub-lain.enable = true;

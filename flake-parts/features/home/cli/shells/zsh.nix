@@ -50,7 +50,7 @@ in
                 fi
 
                 # Source p10k configuration
-                source ${../../assets/p10k.zsh}
+                source ${../../../../../assets/p10k.zsh}
                 
                 # Keybindings
                 bindkey -v

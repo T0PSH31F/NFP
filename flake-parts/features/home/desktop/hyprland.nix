@@ -447,6 +447,7 @@ in
             color = "$shadow_active";
             color_inactive = "$shadow_inactive";
           };
+          screen_shader = "${../../../../assets/hypr-shaders/vibrance.glsl.mustache}";
         };
 
         misc = {

@@ -22,14 +22,17 @@ in
     programs.noctalia-shell = {
       enable = true;
       package = inputs.noctalia.packages.${pkgs.system}.default;
-      # settings = ../assets/noctalia-config.json; # Assuming relative path fix
-      settings = ../assets/noctalia-config.json;
+      settings = ../../../../assets/noctalia-config.json;
     };
 
     home.file = {
       ".config/homepage/.keep".text = "";
       ".config/BraveSoftware/Brave-Browser/Default/User StyleSheets/.keep".text = "";
       ".local/share/gedit/styles/.keep".text = "";
+
+      # Noctalia user profile image
+      ".face".source = ../../../../assets/user_profile/cloud.gif;
+      ".face.icon".source = ../../../../assets/user_profile/cloud.gif;
     };
 
     # Desktop GUI helpers for the user

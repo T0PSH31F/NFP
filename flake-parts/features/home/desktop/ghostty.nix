@@ -39,8 +39,7 @@ in
     };
 
     xdg.configFile."ghostty/config".text = lib.mkAfter ''
-      custom-shader = ${../assets/shaders/neon.glsl}
-      custom-shader = ${../assets/shaders/cursor_trail_neon.glsl}
+      custom-shader = ${../../../../assets/shaders/cursor_blaze_tapered.glsl}
     '';
 
     xdg.configFile."ghostty/config".force = true;
