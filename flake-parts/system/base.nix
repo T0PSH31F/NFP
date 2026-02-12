@@ -21,7 +21,7 @@
   # Bootloader
   boot.loader.systemd-boot = {
     enable = true;
-    configurationLimit = 5; # Aggressive limit to prevent /boot bloat
+    configurationLimit = 10; # Increased for more rollback room
   };
   boot.loader.efi.canTouchEfiVariables = true;
 
@@ -85,4 +85,7 @@
   ];
 
   programs.zsh.enable = true;
+
+  # Fallback root password - change immediately after first login with `passwd`
+  users.users.root.initialPassword = "changeme123";
 }

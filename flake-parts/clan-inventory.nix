@@ -37,7 +37,7 @@
         tags.all = { };
         settings = {
           user = "root";
-          prompt = false; # Set to false to auto-generate password
+          prompt = true; # Prompt for root password during 'clan vars generate'
         };
       };
     };
@@ -55,7 +55,7 @@
         tags.all = { }; # User on all machines
         settings = {
           user = "t0psh31f";
-          prompt = false; # Auto-generate password securely
+          prompt = true; # Prompt for password during 'clan vars generate'
           share = true; # Share same password across machines
           groups = [
             "wheel"

@@ -11,6 +11,19 @@
     isNormalUser = true;
     description = "t0psh31f";
     shell = pkgs.zsh;
+    initialPassword = "changeme123"; # Fallback - change immediately after login with `passwd`
+    extraGroups = [
+      "wheel"
+      "networkmanager"
+      "video"
+      "audio"
+      "input"
+      "docker"
+      "libvirtd"
+      "media"
+      "podman"
+      "i2c"
+    ];
     # Authorized keys are also managed by clan-inventory.nix (admin-access),
     # but we keep them here for local login consistency.
     openssh.authorizedKeys.keys = [

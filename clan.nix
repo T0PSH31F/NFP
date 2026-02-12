@@ -20,6 +20,12 @@
         ];
         deploy.targetHost = "root@z0r0.local";
       };
+      nami = {
+        tags = [
+          "desktop"
+        ];
+        deploy.targetHost = "root@nami.local";
+      };
       # nami = {
       #   tags = [
       #     "server"
@@ -61,16 +67,10 @@
       ];
       clan.services.ai.sillytavern.enable = true;
     };
-    # luffy = {
-    #   imports = [
-    #     ./machines/luffy/default.nix
-    #   ];
-    #   clan.services.ai.sillytavern.enable = true;
-    # };
-    # nami = {
-    #   imports = [
-    #     ./machines/nami/default.nix
-    #   ];
-    # };
+    nami = {
+      imports = [
+        ./machines/nami/default.nix
+      ];
+    };
   };
 }

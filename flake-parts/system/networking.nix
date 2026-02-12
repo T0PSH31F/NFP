@@ -98,7 +98,7 @@
   services.openssh = {
     enable = true;
     settings = {
-      PasswordAuthentication = lib.mkDefault false;
+      PasswordAuthentication = lib.mkDefault true; # Enabled for recovery - disable after setup
       PermitRootLogin = "yes";
     };
     # Explicitly define host keys to ensure they're generated in a persistent location
