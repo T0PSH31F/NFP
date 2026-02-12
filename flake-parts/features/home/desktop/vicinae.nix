@@ -70,9 +70,12 @@ in
       # Vicinae settings
       settings = {
         # Import sops secrets (API keys, tokens for extensions)
-        # NOTE: In home-manager context, use config.sops...
-        # If sops is configured at NixOS level, use osConfig.sops...
-        imports = [ config.sops.secrets."vicinae.json".path ];
+        # Only import if sops secret exists (prevents crash when sops not configured)
+        imports =
+          let
+            secretPath = config.sops.secrets."vicinae.json".path or null;
+          in
+          lib.optionals (secretPath != null && builtins.pathExists secretPath) [ secretPath ];
 
         # UI Behavior
         close_on_focus_loss = true;

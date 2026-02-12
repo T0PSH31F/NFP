@@ -56,10 +56,7 @@
   # ============================================================================
   # THEMES
   # ============================================================================
-  themes.sddm-sel = {
-    enable = true;
-    variant = "shaders";
-  };
+  themes.sddm-sugar-dark.enable = true;
   themes.plymouth-hellonavi.enable = true;
 
   # THEMES

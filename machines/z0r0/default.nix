@@ -43,9 +43,8 @@
 
   # Themes
   themes = {
-    sddm-sel = {
+    sddm-sugar-dark = {
       enable = true;
-      variant = "shaders";
     };
 
     grub-lain.enable = true;

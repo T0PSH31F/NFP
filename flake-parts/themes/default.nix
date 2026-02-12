@@ -10,5 +10,6 @@
     ./plymouth-hellonavi.nix
     ./plymouth-matrix.nix
     ./sddm-sel.nix
+    ./sddm-sugar-dark.nix
   ];
 }
