@@ -31,12 +31,12 @@ in
     # Deploy templates to ~/.config/matugen/templates/
     home.file = {
       ".config/matugen/templates/helix.toml".source = pkgs.fetchurl {
-        url = "https://raw.githubusercontent.com/InioX/matugen-themes/main/helix.toml";
+        url = "https://raw.githubusercontent.com/InioX/matugen-themes/main/templates/helix.toml";
         sha256 = "0kh498w51mk47hxia7frc7c0a5a2lww6day3b8lz5dh5a1j1vxmq";
       };
       ".config/matugen/templates/kitty-colors.conf".source = pkgs.fetchurl {
         url = "https://raw.githubusercontent.com/InioX/matugen-themes/main/templates/kitty-colors.conf";
-        sha256 = "0lxc8mvg263zkxa05amd1dcldli9bm4yhkk41wzpl977vfvnx3wn";
+        sha256 = "1fyr9phqvjci1pid0z9nzhima58sq0jnwx53jr7a33hc6w31jsha";
       };
       ".config/matugen/templates/btop.theme".source = pkgs.fetchurl {
         url = "https://raw.githubusercontent.com/InioX/matugen-themes/main/templates/btop.theme";

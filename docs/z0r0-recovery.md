@@ -12,7 +12,29 @@ z0r0 (192.168.1.159) has 2 unusable generations — passwords for root and t0psh
 
 ## Recovery Steps
 
-### 1. Boot z0r0 from any NixOS USB ISO
+### Method 0: Reset Password via GRUB (Fastest, no USB needed)
+1. Reboot `z0r0`.
+2. At the GRUB menu, select the default NixOS entry and press **`e`**.
+3. Find the line starting with `linux` (it ends with `init=/nix/store/.../init`).
+4. Append `init=/bin/sh` to the end of that line.
+5. Press **`F10`** or **`Ctrl-x`** to boot.
+6. You will get a root shell prompt `#`.
+7. Remount the filesystem as read-write:
+   ```bash
+   mount -o remount,rw /
+   ```
+8. Reset the passwords:
+   ```bash
+   passwd root
+   passwd t0psh31f
+   ```
+9. Reboot forcefully:
+   ```bash
+   reboot -f
+   ```
+
+### Method 1: Chroot from USB ISO (If GRUB is broken)
+1. Boot z0r0 from any NixOS USB ISO
 
 ### 2. Decrypt LUKS and mount
 ```bash

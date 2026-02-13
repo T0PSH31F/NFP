@@ -45,10 +45,21 @@ jobs:
 
       - name: Build ISO
         run: |
-          nix build .#packages.x86_64-linux.iso --no-link --print-out-paths | tee iso-path.txt
-          ISO_DIR=$(cat iso-path.txt)
-          echo "ISO_PATH=$(ls ${ISO_DIR}/iso/*.iso)" >> $GITHUB_ENV
-          echo "ISO built: $(ls -lh ${ISO_DIR}/iso/*.iso)"
+          # Build and get JSON output
+          ISO_OUT=$(nix build .#packages.x86_64-linux.iso --no-link --json | jq -r '.[0].outputs.out')
+          
+          echo "Build output: $ISO_OUT"
+          
+          # Find the .iso file (usually in /iso/ subdirectory)
+          ISO_FILE=$(find "$ISO_OUT/iso" -name "*.iso" -print -quit)
+          
+          if [ -z "$ISO_FILE" ]; then
+            echo "::error::No ISO file found in $ISO_OUT/iso"
+            exit 1
+          fi
+          
+          echo "ISO_PATH=$ISO_FILE" >> $GITHUB_ENV
+          echo "ISO built: $ISO_FILE"
 
       - name: Upload ISO artifact
         uses: actions/upload-artifact@v4

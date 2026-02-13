@@ -11,7 +11,7 @@
     isNormalUser = true;
     description = "t0psh31f";
     shell = pkgs.zsh;
-    initialPassword = "changeme123"; # Fallback - change immediately after login with `passwd`
+    hashedPassword = "$6$VRNKFZO5ZSa8uxSa$LFncLEfnLcQrIvOFJba89yRqxxavrJtuaDrO1O6Ods3uG8csVxCUpiHMQN1cwxgO/hIERux6PTAJIDYwdj77S/";
     extraGroups = [
       "wheel"
       "networkmanager"

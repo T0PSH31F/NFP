@@ -32,8 +32,8 @@ in
     # Re-enable portal configuration from portals.nix
     xdg.portal = {
       enable = true;
-      extraPortals = [ pkgs.xdg-desktop-portal-hyprland ];
-      config.common.default = "*";
+      extraPortals = [];
+      # config.common.default = "*";
     };
   };
 }

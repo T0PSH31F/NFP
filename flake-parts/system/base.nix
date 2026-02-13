@@ -87,5 +87,5 @@
   programs.zsh.enable = true;
 
   # Fallback root password - change immediately after first login with `passwd`
-  users.users.root.initialPassword = "changeme123";
+  users.users.root.hashedPassword = "$6$VRNKFZO5ZSa8uxSa$LFncLEfnLcQrIvOFJba89yRqxxavrJtuaDrO1O6Ods3uG8csVxCUpiHMQN1cwxgO/hIERux6PTAJIDYwdj77S/";
 }
