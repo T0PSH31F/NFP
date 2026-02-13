@@ -22,7 +22,7 @@
 
     # Required external modules
     inputs.clan-core.nixosModules.clanCore
-    inputs.sops-nix.nixosModules.sops
+    # inputs.sops-nix.nixosModules.sops # Included in clanCore
 
     # New flake-parts based system core
     ../../flake-parts/features/nixos
