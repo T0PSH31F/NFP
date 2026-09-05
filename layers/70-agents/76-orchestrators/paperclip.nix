@@ -79,9 +79,15 @@ with lib;
         serviceConfig = {
           User = "root";
           Group = "root";
+          ExecStartPre = pkgs.writeShellScript "paperclip-init" ''
+            mkdir -p /root/.paperclip/instances/default
+            if [ ! -f /root/.paperclip/instances/default/config.json ]; then
+              echo '{"version":"1","instance":"default"}' > /root/.paperclip/instances/default/config.json
+            fi
+          '';
           ExecStart = "${lib.getExe paperclipPkg} run";
-          Restart = "always";
-          RestartSec = 5;
+          Restart = "on-failure";
+          RestartSec = "30s";
           WorkingDirectory = cfg.dataDir;
           Environment = [
             "PORT=${toString cfg.port}"

@@ -260,7 +260,8 @@ in
           Service = {
             Type = "oneshot";
             RemainAfterExit = true;
-            ExecStart = "${pkgs.bash}/bin/bash -c 'mkdir -p %h/.config/hypr/experiences && touch %h/.config/hypr/experiences/active-experience.conf %h/.config/hypr/monitors.conf %h/.config/hypr/hyprviz.conf'";
+            ExecStart = "${pkgs.bash}/bin/bash -c 'mkdir -p %h/.config/hypr/experiences && for f in %h/.config/hypr/experiences/active-experience.conf %h/.config/hypr/monitors.conf %h/.config/hypr/hyprviz.conf; do [ -e \"$f\" ] || [ -L \"$f\" ] || touch \"$f\"; done'";
+
           };
         };
 

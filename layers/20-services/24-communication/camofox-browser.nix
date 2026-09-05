@@ -2,13 +2,14 @@
   config,
   lib,
   pkgs,
+  inputs,
   ...
 }:
 with lib;
 let
   cfg = config.layers.layer-20.services.communication.camofox-browser;
-  camofoxPkg = pkgs.jo-camofox-browser;
   camoufoxBin = pkgs.camoufox;
+  camofoxPkg = pkgs.jo-camofox-browser;
 
   runtimePath = lib.makeBinPath [
     pkgs.xvfb

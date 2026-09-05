@@ -17,8 +17,6 @@ in
       type = types.listOf types.str;
       default = [
         "tailscale0"
-        "wg0"
-        "zt0"
       ];
       description = "VPN interfaces to NAT and forward traffic from";
     };

@@ -12,7 +12,14 @@
   ...
 }:
 {
-  options.layers.layer-70.agent.antigravity = {
+  imports = [
+    (lib.mkAliasOptionModule
+      [ "layers" "layer-70" "agent" "antigravity" ]
+      [ "layers" "layer-71" "harness" "antigravity" ]
+    )
+  ];
+
+  options.layers.layer-71.harness.antigravity = {
     enable = lib.mkEnableOption "Antigravity agentic IDE & CLI";
 
     enableIde = lib.mkOption {
@@ -36,7 +43,7 @@
 
   nixos =
     let
-      cfg = config.layers.layer-70.agent.antigravity;
+      cfg = config.layers.layer-71.harness.antigravity;
     in
     lib.mkIf cfg.enable {
       environment.systemPackages = [
@@ -47,7 +54,7 @@
 
   home =
     let
-      cfg = config.layers.layer-70.agent.antigravity;
+      cfg = config.layers.layer-71.harness.antigravity;
     in
     lib.mkIf cfg.enable {
       # Antigravity MCP & A2A Inter-Agent Gateway Configuration

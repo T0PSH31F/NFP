@@ -11,13 +11,20 @@
   ...
 }:
 {
-  options.layers.layer-70.agent.codex = {
+  imports = [
+    (lib.mkAliasOptionModule
+      [ "layers" "layer-70" "agent" "codex" ]
+      [ "layers" "layer-71" "harness" "codex" ]
+    )
+  ];
+
+  options.layers.layer-71.harness.codex = {
     enable = lib.mkEnableOption "OpenAI Codex coding agent";
   };
 
   nixos =
     let
-      cfg = config.layers.layer-70.agent.codex;
+      cfg = config.layers.layer-71.harness.codex;
     in
     lib.mkIf cfg.enable {
       environment.systemPackages = lib.optional (pkgs ? codex) pkgs.codex;
@@ -25,7 +32,7 @@
 
   home =
     let
-      cfg = config.layers.layer-70.agent.codex;
+      cfg = config.layers.layer-71.harness.codex;
     in
     lib.mkIf cfg.enable {
       xdg.configFile."deepseek/config.toml".text = ''

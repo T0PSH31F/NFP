@@ -2,14 +2,13 @@
   config,
   lib,
   pkgs,
-  osConfig ? config,
   ...
 }:
 let
-  cfg = config.layers.layer-50.cli.gedit;
+  cfg = config.layers.layer-60.gui.gedit;
 in
 {
-  options.layers.layer-50.cli.gedit = {
+  options.layers.layer-60.gui.gedit = {
     enable = lib.mkOption {
       type = lib.types.bool;
       default = false;
@@ -20,10 +19,9 @@ in
   home = lib.mkIf cfg.enable {
     home.packages = [ pkgs.gedit ];
 
-    # Gedit preferences via dconf
     dconf.settings = {
       "org/gnome/gedit/preferences/editor" = {
-        scheme = "noctalia";
+        scheme = lib.mkDefault "oblivion";
         use-default-font = false;
         editor-font = lib.mkDefault "JetBrainsMono Nerd Font 14";
         display-line-numbers = true;

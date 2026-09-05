@@ -21,7 +21,7 @@ let
     "agent-browser"
     "agentburn"
     # "aionui"
-    "antigravity"
+    "antigravity-ide"
     "aven"
     "ax"
     "chatterbox"

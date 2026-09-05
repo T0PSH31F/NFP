@@ -11,11 +11,18 @@
   ...
 }:
 {
-  options.layers.layer-70.agent.supergraph = {
+  imports = [
+    (lib.mkAliasOptionModule
+      [ "layers" "layer-70" "agent" "supergraph" ]
+      [ "layers" "layer-71" "harness" "supergraph" ]
+    )
+  ];
+
+  options.layers.layer-71.harness.supergraph = {
     enable = lib.mkEnableOption "supergraph — monorepo intelligence for AI coding agents";
   };
 
-  config = lib.mkIf config.layers.layer-70.agent.supergraph.enable {
+  config = lib.mkIf config.layers.layer-71.harness.supergraph.enable {
     environment.systemPackages = [ pkgs.supergraph ];
   };
 }

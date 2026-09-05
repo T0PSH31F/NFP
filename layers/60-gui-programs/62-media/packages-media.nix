@@ -17,7 +17,7 @@ in
   config = lib.mkIf config.layers.layer-60.gui.media-packages.enable {
     environment.systemPackages = [
       pkgs.deluge
-      pkgs.ffmpeg-full
+      pkgs.ffmpeg
       pkgs.jellyfin-desktop
       pkgs.pirate-get
       pkgs.spotdl

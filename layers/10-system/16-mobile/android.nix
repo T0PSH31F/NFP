@@ -24,7 +24,7 @@ in
       phonemizer
       pixelflasher
       universal-android-debloater
-      valent # KDE Connect implementation for GTK
+      # valent # KDE Connect implementation for GTK
     ];
 
     # Open ports for KDE Connect protocol (used by Valent)

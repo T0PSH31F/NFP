@@ -11,12 +11,19 @@
   ...
 }:
 {
-  options.layers.layer-70.agent.gemini-cli = {
+  imports = [
+    (lib.mkAliasOptionModule
+      [ "layers" "layer-70" "agent" "gemini-cli" ]
+      [ "layers" "layer-71" "harness" "gemini-cli" ]
+    )
+  ];
+
+  options.layers.layer-71.harness.gemini-cli = {
     enable = lib.mkEnableOption "Gemini CLI agent (alias for Antigravity)";
   };
 
-  config = lib.mkIf config.layers.layer-70.agent.gemini-cli.enable {
-    layers.layer-70.agent.antigravity.enable = true;
+  config = lib.mkIf config.layers.layer-71.harness.gemini-cli.enable {
+    layers.layer-71.harness.antigravity.enable = true;
     environment.systemPackages = lib.optional (pkgs ? gemini-cli) pkgs.gemini-cli;
   };
 }

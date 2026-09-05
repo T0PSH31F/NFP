@@ -13,7 +13,6 @@
 - [Performance Patterns](#performance-patterns)
 
 ---
-
 ## Module System Patterns
 
 ### 1. Module Structure and Evaluation

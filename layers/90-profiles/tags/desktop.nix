@@ -40,6 +40,7 @@
         yazelix-nova.enable = lib.mkDefault true;
       };
       layer-60.gui = {
+        gedit.enable = lib.mkDefault true;
         communication.enable = lib.mkDefault true;
         documents.enable = lib.mkDefault true;
         feh.enable = lib.mkDefault true;
@@ -48,7 +49,7 @@
         mopidy.enable = lib.mkDefault true;
         spicetify.enable = lib.mkDefault true;
         vlc.enable = lib.mkDefault true;
-        wl_shimeji.enable = lib.mkDefault true;
+        wl_shimeji.enable = false;
         lmms.enable = lib.mkDefault true;
       };
     };

@@ -61,8 +61,18 @@ in
     };
     users.groups.headscale = { };
 
+    clan.core.vars.generators.headscale = {
+      files."headscale_auth_key" = {
+        secret = true;
+        owner = "headscale";
+        group = "headscale";
+      };
+    };
+
     systemd.tmpfiles.rules = [
       "d /var/lib/headscale 0750 headscale headscale -"
+      "d /var/lib/headscale/acl 0750 headscale headscale -"
+      ''f+ /var/lib/headscale/acl/hujson 0640 headscale headscale - {\n  "acls": [{ "action": "accept", "src": ["*"], "dst": ["*:*"] }]\n}''
     ];
 
     # Persistence

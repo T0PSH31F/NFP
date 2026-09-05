@@ -11,11 +11,18 @@
   ...
 }:
 {
-  options.layers.layer-70.agent.asr-tts = {
+  imports = [
+    (lib.mkAliasOptionModule
+      [ "layers" "layer-70" "agent" "asr-tts" ]
+      [ "layers" "layer-72" "voice" "agent-audio" ]
+    )
+  ];
+
+  options.layers.layer-72.voice.agent-audio = {
     enable = lib.mkEnableOption "local ASR/TTS voice agent packages";
   };
 
-  home = lib.mkIf config.layers.layer-70.agent.asr-tts.enable {
+  home = lib.mkIf config.layers.layer-72.voice.agent-audio.enable {
     home.packages = with pkgs; [
       piper-tts
       whisper-cpp

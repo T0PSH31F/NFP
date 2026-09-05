@@ -11,11 +11,18 @@
   ...
 }:
 {
-  options.layers.layer-70.agent.codegraph = {
+  imports = [
+    (lib.mkAliasOptionModule
+      [ "layers" "layer-70" "agent" "codegraph" ]
+      [ "layers" "layer-71" "harness" "codegraph" ]
+    )
+  ];
+
+  options.layers.layer-71.harness.codegraph = {
     enable = lib.mkEnableOption "codegraph — semantic code intelligence for AI coding agents";
   };
 
-  config = lib.mkIf config.layers.layer-70.agent.codegraph.enable {
+  config = lib.mkIf config.layers.layer-71.harness.codegraph.enable {
     environment.systemPackages = [
       pkgs.codegraph
       pkgs.lazyskills

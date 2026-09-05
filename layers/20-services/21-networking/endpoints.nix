@@ -27,11 +27,12 @@ in
       }
     );
     default = {
-      extreme-router = mkEndpoint "127.0.0.1" (config.layers.layer-20.services.extreme-router.port
+      extreme-router = mkEndpoint "127.0.0.1" (config.layers.layer-78.llm-routers.extreme-router.port
         or 20128
       ) "/v1";
-      freellmapi = mkEndpoint "127.0.0.1" (config.layers.layer-20.services.freellmapi.port or 3003) "/v1";
-      ollama = mkEndpoint "127.0.0.1" (config.layers.layer-20.services.ollama.port or 11434) "/v1";
+      freellmapi = mkEndpoint "127.0.0.1" (config.layers.layer-78.llm-routers.freellmapi.port or 3003
+      ) "/v1";
+      ollama = mkEndpoint "127.0.0.1" (config.layers.layer-74.ai-infra.ollama.port or 11434) "/v1";
       hermes-gateway = mkEndpoint "127.0.0.1" (config.layers.layer-76.hermes.gatewayPort or 8085) "";
       context-forge = mkEndpoint "127.0.0.1" (config.layers.layer-20.services.context-forge.port or 8094
       ) "/mcp";

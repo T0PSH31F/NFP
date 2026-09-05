@@ -11,13 +11,20 @@
   ...
 }:
 {
-  options.layers.layer-70.agent.claude-code = {
+  imports = [
+    (lib.mkAliasOptionModule
+      [ "layers" "layer-70" "agent" "claude-code" ]
+      [ "layers" "layer-71" "harness" "claude-code" ]
+    )
+  ];
+
+  options.layers.layer-71.harness.claude-code = {
     enable = lib.mkEnableOption "Anthropic Claude Code agentic coding tool";
   };
 
   nixos =
     let
-      cfg = config.layers.layer-70.agent.claude-code;
+      cfg = config.layers.layer-71.harness.claude-code;
     in
     lib.mkIf cfg.enable {
       environment.systemPackages = lib.optional (pkgs ? claude-code) pkgs.claude-code;
@@ -25,7 +32,7 @@
 
   home =
     let
-      cfg = config.layers.layer-70.agent.claude-code;
+      cfg = config.layers.layer-71.harness.claude-code;
     in
     lib.mkIf cfg.enable {
       home.packages = lib.optional (

@@ -9,11 +9,8 @@
 let
   cfg = config.layers.layer-50.cli;
 
-  yazelixOrchestrator = pkgs.yazelix-orchestrator;
-  yazelixPopup = pkgs.yazelix-popup-runner;
-
-  yazelixCursorsPkg = inputs.yazelix-cursors.packages.${pkgs.stdenv.hostPlatform.system}.default;
-  yazelixScreenPkg = inputs.yazelix-screen.packages.${pkgs.stdenv.hostPlatform.system}.default;
+  yazelixOrchestrator = pkgs.yazelix-orchestrator or null;
+  yazelixPopup = pkgs.yazelix-popup-runner or null;
 
   zjstatusWasm = "${
     inputs.zjstatus.packages.${pkgs.stdenv.hostPlatform.system}.default
@@ -597,7 +594,7 @@ let
 
 in
 {
-  home = lib.mkIf cfg.enable {
+  home = lib.mkIf (cfg.enable && cfg.zellij.enable) {
     programs.zellij = {
       enable = true;
       enableZshIntegration = false;
@@ -703,8 +700,6 @@ in
     home.packages = [
       zellij-colors-sync
       zellij-clipboard
-    ]
-    ++ lib.optional cfg.zellij.yazelix.cursors.enable yazelixCursorsPkg
-    ++ lib.optional cfg.zellij.yazelix.screen.enable yazelixScreenPkg;
+    ];
   };
 }

@@ -4,9 +4,8 @@
 { config, lib, ... }:
 {
   config = lib.mkIf (builtins.elem "ai-agent" config.machine.tags) {
-    layers.layer-70.agent = {
+    layers.layer-71.harness = {
       opencode.enable = lib.mkDefault true;
-      mcp.enable = lib.mkDefault true;
       claude-code.enable = lib.mkDefault true;
       gemini-cli.enable = lib.mkDefault true;
       codegraph.enable = lib.mkDefault true;
@@ -34,7 +33,7 @@
     # Memory chassis & gateway services
     layers.layer-73.memory.memory-vault.enable = lib.mkDefault true;
     layers.layer-73.memory.memory-governance.enable = lib.mkDefault true;
-    layers.layer-70.agent.sandbox.enable = lib.mkDefault true;
+    layers.layer-74.ai-infra.agent-sandbox.enable = lib.mkDefault true;
 
     # Agent productivity & messaging daemons
     layers.layer-79.skills.todo-system.enable = lib.mkDefault true;

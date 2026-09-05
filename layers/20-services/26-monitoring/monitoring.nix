@@ -499,6 +499,7 @@ with lib;
             access = "proxy";
             url = "http://127.0.0.1:${toString config.layers.layer-20.services.config.monitoring.prometheus.port}";
             isDefault = true;
+            editable = true;
           }
           {
             name = "Loki";
@@ -506,6 +507,7 @@ with lib;
             uid = "loki";
             access = "proxy";
             url = "http://127.0.0.1:${toString config.layers.layer-20.services.config.monitoring.loki.port}";
+            editable = true;
           }
         ];
       };

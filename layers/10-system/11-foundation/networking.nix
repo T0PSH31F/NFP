@@ -92,7 +92,7 @@
         32768 # Spacedrive
         32784 # MaxKB
         32790 # SimStudio
-        51820 # WireGuard VPN
+        # 51820 # WireGuard VPN
         # 9993 # ZeroTier VPN
         61208 # Glances Web Stats
       ];
@@ -102,7 +102,7 @@
         67 # DHCP
         443 # QUIC / HTTP/3
         5353 # mDNS / Avahi
-        51820 # WireGuard VPN
+        # 51820 # WireGuard VPN
         # 9993 # ZeroTier VPN
       ];
 
@@ -110,8 +110,6 @@
       trustedInterfaces = [
         "tailscale0" # Tailscale VPN mesh
         "podman0" # Podman container bridge
-        # "zt0" # ZeroTier mesh
-        "wg0" # WireGuard tunnel
       ];
 
       allowPing = true;

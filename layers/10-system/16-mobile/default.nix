@@ -17,8 +17,5 @@ in
     # KDE Connect / GSConnect
     # Allows wireless file transfer, clipboard sync, notifications
     programs.kdeconnect.enable = true;
-    systemd.user.services.kdeconnect = {
-      serviceConfig.LogLevelMax = "notice";
-    };
   };
 }

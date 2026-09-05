@@ -10,7 +10,14 @@
   ...
 }:
 {
-  options.layers.layer-70.agent.opencode = {
+  imports = [
+    (lib.mkAliasOptionModule
+      [ "layers" "layer-70" "agent" "opencode" ]
+      [ "layers" "layer-71" "harness" "opencode" ]
+    )
+  ];
+
+  options.layers.layer-71.harness.opencode = {
     enable = lib.mkEnableOption "OpenCode AI coding agent";
     desktop = lib.mkEnableOption "OpenCode desktop application";
 
@@ -27,7 +34,7 @@
       pluginLabel = "oh-my-opencode-slim@latest";
     in
     {
-      config = lib.mkIf osConfig.layers.layer-70.agent.opencode.enable {
+      config = lib.mkIf osConfig.layers.layer-71.harness.opencode.enable {
         programs.opencode = {
           enable = true;
           enableMcpIntegration = true;
@@ -772,7 +779,7 @@
         };
 
         home.packages =
-          lib.optional osConfig.layers.layer-70.agent.opencode.desktop pkgs.opencode-desktop
+          lib.optional osConfig.layers.layer-71.harness.opencode.desktop pkgs.opencode-desktop
           ++ [
             pkgs.libcanberra-gtk3 # canberra-gtk-play for warcraft-notifications fallback
             pkgs.alsa-utils # aplay for warcraft-notifications wav playback

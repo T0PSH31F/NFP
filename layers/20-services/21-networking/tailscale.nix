@@ -14,12 +14,18 @@ in
       default = "https://headscale.lovelain.duckdns.org";
       description = "Headscale login server URL for fleet-wide Tailscale authentication";
     };
+    authKeyFile = lib.mkOption {
+      type = lib.types.nullOr lib.types.path;
+      default = null;
+      description = "Path to file containing Headscale pre-authenticated authkey";
+    };
   };
 
   config = lib.mkIf cfg.enable {
     # Shared Tailscale client configuration for the fleet
     services.tailscale = {
       enable = true;
+      inherit (cfg) authKeyFile;
       extraUpFlags = [ "--login-server=${cfg.loginServer}" ];
     };
 

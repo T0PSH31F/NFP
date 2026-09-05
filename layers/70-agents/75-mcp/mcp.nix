@@ -11,19 +11,26 @@
   ...
 }:
 {
-  options.layers.layer-70.agent.mcp = {
-    enable = lib.mkEnableOption "Model Context Protocol (MCP) servers [DEPRECATED: use layers.layer-75.mcp.enable]";
+  imports = [
+    (lib.mkAliasOptionModule
+      [ "layers" "layer-70" "agent" "mcp" ]
+      [ "layers" "layer-75" "mcp" "catalog" ]
+    )
+  ];
+
+  options.layers.layer-75.mcp.catalog = {
+    enable = lib.mkEnableOption "Model Context Protocol (MCP) servers catalog alias";
     servers = lib.mkOption {
       type = lib.types.attrsOf lib.types.anything;
       default = { };
-      description = "MCP servers [DEPRECATED: use layers.layer-75.mcp.servers]";
+      description = "MCP servers catalog map";
     };
   };
 
-  config = lib.mkIf config.layers.layer-70.agent.mcp.enable {
+  config = lib.mkIf config.layers.layer-75.mcp.catalog.enable {
     layers.layer-75.mcp = {
-      enable = lib.mkForce true;
-      servers = config.layers.layer-70.agent.mcp.servers;
+      enable = lib.mkDefault true;
+      servers = config.layers.layer-75.mcp.catalog.servers;
     };
   };
 }

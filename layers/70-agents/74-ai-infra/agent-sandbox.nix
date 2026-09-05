@@ -12,7 +12,14 @@
 }:
 with lib;
 {
-  options.layers.layer-70.agent.sandbox = {
+  imports = [
+    (mkAliasOptionModule
+      [ "layers" "layer-70" "agent" "sandbox" "enable" ]
+      [ "layers" "layer-74" "ai-infra" "agent-sandbox" "enable" ]
+    )
+  ];
+
+  options.layers.layer-74.ai-infra.agent-sandbox = {
     enable = mkEnableOption "Agent Sandbox Environment";
 
     backend = mkOption {
@@ -55,7 +62,7 @@ with lib;
   config = mkMerge [
     (
       let
-        cfg = config.layers.layer-70.agent.sandbox;
+        cfg = config.layers.layer-74.ai-infra.agent-sandbox;
 
         sandboxRunner = pkgs.writeShellApplication {
           name = "agent-sandbox-run";
@@ -131,7 +138,7 @@ with lib;
       }
     )
 
-    (mkIf (config.layers.layer-70.agent.sandbox.ai-agent-stack.enable or false) {
+    (mkIf (config.layers.layer-74.ai-infra.agent-sandbox.ai-agent-stack.enable or false) {
       services.ai-services = {
         enable = true;
         postgresql.enable = true;

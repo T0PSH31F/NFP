@@ -9,7 +9,7 @@
     # MCP framework
     layers.layer-75.mcp.enable = lib.mkDefault true;
     # Sandbox for agent code execution
-    layers.layer-70.agent.sandbox.enable = lib.mkDefault true;
+    layers.layer-74.ai-infra.agent-sandbox.enable = lib.mkDefault true;
     # Agent control-plane services
     layers.layer-76.orchestrators.mission-control.enable = lib.mkDefault true;
     layers.layer-76.orchestrators.paperclip.enable = lib.mkDefault true;

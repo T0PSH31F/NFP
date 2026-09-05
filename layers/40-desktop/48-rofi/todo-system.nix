@@ -7,7 +7,7 @@
 }:
 
 let
-  cfg = config.layers.layer-20.services.todo-system;
+  cfg = config.layers.layer-79.skills.todo-system;
   user = osConfig.layers.meta.primaryUser or "t0psh31f";
   userHome = "/home/${user}";
 
@@ -413,6 +413,7 @@ in
 
         wayland.windowManager.hyprland = {
           enable = true;
+          configType = "hyprlang";
           settings = {
             bind = [
               "$mod, period, exec, ${rofi-todo}/bin/rofi-todo"

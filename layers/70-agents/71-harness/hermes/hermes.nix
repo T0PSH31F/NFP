@@ -308,9 +308,9 @@
       # can access the hermes venv. systemd StateDirectory= may reset permissions on restart,
       # so tmpfiles.d enforces it persistently.
       systemd.tmpfiles.rules = [
-        "d /var/lib/hermes/.hermes 0750 hermes hermes -"
-        "d /var/lib/hermes/.hermes/hermes-agent 0750 hermes hermes -"
-        "d /var/lib/hermes/.hermes/skills 0750 hermes hermes -"
+        "d /var/lib/hermes/.hermes 0770 hermes hermes -"
+        "d /var/lib/hermes/.hermes/hermes-agent 0770 hermes hermes -"
+        "d /var/lib/hermes/.hermes/skills 0770 hermes hermes -"
         # Harness skill packs — symlinked from the Nix store into HERMES_HOME/skills.
         # Upstream bundled skills ship in $out/share/hermes-agent/skills via HERMES_BUNDLED_SKILLS;
         # repository skills linked here are additive and take precedence for custom workflows.
@@ -334,7 +334,7 @@
         deps = [ "users" ];
         text = ''
           USER_HERMES=$(ls -d /home/*/.hermes 2>/dev/null | head -n1 || true)
-          if [ ! -d "${config.services.hermes-agent.stateDir}/.hermes" ] && [ -n "$USER_HERMES" ]; then
+          if [ ! -d "${config.services.hermes-agent.stateDir}/.hermes" ] && [ -n "$USER_HERMES" ] && [ ! -L "$USER_HERMES" ]; then
             echo "Migrating $USER_HERMES → ${config.services.hermes-agent.stateDir}/.hermes ..."
             mkdir -p "${config.services.hermes-agent.stateDir}"
             cp -a "$USER_HERMES" "${config.services.hermes-agent.stateDir}/.hermes"
@@ -345,6 +345,16 @@
             chown -R hermes:hermes "${config.services.hermes-agent.stateDir}" || true
             chmod -R u+rwX,g+rwX "${config.services.hermes-agent.stateDir}" || true
           fi
+          # Ensure /home/t0psh31f/.hermes points directly to /var/lib/hermes/.hermes
+          if [ -d "/home/t0psh31f" ]; then
+            if [ -d "/home/t0psh31f/.hermes" ] && [ ! -L "/home/t0psh31f/.hermes" ]; then
+              cp -an /home/t0psh31f/.hermes/* "${config.services.hermes-agent.stateDir}/.hermes/" 2>/dev/null || true
+              rm -rf "/home/t0psh31f/.hermes"/* 2>/dev/null || true
+              rmdir "/home/t0psh31f/.hermes" 2>/dev/null || true
+            fi
+            ln -sfn "${config.services.hermes-agent.stateDir}/.hermes" "/home/t0psh31f/.hermes"
+            chown -h t0psh31f:users "/home/t0psh31f/.hermes"
+          fi
           # Clean up any nested .hermes that may remain from the original migration
           if [ -d "${config.services.hermes-agent.stateDir}/.hermes/.hermes" ]; then
             rm -rf "${config.services.hermes-agent.stateDir}/.hermes/.hermes"
@@ -354,10 +364,16 @@
 
       users.users.t0psh31f.extraGroups = [ "hermes" ];
 
-      environment.systemPackages = lib.optional cfg.enableDesktop hermesDesktopPkg ++ [
-        pkgs.uni-pet
-        pkgs.agentburn
-      ];
+      environment.sessionVariables = {
+        HERMES_HOME = "/var/lib/hermes/.hermes";
+      };
+
+      environment.systemPackages =
+        lib.optional cfg.enableDesktop hermesDesktopPkg
+        ++ lib.filter (p: p != null) [
+          pkgs.uni-pet
+          (llmPkgs.agentburn or pkgs.agentburn or null)
+        ];
 
       # ── Pinned Hermes Config ─────────────────────────────────────────────────
       # Stable infra/policy keys that must survive every nixos-rebuild live here.

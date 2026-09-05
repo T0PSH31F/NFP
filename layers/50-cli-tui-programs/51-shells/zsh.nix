@@ -14,7 +14,7 @@ let
   motdAssets = {
     z0r0 = {
       image = ../../../layers/00-cyberia/02-assets/png-ico/roronoa-zoro-monkey-d-luffy-one-piece-vinsmoke-sanji-one-piece-f28baea931e3d454307ef781771688d6.png;
-      label = "Z0R0";
+      label = "ZORO";
     };
     luffy = {
       image = ../../../layers/00-cyberia/02-assets/png-ico/Luffyrave.png;
@@ -29,54 +29,17 @@ let
       label = "NFP";
     };
 
-  # chafa's runtime closure depends on `util-linux-minimal`'s `libmount.so.1`
-  # (and a handful of other transitive libraries like `libselinux.so.1`).
-  # nixpkgs-unstable's `pkgs.util-linux` no longer ships libmount in its main
-  # output; only `util-linux-minimal` does. We resolve the full set of chafa's
-  # closure paths and feed them into `LD_LIBRARY_PATH` so the build sandbox
-  # can run the binary during the derivation.
   motdPkg =
-    let
-      # Compute the proper library path from chafa's runtime closure.
-      runtimePath = lib.makeLibraryPath (
-        with pkgs;
-        [
-          util-linux
-          libselinux
-          pcre2
-          fontconfig
-          glib
-          cairo
-          librsvg
-          gdk-pixbuf
-          libjpeg_turbo
-          libtiff
-          libjxl
-          libavif
-          freetype
-          bzip2
-          libpng
-          brotli
-        ]
-      );
-    in
     pkgs.runCommand "nixos-motd-${hostName}"
       {
         buildInputs = [
-          pkgs.chafa
           pkgs.figlet
           pkgs.lolcat
-          pkgs.coreutils
         ];
       }
       ''
         mkdir -p $out
-        # Make all of chafa's runtime libraries resolvable in the build sandbox.
-        export LD_LIBRARY_PATH="${runtimePath}''${LD_LIBRARY_PATH:+:''${LD_LIBRARY_PATH}}"
-        # Render PNG via chafa — supports kitty/sixel/iterm2/ascii, way better than viu
-        chafa --size=40x20 -f symbols ${currentAsset.image} > $out/motd.txt
-        echo "" >> $out/motd.txt
-        figlet -c -f isometric2 ${currentAsset.label} | lolcat -f >> $out/motd.txt
+        figlet -c -f isometric2 ${currentAsset.label} | lolcat -f > $out/banner.txt
       '';
 in
 {
@@ -129,8 +92,10 @@ in
         bindkey '^Y' autosuggest-accept
         bindkey '^E' autosuggest-clear
         if [[ $- == *i* ]] && [[ -z "$TMUX" ]] && [[ -z "$STY" ]] && [[ "$TERM_PROGRAM" != "vscode" ]]; then
-          # Machine-specific MOTD greeting
-          cat ${motdPkg}/motd.txt
+          # Render high-resolution PNG natively using Kitty/Sixel graphics protocol in Ghostty/Kitty
+          ${pkgs.chafa}/bin/chafa --format=auto --size=60x30 ${currentAsset.image} 2>/dev/null || true
+          echo ""
+          cat ${motdPkg}/banner.txt
         fi
         ${lib.optionalString cfg.theming.enable "[ -f ~/.config/fzf/matugen.conf ] && source ~/.config/fzf/matugen.conf"}
         if command -v starship >/dev/null 2>&1; then
@@ -164,7 +129,7 @@ in
           eval "$(starship init zsh)"
         fi
 
-        ${lib.optionalString (!cfg.headless) ''
+        ${lib.optionalString (!cfg.headless && cfg.zellij.enable) ''
           if [[ $- == *i* ]] && [[ -z "$ZELLIJ" ]] && [[ -z "$TMUX" ]] && [[ -z "$STY" ]] && [[ "$TERM_PROGRAM" != "vscode" ]] && [[ "$TERM_PROGRAM" != "WarpTerminal" ]] && [[ "$TERM_PROGRAM" != "Waveterm" ]] && [[ -z "$SSH_CONNECTION" ]]; then
               if command -v zellij >/dev/null 2>&1; then
                 # Prune old EXITED sessions (keep z0r0.clan)

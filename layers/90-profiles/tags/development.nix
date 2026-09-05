@@ -6,10 +6,10 @@
     layers = {
       layer-50.cli = {
         pythonTools.enable = lib.mkDefault true;
-        zellij.yazelix.bars.enable = lib.mkDefault true;
+        zellij.yazelix.bars.enable = lib.mkDefault false;
         azure-cli.enable = lib.mkDefault true;
       };
-      layer-70.agent = {
+      layer-71.harness = {
         antigravity.enable = lib.mkDefault true;
         claude-code.enable = lib.mkDefault true;
         codex.enable = lib.mkDefault true;
@@ -36,7 +36,7 @@
         ci.auto-update.enable = lib.mkDefault true;
         ci.github-runner.enable = lib.mkDefault true;
         hedgedoc = {
-          enable = lib.mkDefault true;
+          enable = false;
           port = lib.mkDefault 3001;
         };
       };

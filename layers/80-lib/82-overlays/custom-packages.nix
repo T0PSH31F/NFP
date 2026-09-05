@@ -14,21 +14,15 @@ final: prev: {
   # buildFHSEnv's rootfs builder sandbox doesn't have util-linuxMinimal
   # available (glib doesn't propagate it). Fix by wrapping buildFHSEnv to add
   # util-linuxMinimal to the rootfs derivation's nativeBuildInputs. Only affects
-  # fhsenv rootfs builds (steam, lutris, steam-run), not the entire system.
+  # fhsenv rootfs builds (steam, lutris, steam-run, bottles), not the entire system.
   buildFHSEnvBubblewrap =
     let
-      # Intercept callPackage: when buildFHSEnv.nix is called, call the ORIGINAL
-      # file (with ORIGINAL pkgs, no glib override) but wrap the result to add
-      # util-linuxMinimal to nativeBuildInputs of the rootfs derivation.
       interceptCallPackage =
         file: overrides:
         if builtins.isPath file && baseNameOf file == "buildFHSEnv.nix" then
           let
             originalBuildFHSEnv = prev.lib.callPackageWith prev.pkgs file overrides;
           in
-          # Return a wrapper: call original, then add util-linuxMinimal to
-          # the rootfs derivation's nativeBuildInputs so libmount.so.1 is
-          # available when glib-compile-schemas runs in the build sandbox.
           args:
           (originalBuildFHSEnv args).overrideAttrs (old: {
             nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [
@@ -41,51 +35,6 @@ final: prev: {
     prev.lib.callPackageWith prev.pkgs (
       prev.path + "/pkgs/build-support/build-fhsenv-bubblewrap/default.nix"
     ) { callPackage = interceptCallPackage; };
-
-  # Yazelix Zellij Orchestrator
-  yazelix-orchestrator = final.stdenv.mkDerivation {
-    pname = "yazelix-orchestrator";
-    version = "v14";
-    src = final.fetchurl {
-      url = "https://raw.githubusercontent.com/luccahuguet/yazelix/v14/configs/zellij/plugins/yazelix_pane_orchestrator.wasm";
-      sha256 = "sha256-H4uAqyJbx7HHy0vRXZOqDeG1UkkTmfwqZ4qCuAOviOc=";
-    };
-    phases = [ "installPhase" ];
-    installPhase = ''
-      mkdir -p $out/share
-      cp $src $out/share/yazelix_pane_orchestrator.wasm
-    '';
-  };
-
-  # Yazelix Zellij Popup Runner
-  yazelix-popup-runner = final.stdenv.mkDerivation {
-    pname = "yazelix-popup-runner";
-    version = "v14";
-    src = final.fetchurl {
-      url = "https://raw.githubusercontent.com/luccahuguet/yazelix/v14/configs/zellij/plugins/yazelix_popup_runner.wasm";
-      sha256 = "sha256-7m8EXc8DHDZEtcT1PYvulHYIeDB8laprpqCSY7oJl4Y=";
-    };
-    phases = [ "installPhase" ];
-    installPhase = ''
-      mkdir -p $out/share
-      cp $src $out/share/yazelix_popup_runner.wasm
-    '';
-  };
-
-  # Zellij status bar plugin
-  zjstatus = final.stdenv.mkDerivation {
-    pname = "zjstatus";
-    version = "0.20.2";
-    src = final.fetchurl {
-      url = "https://github.com/dj95/zjstatus/releases/download/v0.20.2/zjstatus.wasm";
-      sha256 = "sha256-OSg7Q1AWKW32Y9sHWJbWOXWF1YI5mt0N4Vsa2fcvuNg=";
-    };
-    phases = [ "installPhase" ];
-    installPhase = ''
-      mkdir -p $out/lib
-      cp $src $out/lib/zjstatus.wasm
-    '';
-  };
 
   # REMOVED (2026-08-06): glances test-disable overlay. Upstream 4.5.5 already
   # disables specific sandbox-failing tests (test_webui, test_msg_curse, etc.).
@@ -219,35 +168,21 @@ final: prev: {
   # (jo-inc fork with VNC + persistence plugins, OpenAPI docs, tracing)
   # Override to use our prebuilt camoufox instead of camoufox-nix's source-built one
   # (Firefox 146 source build takes hours and fails on this machine)
-  # Also add missing linux-headers + gcc for better-sqlite3 native addon compilation
-  # VNC watcher paths (NOVNC_DIR, websockify, awk) fixed via systemd PATH + tmpfiles
-  # in layers/20-services/24-communication/camofox-browser.nix — no derivation patch needed.
-  jo-camofox-browser =
-    (prev.jo-camofox-browser.override { inherit (final) camoufox; }).overrideAttrs
-      (old: {
-        nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [
-          final.linuxHeaders
-          final.gcc
-        ];
-        buildInputs = (old.buildInputs or [ ]) ++ [ final.linuxHeaders ];
-      });
-
-  # Fix for browserify build failure: npm: command not found
-  # browserify = prev.nodePackages.browserify.overrideAttrs (old: {
-  #   nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [
-  #     final.python3
-  #     final.nodejs
-  #   ];
-  # });
-
-  # REMOVED (2026-08-07): noctalia-greeter overlay — DEAD CODE. The greeter
-  # module (layers/30-theming/32-boot/greeter.nix) builds from
-  # inputs.noctalia-greeter.packages.<system>.default directly and applies its
-  # own overrideAttrs there. Nothing references pkgs.noctalia-greeter.
-  # REMOVED (2026-08-07): desktop-file-utils linuxHeaders/libselinux/patchelf
-  # overlay — same glib-2.88 libmount.so.1 era as the glibc-2.42 fixes removed
-  # 2026-08-06, which are now upstream. If the build fails with libselinux or
-  # libmount.so.1 link errors, restore from git history (commit before this).
+  jo-camofox-browser = prev.jo-camofox-browser.override {
+    inherit (final) camoufox;
+  };
+  camofox-browser = prev.camofox-browser.override {
+    inherit (final) camoufox;
+  };
+  camofox-cli = prev.camofox-cli.override {
+    inherit (final) camoufox;
+  };
+  camofox-mcp = prev.camofox-mcp.override {
+    inherit (final) camoufox;
+  };
+  camoufox-js = prev.camoufox-js.override {
+    inherit (final) camoufox;
+  };
 
   pythonPackagesExtensions = (prev.pythonPackagesExtensions or [ ]) ++ [
     (python-final: python-prev: {
@@ -262,70 +197,70 @@ final: prev: {
   # Rust-based knowledge base with MCP server, hybrid search, and
   # support for 15+ formats (PDF, EPUB, ZIM, Telegram, etc.)
   # https://github.com/meteora-pro/lokb
-  lokb = final.rustPlatform.buildRustPackage rec {
-    pname = "lokb";
-    version = "0.1.0-unstable-2026-04-22";
+  # lokb = final.rustPlatform.buildRustPackage rec {
+  #   pname = "lokb";
+  #   version = "0.1.0-unstable-2026-04-22";
 
-    src = final.fetchFromGitHub {
-      owner = "meteora-pro";
-      repo = "lokb";
-      rev = "7f0c8ba068e083467dc8e520f54569b208dd2303";
-      hash = "sha256-ErF4xAMeWw9K6s7MK/MRZ91iGM8p+tr8smfUBE8vW6I=";
-    };
+  #   src = final.fetchFromGitHub {
+  #     owner = "meteora-pro";
+  #     repo = "lokb";
+  #     rev = "7f0c8ba068e083467dc8e520f54569b208dd2303";
+  #     hash = "sha256-ErF4xAMeWw9K6s7MK/MRZ91iGM8p+tr8smfUBE8vW6I=";
+  #   };
 
-    cargoLock = {
-      lockFile = src + "/Cargo.lock";
-      outputHashes = {
-        # Add any git dependency hashes here if needed
-      };
-    };
+  #   cargoLock = {
+  #     lockFile = src + "/Cargo.lock";
+  #     outputHashes = {
+  #       # Add any git dependency hashes here if needed
+  #     };
+  #   };
 
-    nativeBuildInputs = with final; [
-      pkg-config
-      rustPlatform.bindgenHook
-    ];
+  #   nativeBuildInputs = with final; [
+  #     pkg-config
+  #     rustPlatform.bindgenHook
+  #   ];
 
-    buildInputs =
-      with final;
-      [
-        openssl
-        sqlite
-        zlib
-        linuxHeaders
-      ]
-      ++ final.lib.optionals final.stdenv.isLinux [
-        # For PDF rendering (poppler)
-        poppler
-        poppler_gi
-        cairo
-        glib
-      ];
+  #   buildInputs =
+  #     with final;
+  #     [
+  #       openssl
+  #       sqlite
+  #       zlib
+  #       linuxHeaders
+  #     ]
+  #     ++ final.lib.optionals final.stdenv.isLinux [
+  #       # For PDF rendering (poppler)
+  #       poppler
+  #       poppler_gi
+  #       cairo
+  #       glib
+  #     ];
 
-    # Patch lokb-cli to remove lokb-embed dependency (ONNX runtime version conflict).
-    # Full-text search (Tantivy) and knowledge graph work without embeddings.
-    # Semantic search can be added later via Ollama API.
-    postPatch = ''
-      substituteInPlace crates/lokb-cli/Cargo.toml \
-        --replace 'lokb-embed = { path = "../lokb-embed" }' '# lokb-embed disabled (ONNX runtime conflict)'
-      substituteInPlace crates/lokb-cli/src/main.rs \
-        --replace 'mod parallel_zim;' '# mod parallel_zim;' \
-        --replace 'Commands::Enrich' 'Commands::_Enrich' \
-        --replace 'Commands::Entity' 'Commands::_Entity' \
-        --replace 'Commands::Substring' 'Commands::_Substring' \
-        --replace 'Commands::BuildIndex' 'Commands::_BuildIndex'
-    '';
+  #   # Patch lokb-cli to remove lokb-embed dependency (ONNX runtime version conflict).
+  #   # Full-text search (Tantivy) and knowledge graph work without embeddings.
+  #   # Semantic search can be added later via Ollama API.
+  #   postPatch = ''
+  #     substituteInPlace crates/lokb-cli/Cargo.toml \
+  #       --replace 'lokb-embed = { path = "../lokb-embed" }' '# lokb-embed disabled (ONNX runtime conflict)'
+  #     substituteInPlace crates/lokb-cli/src/main.rs \
+  #       --replace 'mod parallel_zim;' '# mod parallel_zim;' \
+  #       --replace 'Commands::Enrich' 'Commands::_Enrich' \
+  #       --replace 'Commands::Entity' 'Commands::_Entity' \
+  #       --replace 'Commands::Substring' 'Commands::_Substring' \
+  #       --replace 'Commands::BuildIndex' 'Commands::_BuildIndex'
+  #   '';
 
-    # Disable tests that need network or special setup
-    doCheck = false;
+  #   # Disable tests that need network or special setup
+  #   doCheck = false;
 
-    meta = with final.lib; {
-      description = "Local Offline Knowledge Base — 15 formats, hybrid search, MCP server";
-      homepage = "https://github.com/meteora-pro/lokb";
-      license = licenses.asl20;
-      maintainers = [ ];
-      mainProgram = "lokb";
-    };
-  };
+  #   meta = with final.lib; {
+  #     description = "Local Offline Knowledge Base — 15 formats, hybrid search, MCP server";
+  #     homepage = "https://github.com/meteora-pro/lokb";
+  #     license = licenses.asl20;
+  #     maintainers = [ ];
+  #     mainProgram = "lokb";
+  #   };
+  # };
 
   # ── codegraph: Semantic code intelligence for AI agents ───────────
   # Wrap codegraph to strip plain-text update banners on stdout that break stdio MCP JSON-RPC

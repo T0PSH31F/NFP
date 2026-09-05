@@ -15,7 +15,14 @@
 with lib;
 
 {
-  options.layers.layer-70.agent.kiro-cli = {
+  imports = [
+    (lib.mkAliasOptionModule
+      [ "layers" "layer-70" "agent" "kiro-cli" ]
+      [ "layers" "layer-71" "harness" "kiro-cli" ]
+    )
+  ];
+
+  options.layers.layer-71.harness.kiro-cli = {
     enable = mkEnableOption "Kiro CLI — command-line interface for Kiro agentic IDE";
     enableA2A = mkOption {
       type = types.bool;
@@ -26,7 +33,7 @@ with lib;
 
   config =
     let
-      cfg = config.layers.layer-70.agent.kiro-cli;
+      cfg = config.layers.layer-71.harness.kiro-cli;
       user = osConfig.layers.meta.primaryUser or "t0psh31f";
     in
     mkIf cfg.enable {

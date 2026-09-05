@@ -2,6 +2,7 @@
 {
   config,
   lib,
+  pkgs,
   osConfig ? config,
   ...
 }:
@@ -69,7 +70,8 @@ in
           Service = {
             Type = "oneshot";
             RemainAfterExit = true;
-            ExecStart = "${config.home.homeDirectory}/.nix-profile/bin/bash -c 'mkdir -p %h/.config/hypr/experiences %h/.cache/noctalia/HVE'";
+            ExecStart = "${pkgs.bash}/bin/bash -c 'mkdir -p %h/.config/hypr/experiences %h/.cache/noctalia/HVE'";
+
           };
         };
       };

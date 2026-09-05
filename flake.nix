@@ -1,6 +1,19 @@
 {
   description = "Nix Flake Pirates (NFP) Configuration";
 
+  nixConfig = {
+    extra-substituters = [
+      "https://yazelix.cachix.org"
+      "https://nix-community.cachix.org"
+      "https://hyprland.cachix.org"
+    ];
+    extra-trusted-public-keys = [
+      "yazelix.cachix.org-1:ZgxIjQvaP0VTWL8Racx27mpUNzDJ97xC2y7QWYjmGNM="
+      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+      "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
+    ];
+  };
+
   inputs = {
     # ── Core Flake Tools & Clan ──────────────────────────────────
     clan-core = {
@@ -72,10 +85,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.systems.follows = "systems";
     };
-    nova = {
-      url = "github:Yazelix/nova";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     vicinae = {
       url = "github:vicinaehq/vicinae";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -88,26 +97,7 @@
       inputs.flake-compat.follows = "hyprland/pre-commit-hooks/flake-compat";
       inputs.systems.follows = "systems";
     };
-    yazelix-cursors = {
-      url = "github:luccahuguet/yazelix-cursors";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    yazelix-hm = {
-      url = "github:luccahuguet/yazelix";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.home-manager.follows = "home-manager";
-      inputs.beads.inputs.nixpkgs.follows = "nixpkgs";
-      inputs.nixgl.inputs.nixpkgs.follows = "nixpkgs";
-      inputs.nixgl.inputs.flake-utils.follows = "flake-utils";
-      inputs.zjstatus.inputs.flake-utils.follows = "flake-utils";
-      inputs.zjstatus.inputs.rust-overlay.follows = "wakatime-lsp/rust-overlay";
-      inputs.yazelixZellijPaneOrchestrator.inputs.flake-utils.follows = "flake-utils";
-      inputs.yazelixZellijPopup.inputs.flake-utils.follows = "flake-utils";
-    };
-    yazelix-screen = {
-      url = "github:luccahuguet/yazelix-screen";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+
     zjstatus = {
       url = "github:dj95/zjstatus";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -145,7 +135,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
     };
-    nixpkgs-ai.url = "github:NixOS/nixpkgs/9c4c05a947a91dc14625265fab505fb695e93218";
     polyfloor = {
       url = "github:T0PSH31F/Polyfloor";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -175,6 +164,10 @@
     };
     nixvim = {
       url = "github:nix-community/nixvim";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    stellar = {
+      url = "github:a3chron/stellar";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     wakatime-lsp = {
