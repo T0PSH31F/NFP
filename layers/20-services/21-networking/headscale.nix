@@ -1,4 +1,4 @@
-{ config, lib, ... }:
+{ config, lib, pkgs, ... }:
 with lib;
 let
   cfg = config.services.headscale-server;
@@ -67,6 +67,9 @@ in
         owner = "headscale";
         group = "headscale";
       };
+      script = ''
+        ${pkgs.openssl}/bin/openssl rand -hex 32 > "$out/headscale_auth_key"
+      '';
     };
 
     systemd.tmpfiles.rules = [

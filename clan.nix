@@ -29,7 +29,7 @@ let
         "media"
         "intel-9th-gen"
       ];
-      deploy.targetHost = "root@100.80.146.120"; # Tailscale mesh IP
+      deploy.targetHost = "root@100.64.0.3"; # Tailscale mesh IP
     };
 
     # NAMI — Cloud control-plane (always-on AI gateway, agent orchestration, media)
