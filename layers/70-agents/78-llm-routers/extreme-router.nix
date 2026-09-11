@@ -1,6 +1,8 @@
 # Tier: 78-llm-routers
 # Module: extreme-router.nix
 # Purpose: ExtremeRouter OCI container proxy — 154+ LLM providers with web UI & /v1/* API.
+# Polyfloor (76-orchestrators) can point services.polyfloor.routerEndpoint here
+# (http://127.0.0.1:<port>/v1) and enumerate models via GET /v1/models.
 # Option Path: layers.layer-78.llm-routers.extreme-router
 # Enabling Host Tags: ai-router, ai-agent, workstation
 # RAM Footprint: medium (300MB-1GB)

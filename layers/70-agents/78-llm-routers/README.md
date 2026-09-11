@@ -23,3 +23,6 @@ The `78-llm-routers` tier is responsible for unified API gateways, LLM load bala
 
 - **Sits In Front Of**: Backends in `74-ai-infra` (Ollama `:11434`, llama.cpp `:8080`, vLLM `:8000`) and external cloud APIs (OpenAI, Anthropic, Gemini, OpenRouter).
 - **Sits Behind**: Client harnesses in `71-harness` (OpenCode, Hermes, Antigravity), orchestrators in `76-orchestrators` (Polyfloor, LangGraph), and desktop UIs in `77-dash-desk-ui`.
+
+> [!NOTE]
+> **Polyfloor model discovery**: Polyfloor (`76-orchestrators/polyfloor.nix`) points `services.polyfloor.routerEndpoint` at one of these routers and enumerates models via `GET {base}/v1/models`. Kong exposes this on the `v1-models` route (forwarded to the coding router); LiteLLM (`/v1/models`) and ExtremeRouter (`/v1/*`) expose it natively.

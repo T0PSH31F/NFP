@@ -1,6 +1,8 @@
 # Tier: 78-llm-routers
 # Module: litellm.nix
 # Purpose: LiteLLM proxy server — unified OpenAI-compatible format with cost tracking & load balancing.
+# Polyfloor (76-orchestrators) can point services.polyfloor.routerEndpoint here
+# (http://127.0.0.1:<port>/v1, its default) and enumerate models via GET /v1/models.
 # Option Path: services.litellm-proxy
 # Enabling Host Tags: ai-router, homelab
 # RAM Footprint: medium (300MB-1GB)

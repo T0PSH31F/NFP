@@ -125,7 +125,10 @@ let
             tags = [ "llm" ];
           }
           # Primary — model discovery → coding router (ExtremeRouter or OmniRoute)
-          # OpenCode/Hermes call /v1/models to enumerate available models
+          # OpenCode/Hermes call /v1/models to enumerate available models.
+          # Polyfloor (76-orchestrators/polyfloor.nix) also enumerates this via
+          # GET {routerEndpoint}/models (services.polyfloor.routerEndpoint),
+          # grouping results into free|fast|reasoning|frontier for its UI.
           {
             name = "v1-models";
             service =
