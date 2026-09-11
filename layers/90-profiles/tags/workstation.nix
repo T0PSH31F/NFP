@@ -15,6 +15,7 @@
         avahi.enable = lib.mkDefault true;
         tailscale.enable = lib.mkDefault true;
         monitoring.enable = lib.mkDefault true;
+        syncthing.enable = lib.mkDefault true;
       };
       layer-20.services.backups.restic.enable = lib.mkDefault true;
     };

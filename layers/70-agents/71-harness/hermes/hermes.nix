@@ -292,6 +292,8 @@
         environmentFiles = [ config.sops.templates."hermes-env".path ];
       };
 
+      systemd.services.hermes-agent.serviceConfig.UMask = lib.mkForce "0002";
+
       # Grant hermes user access to the GLaDOS TTS project under /home/t0psh31f/
       users.users.hermes.extraGroups = [ "users" ];
 
@@ -304,13 +306,13 @@
         '';
       };
 
-      # Ensure the .hermes directory stays group-readable so t0psh31f (in hermes group)
-      # can access the hermes venv. systemd StateDirectory= may reset permissions on restart,
-      # so tmpfiles.d enforces it persistently.
+      # Ensure the .hermes directory stays group-readable and group-writable so t0psh31f (in hermes group)
+      # can access state files (like .container-mode). setgid bit (2775) ensures inherited group ownership.
       systemd.tmpfiles.rules = [
-        "d /var/lib/hermes/.hermes 0770 hermes hermes -"
-        "d /var/lib/hermes/.hermes/hermes-agent 0770 hermes hermes -"
-        "d /var/lib/hermes/.hermes/skills 0770 hermes hermes -"
+        "Z /var/lib/hermes/.hermes 2775 hermes hermes -"
+        "d /var/lib/hermes/.hermes 2775 hermes hermes -"
+        "d /var/lib/hermes/.hermes/hermes-agent 2775 hermes hermes -"
+        "d /var/lib/hermes/.hermes/skills 2775 hermes hermes -"
         # Harness skill packs — symlinked from the Nix store into HERMES_HOME/skills.
         # Upstream bundled skills ship in $out/share/hermes-agent/skills via HERMES_BUNDLED_SKILLS;
         # repository skills linked here are additive and take precedence for custom workflows.

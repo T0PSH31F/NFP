@@ -51,18 +51,42 @@ in
   home =
     { config, lib, ... }:
     let
-      communityPluginsSrc = pkgs.fetchFromGitHub {
-        owner = "noctalia-dev";
-        repo = "community-plugins";
-        rev = "caed21ab081948435cd770d2e954c99b8bbb72cf";
-        hash = "sha256-3mFoSMTkfR2W7qVsV4MaM8s1pX5cjucu9UXLI88qv0s=";
-      };
-      officialPluginsSrc = pkgs.fetchFromGitHub {
-        owner = "noctalia-dev";
-        repo = "official-plugins";
-        rev = "8cb833c3e2502f57e49d34fa64386b4d66794b77";
-        hash = "sha256-gb4YgbRAismjl3Cur4ERFDfU2pR33ynRw0/CCAFw+Pw=";
-      };
+      communityPluginsSrc =
+        inputs.noctalia-community-plugins or (pkgs.fetchFromGitHub {
+          owner = "noctalia-dev";
+          repo = "community-plugins";
+          rev = "caed21ab081948435cd770d2e954c99b8bbb72cf";
+          hash = "sha256-3mFoSMTkfR2W7qVsV4MaM8s1pX5cjucu9UXLI88qv0s=";
+        });
+      officialPluginsSrc =
+        inputs.noctalia-official-plugins or (pkgs.fetchFromGitHub {
+          owner = "noctalia-dev";
+          repo = "official-plugins";
+          rev = "8cb833c3e2502f57e49d34fa64386b4d66794b77";
+          hash = "sha256-gb4YgbRAismjl3Cur4ERFDfU2pR33ynRw0/CCAFw+Pw=";
+        });
+
+      patchPlugin =
+        pluginName: rawSrc:
+        pkgs.runCommand "noctalia-plugin-${builtins.replaceStrings [ "/" ] [ "-" ] pluginName}"
+          {
+            nativeBuildInputs = [ pkgs.jq ];
+          }
+          ''
+            cp -r "${rawSrc}" $out
+            chmod -R u+w $out
+            if [ -f "$out/plugin.json" ]; then
+              if ! jq -e 'has("min_noctalia")' "$out/plugin.json" >/dev/null 2>&1; then
+                jq '. + {"min_noctalia": "5.0.0"}' "$out/plugin.json" > "$out/plugin.json.tmp"
+                mv "$out/plugin.json.tmp" "$out/plugin.json"
+              fi
+            elif [ -f "$out/manifest.json" ]; then
+              if ! jq -e 'has("min_noctalia")' "$out/manifest.json" >/dev/null 2>&1; then
+                jq '. + {"min_noctalia": "5.0.0"}' "$out/manifest.json" > "$out/manifest.json.tmp"
+                mv "$out/manifest.json.tmp" "$out/manifest.json"
+              fi
+            fi
+          '';
     in
     {
       imports = [
@@ -78,12 +102,16 @@ in
         home.file = lib.mkMerge (
           map (pluginName: {
             ".config/noctalia/plugins/${pluginName}".source =
-              if builtins.pathExists "${officialPluginsSrc}/${pluginName}" then
-                "${officialPluginsSrc}/${pluginName}"
-              else if builtins.pathExists "${communityPluginsSrc}/${pluginName}" then
-                "${communityPluginsSrc}/${pluginName}"
-              else
-                "${communityPluginsSrc}/${pluginName}";
+              let
+                raw =
+                  if builtins.pathExists "${officialPluginsSrc}/${pluginName}" then
+                    "${officialPluginsSrc}/${pluginName}"
+                  else if builtins.pathExists "${communityPluginsSrc}/${pluginName}" then
+                    "${communityPluginsSrc}/${pluginName}"
+                  else
+                    "${communityPluginsSrc}/${pluginName}";
+              in
+              patchPlugin pluginName raw;
           }) cfg.plugins
           ++ [
             {

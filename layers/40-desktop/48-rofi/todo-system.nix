@@ -7,7 +7,16 @@
 }:
 
 let
-  cfg = config.layers.layer-79.skills.todo-system;
+  cfg =
+    if
+      (osConfig ? layers)
+      && (osConfig.layers ? layer-79)
+      && (osConfig.layers.layer-79 ? skills)
+      && (osConfig.layers.layer-79.skills ? todo-system)
+    then
+      osConfig.layers.layer-79.skills.todo-system
+    else
+      { enable = false; };
   user = osConfig.layers.meta.primaryUser or "t0psh31f";
   userHome = "/home/${user}";
 

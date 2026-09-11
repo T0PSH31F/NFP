@@ -1,7 +1,7 @@
-_: {
+{ inputs, ... }:
+{
   perSystem =
     {
-      inputs,
       system,
       ...
     }:

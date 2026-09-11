@@ -77,6 +77,7 @@
 | **8989** | Sonarr                 | luffy  | `layers/20-services/23-media/media-stack.nix`     | TV Series Management            |
 | **9090** | Prometheus             | Both   | `machines/*/default.nix`                           | Metrics Collection Daemon       |
 | **9100** | Glances / Node Exporter| z0r0   | `layers/20-services/26-monitoring/`                | Node Hardware Stats Daemon      |
+| **8384** | Syncthing Web GUI      | Both   | `layers/20-services/25-data/syncthing.nix`         | Syncthing Web Management UI     |
 | **9115** | Blackbox Exporter      | z0r0   | `layers/20-services/26-monitoring/`                | HTTP Probe Exporter             |
 | **9119** | Hermes Dashboard       | z0r0   | `layers/70-agents/76-hermes-agent/`                | Hermes Agent Control Center     |
 | **9187** | Postgres Exporter      | Both   | `layers/20-services/26-monitoring/`                | PostgreSQL Database Metrics     |
@@ -86,7 +87,9 @@
 | **9696** | Prowlarr               | luffy  | `layers/20-services/23-media/media-stack.nix`     | Indexer Proxy Manager           |
 | **11434**| Ollama                 | Both   | `layers/20-services/22-ai/ollama.nix`              | Local LLM Inference Engine      |
 | **20128**| ExtremeRouter          | z0r0   | `layers/20-services/22-ai/21-llm-routers/extreme-router.nix` | Coding LLM router — 154+ providers, web UI + `/v1/*` API |
+| **21027**| Syncthing Discovery    | Both   | `layers/20-services/25-data/syncthing.nix`         | Syncthing UDP Discovery         |
 | **21116**| RustDesk Signal        | z0r0   | `layers/20-services/24-communication/`             | Remote Desktop Signaling        |
+| **22000**| Syncthing Sync         | Both   | `layers/20-services/25-data/syncthing.nix`         | Syncthing Peer Transfer Port    |
 | **25600**| Komga                  | luffy  | `layers/20-services/26-monitoring/`                | Comic & Manga Server            |
 | **29317**| Mautrix WhatsApp       | luffy  | `layers/20-services/24-communication/`             | WhatsApp Matrix Bridge          |
 | **29318**| Mautrix Signal         | luffy  | `layers/20-services/24-communication/`             | Signal Matrix Bridge            |

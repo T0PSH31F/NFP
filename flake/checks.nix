@@ -1,9 +1,10 @@
-_: {
+{ inputs, ... }:
+{
   perSystem =
     {
       pkgs,
       system,
-      inputs,
+      inputs',
       ...
     }:
     let

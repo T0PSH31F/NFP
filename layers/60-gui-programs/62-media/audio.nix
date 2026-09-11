@@ -53,6 +53,9 @@
       home.packages = with pkgs; [
         cavalier # GUI Visualizer
         mpc # CLI control for mpd
+        picard # MusicBrainz Picard for metadata tagging & cover art
+        mediainfo-gui # GUI media file technical inspector
+        mediainfo # CLI media file inspector
       ];
     };
 }

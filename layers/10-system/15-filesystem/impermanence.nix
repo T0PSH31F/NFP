@@ -97,7 +97,6 @@ with lib;
           ".background"
           ".antigravity"
           ".gemini"
-          ".hermes"
           ".claude" # Claude Code transcripts + skills
           ".codex" # Codex CLI state
           ".opencode" # OpenCode local plugin data
