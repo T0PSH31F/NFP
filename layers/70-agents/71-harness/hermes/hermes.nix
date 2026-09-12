@@ -90,6 +90,7 @@
         "reka_api_key"
         "opencode_api_key"
         "opencode_go_api_key_2"
+        "opencode_go_api_key_3"
         "nous_api_key"
         "openclaw_gateway_token"
         "gemini_api_key_we77"
@@ -724,9 +725,8 @@
           CEREBRAS_API_KEY=${config.sops.placeholder.cerebras_api_key}
           REKA_API_KEY=${config.sops.placeholder.reka_api_key}
           OPENCODE_ZEN_API_KEY=${config.sops.placeholder.opencode_api_key}
-          # OpenCode Go credential pool (primary: new key, fallback: old key)
-          OPENCODE_GO_API_KEY=${config.sops.placeholder.opencode_go_api_key_2}
-          OPENCODE_GO_API_KEY_2=${config.sops.placeholder.opencode_api_key}
+          # OpenCode Go key (primary/only)
+          OPENCODE_GO_API_KEY=${config.sops.placeholder.opencode_go_api_key_3}
           NOUS_API_KEY=${config.sops.placeholder.nous_api_key}
           NOUS_PORTAL_KEY=${config.sops.placeholder.nous_api_key}
           OPENCLAW_GATEWAY_KEY=${config.sops.placeholder.openclaw_gateway_token}
