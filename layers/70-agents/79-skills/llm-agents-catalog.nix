@@ -217,13 +217,34 @@ in
       primaryUser = config.layers.meta.primaryUser or "t0psh31f";
       hasTag = tag: builtins.elem tag (config.machine.tags or [ ]);
 
+      guiCatalogPackages = [
+        "agentdesk"
+        "antigravity-ide"
+        "chatgpt"
+        "claude-desktop"
+        "hermes-desktop"
+        "hermes-hud"
+        "kandev-desktop"
+        "paseo-desktop"
+        "voxtype"
+      ];
+
+      isGuiHost = hasTag "desktop" || (config.layers.layer-60.gui.enable or false);
+
       effectivePackageNames =
-        if cfg.packages != [ ] then
-          cfg.packages
-        else if (hasTag "ai-agent" || hasTag "ai-server" || hasTag "development") then
-          defaultCatalogPackages
+        let
+          rawNames =
+            if cfg.packages != [ ] then
+              cfg.packages
+            else if (hasTag "ai-agent" || hasTag "ai-server" || hasTag "development") then
+              defaultCatalogPackages
+            else
+              [ ];
+        in
+        if isGuiHost then
+          rawNames
         else
-          [ ];
+          filter (name: !(elem name guiCatalogPackages)) rawNames;
 
       resolvedPackages = filter (p: p != null) (
         map (name: llmPkgs.${name} or pkgs.${name} or null) effectivePackageNames
