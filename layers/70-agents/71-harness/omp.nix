@@ -34,10 +34,7 @@ in
       [ "layers" "layer-70" "agent" "omp" ]
       [ "layers" "layer-71" "harness" "omp" ]
     )
-  ]
-  ++ optional (
-    inputs ? omp && inputs.omp ? homeManagerModules && inputs.omp.homeManagerModules ? default
-  ) inputs.omp.homeManagerModules.default;
+  ];
 
   options.layers.layer-71.harness.omp = {
     enable = mkEnableOption "Oh-My-Pi (OMP) AI coding agent harness";
@@ -58,6 +55,12 @@ in
       type = types.str;
       default = "http://127.0.0.1:8090/v1";
       description = "NFP LLM router OpenAI-compatible gateway endpoint (default: kong-er)";
+    };
+
+    settings = mkOption {
+      type = types.nullOr types.anything;
+      default = null;
+      description = "Optional custom settings attribute set for OMP";
     };
   };
 
