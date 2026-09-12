@@ -30,9 +30,8 @@
     readest
     epy
     glow
-    lf
+    iconic
     yazi
-    fff
     librum
     superfile
     # spacedrive — refused to evaluate in this nixpkgs rev

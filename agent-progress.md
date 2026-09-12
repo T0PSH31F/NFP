@@ -159,10 +159,21 @@ Append one entry per session, newest at the bottom. Never edit past entries.
 
 - **Date / Agent:** 2026-09-03 / mimo-v2.5-pro
 - **Feature:** tag-refactor-granular-service-redistribution
-- **Work done:** Recovered session context from crash. Fixed 7 broken option paths across tag files from incomplete previous refactor. Created 4 new granular tags (ai-router, pkb-node, agent-orchestrator, network-router). Redistributed services: Sanji = always-on control-plane (AI gateway, agent orchestration, network routing), Luffy = private memory (brain-service, Honcho, media), Z0r0 = stateless desktop workstation. Removed stale mkForce overrides from z0r0. Fixed undefined `jerry` package. Updated validTags in both registry and CI test.
-- **Verification:** `nix eval` toplevel on z0r0, luffy, sanji all return clean drvPaths; `dendritic-structure-test` passes green.
-- **State change:** passing (eval evidence: z0r0/bf94j77vd, luffy/fqpmprc295, sanji/b52npnzrf7)
-- **Next action:** Luffy Tailscale recovery (user in progress). Then fleet deployment via `clan machines update sanji` (first deploy), upstream mkDefault cleanup for module defaults, Omniroute port verification.
+- **Work done:** Recovered session context from crash. Fixed 7 broken option paths across tag files from incomplete previous refactor. Created 4 new granular tags (ai-router, pkb-node, agent-orchestrator, network-router). Redistributed services: nami = always-on control-plane (AI gateway, agent orchestration, network routing), Luffy = private memory (brain-service, Honcho, media), Z0r0 = stateless desktop workstation. Removed stale mkForce overrides from z0r0. Fixed undefined `jerry` package. Updated validTags in both registry and CI test.
+- **Verification:** `nix eval` toplevel on z0r0, luffy, nami all return clean drvPaths; `dendritic-structure-test` passes green.
+- **State change:** passing (eval evidence: z0r0/bf94j77vd, luffy/fqpmprc295, nami/b52npnzrf7)
+- **Date / Agent:** 2026-09-12 / antigravity
+- **Feature:** homelab-hardening-service-contracts
+- **Work done:** Implemented Phase 0-6 Homelab Hardening: authored `docs/homelab-cutover.md` inventory; created `mkServiceContract.nix` contract schema and `nfp-services.nix` consumer; added `nixarr` and `nixos-telemetry` flake inputs; created `nixarr.nix` module with Komga (`nixarr.komga.enable=true`), Jellyfin, *Arr suite, exporters, and `/data/.state/nixarr` impermanence state; cleaned legacy `komga.nix` and `media-stack.nix` option references; updated `restic-backups.nix` dual target defaults (`/data/backups` placeholder + GCS `rclone:gcs:...`).
+- **Verification:** `./init.sh` green; `nix eval` confirmed `luffy.nixarr.enable = true`, `luffy.nixarr.komga.enable = true`, `luffy.nixarr.plex.enable = false`, `z0r0.nixarr.enable = false`; `z0r0`, `luffy`, `nami` system toplevel drvPaths evaluated cleanly.
+- **State change:** passing (evidence recorded in feature_list.json)
+- **Date / Agent:** 2026-09-12 / antigravity
+- **Feature:** kong-dual-upstreams-herdr-fix
+- **Work done:** Integrated `herdr` terminal workspace manager harness on `z0r0` via `inputs.llm-agents` (`herdr.nix`, `ai-agent.nix`). Removed `codingRouter` XOR logic in `kong-gateway.nix` allowing `extremerouter-llm` (`http://z0r0:20128`) and `omniroute-llm` (`http://127.0.0.1:20129`) to run simultaneously on `nami:8090`. Bound `extreme-router.nix` to loopback and tailnet interface (`tailscale0`) with firewall isolation. Updated `omniroute.nix` default port to `20129`. Updated homepage dashboard and documentation.
+- **Verification:** `./init.sh` green; `nix eval` confirmed `z0r0.herdr.enable = true`, `z0r0.systemPackages` contains `herdr-0.8.2`, `z0r0.extreme-router.enable = true`, `nami.kong-gateway.enable = true`, `nami.omniroute.enable = true`; `z0r0`, `luffy`, `nami` system toplevel drvPaths evaluated cleanly.
+- **State change:** passing (evidence recorded in feature_list.json)
+- **Next action:** Deploy changes to `z0r0` (`clan machines update z0r0`) and `nami` (`clan machines update nami`).
+
 
 
 

@@ -1,6 +1,12 @@
 # Tier: 71-harness
 # Module: antigravity.nix
 # Purpose: Google Antigravity Agentic IDE & CLI suite integration.
+# Provider endpoints (Kong path multiplexer + ExtremeRouter backup):
+#   kong-er:       http://127.0.0.1:8090/v1 (ExtremeRouter)
+#   kong-omni:     http://127.0.0.1:8090/omni/v1 (OmniRoute - TODO: when merged)
+#   kong-free:     http://127.0.0.1:8090/llm/free/v1 (FreeLLMPool)
+#   kong-frontier: http://127.0.0.1:8090/llm/frontier/v1 (Manifest)
+#   extreme-direct: http://127.0.0.1:20128/v1 (ER direct backup)
 # Option Path: layers.layer-70.agent.antigravity
 # Enabling Host Tags: ai-agent, workstation, desktop
 # RAM Footprint: medium (300MB-1GB)
@@ -50,6 +56,14 @@
         pkgs.antigravity-cli
       ]
       ++ lib.optional cfg.enableIde pkgs.antigravity-ide;
+
+      environment.sessionVariables = {
+        OPENAI_BASE_URL_KONG_ER = "http://127.0.0.1:8090/v1";
+        OPENAI_BASE_URL_KONG_OMNI = "http://127.0.0.1:8090/omni/v1";
+        OPENAI_BASE_URL_KONG_FREE = "http://127.0.0.1:8090/llm/free/v1";
+        OPENAI_BASE_URL_KONG_FRONTIER = "http://127.0.0.1:8090/llm/frontier/v1";
+        OPENAI_BASE_URL_EXTREME_DIRECT = "http://127.0.0.1:20128/v1";
+      };
     };
 
   home =
@@ -80,6 +94,14 @@
               "@portel/ncp"
             ];
             description = "Semantic MCP Gateway (Context Reduction)";
+          };
+          playwright = {
+            command = "npx";
+            args = [
+              "-y"
+              "@playwright/mcp@latest"
+            ];
+            description = "Playwright Browser Automation MCP Server";
           };
           headroom = {
             command = "headroom";

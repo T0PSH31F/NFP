@@ -44,7 +44,6 @@ with lib;
     layers.layer-20.services.config.download-clients = {
       enable = mkDefault true;
       aria2.enable = mkDefault true;
-      qbittorrent.enable = mkDefault true;
     };
 
     layers.layer-20.services.config.usenet = {
@@ -53,8 +52,6 @@ with lib;
       nzbget.enable = mkDefault true;
       nzbhydra2.enable = mkDefault true;
     };
-
-    layers.layer-20.services.config.recyclarr.enable = mkDefault true;
 
     # User & Group
     users.users.${config.layers.layer-20.services.config.media-stack.user} = {

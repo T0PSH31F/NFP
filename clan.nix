@@ -1,3 +1,4 @@
+_:
 let
   machinesInventory = {
     # Z0R0 — Desktop workstation (dev, gaming, inference)
@@ -131,6 +132,15 @@ in
       imports = [
         ./machines/z0r0/default.nix
         ./all-layers.nix
+        (
+          { inputs, ... }:
+          {
+            imports = [
+              inputs.nixarr.nixosModules.default
+              inputs.nixos-telemetry.nixosModules.default
+            ];
+          }
+        )
       ];
     };
 
@@ -139,6 +149,15 @@ in
       imports = [
         ./machines/luffy/default.nix
         ./all-layers.nix
+        (
+          { inputs, ... }:
+          {
+            imports = [
+              inputs.nixarr.nixosModules.default
+              inputs.nixos-telemetry.nixosModules.default
+            ];
+          }
+        )
       ];
     };
 
@@ -147,6 +166,15 @@ in
       imports = [
         ./machines/nami/default.nix
         ./server-layers.nix # headless: all layers EXCEPT 13-users (no HM profile)
+        (
+          { inputs, ... }:
+          {
+            imports = [
+              inputs.nixarr.nixosModules.default
+              inputs.nixos-telemetry.nixosModules.default
+            ];
+          }
+        )
       ];
     };
   };

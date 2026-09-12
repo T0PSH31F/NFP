@@ -17,7 +17,7 @@ with lib;
 
     port = mkOption {
       type = types.port;
-      default = 20128;
+      default = 20129;
       description = "HTTP API port (host side)";
     };
 

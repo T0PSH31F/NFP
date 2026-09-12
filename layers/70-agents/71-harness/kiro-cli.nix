@@ -1,6 +1,12 @@
 # Tier: 71-harness
 # Module: kiro-cli.nix
 # Purpose: Kiro autonomous agent CLI tool integration.
+# Provider endpoints (Kong path multiplexer + ExtremeRouter backup):
+#   kong-er:       http://127.0.0.1:8090/v1 (ExtremeRouter)
+#   kong-omni:     http://127.0.0.1:8090/omni/v1 (OmniRoute - TODO: when merged)
+#   kong-free:     http://127.0.0.1:8090/llm/free/v1 (FreeLLMPool)
+#   kong-frontier: http://127.0.0.1:8090/llm/frontier/v1 (Manifest)
+#   extreme-direct: http://127.0.0.1:20128/v1 (ER direct backup)
 # Option Path: layers.layer-70.agent.kiro-cli
 # Enabling Host Tags: ai-agent, development
 # RAM Footprint: light (<300MB)
@@ -41,6 +47,14 @@ with lib;
         kiro-cli
       ];
 
+      environment.sessionVariables = {
+        OPENAI_BASE_URL_KONG_ER = "http://127.0.0.1:8090/v1";
+        OPENAI_BASE_URL_KONG_OMNI = "http://127.0.0.1:8090/omni/v1";
+        OPENAI_BASE_URL_KONG_FREE = "http://127.0.0.1:8090/llm/free/v1";
+        OPENAI_BASE_URL_KONG_FRONTIER = "http://127.0.0.1:8090/llm/frontier/v1";
+        OPENAI_BASE_URL_EXTREME_DIRECT = "http://127.0.0.1:20128/v1";
+      };
+
       home-manager.users.${user} = { pkgs, ... }: {
         config = {
           # Kiro CLI MCP & A2A Inter-Agent Gateway Configuration
@@ -53,6 +67,14 @@ with lib;
               context-forge = {
                 url = "http://127.0.0.1:8083/mcp";
                 description = "ContextForge Universal MCP/A2A Gateway";
+              };
+              playwright = {
+                command = "npx";
+                args = [
+                  "-y"
+                  "@playwright/mcp@latest"
+                ];
+                description = "Playwright Browser Automation MCP Server";
               };
               mcp-nixos = {
                 command = "${lib.getExe pkgs.mcp-nixos}";

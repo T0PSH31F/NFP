@@ -1,6 +1,13 @@
 # Tier: 71-harness
 # Module: aider-chat.nix
 # Purpose: Aider AI pair programming terminal harness wrapper with NFP router & auto-commit options.
+# Provider endpoints (Kong path multiplexer + ExtremeRouter backup):
+#   kong-er:       http://127.0.0.1:8090/v1 (ExtremeRouter)
+#   kong-omni:     http://127.0.0.1:8090/omni/v1 (OmniRoute - TODO: when merged)
+#   kong-free:     http://127.0.0.1:8090/llm/free/v1 (FreeLLMPool)
+#   kong-frontier: http://127.0.0.1:8090/llm/frontier/v1 (Manifest)
+#   extreme-direct: http://127.0.0.1:20128/v1 (ER direct backup)
+# Note: Single-endpoint harness; endpoint switchable via routerEndpoint or OPENAI_API_BASE env aliases.
 # Option Path: programs.aider-chat (and layers.layer-71.harness.aider-chat)
 # Enabling Host Tags: ai-agent, development
 # RAM Footprint: light (<300MB)
@@ -45,7 +52,7 @@ in
     routerEndpoint = mkOption {
       type = types.str;
       default = "http://127.0.0.1:8090/v1";
-      description = "NFP LLM router OpenAI-compatible gateway endpoint";
+      description = "NFP LLM router OpenAI-compatible gateway endpoint (default: kong-er at http://127.0.0.1:8090/v1)";
     };
 
     autoCommits = mkOption {
@@ -84,6 +91,11 @@ in
 
     environment.sessionVariables = {
       OPENAI_API_BASE = cfg.routerEndpoint;
+      OPENAI_BASE_URL_KONG_ER = "http://127.0.0.1:8090/v1";
+      OPENAI_BASE_URL_KONG_OMNI = "http://127.0.0.1:8090/omni/v1";
+      OPENAI_BASE_URL_KONG_FREE = "http://127.0.0.1:8090/llm/free/v1";
+      OPENAI_BASE_URL_KONG_FRONTIER = "http://127.0.0.1:8090/llm/frontier/v1";
+      OPENAI_BASE_URL_EXTREME_DIRECT = "http://127.0.0.1:20128/v1";
       AIDER_MODEL = cfg.defaultModel;
     };
 

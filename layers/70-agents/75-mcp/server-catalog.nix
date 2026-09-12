@@ -94,6 +94,13 @@
               "@modelcontextprotocol/server-browser-use"
             ];
           };
+          playwright = {
+            command = "npx";
+            args = [
+              "-y"
+              "@playwright/mcp@latest"
+            ];
+          };
           file-manager = {
             command = "npx";
             args = [

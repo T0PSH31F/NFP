@@ -30,7 +30,7 @@ with lib;
     kongUrl = mkOption {
       type = types.str;
       default = "http://127.0.0.1:8090";
-      description = "Kong Gateway URL for all LLM calls";
+      description = "Kong Gateway URL for LLM calls (supports /v1, /omni/v1, /llm/free/v1, /llm/frontier/v1, or extreme-direct at :20128/v1)";
     };
 
     kongApiKey = mkOption {

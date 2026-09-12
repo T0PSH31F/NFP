@@ -49,8 +49,9 @@ with lib;
         kong_key_cursor = mkSecret "kong_key_cursor";
         kong_key_deerflow = mkSecret "kong_key_deerflow";
 
-        # ExtremeRouter remote API key
+        # ExtremeRouter & OmniRoute remote API keys
         extremerouter_api_key = mkSecret "extremerouter_api_key";
+        omniroute_api_key = mkSecret "omniroute_api_key";
       };
 
       # ── Environment file template for Kong ──────────────────────────
@@ -119,6 +120,31 @@ with lib;
                 add = {
                   headers = [
                     "Authorization: Bearer ${config.sops.placeholder.extremerouter_api_key}"
+                  ];
+                };
+              };
+            }
+          ];
+        };
+        owner = "root";
+        group = "root";
+        mode = "0400";
+      };
+
+      # ── OmniRoute upstream auth (request-transformer plugin) ─────────
+      sops.templates."kong-omniroute-auth" = {
+        content = builtins.toJSON {
+          _format_version = "3.0";
+          plugins = [
+            {
+              name = "request-transformer";
+              service = "omniroute-llm";
+              config = {
+                add = {
+                  headers = [
+                    "Authorization: Bearer ${
+                      config.sops.placeholder.omniroute_api_key or config.sops.placeholder.extremerouter_api_key
+                    }"
                   ];
                 };
               };

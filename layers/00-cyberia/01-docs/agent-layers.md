@@ -61,9 +61,9 @@ Based on machine tags and hardware specs:
 | `73-memory` | Central PKB Node & Server | `luffy` | `pkb-node`, `ai-server`, `homelab` |
 | `74-ai-infra` | High-RAM & GPU Nodes | `luffy` | `gpu-compute`, `ai-server` |
 | `75-mcp` | All Client & Agent Hosts | `z0r0`, `luffy` | `ai-agent`, `workstation` |
-| `76-orchestrators` | Control Plane & Homelab | `sanji`, `luffy` | `agent-orchestrator`, `ai-router`, `homelab` |
+| `76-orchestrators` | Control Plane & Homelab | `nami`, `luffy` | `agent-orchestrator`, `ai-router`, `homelab` |
 | `77-dash-desk-ui` | Desktop Workstation & Homelab | `z0r0`, `luffy` | `desktop`, `workstation`, `homelab` |
-| `78-llm-routers` | Edge Network & Control Routers | `sanji`, `z0r0` | `ai-router`, `network-router`, `homelab` |
+| `78-llm-routers` | Edge Network & Control Routers | `nami`, `z0r0` | `ai-router`, `network-router`, `homelab` |
 | `79-skills` | Flake-wide Base Layer | All hosts | Implemented everywhere as declarative defaults |
 
 ---
@@ -74,41 +74,41 @@ Below is the canonical port allocation registry for all `70-agents` services acr
 
 | Port | Service Name | Module Location | Service Description | Machine(s) |
 | :--- | :--- | :--- | :--- | :--- |
-| **3000** | Langfuse / Polyfloor UI | `73-memory/langfuse.nix`, `76-orchestrators/polyfloor.nix` | Observability UI & Polyfloor Next.js app | `luffy`, `sanji` |
-| **3002** | Manifest | `78-llm-routers/manifest.nix` | Frontier LLM fallback router | `sanji` |
-| **3003** | FreeLLMAPI | `78-llm-routers/freellmapi.nix` | Aggregated free-tier LLM API pool | `sanji` |
-| **3004** | FreeLLMPool | `78-llm-routers/freellmpool.nix` | Connection pool for free providers | `sanji` |
-| **3006** | AionUI | `76-orchestrators/aionui.nix` | AI Coworker Web Interface | `sanji`, `luffy` |
-| **3100** | Paperclip | `76-orchestrators/paperclip.nix` | Multi-agent task queue engine | `sanji` |
+| **3000** | Langfuse / Polyfloor UI | `73-memory/langfuse.nix`, `76-orchestrators/polyfloor.nix` | Observability UI & Polyfloor Next.js app | `luffy`, `nami` |
+| **3002** | Manifest | `78-llm-routers/manifest.nix` | Frontier LLM fallback router | `nami` |
+| **3003** | FreeLLMAPI | `78-llm-routers/freellmapi.nix` | Aggregated free-tier LLM API pool | `nami` |
+| **3004** | FreeLLMPool | `78-llm-routers/freellmpool.nix` | Connection pool for free providers | `nami` |
+| **3006** | AionUI | `76-orchestrators/aionui.nix` | AI Coworker Web Interface | `nami`, `luffy` |
+| **3100** | Paperclip | `76-orchestrators/paperclip.nix` | Multi-agent task queue engine | `nami` |
 | **3456** | GNO | `73-memory/gno.nix` | Gnosis Knowledge Node graph API | `luffy` |
-| **4000** | LiteLLM | `78-llm-routers/litellm.nix` | Unified OpenAI-compatible proxy | `sanji` |
-| **5680** | OpenCompany UI | `76-orchestrators/opencompany.nix` | AI Organization frontend canvas | `sanji`, `luffy` |
-| **5681** | OpenCompany Backend | `76-orchestrators/opencompany.nix` | AI Organization Python API | `sanji`, `luffy` |
+| **4000** | LiteLLM | `78-llm-routers/litellm.nix` | Unified OpenAI-compatible proxy | `nami` |
+| **5680** | OpenCompany UI | `76-orchestrators/opencompany.nix` | AI Organization frontend canvas | `nami`, `luffy` |
+| **5681** | OpenCompany Backend | `76-orchestrators/opencompany.nix` | AI Organization Python API | `nami`, `luffy` |
 | **7998** | Hermes Daemon | `71-harness/hermes/hermes.nix` | Hermes background agent runner | `luffy` |
-| **8000** | Polyfloor API / vLLM | `76-orchestrators/polyfloor.nix`, `74-ai-infra/vllm.nix` | Polyfloor FastAPI / vLLM inference server | `sanji`, `luffy` |
+| **8000** | Polyfloor API / vLLM | `76-orchestrators/polyfloor.nix`, `74-ai-infra/vllm.nix` | Polyfloor FastAPI / vLLM inference server | `nami`, `luffy` |
 | **8010** | Brain-service | `73-memory/brain-service.nix` | PKB RAG ingestion & query API | `luffy` |
 | **8080** | llama.cpp / LocalAI | `74-ai-infra/llama-cpp.nix`, `74-ai-infra/localai.nix` | GGUF / multi-modal local inference | `luffy` |
 | **8082** | llama-swap | `74-ai-infra/llama-swap.nix` | Dynamic model loading proxy | `luffy` |
 | **8085** | Hermes Gateway | `71-harness/hermes/hermes.nix` | Hermes API gateway endpoint | `luffy` |
 | **8087** | Ollama-UI | `77-dash-desk-ui/ollama-ui.nix` | Minimal web UI for Ollama | `z0r0` |
 | **8088** | Open WebUI | `77-dash-desk-ui/open-webui.nix` | Multi-user LLM chat & RAG interface | `z0r0`, `luffy` |
-| **8090** | Kong Gateway Proxy | `78-llm-routers/kong-gateway.nix` | Central LLM authentication proxy | `sanji` |
-| **8091** | Kong Admin API | `78-llm-routers/kong-gateway.nix` | Kong admin loopback endpoint | `sanji` |
+| **8090** | Kong Gateway Proxy | `78-llm-routers/kong-gateway.nix` | Central LLM authentication proxy | `nami` |
+| **8091** | Kong Admin API | `78-llm-routers/kong-gateway.nix` | Kong admin loopback endpoint | `nami` |
 | **8092** | EverOS | `73-memory/everos.nix` | Memory consolidation engine | `luffy` |
 | **8093** | Memory Vault | `73-memory/memory-vault.nix` | Encrypted memory storage daemon | `luffy` |
 | **8094** | ContextForge | `73-memory/context-forge.nix` | Dynamic context assembly API | `luffy` |
-| **8095** | Headroom | `75-mcp/headroom.nix` | Context compression MCP proxy | `sanji` |
+| **8095** | Headroom | `75-mcp/headroom.nix` | Context compression MCP proxy | `nami` |
 | **8096** | Mistral MCP | `75-mcp/mistral-mcp.nix` | Mistral model surface MCP daemon | `luffy` |
 | **8097** | Voice STT | `72-voice/voice.nix` | Local whisper.cpp STT server | `z0r0`, `luffy` |
 | **8098** | Voice TTS | `72-voice/voice.nix` | Local Piper / XTTSv2 server | `z0r0`, `luffy` |
-| **8099** | Mission Control | `76-orchestrators/mission-control.nix` | Fleet management dashboard | `sanji` |
+| **8099** | Mission Control | `76-orchestrators/mission-control.nix` | Fleet management dashboard | `nami` |
 | **9119** | Hermes Dashboard | `71-harness/hermes/dashboard.nix` | Hermes status REST API | `luffy` |
 | **9377** | Hermes Browser | `71-harness/hermes/hermes.nix` | Camoufox headless browser server | `luffy` |
 | **10200** | Wyoming Piper | `72-voice/wyoming.nix` | Wyoming TTS endpoint | `luffy` |
 | **10300** | Wyoming Whisper | `72-voice/wyoming.nix` | Wyoming STT endpoint | `luffy` |
 | **10400** | Wyoming OpenWakeWord | `72-voice/wyoming.nix` | Wyoming wake word endpoint | `luffy` |
 | **11434** | Ollama | `74-ai-infra/ollama.nix` | GGUF model manager endpoint | `luffy` |
-| **20128** | ExtremeRouter / OmniRoute | `78-llm-routers/extreme-router.nix` | 154+ provider LLM router / OmniRoute | `z0r0`, `sanji` |
+| **20128** | ExtremeRouter / OmniRoute | `78-llm-routers/extreme-router.nix` | 154+ provider LLM router / OmniRoute | `z0r0`, `nami` |
 
 ---
 
@@ -122,7 +122,7 @@ Below is the canonical port allocation registry for all `70-agents` services acr
 - `omniroute.nix` runs as a Next.js OCI container with `-p 127.0.0.1:${toString port}:20128`.
 
 ### Mitigation Strategy
-1. **Machine Isolation**: `extreme-router` is assigned to workstation environments (`z0r0`) while `omniroute` runs on homelab router control nodes (`sanji`).
+1. **Machine Isolation**: `extreme-router` is assigned to workstation environments (`z0r0`) while `omniroute` runs on homelab router control nodes (`nami`).
 2. **Explicit Port Offset**: When co-locating both services on a single node, explicitly configure:
    ```nix
    services.ai-services.omniroute.port = 20129;

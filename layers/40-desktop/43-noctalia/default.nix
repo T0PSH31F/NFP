@@ -73,7 +73,11 @@ in
             nativeBuildInputs = [ pkgs.jq ];
           }
           ''
-            cp -r "${rawSrc}" $out
+            if [ -d "${rawSrc}" ]; then
+              cp -r "${rawSrc}/." $out
+            else
+              mkdir -p $out
+            fi
             chmod -R u+w $out
             if [ -f "$out/plugin.json" ]; then
               if ! jq -e 'has("min_noctalia")' "$out/plugin.json" >/dev/null 2>&1; then

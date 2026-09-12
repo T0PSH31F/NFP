@@ -52,18 +52,20 @@ let
               "free-only"
             ];
           })
-          # Coding router — mutually exclusive (omniroute or extreme-router)
-          ++ (optional (cfg.routers.codingRouter == "omniroute") {
+          # OmniRoute LLM router
+          ++ (optional cfg.routers.omniroute.enable {
             name = "omniroute-llm";
-            url = "http://127.0.0.1:${toString cfg.routers.omniroute.port}";
+            url = "http://${cfg.routers.omniroute.host}:${toString cfg.routers.omniroute.port}";
             tags = [
               "llm"
               "coding"
+              "omni"
             ];
           })
-          ++ (optional (cfg.routers.codingRouter == "extreme-router") {
+          # ExtremeRouter LLM router
+          ++ (optional cfg.routers.extreme-router.enable {
             name = "extremerouter-llm";
-            url = "http://127.0.0.1:${toString cfg.routers.extreme-router.port}";
+            url = "http://${cfg.routers.extreme-router.host}:${toString cfg.routers.extreme-router.port}";
             tags = [
               "llm"
               "coding"
@@ -79,11 +81,10 @@ let
         #  2. Legacy `/llm/{pool}/v1/*` pool-split paths — strip_path=true strips
         #     the `/llm/{pool}` prefix so the upstream still sees `/v1/*`.
         routes = [
-          # ★ Primary — chat completions → coding router (ExtremeRouter)
+          # ★ Primary — chat completions → ExtremeRouter
           {
             name = "v1-chat";
-            service =
-              if cfg.routers.codingRouter == "extreme-router" then "extremerouter-llm" else "omniroute-llm";
+            service = "extremerouter-llm";
             paths = [ "/v1/chat/completions" ];
             methods = [ "POST" ];
             strip_path = false;
@@ -96,11 +97,10 @@ let
               "coding"
             ];
           }
-          # Primary — legacy completions → coding router
+          # Primary — legacy completions → ExtremeRouter
           {
             name = "v1-completions";
-            service =
-              if cfg.routers.codingRouter == "extreme-router" then "extremerouter-llm" else "omniroute-llm";
+            service = "extremerouter-llm";
             paths = [ "/v1/completions" ];
             methods = [ "POST" ];
             strip_path = false;
@@ -110,11 +110,10 @@ let
             ];
             tags = [ "llm" ];
           }
-          # Primary — embeddings → coding router
+          # Primary — embeddings → ExtremeRouter
           {
             name = "v1-embeddings";
-            service =
-              if cfg.routers.codingRouter == "extreme-router" then "extremerouter-llm" else "omniroute-llm";
+            service = "extremerouter-llm";
             paths = [ "/v1/embeddings" ];
             methods = [ "POST" ];
             strip_path = false;
@@ -124,15 +123,10 @@ let
             ];
             tags = [ "llm" ];
           }
-          # Primary — model discovery → coding router (ExtremeRouter or OmniRoute)
-          # OpenCode/Hermes call /v1/models to enumerate available models.
-          # Polyfloor (76-orchestrators/polyfloor.nix) also enumerates this via
-          # GET {routerEndpoint}/models (services.polyfloor.routerEndpoint),
-          # grouping results into free|fast|reasoning|frontier for its UI.
+          # Primary — model discovery → ExtremeRouter
           {
             name = "v1-models";
-            service =
-              if cfg.routers.codingRouter == "extreme-router" then "extremerouter-llm" else "omniroute-llm";
+            service = "extremerouter-llm";
             paths = [ "/v1/models" ];
             methods = [ "GET" ];
             strip_path = false;
@@ -143,6 +137,57 @@ let
             tags = [
               "llm"
               "models"
+            ];
+          }
+          # Primary — v1 root -> ExtremeRouter
+          {
+            name = "v1-root";
+            service = "extremerouter-llm";
+            paths = [ "/v1" ];
+            methods = [ "GET" ];
+            strip_path = false;
+            protocols = [
+              "http"
+              "https"
+            ];
+            tags = [ "llm" ];
+          }
+          # Explicit ExtremeRouter route (/er/v1/* -> extremerouter-llm)
+          {
+            name = "er-v1";
+            service = "extremerouter-llm";
+            paths = [ "/er/v1" ];
+            methods = [
+              "GET"
+              "POST"
+            ];
+            strip_path = true;
+            protocols = [
+              "http"
+              "https"
+            ];
+            tags = [
+              "llm"
+              "extreme"
+            ];
+          }
+          # Explicit OmniRoute route (/omni/v1/* -> omniroute-llm)
+          {
+            name = "omni-v1";
+            service = "omniroute-llm";
+            paths = [ "/omni/v1" ];
+            methods = [
+              "GET"
+              "POST"
+            ];
+            strip_path = true;
+            protocols = [
+              "http"
+              "https"
+            ];
+            tags = [
+              "llm"
+              "omni"
             ];
           }
           # Legacy pool split — chat via FreeLLMAPI
@@ -198,11 +243,10 @@ let
               "frontier"
             ];
           }
-          # Coding traffic → OmniRoute or ExtremeRouter (mutually exclusive)
+          # Coding traffic → ExtremeRouter
           {
             name = "llm-coding";
-            service =
-              if cfg.routers.codingRouter == "extreme-router" then "extremerouter-llm" else "omniroute-llm";
+            service = "extremerouter-llm";
             paths = [ "/llm/coding/v1/chat/completions" ];
             methods = [ "POST" ];
             strip_path = true;
@@ -231,11 +275,10 @@ let
               "free"
             ];
           }
-          # Legacy model discovery → coding router
+          # Legacy model discovery → ExtremeRouter
           {
             name = "llm-models";
-            service =
-              if cfg.routers.codingRouter == "extreme-router" then "extremerouter-llm" else "omniroute-llm";
+            service = "extremerouter-llm";
             paths = [ "/llm/v1/models" ];
             methods = [ "GET" ];
             strip_path = true;
@@ -353,11 +396,11 @@ let
               };
             };
           })
-          ++ (optional (cfg.routers.codingRouter == "omniroute") {
+          ++ (optional cfg.routers.omniroute.enable {
             name = "omniroute-upstream";
             targets = [
               {
-                target = "127.0.0.1:${toString cfg.routers.omniroute.port}";
+                target = "${cfg.routers.omniroute.host}:${toString cfg.routers.omniroute.port}";
                 weight = 100;
               }
             ];
@@ -374,11 +417,11 @@ let
               };
             };
           })
-          ++ (optional (cfg.routers.codingRouter == "extreme-router") {
+          ++ (optional cfg.routers.extreme-router.enable {
             name = "extremerouter-upstream";
             targets = [
               {
-                target = "127.0.0.1:${toString cfg.routers.extreme-router.port}";
+                target = "${cfg.routers.extreme-router.host}:${toString cfg.routers.extreme-router.port}";
                 weight = 100;
               }
             ];
@@ -544,31 +587,35 @@ in
         };
       };
 
-      # Coding router — mutually exclusive. Only one can be active.
-      codingRouter = mkOption {
-        type = types.enum [
-          "omniroute"
-          "extreme-router"
-        ];
-        default = "extreme-router";
-        description = ''
-          Which coding LLM router to use for /llm/coding/* traffic.
-          - "omniroute": OmniRoute (231+ providers, 17 combo strategies)
-          - "extreme-router": ExtremeRouter (154+ providers, RTK savings, quota tracking, 49 free providers)
-          Only one can be active at a time — Kong routes accordingly.
-        '';
-      };
-
       omniroute = {
+        enable = mkEnableOption "Route traffic to OmniRoute" // {
+          default = true;
+        };
+        host = mkOption {
+          type = types.str;
+          default = "127.0.0.1";
+          description = "OmniRoute host IP or hostname";
+        };
         port = mkOption {
           type = types.port;
-          default = 20128;
+          default = 20129;
+          description = "OmniRoute port (default 20129)";
         };
       };
+
       extreme-router = {
+        enable = mkEnableOption "Route traffic to ExtremeRouter" // {
+          default = true;
+        };
+        host = mkOption {
+          type = types.str;
+          default = "z0r0";
+          description = "ExtremeRouter host IP or hostname";
+        };
         port = mkOption {
           type = types.port;
           default = 20128;
+          description = "ExtremeRouter port";
         };
       };
     };
@@ -657,7 +704,7 @@ in
                 reduce .[] as $item ({}; deep_merge(.; $item))
               ' ${kongYml} "${config.sops.templates."kong-consumers".path}" "${
                 config.sops.templates."kong-extremerouter-auth".path
-              }" > ${cfg.dataDir}/declarative.json
+              }" "${config.sops.templates."kong-omniroute-auth".path}" > ${cfg.dataDir}/declarative.json
               chmod 0644 ${cfg.dataDir}/declarative.json
             ''}"
           ];

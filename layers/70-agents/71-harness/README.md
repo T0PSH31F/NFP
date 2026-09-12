@@ -14,7 +14,9 @@ The `71-harness` tier is responsible for agent execution harnesses, Interactive 
 | `codex.nix` | OpenAI Codex CLI terminal harness tool. | `layers.layer-70.agent.codex` | None | On-demand CLI | `ai-agent`, `development` |
 | `dsh.nix` | Dendritic Shell (DSH) AI terminal shell environment. | `layers.layer-71.harness.dsh` | None | On-demand TUI | `ai-agent`, `desktop`, `workstation` |
 | `gemini-cli.nix` | Google Gemini CLI harness for command line generation. | `layers.layer-70.agent.gemini-cli` | None | On-demand CLI | `ai-agent`, `development` |
+| `kilocode.nix` | Kilo Code AI terminal agent & IDE extension harness. | `layers.layer-71.harness.kilocode` | None | On-demand CLI | `ai-agent`, `development` |
 | `kiro-cli.nix` | Kiro autonomous agent CLI tool. | `layers.layer-70.agent.kiro-cli` | None | On-demand CLI | `ai-agent`, `development` |
+| `omp.nix` | Oh-My-Pi (OMP) terminal AI coding agent harness. | `layers.layer-71.harness.omp` | None | On-demand CLI | `ai-agent`, `development` |
 | `opencode.nix` | OpenCode terminal agent harness with custom skills & configs. | `layers.layer-70.agent.opencode` | None | On-demand TUI | `ai-agent`, `development`, `workstation` |
 | `supergraph.nix` | Supergraph autonomous codebase navigation harness. | `layers.layer-70.agent.supergraph` | None | On-demand CLI | `ai-agent`, `development` |
 | `hermes/hermes.nix` | Nous Research Hermes autonomous agent daemon & browser runner. | `layers.layer-76.hermes` / `services.hermes` | 8085 (Gateway), 9377 (Browser), 9119 (REST API), 7998 (Daemon) | Always-on systemd service | `ai-agent`, `agent-orchestrator`, `homelab` |

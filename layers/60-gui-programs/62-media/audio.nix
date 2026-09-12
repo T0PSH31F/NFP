@@ -60,6 +60,7 @@
         musikcube
         clementine
         strawberry
+        wrtag
       ];
     };
 }

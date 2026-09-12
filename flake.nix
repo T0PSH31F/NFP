@@ -143,6 +143,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
     };
+    omp = {
+      url = "github:can1357/oh-my-pi";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     polyfloor = {
       url = "github:T0PSH31F/Polyfloor";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -174,6 +178,14 @@
     };
     nixvim = {
       url = "github:nix-community/nixvim";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    nixarr = {
+      url = "github:nix-media-server/nixarr";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    nixos-telemetry = {
+      url = "github:mrVanDalo/nixos-telemetry";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     stellar = {

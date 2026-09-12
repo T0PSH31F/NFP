@@ -96,12 +96,12 @@ let
     aionUi = 3006;
     glances = 61208;
 
-    # sanji — cloud control plane
+    # nami — cloud control plane
     headscale = 8086;
     paperclip = 3101;
     missionControl = 3099;
     kongGateway = 8090;
-    omniroute = 20128;
+    omniroute = 20129;
     gno = 3456;
 
     # luffy — media

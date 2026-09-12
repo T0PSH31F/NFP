@@ -395,34 +395,69 @@
           # Mutable runtime prefs live in ~/.hermes/config.yaml (user-owned).
 
           model:
-            default: "kong/claude-3-7-sonnet"
-            fallback: "extremerouter/claude-3-5-sonnet"
+            default: "kong-er/claude-3-7-sonnet"
+            fallback: "extreme-direct/claude-3-5-sonnet"
             api_mode: chat_completions
 
           providers:
+            kong-er:
+              base_url: "http://127.0.0.1:8090/v1"
+              api_key: "''${KONG_API_KEY}"
+              request_timeout_seconds: 180
+              fetch_models: true
+            kong-omni:
+              base_url: "http://127.0.0.1:8090/omni/v1"
+              api_key: "''${KONG_API_KEY}"
+              request_timeout_seconds: 180
+              fetch_models: true
+            kong-free:
+              base_url: "http://127.0.0.1:8090/llm/free/v1"
+              api_key: "''${KONG_API_KEY}"
+              request_timeout_seconds: 180
+              fetch_models: true
+            kong-frontier:
+              base_url: "http://127.0.0.1:8090/llm/frontier/v1"
+              api_key: "''${KONG_API_KEY}"
+              request_timeout_seconds: 180
+              fetch_models: true
+            extreme-direct:
+              base_url: "http://127.0.0.1:20128/v1"
+              api_key: "''${EXTREMEROUTER_API_KEY}"
+              request_timeout_seconds: 180
+              fetch_models: true
             kong:
               base_url: "http://127.0.0.1:8090/v1"
               api_key: "''${KONG_API_KEY}"
               request_timeout_seconds: 180
-            extremerouter:
+
+          custom_providers:
+            kong-er:
+              base_url: "http://127.0.0.1:8090/v1"
+              api_key: "''${KONG_API_KEY}"
+              fetch_models: true
+            kong-omni:
+              base_url: "http://127.0.0.1:8090/omni/v1"
+              api_key: "''${KONG_API_KEY}"
+              fetch_models: true
+            kong-free:
+              base_url: "http://127.0.0.1:8090/llm/free/v1"
+              api_key: "''${KONG_API_KEY}"
+              fetch_models: true
+            kong-frontier:
+              base_url: "http://127.0.0.1:8090/llm/frontier/v1"
+              api_key: "''${KONG_API_KEY}"
+              fetch_models: true
+            extreme-direct:
               base_url: "http://127.0.0.1:20128/v1"
               api_key: "''${EXTREMEROUTER_API_KEY}"
-              request_timeout_seconds: 180
-            custom:
-              request_timeout_seconds: 180
-            openrouter:
-              request_timeout_seconds: 180
-            freellmapi:
-              base_url: "http://127.0.0.1:3003/v1"
-              api_key: ""
-              request_timeout_seconds: 60
+              fetch_models: true
 
           fallback_providers:
-            - kong
-            - extremerouter
-            - freellmapi
-            - openrouter
-            - nous
+            - kong-er
+            - kong-omni
+            - kong-free
+            - kong-frontier
+            - extreme-direct
 
           credential_pool_strategies:
             openrouter: round_robin
@@ -653,6 +688,12 @@
               args:
                 - mcp
                 - serve
+              env: {}
+            playwright:
+              command: npx
+              args:
+                - -y
+                - "@playwright/mcp@latest"
               env: {}
         '';
       };

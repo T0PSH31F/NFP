@@ -36,14 +36,6 @@ in
         default = 6800;
       };
     };
-
-    qbittorrent = {
-      enable = mkEnableOption "qBittorrent torrent client";
-      port = mkOption {
-        type = types.port;
-        default = 8095;
-      };
-    };
   };
 
   config = mkIf cfg.enable {
@@ -139,28 +131,6 @@ in
       };
     };
 
-    # qBittorrent
-    services.qbittorrent = mkIf cfg.qbittorrent.enable {
-      enable = true;
-      inherit (mediaCfg) user;
-      inherit (mediaCfg) group;
-      webuiPort = cfg.qbittorrent.port;
-      openFirewall = true;
-      serverConfig = {
-        Preferences = {
-          WebUI.UseUPnP = false;
-          Downloads.SavePath = "${mediaCfg.downloadsDir}/qbittorrent";
-          Downloads.TempPath = "${mediaCfg.downloadsDir}/qbittorrent/tmp";
-          Downloads.TempPathEnabled = true;
-          Connection.PortRangeMin = 56881;
-        };
-      };
-    };
-
-    systemd.services.qbittorrent = mkIf cfg.qbittorrent.enable {
-      serviceConfig.ReadWritePaths = [ mediaCfg.downloadsDir ];
-    };
-
     clan.core.vars.generators.aria2 = mkIf cfg.aria2.enable {
       files."rpc_secret" = {
         secret = true;
@@ -187,10 +157,6 @@ in
         "d ${mediaCfg.downloadsDir}/aria2 0755 ${mediaCfg.user} ${mediaCfg.group} -"
         "d /var/lib/aria2 0750 ${mediaCfg.user} ${mediaCfg.group} -"
         "f /var/lib/aria2/session.gz 0644 ${mediaCfg.user} ${mediaCfg.group} -"
-      ])
-      ++ (optionals cfg.qbittorrent.enable [
-        "d ${mediaCfg.downloadsDir}/qbittorrent 0755 ${mediaCfg.user} ${mediaCfg.group} -"
-        "d ${mediaCfg.downloadsDir}/qbittorrent/tmp 0755 ${mediaCfg.user} ${mediaCfg.group} -"
       ]);
 
     # Firewall
@@ -200,8 +166,7 @@ in
       ++ (optionals cfg.aria2.enable [
         cfg.aria2.port
         6801
-      ])
-      ++ (optional cfg.qbittorrent.enable cfg.qbittorrent.port);
+      ]);
 
     # Persistence
     environment.persistence."/persist" = mkIf config.layers.layer-10.system.config.impermanence.enable {
@@ -213,15 +178,7 @@ in
           mode = "0750";
         })
         ++ (optional cfg.transmission.enable "/var/lib/transmission")
-        ++ (optional cfg.aria2.enable "/var/lib/aria2")
-        ++ (optionals cfg.qbittorrent.enable [
-          {
-            directory = "/var/lib/qBittorrent";
-            inherit (mediaCfg) user;
-            inherit (mediaCfg) group;
-            mode = "0750";
-          }
-        ]);
+        ++ (optional cfg.aria2.enable "/var/lib/aria2");
     };
   };
 }

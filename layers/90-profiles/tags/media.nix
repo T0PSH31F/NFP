@@ -7,6 +7,7 @@
 
     layers.layer-20.services.config = {
       media-stack.enable = lib.mkDefault true;
+      nixarr-stack.enable = lib.mkDefault true;
       romm.enable = lib.mkDefault true;
     };
 

@@ -90,7 +90,7 @@ with lib;
       virtualisation.oci-containers.containers.extreme-router = {
         inherit (cfg) image;
         ports = [
-          "127.0.0.1:${toString cfg.port}:20128"
+          "${toString cfg.port}:20128"
         ];
         environment = {
           NODE_ENV = "production";
@@ -118,8 +118,8 @@ with lib;
         autoStart = true;
       };
 
-      # Open firewall port
-      networking.firewall.allowedTCPPorts = [ cfg.port ];
+      # Firewall: open port on tailscale0 interface ONLY (loopback is allowed by default)
+      networking.firewall.interfaces."tailscale0".allowedTCPPorts = [ cfg.port ];
 
       # MITM proxy root CA certificate trust
       security.pki.certificateFiles = lib.optional (builtins.pathExists "${cfg.dataDir}/ca.crt") "${cfg.dataDir}/ca.crt";

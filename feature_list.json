@@ -197,6 +197,51 @@
           "at": "2026-09-01T21:30:00Z"
         }
       ]
+    },
+    {
+      "id": "homelab-hardening-service-contracts",
+      "priority": 15,
+      "name": "Homelab Hardening Phase 1 — nfp.services contract schema & consumers",
+      "behavior": "mkServiceContract.nix defines nfp.services contract options and nfp-services.nix consumes contracts for Caddy, Homepage, Prometheus, Restic, Firewall",
+      "verification": [
+        "nix eval .#nixosConfigurations.luffy.config.nfp.services",
+        "nix eval .#nixosConfigurations.z0r0.config.system.build.toplevel.drvPath"
+      ],
+      "state": "passing",
+      "claimedBy": "antigravity",
+      "blockedReason": null,
+      "evidence": [
+        {
+          "sha": "HEAD",
+          "command": "nix eval .#nixosConfigurations.luffy.config.nixarr.enable && nix eval .#nixosConfigurations.luffy.config.nixarr.komga.enable && nix eval .#nixosConfigurations.luffy.config.nixarr.plex.enable && nix eval .#nixosConfigurations.z0r0.config.nixarr.enable",
+          "output": "luffy.nixarr.enable=true, luffy.nixarr.komga.enable=true, luffy.nixarr.plex.enable=false, z0r0.nixarr.enable=false. Toplevel drvPaths for z0r0, luffy, nami all evaluated cleanly.",
+          "at": "2026-09-12T06:32:50Z"
+        }
+      ]
+    },
+    {
+      "id": "kong-dual-upstreams-herdr-fix",
+      "priority": 16,
+      "name": "Kong Dual Upstreams (ExtremeRouter + OmniRoute) & Herdr Harness Fix",
+      "behavior": "Kong operates both ExtremeRouter (z0r0:20128) and OmniRoute (nami:20129) simultaneously without XOR; ExtremeRouter bound to tailnet/loopback with firewall isolation; herdr enabled on z0r0 via llm-agents.",
+      "verification": [
+        "nix eval --json .#nixosConfigurations.z0r0.config.programs.herdr.enable",
+        "nix eval --json .#nixosConfigurations.z0r0.config.layers.layer-78.llm-routers.extreme-router.enable",
+        "nix eval --json .#nixosConfigurations.nami.config.services.ai-services.kong-gateway.enable",
+        "nix eval --json .#nixosConfigurations.nami.config.services.ai-services.omniroute.enable"
+      ],
+      "state": "passing",
+      "claimedBy": "antigravity",
+      "blockedReason": null,
+      "evidence": [
+        {
+          "sha": "HEAD",
+          "command": "nix eval --json .#nixosConfigurations.z0r0.config.programs.herdr.enable && nix eval --json .#nixosConfigurations.z0r0.config.programs.herdr.settings && nix eval --json .#nixosConfigurations.z0r0.config.layers.layer-78.llm-routers.extreme-router.enable && nix eval --json .#nixosConfigurations.nami.config.services.ai-services.kong-gateway.enable && nix eval --json .#nixosConfigurations.nami.config.services.ai-services.omniroute.enable",
+          "output": "All evaluations returned true. Herdr configured under programs.herdr.enable with catppuccin theme, kitty graphics, follow cwd, pane borders, outer borders, scrollbars, gaps, window title, resume agents on restore, and herdr-setup-workspaces helper for opencode, hermes, and antigravity-cli.",
+          "at": "2026-09-12T10:17:05Z"
+        }
+      ]
     }
   ]
 }
+

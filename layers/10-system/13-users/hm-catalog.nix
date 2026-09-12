@@ -1,4 +1,4 @@
-# HM Catalog — minimal HM module imports for headless hosts (sanji).
+# HM Catalog — minimal HM module imports for headless hosts (nami).
 # Imported by server-layers.nix — NOT by all-layers.nix (z0r0/luffy get
 # these from 13-users/t0psh31f.nix directly).
 # Only includes modules whose option-definitions are needed by NixOS modules

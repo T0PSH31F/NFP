@@ -18,6 +18,8 @@ in
   home = lib.mkIf cfg.enable {
     home.packages = with pkgs; [
       abtop
+      angryoxide
+      angryipscanner
       beadwork
       cc-switch
       crush

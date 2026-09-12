@@ -76,8 +76,8 @@ in
 
     repository = mkOption {
       type = types.str;
-      default = "rclone:gdrive:backups/restic";
-      description = "Primary restic repository URL or rclone remote target";
+      default = "/data/backups";
+      description = "Primary restic repository URL or local path (mount point for 2TB USB)";
     };
 
     passwordFile = mkOption {
@@ -105,6 +105,7 @@ in
       type = types.listOf types.str;
       default = [
         "/persist/home"
+        "/data/.state/nixarr"
         "/var/lib/postgresql"
         "/var/lib/n8n"
         "/var/lib/hermes"
@@ -132,8 +133,8 @@ in
 
     secondaryRepository = mkOption {
       type = types.str;
-      default = "rclone:teldrive:backups/restic";
-      description = "Secondary restic repository URL or rclone remote target";
+      default = "rclone:gcs:backups/restic";
+      description = "Secondary restic repository URL or rclone remote target (GCS)";
     };
   };
 

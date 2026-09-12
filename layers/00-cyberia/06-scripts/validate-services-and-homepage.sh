@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Layer: 00-cyberia / 06-scripts
-# Purpose: Service & Homepage Dashboard Link Resolution Validator across z0r0, luffy, and sanji.
+# Purpose: Service & Homepage Dashboard Link Resolution Validator across z0r0, luffy, and nami.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

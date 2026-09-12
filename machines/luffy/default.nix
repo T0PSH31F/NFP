@@ -154,7 +154,7 @@ in
     # Disable SillyTavern Tag Default to completely disable it
     sillytavern-app.enable = lib.mkForce false;
 
-    # Headscale moved to Sanji (network-router tag)
+    # Headscale moved to nami (network-router tag)
     headscale-server.enable = lib.mkForce false;
 
     # Native Postgres (Shared for Nextcloud, Immich, MaxKB etc.)
@@ -258,7 +258,6 @@ in
 
     # Moved from Nami
     n8n-server.enable = true;
-    komga-server.enable = lib.mkForce false; # Removed — redundant with Kavita
     mautrix-bridges = {
       enable = true;
       homeserverUrl = "http://localhost:8008";

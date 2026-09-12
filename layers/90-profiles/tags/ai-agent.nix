@@ -11,6 +11,7 @@
       codegraph.enable = lib.mkDefault true;
       kiro-cli.enable = lib.mkDefault true;
       dsh.enable = lib.mkDefault true;
+      herdr.enable = lib.mkDefault true;
       pi-coding-agent.enable = lib.mkDefault true;
       aider-chat.enable = lib.mkDefault true;
     };
@@ -25,6 +26,9 @@
     layers.layer-76.hermes-dashboard.enable = lib.mkDefault true;
     layers.layer-76.hermes-live-voice.enable = lib.mkDefault true;
     layers.layer-76.open-skills.enable = lib.mkDefault true;
+
+    # LLM Routers
+    layers.layer-78.llm-routers.extreme-router.enable = lib.mkDefault true;
 
     # Orchestration & control plane services
     layers.layer-79.skills.llm-agents-catalog.enable = lib.mkDefault true;

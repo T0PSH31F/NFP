@@ -1,7 +1,7 @@
 keys:
   - &z0r0 age10ght7h8d49cec9tfasr64ls49qxzv3rn6f0du2fzhrfs4a7u3yysajk9gh
   - &z0r0_host age13ytd3kguxglv2k67mcx298djypxseqx2jkn5vw0zlf2079g28chqw8dm24
-  - &sanji_host age12lzzwsherlppaga5n4fz08yfxln2qkq7xqw73escmch3gth6mqmq6h0frs
+  - &nami_host age12lzzwsherlppaga5n4fz08yfxln2qkq7xqw73escmch3gth6mqmq6h0frs
   - &luffy_host age1uzq0cywyyxms3ntsuecpxh0ygrak4n9xenrhxjjyy59h46kaes7s2t4php
 
 creation_rules:
@@ -10,5 +10,5 @@ creation_rules:
       - age:
           - *z0r0
           - *z0r0_host
-          - *sanji_host
+          - *nami_host
           - *luffy_host

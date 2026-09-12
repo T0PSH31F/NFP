@@ -9,5 +9,6 @@
     ./headscale.nix
     ./ssh-agent.nix
     ./tailscale.nix
+    ./nfp-services.nix
   ];
 }

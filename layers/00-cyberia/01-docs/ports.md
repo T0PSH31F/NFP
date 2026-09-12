@@ -86,7 +86,8 @@
 | **9377** | Camofox Browser        | z0r0   | `machines/z0r0/default.nix`                        | Anti-Detection Browser CDP      |
 | **9696** | Prowlarr               | luffy  | `layers/20-services/23-media/media-stack.nix`     | Indexer Proxy Manager           |
 | **11434**| Ollama                 | Both   | `layers/20-services/22-ai/ollama.nix`              | Local LLM Inference Engine      |
-| **20128**| ExtremeRouter          | z0r0   | `layers/20-services/22-ai/21-llm-routers/extreme-router.nix` | Coding LLM router — 154+ providers, web UI + `/v1/*` API |
+| **20128**| ExtremeRouter          | z0r0   | `layers/70-agents/78-llm-routers/extreme-router.nix` | Coding LLM router — 154+ providers, web UI + `/v1/*` API |
+| **20129**| OmniRoute              | nami   | `layers/70-agents/78-llm-routers/omniroute.nix`      | Next.js LLM router & RTK compressor |
 | **21027**| Syncthing Discovery    | Both   | `layers/20-services/25-data/syncthing.nix`         | Syncthing UDP Discovery         |
 | **21116**| RustDesk Signal        | z0r0   | `layers/20-services/24-communication/`             | Remote Desktop Signaling        |
 | **22000**| Syncthing Sync         | Both   | `layers/20-services/25-data/syncthing.nix`         | Syncthing Peer Transfer Port    |

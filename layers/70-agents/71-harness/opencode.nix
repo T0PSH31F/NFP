@@ -138,6 +138,15 @@
               enabled = true;
               type = "local";
             };
+            playwright = {
+              command = [
+                "npx"
+                "-y"
+                "@playwright/mcp@latest"
+              ];
+              enabled = true;
+              type = "local";
+            };
 
             # ── Disabled ───────────────────────────────────────────
             browser-use.enabled = false; # 100% error rate, not needed
@@ -581,6 +590,32 @@
                 };
               };
             };
+          };
+
+          # Kong AI Gateway — path-specific providers
+          provider.kong-er = {
+            baseUrl = "http://127.0.0.1:8090/v1";
+            name = "Kong ExtremeRouter";
+          };
+
+          provider.kong-omni = {
+            baseUrl = "http://127.0.0.1:8090/omni/v1";
+            name = "Kong OmniRoute (TODO: when merged)";
+          };
+
+          provider.kong-free = {
+            baseUrl = "http://127.0.0.1:8090/llm/free/v1";
+            name = "Kong FreeLLMPool";
+          };
+
+          provider.kong-frontier = {
+            baseUrl = "http://127.0.0.1:8090/llm/frontier/v1";
+            name = "Kong Frontier Manifest";
+          };
+
+          provider.extreme-direct = {
+            baseUrl = "http://127.0.0.1:20128/v1";
+            name = "ExtremeRouter Direct (Backup)";
           };
 
           # ExtremeRouter — 154+ providers, RTK savings, smart fallback

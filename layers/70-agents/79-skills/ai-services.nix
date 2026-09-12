@@ -51,7 +51,6 @@ with lib;
         localai.enable = mkDefault true;
         ollama.enable = mkDefault true;
         ollama-ui.enable = mkDefault true;
-        # extreme-router.enable is controlled by kong-gateway.routers.codingRouter
       };
     };
 }

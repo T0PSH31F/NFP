@@ -8,7 +8,7 @@
 |-----------|-------------|-------------------------|----------------------|--------------------|
 | **z0r0** | `z0r0` | Daily driver laptop workstation | `workstation`, `desktop`, `laptop`, `development` | Btrfs Impermanence (`/persist`), Linux Zen |
 | **luffy** | `luffy` | Homelab / PKB / Media / Local AI node | `homelab`, `media-server`, `pkb-node`, `server` | Btrfs Impermanence (`/persist`), Linux CachyOS, NVIDIA 580 |
-| **nami** | `sanji` | Cloud control plane (Alibaba ECS `47.254.90.69`) | `network-router`, `ai-router`, `agent-orchestrator` | Standard ext4 root (Cloud VM), Headless Linux |
+| **nami** | `nami` | Cloud control plane (Alibaba ECS `47.254.90.69`) | `network-router`, `ai-router`, `agent-orchestrator` | Standard ext4 root (Cloud VM), Headless Linux |
 
 ---
 

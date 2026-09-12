@@ -66,13 +66,12 @@ in
       # and runs agent inference via:
       #     POST {routerEndpoint}/chat/completions
       #
-      # The NFP Kong gateway (78-llm-routers/kong-gateway.nix) exposes both:
-      #   - route "v1-models"  → GET  /v1/models         → coding router
-      #   - route "v1-chat"    → POST /v1/chat/completions → coding router
-      # Kong proxy default port is 8090 (admin 8091). Alternatives:
-      #   - LiteLLM      (78-llm-routers/litellm.nix,  port 4000, OpenAI /v1/models)
-      #   - ExtremeRouter (78-llm-routers/extreme-router.nix, port 20128, /v1/*)
-      # Polyfloor's own default (http://127.0.0.1:4000/v1) already matches LiteLLM.
+      # Kong path multiplexer endpoints available (port 8090):
+      #   - kong-er:       http://127.0.0.1:8090/v1 (ExtremeRouter)
+      #   - kong-omni:     http://127.0.0.1:8090/omni/v1 (OmniRoute - TODO: when merged)
+      #   - kong-free:     http://127.0.0.1:8090/llm/free/v1 (FreeLLMPool)
+      #   - kong-frontier: http://127.0.0.1:8090/llm/frontier/v1 (Manifest)
+      #   - extreme-direct: http://127.0.0.1:20128/v1 (ER direct backup)
       routerEndpoint = "http://127.0.0.1:8090/v1";
 
       # Default HR orchestrator model: Xiaomi MiMo-V2.5 Pro.

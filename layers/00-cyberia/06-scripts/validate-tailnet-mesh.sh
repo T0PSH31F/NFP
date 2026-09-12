@@ -2,7 +2,7 @@
 # validate-tailnet-mesh.sh — Automated Tailnet Mesh Verification
 #
 # Validates Tailscale mesh connectivity, MagicDNS / Tailnet hostnames,
-# HTTP service endpoints, and SSH reachability across z0r0, luffy, and sanji (nami).
+# HTTP service endpoints, and SSH reachability across z0r0, luffy, and nami (nami).
 set -euo pipefail
 
 RED='\031[0;31m'
@@ -32,7 +32,7 @@ else
 fi
 
 # 2. Check Node Reachability (ping)
-NODES=("z0r0" "luffy" "sanji")
+NODES=("z0r0" "luffy" "nami")
 DOMAIN="grandlix.net"
 
 log_info "Probing Tailnet Node IPs and Hostnames..."
@@ -55,7 +55,7 @@ if curl -sf --connect-timeout 5 "$HS_URL" >/dev/null 2>&1; then
 else
   log_warn "Headscale control plane health endpoint check failed: $HS_URL (checking fallback port 8086...)"
   if curl -sf --connect-timeout 5 "http://47.254.90.69:8086/health" >/dev/null 2>&1; then
-    log_info "Headscale fallback port 8086 reachable on sanji."
+    log_info "Headscale fallback port 8086 reachable on nami."
   else
     log_err "Headscale control plane unreachable!"
   fi
@@ -64,11 +64,11 @@ fi
 # 4. Probing Tailnet Service Endpoints
 log_info "Probing key service endpoints across tailnet..."
 
-# Kong Gateway status on sanji
-if curl -sf --connect-timeout 5 "http://sanji.${DOMAIN}:8090/status" >/dev/null 2>&1 || curl -sf --connect-timeout 5 "http://nami.${DOMAIN}:8090/status" >/dev/null 2>&1; then
-  log_info "Kong Gateway reachable on sanji:8090"
+# Kong Gateway status on nami
+if curl -sf --connect-timeout 5 "http://nami.${DOMAIN}:8090/status" >/dev/null 2>&1 || curl -sf --connect-timeout 5 "http://nami.${DOMAIN}:8090/status" >/dev/null 2>&1; then
+  log_info "Kong Gateway reachable on nami:8090"
 else
-  log_warn "Kong Gateway unreachable on sanji:8090 (host may be updating or port restricted)"
+  log_warn "Kong Gateway unreachable on nami:8090 (host may be updating or port restricted)"
 fi
 
 # Brain Service on luffy
