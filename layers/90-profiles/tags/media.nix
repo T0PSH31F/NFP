@@ -3,6 +3,8 @@
 { config, lib, ... }:
 {
   config = lib.mkIf (builtins.elem "media" config.machine.tags) {
+    services.feishin.enable = lib.mkDefault true;
+
     layers.layer-20.services.config = {
       media-stack.enable = lib.mkDefault true;
       romm.enable = lib.mkDefault true;

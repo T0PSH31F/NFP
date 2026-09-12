@@ -13,5 +13,6 @@
     ./sonarr.nix
     ./usenet.nix
     ./romm.nix
+    ./feishin.nix
   ];
 }
