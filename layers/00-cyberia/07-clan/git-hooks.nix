@@ -32,15 +32,13 @@
           nix-eval-toplevels = {
             enable = true;
             name = "Fast nix eval of machine toplevels";
-            entry = toString (
-              pkgs.writeShellScript "nix-eval-toplevels" ''
-                set -euo pipefail
-                exec >/dev/null 2>&1
-                nix eval --raw .#nixosConfigurations.luffy.config.system.build.toplevel.drvPath
-                nix eval --raw .#nixosConfigurations.z0r0.config.system.build.toplevel.drvPath
-                nix eval --raw .#nixosConfigurations.nami.config.system.build.toplevel.drvPath
-              ''
-            );
+            entry = "${pkgs.writeShellScript "nix-eval-toplevels" ''
+              set -euo pipefail
+              exec >/dev/null 2>&1
+              nix eval --raw .#nixosConfigurations.luffy.config.system.build.toplevel.drvPath
+              nix eval --raw .#nixosConfigurations.z0r0.config.system.build.toplevel.drvPath
+              nix eval --raw .#nixosConfigurations.nami.config.system.build.toplevel.drvPath
+            ''}";
             stages = [ "pre-push" ];
             pass_filenames = false;
           };
