@@ -77,7 +77,7 @@
             ''
               NUMBERING_FILE="${../layers/NUMBERING.md}"
               LAYERS_DIR="${../layers}"
-              for dir in $(find $LAYERS_DIR -maxdepth 2 -type d); do
+              for dir in $(find $LAYERS_DIR -mindepth 1 -maxdepth 2 -type d); do
                 base=$(basename "$dir")
                 if [ "$base" != "layers" ] && [ "$base" != "NUMBERING.md" ]; then
                   if ! grep -q "$base" "$NUMBERING_FILE"; then

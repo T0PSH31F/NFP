@@ -39,11 +39,12 @@
   services.ai-services.brain-service.enable = lib.mkForce false;
   layers.layer-20.services.config.adguard.enable = lib.mkForce false;
 
-  # === Cloud VM: disable media stack & desktop/GUI apps ===
+  # === Cloud VM: disable media stack, desktop/GUI apps & bulk agent catalog ===
   layers.layer-20.services.config.media-stack.enable = lib.mkForce false;
   layers.layer-20.services.config.download-clients.enable = lib.mkForce false;
   layers.layer-76.hermes.enableDesktop = lib.mkForce false;
   layers.layer-71.harness.antigravity.enableIde = lib.mkForce false;
+  layers.layer-79.skills.llm-agents-catalog.enable = lib.mkForce false;
   services.aria2.enable = lib.mkForce false;
   services.sabnzbd.enable = lib.mkForce false;
   systemd.services.rclone-gdrive-mount.enable = lib.mkForce false;
