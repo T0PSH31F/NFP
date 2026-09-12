@@ -1,13 +1,20 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   user = "t0psh31f";
   mountPoint = "/home/${user}/GoogleDrive";
 in
 {
   environment.systemPackages = [ pkgs.rclone ];
-  environment.persistence."/persist" = lib.mkIf (config.layers.layer-10.system.config.impermanence.enable or false) {
-    users.${user}.directories = [ ".config/rclone" ];
-  };
+  environment.persistence."/persist" =
+    lib.mkIf (config.layers.layer-10.system.config.impermanence.enable or false)
+      {
+        users.${user}.directories = [ ".config/rclone" ];
+      };
   systemd.services.rclone-gdrive-mount = {
     description = "Mount Google Drive via rclone";
     after = [ "network-online.target" ];

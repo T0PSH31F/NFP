@@ -138,7 +138,7 @@ in
       requires = [ "n8n.service" ];
       serviceConfig = {
         Type = "oneshot";
-        ExecStart = "${pkgs.curl}/bin/curl -sf http://localhost:${toString cfg.port}/healthz || exit 1";
+        ExecStart = "${pkgs.curl}/bin/curl --max-time 10 -sf http://localhost:${toString cfg.port}/healthz";
       };
     };
 
