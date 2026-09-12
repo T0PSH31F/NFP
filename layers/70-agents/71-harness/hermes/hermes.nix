@@ -362,6 +362,13 @@
           if [ -d "${config.services.hermes-agent.stateDir}/.hermes/.hermes" ]; then
             rm -rf "${config.services.hermes-agent.stateDir}/.hermes/.hermes"
           fi
+          # Sync desktop.json API key with sops token
+          if [ -f "${config.services.hermes-agent.stateDir}/.hermes/desktop.json" ]; then
+            TOKEN=$(grep -i HERMES_API_TOKEN /run/secrets/hermes-env 2>/dev/null | cut -d= -f2 || true)
+            if [ -n "$TOKEN" ]; then
+              ${pkgs.jq}/bin/jq --arg token "$TOKEN" '.remoteApiKey = $token' "${config.services.hermes-agent.stateDir}/.hermes/desktop.json" > "${config.services.hermes-agent.stateDir}/.hermes/desktop.json.tmp" && mv "${config.services.hermes-agent.stateDir}/.hermes/desktop.json.tmp" "${config.services.hermes-agent.stateDir}/.hermes/desktop.json" || true
+            fi
+          fi
         '';
       };
 
