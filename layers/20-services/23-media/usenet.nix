@@ -44,13 +44,8 @@ in
     # SABnzbd
     services.sabnzbd = mkIf cfg.sabnzbd.enable {
       enable = true;
-      configFile = null;
       inherit (mediaCfg) user;
       inherit (mediaCfg) group;
-    };
-
-    systemd.services.sabnzbd = mkIf cfg.sabnzbd.enable {
-      serviceConfig.ExecStart = mkForce "${pkgs.sabnzbd}/bin/sabnzbd -f /var/lib/sabnzbd/sabnzbd.ini -s 0.0.0.0:${toString cfg.sabnzbd.port}";
     };
 
     # NZBGet

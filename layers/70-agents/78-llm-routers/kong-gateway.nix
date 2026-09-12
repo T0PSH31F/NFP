@@ -680,11 +680,12 @@ in
             "+${pkgs.writeShellScript "kong-merge-declarative-config" ''
               set -euo pipefail
               mkdir -p ${cfg.dataDir}
-              # Base structural config first; consumer keys and the ExtremeRouter
-              # upstream auth header are sops-rendered fragments merged alongside.
-              # deep_merge concatenates Kong's declarative array keys (services,
-              # routes, upstreams, plugins, consumers) instead of overwriting them,
-              # which plain jq `*` would do.
+              FILES=("${kongYml}")
+              for f in "${config.sops.templates."kong-consumers".path}" "${config.sops.templates."kong-extremerouter-auth".path}" "${config.sops.templates."kong-omniroute-auth".path}"; do
+                if [ -f "$f" ]; then
+                  FILES+=("$f")
+                fi
+              done
               ${pkgs.jq}/bin/jq -s '
                 def deep_merge($a; $b):
                   if ($a | type) == "object" and ($b | type) == "object" then
@@ -702,9 +703,7 @@ in
                     $b
                   end;
                 reduce .[] as $item ({}; deep_merge(.; $item))
-              ' ${kongYml} "${config.sops.templates."kong-consumers".path}" "${
-                config.sops.templates."kong-extremerouter-auth".path
-              }" "${config.sops.templates."kong-omniroute-auth".path}" > ${cfg.dataDir}/declarative.json
+              ' "''${FILES[@]}" > ${cfg.dataDir}/declarative.json
               chmod 0644 ${cfg.dataDir}/declarative.json
             ''}"
           ];
