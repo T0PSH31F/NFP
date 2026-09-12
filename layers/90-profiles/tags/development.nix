@@ -16,6 +16,8 @@
         dsh.enable = lib.mkDefault true;
         gemini-cli.enable = lib.mkDefault true;
         kiro-cli.enable = lib.mkDefault true;
+        pi-coding-agent.enable = lib.mkDefault true;
+        aider-chat.enable = lib.mkDefault true;
         opencode = {
           enable = lib.mkDefault true;
           desktop = lib.mkDefault true;

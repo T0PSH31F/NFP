@@ -56,6 +56,10 @@
         picard # MusicBrainz Picard for metadata tagging & cover art
         mediainfo-gui # GUI media file technical inspector
         mediainfo # CLI media file inspector
+        musicfree-desktop
+        musikcube
+        clementine
+        strawberry
       ];
     };
 }

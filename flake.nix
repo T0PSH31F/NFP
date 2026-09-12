@@ -148,6 +148,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-parts.follows = "flake-parts";
       inputs.systems.follows = "systems";
+      inputs.clan-core.follows = "clan-core";
+      inputs.sops-nix.follows = "sops-nix";
     };
 
     # ── Services & Utilities ───────────────────────────────────

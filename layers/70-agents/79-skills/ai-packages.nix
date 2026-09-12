@@ -60,15 +60,14 @@ in
             fabric-ai
             go-hass-agent
             ramalama
-            bluemail
+            # bluemail
             librechat
             nextjs-ollama-llm-ui
             skills
             beads
             openshell
             gemini-cli
-            aider-chat
-            jan
+            # jan
             cherry-studio
             lmstudio
             python314Packages.pydantic-graph
@@ -76,6 +75,7 @@ in
           ++ cfg.packages
           ++ optionals cfg.enableCodingAgents (
             filter (p: p != null) [
+              (pkgs.agentsploit or null)
               (llmPkgs.claude-code or pkgs.claude-code or null)
               (llmPkgs.goose-cli or null)
               (llmPkgs.opencode or pkgs.opencode or null)

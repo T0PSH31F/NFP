@@ -11,6 +11,8 @@
       codegraph.enable = lib.mkDefault true;
       kiro-cli.enable = lib.mkDefault true;
       dsh.enable = lib.mkDefault true;
+      pi-coding-agent.enable = lib.mkDefault true;
+      aider-chat.enable = lib.mkDefault true;
     };
 
     layers.layer-72.voice.voice.enable = lib.mkDefault false;
