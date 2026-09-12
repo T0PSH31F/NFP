@@ -48,7 +48,7 @@
       port = lib.mkDefault 8080;
     };
     layers.layer-20.services.communication.camofox-browser = {
-      enable = lib.mkDefault true;
+      enable = lib.mkDefault (builtins.elem "desktop" config.machine.tags);
       port = lib.mkDefault 9377;
       apiKey = config.sops.placeholder.camofox_api_key or "";
     };
