@@ -1,7 +1,6 @@
 {
   config,
   lib,
-  pkgs,
   ...
 }:
 with lib;
@@ -50,9 +49,7 @@ in
     environment.persistence."/persist" =
       mkIf (config.layers.layer-10.system.config.impermanence.enable or false)
         {
-          directories = [
-            "/var/lib/syncthing"
-          ];
+          directories = optional (cfg.user == "syncthing") "/var/lib/syncthing";
           users.${cfg.user}.directories = [
             ".config/syncthing"
           ];

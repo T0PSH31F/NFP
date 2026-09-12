@@ -98,6 +98,49 @@ in
       session = {
         resume_agents_on_restore = mkDefault true;
       };
+      keys = {
+        # Single prefix only — herdr does NOT support multiple prefixes / zellij-style modes.
+        # Kept as ctrl+b tmux-style (ctrl+p freed by moving ray/pet). User requested revert.
+        # Then prefix+h/j/k/l still works; true ctrl+p / ctrl+t modal modes
+        # would require a herdr plugin; see notes below.
+        prefix = mkDefault "ctrl+b";
+
+        # ── Zellij-like direct navigation (no prefix) ─────────────────────
+        # Requested: Alt + arrows for pane/tab focus. These are direct chords
+        # (no prefix) and override the defaults prefix+h/j/k/l.
+        # Valid syntax: "alt+left/right/up/down", "alt+h/j/k/l", "ctrl+alt+…".
+        # Alt-bindings depend on terminal passing Alt correctly (Kitty, Ghostty,
+        # WezTerm, Alacritty all do; tmux nested needs set -g xterm-keys on).
+        # Alt+arrows requested but Ghostty xterm-ghostty sends ESC[1;3* which Herdr
+        # parses unreliably (see docs: alt+... depends on terminal). Alt+h/j/k/l
+        # is reliable (ESC h) and matches zellij vim style.
+        focus_pane_left = mkDefault "alt+h";
+        focus_pane_right = mkDefault "alt+l";
+        focus_pane_up = mkDefault "alt+k";
+        focus_pane_down = mkDefault "alt+j";
+
+        # Tab navigation without prefix — Alt+Shift+arrows (faster than prefix+p/n)
+        # zellij tab-mode is ctrl+t → h/l ; this direct binding is more ergonomic.
+        previous_tab = mkDefault "alt+shift+left";
+        next_tab = mkDefault "alt+shift+right";
+        move_tab_previous = mkDefault "ctrl+shift+left";
+        move_tab_next = mkDefault "ctrl+shift+right";
+
+        # Direct resize without entering resize_mode (like holding Alt in zellij)
+        resize_pane_left = mkDefault "ctrl+alt+left";
+        resize_pane_down = mkDefault "ctrl+alt+down";
+        resize_pane_up = mkDefault "ctrl+alt+up";
+        resize_pane_right = mkDefault "ctrl+alt+right";
+        # Modal resize (zellij ctrl+n analog) — prefix+r then h/j/k/l, Esc to exit
+        resize_mode = mkDefault "prefix+r";
+
+        # Keep useful prefix bindings familiar; uncomment to make more zellij-like:
+        # new_tab = "ctrl+t";      # zellij: ctrl+t → n  (default herdr: prefix+c)
+        # close_tab = "prefix+shift+x";
+        # split_vertical = "prefix+v";
+        # split_horizontal = "prefix+minus";
+        # zoom = "prefix+z";
+      };
     };
 
     environment.systemPackages = mkIf (cfg.package != null) [

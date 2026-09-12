@@ -11,6 +11,15 @@
 
   # Boot configuration - LUKS encryption
   boot.initrd = {
+    availableKernelModules = [
+      "xhci_pci"
+      "thunderbolt"
+      "vmd"
+      "nvme"
+      "usbhid"
+      "usb_storage"
+      "sd_mod"
+    ];
     luks.devices."crypted" = {
       device = "/dev/disk/by-uuid/458b615c-3ac2-4cff-98a2-c8e266bae90f";
       allowDiscards = true;

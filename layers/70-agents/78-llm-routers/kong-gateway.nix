@@ -681,7 +681,9 @@ in
               set -euo pipefail
               mkdir -p ${cfg.dataDir}
               FILES=("${kongYml}")
-              for f in "${config.sops.templates."kong-consumers".path}" "${config.sops.templates."kong-extremerouter-auth".path}" "${config.sops.templates."kong-omniroute-auth".path}"; do
+              for f in "${config.sops.templates."kong-consumers".path}" "${
+                config.sops.templates."kong-extremerouter-auth".path
+              }" "${config.sops.templates."kong-omniroute-auth".path}"; do
                 if [ -f "$f" ]; then
                   FILES+=("$f")
                 fi

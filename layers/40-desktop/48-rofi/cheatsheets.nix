@@ -1,6 +1,5 @@
 {
   pkgs,
-  lib,
   ...
 }:
 
@@ -13,20 +12,24 @@ let
     if [ -f "$NOCTALIA_COLORS" ]; then
       eval "$(sed -n 's/^\$\([a-z_][a-z_]*\) = rgb(\([0-9a-fA-F]\{6,\}\))$/\1=\2/p' "$NOCTALIA_COLORS")"
     fi
-    ROFI_PRIMARY="''${primary:-c7c3e6}"
-    ROFI_SURFACE="''${surface:-141315}"
+    ROFI_PRIMARY="''${primary:-eab4f4}"
+    ROFI_SURFACE="''${surface:-161216}"
+    ROFI_TEXT="''${on_surface:-e0e0ff}"
     rofi_with_theme() {
       ${pkgs.rofi}/bin/rofi "$@" \
-        -theme-str "window {width: 55%; height: 78%; background-color: #''${ROFI_SURFACE}; border: 1px solid; border-color: #''${ROFI_PRIMARY}; border-radius: 8px; padding: 16px;}" \
-        -theme-str "mainbox {background-color: transparent;}" \
-        -theme-str "inputbar {background-color: #''${ROFI_SURFACE}dd; border-radius: 6px; padding: 8px; margin-bottom: 8px;}" \
-        -theme-str "prompt {color: #''${ROFI_PRIMARY}; font: \"monospace 11\";}" \
-        -theme-str "entry {color: #e0e0ff; font: \"monospace 10\";}" \
-        -theme-str "listview {background-color: transparent; columns: 1; spacing: 2px;}" \
-        -theme-str "element {background-color: transparent; padding: 4px 8px; border-radius: 4px;}" \
-        -theme-str "element active {background-color: #''${ROFI_SURFACE}bb;}" \
-        -theme-str "element-text {color: #e0e0ff; font: \"monospace 10\";}" \
-        -theme-str "element-text active {color: #''${ROFI_PRIMARY};}"
+        -theme-str "window {width: 55%; height: 78%; background-color: #''${ROFI_SURFACE}; border: 1px solid; border-color: #''${ROFI_PRIMARY}; border-radius: 12px; padding: 16px;}" \
+        -theme-str "mainbox {background-color: transparent; children: [inputbar, listview];}" \
+        -theme-str "inputbar {background-color: #''${ROFI_SURFACE}dd; border-radius: 8px; padding: 10px; margin: 0 0 8px 0;}" \
+        -theme-str "prompt {background-color: transparent; text-color: #''${ROFI_PRIMARY}; font: \"JetBrainsMono Nerd Font 11\";}" \
+        -theme-str "entry {background-color: transparent; text-color: #''${ROFI_TEXT}; font: \"JetBrainsMono Nerd Font 10\"; placeholder-color: #''${ROFI_TEXT}88;}" \
+        -theme-str "listview {background-color: transparent; columns: 1; spacing: 4px; lines: 0; fixed-height: false; scrollbar: false;}" \
+        -theme-str "element {background-color: transparent; text-color: #''${ROFI_TEXT}; padding: 6px 10px; border-radius: 6px;}" \
+        -theme-str "element normal normal {background-color: transparent; text-color: #''${ROFI_TEXT};}" \
+        -theme-str "element alternate normal {background-color: #''${ROFI_SURFACE}66; text-color: #''${ROFI_TEXT};}" \
+        -theme-str "element selected normal {background-color: #''${ROFI_PRIMARY}; text-color: #''${ROFI_SURFACE}; border-radius: 6px;}" \
+        -theme-str "element selected active {background-color: #''${ROFI_PRIMARY}dd; text-color: #''${ROFI_SURFACE};}" \
+        -theme-str "element-text {background-color: transparent; text-color: inherit; highlight: bold #''${ROFI_PRIMARY};}" \
+        -theme-str "element-icon {background-color: transparent; size: 1.2em;}"
     }
   '';
 
@@ -55,25 +58,28 @@ let
     CHOICES
           )
           [ -z "$SELECTED" ] && break
+          # Trim leading/trailing whitespace from rofi output (rofi 2.0 adds padding)
+          SELECTED="$(echo "$SELECTED" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
+          [ -z "$SELECTED" ] && break
           case "$SELECTED" in
-            "⚡ Zellij")            zellij-cheatsheet ;;
-            "📝 Neovim")            nvim-cheatsheet ;;
-            "✦ Helix")             helix-cheatsheet ;;
-            "📂 Yazi")             yazi-cheatsheet ;;
-            "🐚 Zsh / Ghostty")    zsh-cheatsheet ;;
-            "🔍 Fzf / TV / Ripgrep") fzf-cheatsheet ;;
-            "🔧 Grep / Sed / Awk") grep-sed-awk-cheatsheet ;;
-            "🐳 Docker / Podman")  docker-cheatsheet ;;
-            "💻 VMs / MicroVMs")   vm-cheatsheet ;;
-            "🚀 CLI Power Tools")  cli-power-cheatsheet ;;
-            "🖥️ Hyprland")         hypr-keybind-cheatsheet ;;
-            "🤖 OpenCode")          opencode-cheatsheet ;;
-            "🧠 Hermes Agent")      hermes-cheatsheet ;;
-            "📋 Shell Aliases")     aliases-cheatsheet ;;
-            "🐚 Nushell")           nushell-cheatsheet ;;
-            "⚡ Carapace")          carapace-cheatsheet ;;
-            "🛠️ CLI Tools")       cli-tools-cheatsheet ;;
-            "🏷️ Tag Groups")      tag-groups-cheatsheet ;;
+            "⚡ Zellij")            ${zellij_cheatsheet}/bin/zellij-cheatsheet ;;
+            "📝 Neovim")            ${nvim_cheatsheet}/bin/nvim-cheatsheet ;;
+            "✦ Helix")             ${helix_cheatsheet}/bin/helix-cheatsheet ;;
+            "📂 Yazi")             ${yazi_cheatsheet}/bin/yazi-cheatsheet ;;
+            "🐚 Zsh / Ghostty")    ${zsh_cheatsheet}/bin/zsh-cheatsheet ;;
+            "🔍 Fzf / TV / Ripgrep") ${fzf_cheatsheet}/bin/fzf-cheatsheet ;;
+            "🔧 Grep / Sed / Awk") ${grep_sed_awk_cheatsheet}/bin/grep-sed-awk-cheatsheet ;;
+            "🐳 Docker / Podman")  ${docker_cheatsheet}/bin/docker-cheatsheet ;;
+            "💻 VMs / MicroVMs")   ${vm_cheatsheet}/bin/vm-cheatsheet ;;
+            "🚀 CLI Power Tools")  ${cli_power_cheatsheet}/bin/cli-power-cheatsheet ;;
+            "🖥️ Hyprland")         hypr-keybind-cheatsheet 2>/dev/null || echo "Hyprland cheatsheet not yet ported — see Hyprland wiki" | rofi_with_theme -dmenu -p "Hyprland" ;;
+            "🤖 OpenCode")          ${opencode_cheatsheet}/bin/opencode-cheatsheet ;;
+            "🧠 Hermes Agent")      ${hermes_cheatsheet}/bin/hermes-cheatsheet ;;
+            "📋 Shell Aliases")     ${aliases_cheatsheet}/bin/aliases-cheatsheet ;;
+            "🐚 Nushell")           ${nushell_cheatsheet}/bin/nushell-cheatsheet ;;
+            "⚡ Carapace")          ${carapace_cheatsheet}/bin/carapace-cheatsheet ;;
+            "🛠️ CLI Tools")       ${cli_tools_cheatsheet}/bin/cli-tools-cheatsheet ;;
+            "🏷️ Tag Groups")      ${tag_groups_cheatsheet}/bin/tag-groups-cheatsheet ;;
           esac
         done
   '';
