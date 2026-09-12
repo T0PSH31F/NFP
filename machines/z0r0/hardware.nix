@@ -9,6 +9,8 @@
     ../../layers/10-system/12-processor/12.4-platform/laptop.nix
   ];
 
+  boot.kernelModules = [ "lg-laptop" ];
+
   # Boot configuration - LUKS encryption
   boot.initrd = {
     availableKernelModules = [

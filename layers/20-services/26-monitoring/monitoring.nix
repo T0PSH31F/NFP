@@ -400,6 +400,7 @@ with lib;
     users.users.alloy = {
       isSystemUser = true;
       group = "alloy";
+      uid = 985;
       description = "Grafana Alloy Daemon";
     };
     users.groups.alloy = { };

@@ -20,6 +20,15 @@
   networking.hostName = "nami";
   system.stateVersion = "25.05";
 
+  machine.tags = [
+    "network-router"
+    "ai-router"
+    "agent-orchestrator"
+    "ai-agent"
+  ];
+
+  sops.age.keyFile = "/var/lib/sops/nami/key.txt";
+
   # === Headscale — fleet VPN control server (via network-router tag) ===
   services.headscale-server = {
     serverUrl = "http://headscale.lovelain.duckdns.org";
@@ -30,9 +39,16 @@
   services.ai-services.brain-service.enable = lib.mkForce false;
   layers.layer-20.services.config.adguard.enable = lib.mkForce false;
 
-  # === gno: retrieval/workspace/graph OCI container (always-on, indexes luffy corpus) ===
+  # === Cloud VM: disable media stack & desktop services ===
+  layers.layer-20.services.config.media-stack.enable = lib.mkForce false;
+  layers.layer-20.services.config.download-clients.enable = lib.mkForce false;
+  services.aria2.enable = lib.mkForce false;
+  services.sabnzbd.enable = lib.mkForce false;
+  systemd.services.rclone-gdrive-mount.enable = lib.mkForce false;
+
+  # === gno: retrieval/workspace/graph OCI container (disabled until public image available) ===
   layers.layer-73.memory.gno = {
-    enable = true;
+    enable = false;
     port = 3456;
     dataDir = "/var/lib/gno";
     corpusDir = "/var/lib/gno/corpus"; # Synced from luffy via rsync/cron

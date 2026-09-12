@@ -28,6 +28,14 @@ in
       };
     };
 
+    users.users.filebrowser = {
+      isSystemUser = true;
+      group = "filebrowser";
+      uid = 984;
+      description = "FileBrowser Daemon";
+    };
+    users.groups.filebrowser = { };
+
     # Persistence
     environment.persistence."/persist" = mkIf config.layers.layer-10.system.config.impermanence.enable {
       directories = [ cfg.rootDir ];

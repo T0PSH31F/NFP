@@ -82,6 +82,8 @@ with lib;
 
       systemd.tmpfiles.rules = [
         "d ${cfg.dataDir} 0777 root root -"
+        "d /home/t0psh31f/.gemini/config/skills 0755 t0psh31f users -"
+        "d /var/lib/hermes 0755 root root -"
       ];
 
       environment.persistence."/persist" =

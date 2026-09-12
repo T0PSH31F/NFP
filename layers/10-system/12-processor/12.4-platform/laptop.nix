@@ -16,6 +16,13 @@ in
     services.power-profiles-daemon.enable = lib.mkDefault true;
     services.upower.enable = lib.mkDefault true;
 
+    # Prevent Intel Type-C / UCSI controller auto-suspend sleep lockups & extend timeouts
+    boot.kernelParams = [ "typec_ucsi.cmd_timeout=5000" ];
+    services.udev.extraRules = ''
+      ACTION=="add", SUBSYSTEM=="pci", ATTR{vendor}=="0x8086", ATTR{class}=="0x0c0330", ATTR{power/control}="on"
+      ACTION=="add", SUBSYSTEM=="typec", ATTR{power/control}="on"
+    '';
+
     # Touchpad support
     services.libinput.enable = lib.mkDefault true;
     services.libinput.touchpad.tapping = lib.mkDefault true;

@@ -81,9 +81,14 @@ with lib;
           Group = "root";
           ExecStartPre = pkgs.writeShellScript "paperclip-init" ''
             mkdir -p /root/.paperclip/instances/default
-            if [ ! -f /root/.paperclip/instances/default/config.json ]; then
-              echo '{"version":"1","instance":"default"}' > /root/.paperclip/instances/default/config.json
-            fi
+            cat << 'EOF' > /root/.paperclip/instances/default/config.json
+            {
+              "$meta": { "version": "1.0" },
+              "database": { "url": "${cfg.databaseUrl}" },
+              "logging": { "level": "info" },
+              "server": { "port": ${toString cfg.port} }
+            }
+            EOF
           '';
           ExecStart = "${lib.getExe paperclipPkg} run";
           Restart = "on-failure";
