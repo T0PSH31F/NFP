@@ -13,21 +13,22 @@ let
       eval "$(sed -n 's/^\$\([a-z_][a-z_]*\) = rgb(\([0-9a-fA-F]\{6,\}\))$/\1=\2/p' "$NOCTALIA_COLORS")"
     fi
     ROFI_PRIMARY="''${primary:-eab4f4}"
+    ROFI_SECONDARY="''${secondary:-d9beda}"
     ROFI_SURFACE="''${surface:-161216}"
     ROFI_TEXT="''${on_surface:-e0e0ff}"
     rofi_with_theme() {
       ${pkgs.rofi}/bin/rofi "$@" \
-        -theme-str "window {width: 55%; height: 78%; background-color: #''${ROFI_SURFACE}; border: 1px solid; border-color: #''${ROFI_PRIMARY}; border-radius: 12px; padding: 16px;}" \
+        -theme-str "window {width: 62%; height: 82%; background-color: #''${ROFI_SURFACE}f2; border: 2px solid; border-color: #''${ROFI_PRIMARY}; border-radius: 18px; padding: 20px;}" \
         -theme-str "mainbox {background-color: transparent; children: [inputbar, listview];}" \
-        -theme-str "inputbar {background-color: #''${ROFI_SURFACE}dd; border-radius: 8px; padding: 10px; margin: 0 0 8px 0;}" \
-        -theme-str "prompt {background-color: transparent; text-color: #''${ROFI_PRIMARY}; font: \"JetBrainsMono Nerd Font 11\";}" \
-        -theme-str "entry {background-color: transparent; text-color: #''${ROFI_TEXT}; font: \"JetBrainsMono Nerd Font 10\"; placeholder-color: #''${ROFI_TEXT}88;}" \
-        -theme-str "listview {background-color: transparent; columns: 1; spacing: 4px; lines: 0; fixed-height: false; scrollbar: false;}" \
-        -theme-str "element {background-color: transparent; text-color: #''${ROFI_TEXT}; padding: 6px 10px; border-radius: 6px;}" \
-        -theme-str "element normal normal {background-color: transparent; text-color: #''${ROFI_TEXT};}" \
-        -theme-str "element alternate normal {background-color: #''${ROFI_SURFACE}66; text-color: #''${ROFI_TEXT};}" \
-        -theme-str "element selected normal {background-color: #''${ROFI_PRIMARY}; text-color: #''${ROFI_SURFACE}; border-radius: 6px;}" \
-        -theme-str "element selected active {background-color: #''${ROFI_PRIMARY}dd; text-color: #''${ROFI_SURFACE};}" \
+        -theme-str "inputbar {background-color: #''${ROFI_SURFACE}; border: 1.5px solid; border-color: #''${ROFI_PRIMARY}bb; border-radius: 24px; padding: 10px 18px; margin: 0 0 14px 0; children: [prompt, entry];}" \
+        -theme-str "prompt {background-color: transparent; text-color: #''${ROFI_PRIMARY}; font: \"JetBrainsMono Nerd Font Bold 12\"; margin: 0 10px 0 0;}" \
+        -theme-str "entry {background-color: transparent; text-color: #''${ROFI_TEXT}; font: \"JetBrainsMono Nerd Font 11\"; placeholder-color: #''${ROFI_TEXT}77;}" \
+        -theme-str "listview {background-color: transparent; columns: 1; spacing: 8px; lines: 0; fixed-height: false; scrollbar: false;}" \
+        -theme-str "element {background-color: #''${ROFI_SURFACE}aa; text-color: #''${ROFI_TEXT}; border: 1.5px solid; border-color: #''${ROFI_SECONDARY}44; padding: 10px 16px; border-radius: 24px; font: \"JetBrainsMono Nerd Font 10.5\";}" \
+        -theme-str "element normal normal {background-color: #''${ROFI_SURFACE}88; text-color: #''${ROFI_TEXT}; border-color: #''${ROFI_SECONDARY}44;}" \
+        -theme-str "element alternate normal {background-color: #''${ROFI_SURFACE}cc; text-color: #''${ROFI_TEXT}; border-color: #''${ROFI_SECONDARY}44;}" \
+        -theme-str "element selected normal {background-color: #''${ROFI_PRIMARY}; text-color: #''${ROFI_SURFACE}; border: 1.5px solid; border-color: #ffffff; border-radius: 24px; font: \"JetBrainsMono Nerd Font Bold 10.5\";}" \
+        -theme-str "element selected active {background-color: #''${ROFI_PRIMARY}; text-color: #''${ROFI_SURFACE}; border: 1.5px solid; border-color: #ffffff; border-radius: 24px; font: \"JetBrainsMono Nerd Font Bold 10.5\";}" \
         -theme-str "element-text {background-color: transparent; text-color: inherit; highlight: bold #''${ROFI_PRIMARY};}" \
         -theme-str "element-icon {background-color: transparent; size: 1.2em;}"
     }
@@ -37,6 +38,9 @@ let
         ${rofiTheme}
         while true; do
           SELECTED=$(cat <<CHOICES | rofi_with_theme -dmenu -p "Cheatsheets"
+        🤠 Herdr AI Harness
+        🧰 z0r0 App & Tool Catalog
+        🐚 Nushell
         ⚡ Zellij
         📝 Neovim
         ✦ Helix
@@ -51,7 +55,6 @@ let
         🤖 OpenCode
         🧠 Hermes Agent
         📋 Shell Aliases
-        🐚 Nushell
         ⚡ Carapace
         🛠️ CLI Tools
         🏷️ Tag Groups
@@ -62,6 +65,9 @@ let
           SELECTED="$(echo "$SELECTED" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
           [ -z "$SELECTED" ] && break
           case "$SELECTED" in
+            "🤠 Herdr AI Harness")     ${herdr_cheatsheet}/bin/herdr-cheatsheet ;;
+            "🧰 z0r0 App & Tool Catalog") ${z0r0_catalog_cheatsheet}/bin/z0r0-catalog-cheatsheet ;;
+            "🐚 Nushell")           ${nushell_cheatsheet}/bin/nushell-cheatsheet ;;
             "⚡ Zellij")            ${zellij_cheatsheet}/bin/zellij-cheatsheet ;;
             "📝 Neovim")            ${nvim_cheatsheet}/bin/nvim-cheatsheet ;;
             "✦ Helix")             ${helix_cheatsheet}/bin/helix-cheatsheet ;;
@@ -76,7 +82,6 @@ let
             "🤖 OpenCode")          ${opencode_cheatsheet}/bin/opencode-cheatsheet ;;
             "🧠 Hermes Agent")      ${hermes_cheatsheet}/bin/hermes-cheatsheet ;;
             "📋 Shell Aliases")     ${aliases_cheatsheet}/bin/aliases-cheatsheet ;;
-            "🐚 Nushell")           ${nushell_cheatsheet}/bin/nushell-cheatsheet ;;
             "⚡ Carapace")          ${carapace_cheatsheet}/bin/carapace-cheatsheet ;;
             "🛠️ CLI Tools")       ${cli_tools_cheatsheet}/bin/cli-tools-cheatsheet ;;
             "🏷️ Tag Groups")      ${tag_groups_cheatsheet}/bin/tag-groups-cheatsheet ;;
@@ -984,30 +989,143 @@ let
     "
         echo "$TAGS" | rofi_with_theme -dmenu -p "Tag Groups" -filter ""
   '';
+  herdr_cheatsheet = pkgs.writeShellScriptBin "herdr-cheatsheet" ''
+        ${rofiTheme}
+        HERDR="
+    🤠 HERDR AI HARNESS KEYBINDS & WORKSPACES
+    ═════════════════════════════════════════════════════════════════
+
+    🎯 PREFIX KEY
+    ─────────────────────────────────────────────────────────────────
+    Ctrl + b                    Master Prefix Key (Tmux Style)
+
+    🧭 DIRECT NAVIGATION (NO PREFIX)
+    ─────────────────────────────────────────────────────────────────
+    Alt + h / j / k / l         Focus Pane (Left / Down / Up / Right)
+    Alt + Shift + Left / Right  Switch Previous / Next Tab
+    Ctrl + Shift + Left / Right Move Tab Left / Right
+    Ctrl + Alt + Arrows         Direct Resize Pane
+
+    ⌨️ PREFIX SHORTCUTS
+    ─────────────────────────────────────────────────────────────────
+    Ctrl + b  r                 Enter Modal Resize Mode (Esc to Exit)
+    Ctrl + b  c                 Create New Tab / Workspace
+    Ctrl + b  x                 Close Current Pane
+    Ctrl + b  z                 Toggle Pane Zoom / Fullscreen
+    Ctrl + b  d                 Detach Herdr Session
+
+    🤖 WORKSPACE PROVISIONING & AGENTS
+    ─────────────────────────────────────────────────────────────────
+    herdr-setup-workspaces      Auto-create opencode, hermes & agy workspaces
+    herdr workspace list        List running agent workspaces
+    herdr status server         Check Herdr background daemon status
+    "
+        echo "$HERDR" | rofi_with_theme -dmenu -p "Herdr Keybinds" -filter ""
+  '';
+
+  z0r0_catalog_cheatsheet = pkgs.writeShellScriptBin "z0r0-catalog-cheatsheet" ''
+        ${rofiTheme}
+        CATALOG="
+    🧰 Z0R0 COMPLETE APP & TOOL CATALOG (NFP WORKSTATION)
+    ═════════════════════════════════════════════════════════════════
+
+    🌐 INTERNET, COMMUNICATION & BROWSERS
+    ─────────────────────────────────────────────────────────────────
+    Zen Browser / Firefox       Primary Web Browsers (Gecko Engine)
+    Brave Browser               Chromium Privacy Browser
+    Camofox Browser             Anti-Detection Headless/VNC Browser Server
+    Element Desktop             Matrix Encrypted Chat Client
+    Discord Desktop             Community Voice & Text Chat
+    Telegram Desktop            Messaging & Agent Bot Channel
+    Signal Desktop              Private E2EE Messaging
+    Thunderbird                 Email Client & RSS Reader
+    RustDesk                    High-Performance Remote Desktop Access
+
+    🎨 MULTIMEDIA, AUDIO & VIDEO
+    ─────────────────────────────────────────────────────────────────
+    Feishin                     Subsonic/Navidrome Music Streaming Client
+    MPV                         Hardware-Accelerated Video Player
+    VLC Media Player            Universal Media Playback
+    Amberol                     Minimalist GTK Music Player
+    OBS Studio                  Screen Recording & Live Streaming
+    Audacity                    Multi-track Audio Editor
+    Mopidy                      Background Music Server & MPD Daemon
+
+    💻 DEVELOPMENT, EDITORS & AGENTS
+    ─────────────────────────────────────────────────────────────────
+    VSCode (Visual Studio Code) IDE & Extension Ecosystem
+    Zed Editor                  High-Performance Rust Text Editor
+    Neovim (nvim)               Extensible Lua/Vim IDE & Terminal Editor
+    Helix (hx)                  Modal Post-Modern Terminal Editor
+    Ghostty / Kitty / Alacritty GPU-Accelerated Terminal Emulators
+    OpenCode & Slim Harness     AI Coding Assistant & Slim Tool Harness
+    Hermes Agent                Autonomous Multi-Platform AI Agent
+    Antigravity CLI (agy)       Google DeepMind Pair-Programming AI CLI
+    Herdr                       Agent Terminal Workspace Manager
+    DBeaver / Postman / Insomnia DB GUI Manager & API Testing Suites
+    Git & LazyGit               Source Control & Terminal TUI
+
+    🕹️ GAMING, PROTON & EMULATORS
+    ─────────────────────────────────────────────────────────────────
+    Steam                       PC Gaming Platform (Proton GE Enabled)
+    GameMode                    Linux Performance Optimizer Daemon
+    Gamescope                   Valve Micro-Compositor & Upscaler
+    MangoHud                    Real-time Performance & FPS Overlay
+    Lutris / Bottles            Windows Game & Wine Bottling Managers
+    RetroArch                   All-in-One Multi-System Emulator
+    Dolphin / PCSX2 / RPCS3     GameCube/Wii, PS2 & PS3 Emulators
+    Ryubing (Switch) / Cemu     Nintendo Switch & Wii U Emulators
+    AntiMicroX / Vintage Story  Gamepad Mapper & Open-World Survival Sandbox
+
+    🛠️ SYSTEM, UTILITIES & POWER TOOLS
+    ─────────────────────────────────────────────────────────────────
+    Rofi                        App Launcher, Cheatsheet & Todo Picker
+    Yazi / Btop                 TUI File Manager & Process System Monitor
+    Eza / Zoxide / Fzf / TV     Modern ls, cd, Fuzzy Finder & TUI Viewer
+    Bat / Jq / Ripgrep / Fd     Syntax Cat, JSON Parser, Search & Find
+    Direnv                      Per-Directory Environment Loader
+    Fastfetch / Glances         System Info & Fleet Metrics Exporter
+    Restic / Sops               Encrypted Backup & Secret Management
+
+    🧸 CLI TOYS & DESKTOP EXTRAS
+    ─────────────────────────────────────────────────────────────────
+    Wl_shimeji                  Wayland Animated Desktop Companion Pets
+    Jerry                       Anime Streaming TUI Script (Rofi/MPV)
+    Cmatrix / CBonsai / Pipes   Matrix Rain, ASCII Bonsai & Screen Saver
+    Noctalia                    Material You Dynamic Color System
+    "
+        echo "$CATALOG" | rofi_with_theme -dmenu -p "z0r0 App Catalog" -filter ""
+  '';
+
   nushell_cheatsheet = pkgs.writeShellScriptBin "nushell-cheatsheet" ''
         ${rofiTheme}
         NUSHELL="
-    🐚 NUSHELL CHEATSHEET & GUIDE
-    ═══════════════════════════════════════════
+    🐚 NUSHELL CHEATSHEET & COMPLETE GUIDE
+    ═════════════════════════════════════════════════════════════════
 
-    💡 CONCEPTS & PIPELINES
-    ─────────────────────────────────────────
+    💡 CONCEPTS & STRUCTURED PIPELINES
+    ─────────────────────────────────────────────────────────────────
     Pipelines vs Commands       Data streams as structured tables, not plain text
-    open file.json | get key    Load structured data into table/record
-    sys | where cpu > 50        Filter structured data stream
+    open file.json | get key    Load structured JSON/YAML/CSV into table record
+    sys | where cpu > 50        Filter structured data stream by column condition
     ls | sort-by size           Sort table rows by column
+    ls | select name size       Project specific table columns
     each { |it| print $it }     Iterate structured rows
-    reduce { |it, acc| ... }    Fold structured table data
+    reduce { |it, acc| ... }    Fold structured table data into accumulator
 
-    🛠️ USEFUL COMMANDS
-    ─────────────────────────────────────────
+    🛠️ BUILT-IN DATA CONVERTERS & HELP
+    ─────────────────────────────────────────────────────────────────
+    from json / to json         Parse or serialize JSON data
+    from yaml / to yaml         Parse or serialize YAML documents
+    from csv / to csv           Parse or serialize CSV spreadsheets
+    str contains \"pattern\"      String pattern testing inside pipeline
+    split row \",\"              Split string into list stream
     help find <term>            Search Nushell built-in help documentation
     config nu                   Edit main Nushell config
     config env                  Edit Nushell environment variables
-    http get <url>              Native structured HTTP GET query
 
-     NFP FLEET & HARNESS
-    ─────────────────────────────────────────
+     NFP FLEET & CLAN ALIASES
+    ─────────────────────────────────────────────────────────────────
     cuw <machine>               clan-update-watch wrapper script
     cupdate                     clan machines update
     cbuild                      clan machines build
@@ -1041,6 +1159,8 @@ in
 {
   environment.systemPackages = [
     cheatsheet_picker
+    herdr_cheatsheet
+    z0r0_catalog_cheatsheet
     zellij_cheatsheet
     nvim_cheatsheet
     yazi_cheatsheet
