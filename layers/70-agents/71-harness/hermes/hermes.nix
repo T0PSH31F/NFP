@@ -383,6 +383,10 @@
         ++ lib.filter (p: p != null) [
           pkgs.uni-pet
           (llmPkgs.agentburn or pkgs.agentburn or null)
+          # GLaDOS TTS alert voice (~/.local/bin/glados-tts-cli shells out to piper).
+          # Kept here independent of layers.layer-72.voice (which drags in the whisper server).
+          pkgs.piper-tts
+          pkgs.espeak-ng
         ];
 
       # ── Pinned Hermes Config ─────────────────────────────────────────────────
