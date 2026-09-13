@@ -42,6 +42,7 @@ with lib;
       nix-init
       nix-inspect
       nix-olde
+      portaudio # libportaudio.so in sw/lib — required by hermes-agent sounddevice Voice mode (nix-ld list alone doesn't expose it)
       nix-output-monitor # nom command
       nix-search-tv
       nix-serve-ng

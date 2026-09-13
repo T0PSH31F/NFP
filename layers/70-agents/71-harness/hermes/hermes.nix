@@ -232,6 +232,8 @@
                 for name in hermes-agent hermes-acp; do
                   makeWrapper ${old.passthru.hermesVenv}/bin/$name $out/bin/$name \
                     --suffix PATH : "${runtimePath}" \
+                    --suffix LIBRARY_PATH : "${pkgs.portaudio.out}/lib" \
+                    --prefix LD_LIBRARY_PATH : "${pkgs.portaudio.out}/lib" \
                     --set HERMES_BUNDLED_SKILLS $out/share/hermes-agent/skills \
                     --set HERMES_BUNDLED_PLUGINS $out/share/hermes-agent/plugins \
                     --set HERMES_BUNDLED_LOCALES $out/share/hermes-agent/locales \
@@ -246,6 +248,8 @@
                 # shell case above to run first.  Instead, source the env inline.
                 wrapProgram $out/bin/hermes \
                   --suffix PATH : "${runtimePath}" \
+                  --suffix LIBRARY_PATH : "${pkgs.portaudio.out}/lib" \
+                  --prefix LD_LIBRARY_PATH : "${pkgs.portaudio.out}/lib" \
                   --set HERMES_BUNDLED_SKILLS $out/share/hermes-agent/skills \
                   --set HERMES_BUNDLED_PLUGINS $out/share/hermes-agent/plugins \
                   --set HERMES_BUNDLED_LOCALES $out/share/hermes-agent/locales \
