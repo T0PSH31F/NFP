@@ -2,10 +2,10 @@
 # Module: kilocode.nix
 # Purpose: Kilo Code terminal AI agent & IDE extension harness integration (Roo/Cline lineage).
 # Provider endpoints (Kong path multiplexer + ExtremeRouter backup):
-#   kong-er:       http://127.0.0.1:8090/v1 (ExtremeRouter)
-#   kong-omni:     http://127.0.0.1:8090/omni/v1 (OmniRoute - TODO: when merged)
-#   kong-free:     http://127.0.0.1:8090/llm/free/v1 (FreeLLMPool)
-#   kong-frontier: http://127.0.0.1:8090/llm/frontier/v1 (Manifest)
+#   kong-er:       http://nami:8090/v1 (ExtremeRouter)
+#   kong-omni:     http://nami:8090/omni/v1 (OmniRoute - TODO: when merged)
+#   kong-free:     http://nami:8090/llm/free/v1 (FreeLLMPool)
+#   kong-frontier: http://nami:8090/llm/frontier/v1 (Manifest)
 #   extreme-direct: http://127.0.0.1:20128/v1 (ER direct backup)
 # Option Path: layers.layer-71.harness.kilocode
 # Enabling Host Tags: ai-agent, development
@@ -51,7 +51,7 @@ in
 
     routerEndpoint = mkOption {
       type = types.str;
-      default = "http://127.0.0.1:8090/v1";
+      default = "http://nami:8090/v1";
       description = "NFP LLM router OpenAI-compatible gateway endpoint (default: kong-er)";
     };
   };
@@ -63,10 +63,10 @@ in
       KILO_MODEL = cfg.defaultModel;
       KILO_ROUTER_ENDPOINT = cfg.routerEndpoint;
       OPENAI_BASE_URL = cfg.routerEndpoint;
-      OPENAI_BASE_URL_KONG_ER = "http://127.0.0.1:8090/v1";
-      OPENAI_BASE_URL_KONG_OMNI = "http://127.0.0.1:8090/omni/v1";
-      OPENAI_BASE_URL_KONG_FREE = "http://127.0.0.1:8090/llm/free/v1";
-      OPENAI_BASE_URL_KONG_FRONTIER = "http://127.0.0.1:8090/llm/frontier/v1";
+      OPENAI_BASE_URL_KONG_ER = lib.mkDefault "http://nami:8090/v1";
+      OPENAI_BASE_URL_KONG_OMNI = "http://nami:8090/omni/v1";
+      OPENAI_BASE_URL_KONG_FREE = "http://nami:8090/llm/free/v1";
+      OPENAI_BASE_URL_KONG_FRONTIER = "http://nami:8090/llm/frontier/v1";
       OPENAI_BASE_URL_EXTREME_DIRECT = "http://127.0.0.1:20128/v1";
     };
 
@@ -78,19 +78,19 @@ in
           apiBase = cfg.routerEndpoint;
           providers = {
             kong-er = {
-              baseUrl = "http://127.0.0.1:8090/v1";
+              baseUrl = "http://nami:8090/v1";
               name = "Kong ExtremeRouter";
             };
             kong-omni = {
-              baseUrl = "http://127.0.0.1:8090/omni/v1";
+              baseUrl = "http://nami:8090/omni/v1";
               name = "Kong OmniRoute (TODO: when merged)";
             };
             kong-free = {
-              baseUrl = "http://127.0.0.1:8090/llm/free/v1";
+              baseUrl = "http://nami:8090/llm/free/v1";
               name = "Kong FreeLLMPool";
             };
             kong-frontier = {
-              baseUrl = "http://127.0.0.1:8090/llm/frontier/v1";
+              baseUrl = "http://nami:8090/llm/frontier/v1";
               name = "Kong Frontier Manifest";
             };
             extreme-direct = {

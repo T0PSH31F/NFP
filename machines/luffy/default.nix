@@ -57,6 +57,21 @@ in
   networking.hostName = "luffy";
   system.stateVersion = "25.05";
 
+  # Memory services run here (brain-service, Honcho, GNO) — see layers/90-profiles/tags/pkb-node.nix
+  machine.tags = [
+    "homelab"
+    "pkb-node"
+  ];
+
+  # Honcho postgres password from sops. The template file is read by the module
+  # at runtime via databaseUrlFile (kept out of the nix store).
+  sops.templates."honcho-database-url".content = ''
+    DATABASE_URL=postgresql://honcho:${
+      config.sops.placeholder."postgres-password"
+    }@host.containers.internal:5432/honcho
+  '';
+  services.honcho.databaseUrlFile = config.sops.templates."honcho-database-url".path;
+
   nixpkgs.config.allowUnfree = true;
 
   # ============================================================================
@@ -433,6 +448,12 @@ in
   # 05 - SECURITY & SECRETS (SOPS/ACME)
   # ============================================================================
   sops.age.keyFile = "/persist/home/t0psh31f/.config/sops/age/keys.txt";
+
+  # Login passwords: clan-core's users service generates user-password-root var
+  # (vars/per-machine/luffy/user-password-root/) and wires hashedPasswordFile itself.
+  # The root password lives in vars/per-machine/luffy/user-password-root/user-password (sops-encrypted).
+  # NOTE: do NOT define hashedPasswordFile here — it conflicts with the clan users service.
+
   sops.secrets."duckdns-token" = {
     sopsFile = lib.mkForce ../../layers/00-cyberia/03-treasure/secrets/duckdns.yaml;
     format = lib.mkForce "yaml";

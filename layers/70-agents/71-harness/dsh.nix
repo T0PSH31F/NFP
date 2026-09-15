@@ -2,10 +2,10 @@
 # Module: dsh.nix
 # Purpose: Dendritic Shell (DSH) AI terminal shell environment integration.
 # Provider endpoints (Kong path multiplexer + ExtremeRouter backup):
-#   kong-er:       http://127.0.0.1:8090/v1 (ExtremeRouter)
-#   kong-omni:     http://127.0.0.1:8090/omni/v1 (OmniRoute - TODO: when merged)
-#   kong-free:     http://127.0.0.1:8090/llm/free/v1 (FreeLLMPool)
-#   kong-frontier: http://127.0.0.1:8090/llm/frontier/v1 (Manifest)
+#   kong-er:       http://nami:8090/v1 (ExtremeRouter)
+#   kong-omni:     http://nami:8090/omni/v1 (OmniRoute - TODO: when merged)
+#   kong-free:     http://nami:8090/llm/free/v1 (FreeLLMPool)
+#   kong-frontier: http://nami:8090/llm/frontier/v1 (Manifest)
 #   extreme-direct: http://127.0.0.1:20128/v1 (ER direct backup)
 # Option Path: layers.layer-71.harness.dsh
 # Enabling Host Tags: ai-agent, desktop, workstation
@@ -88,11 +88,11 @@ in
     environment.systemPackages = mkIf (cfg.package != null) [ cfg.package ];
 
     environment.sessionVariables = {
-      OPENAI_BASE_URL = "http://127.0.0.1:8090/v1";
-      OPENAI_BASE_URL_KONG_ER = "http://127.0.0.1:8090/v1";
-      OPENAI_BASE_URL_KONG_OMNI = "http://127.0.0.1:8090/omni/v1";
-      OPENAI_BASE_URL_KONG_FREE = "http://127.0.0.1:8090/llm/free/v1";
-      OPENAI_BASE_URL_KONG_FRONTIER = "http://127.0.0.1:8090/llm/frontier/v1";
+      OPENAI_BASE_URL = "http://nami:8090/v1";
+      OPENAI_BASE_URL_KONG_ER = "http://nami:8090/v1";
+      OPENAI_BASE_URL_KONG_OMNI = "http://nami:8090/omni/v1";
+      OPENAI_BASE_URL_KONG_FREE = "http://nami:8090/llm/free/v1";
+      OPENAI_BASE_URL_KONG_FRONTIER = "http://nami:8090/llm/frontier/v1";
       OPENAI_BASE_URL_EXTREME_DIRECT = "http://127.0.0.1:20128/v1";
     };
 

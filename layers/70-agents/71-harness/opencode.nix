@@ -594,22 +594,22 @@
 
           # Kong AI Gateway — path-specific providers
           provider.kong-er = {
-            baseUrl = "http://127.0.0.1:8090/v1";
+            baseUrl = "http://nami:8090/v1";
             name = "Kong ExtremeRouter";
           };
 
           provider.kong-omni = {
-            baseUrl = "http://127.0.0.1:8090/omni/v1";
+            baseUrl = "http://nami:8090/omni/v1";
             name = "Kong OmniRoute (TODO: when merged)";
           };
 
           provider.kong-free = {
-            baseUrl = "http://127.0.0.1:8090/llm/free/v1";
+            baseUrl = "http://nami:8090/llm/free/v1";
             name = "Kong FreeLLMPool";
           };
 
           provider.kong-frontier = {
-            baseUrl = "http://127.0.0.1:8090/llm/frontier/v1";
+            baseUrl = "http://nami:8090/llm/frontier/v1";
             name = "Kong Frontier Manifest";
           };
 

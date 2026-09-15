@@ -68,6 +68,12 @@
     defaultNetwork.settings.dns_enabled = true;
   };
 
+  # === AI-router: Kong kept as sole gateway, align freellm ports for side-by-side test ===
+  # freellmapi:3001 / freellmpool:8080 are module defaults; Kong previously expected 3003/8083 — align to actual ports
+  services.ai-services.kong-gateway.routers.freellmapi.port = lib.mkForce 3001;
+  services.ai-services.kong-gateway.routers.freellmpool.port = lib.mkForce 8080;
+  services.ai-services.kong-gateway.enable = lib.mkDefault true;
+
   # === Home Manager: headless cloud host overrides ===
   home-manager.useUserPackages = lib.mkForce false;
   home-manager.users.t0psh31f.dconf.enable = false;

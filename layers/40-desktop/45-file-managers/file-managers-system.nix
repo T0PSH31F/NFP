@@ -17,7 +17,17 @@
   services.tumbler.enable = true;
   services.gnome.gnome-online-accounts.enable = true;
 
+  # Enable system MIME database build & linking for GLib application enumeration in file managers (Nemo/Thunar/PCManFM)
+  xdg.mime.enable = true;
+  environment.pathsToLink = [
+    "/share/applications"
+    "/share/mime"
+  ];
+
   environment.systemPackages = with pkgs; [
+    shared-mime-info
+    desktop-file-utils
+
     # Nemo File Manager (Cinnamon)
     nemo-with-extensions
     nemo-fileroller

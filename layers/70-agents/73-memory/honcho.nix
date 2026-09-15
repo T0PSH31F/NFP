@@ -29,8 +29,14 @@ with lib;
 
     databaseUrl = mkOption {
       type = types.str;
-      default = "postgresql://honcho:honcho@localhost:5432/honcho";
-      description = "PostgreSQL connection string";
+      default = "postgresql://honcho:***@host.containers.internal:5432/honcho";
+      description = "PostgreSQL connection string (used when databaseUrlFile is null)";
+    };
+
+    databaseUrlFile = mkOption {
+      type = types.nullOr types.path;
+      default = null;
+      description = "Path to a file containing 'DATABASE_URL=<url>' (sops template). Takes precedence over databaseUrl.";
     };
 
     llmProvider = mkOption {
@@ -82,20 +88,27 @@ with lib;
 
       # Honcho API server (containerized)
       virtualisation.oci-containers.containers.honcho-api = {
-        image = "ghcr.io/nicepkg/honcho:latest";
+        image = "ghcr.io/plastic-labs/honcho:latest"; # nicepkg/honcho on ghcr no longer exists (403)
         ports = [ "127.0.0.1:${toString cfg.port}:8000" ];
         environment = {
-          DATABASE_URL = cfg.databaseUrl;
           CACHE_ENABLED = "true";
-          CACHE_URL = "redis://localhost:6379";
+          CACHE_URL = "redis://host.containers.internal:6379";
           AUTH_USE_AUTH = "false";
           METRICS_ENABLED = "true";
+        }
+        // optionalAttrs (cfg.databaseUrlFile == null) {
+          DATABASE_URL = cfg.databaseUrl;
         }
         // optionalAttrs (cfg.llmBaseUrl != "") {
           DERIVER_MODEL_CONFIG__OVERRIDES__BASE_URL = cfg.llmBaseUrl;
           DIALECTIC_MODEL_CONFIG__OVERRIDES__BASE_URL = cfg.llmBaseUrl;
           SUMMARY_MODEL_CONFIG__OVERRIDES__BASE_URL = cfg.llmBaseUrl;
         };
+        # When databaseUrlFile is set, inject DATABASE_URL at runtime via
+        # podman --env-file (sops template renders KEY=value content).
+        extraOptions = mkIf (cfg.databaseUrlFile != null) [
+          "--env-file=${cfg.databaseUrlFile}"
+        ];
         volumes = [
           "${cfg.dataDir}:/app/data"
         ];
@@ -105,7 +118,7 @@ with lib;
 
       # Honcho deriver (background worker for memory processing)
       virtualisation.oci-containers.containers.honcho-deriver = mkIf cfg.enableDeriver {
-        image = "ghcr.io/nicepkg/honcho:latest";
+        image = "ghcr.io/plastic-labs/honcho:latest"; # nicepkg/honcho on ghcr no longer exists (403)
         cmd = [
           "uv"
           "run"
@@ -116,7 +129,7 @@ with lib;
         environment = {
           DATABASE_URL = cfg.databaseUrl;
           CACHE_ENABLED = "true";
-          CACHE_URL = "redis://localhost:6379";
+          CACHE_URL = "redis://host.containers.internal:6379";
         }
         // optionalAttrs (cfg.llmBaseUrl != "") {
           DERIVER_MODEL_CONFIG__OVERRIDES__BASE_URL = cfg.llmBaseUrl;
@@ -130,7 +143,7 @@ with lib;
 
       # Redis for caching
       virtualisation.oci-containers.containers.honcho-redis = {
-        image = "redis:7-alpine";
+        image = "docker.io/library/redis:7-alpine";
         ports = [ "127.0.0.1:6379:6379" ];
         volumes = [
           "${cfg.dataDir}/redis:/data"

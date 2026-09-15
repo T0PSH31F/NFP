@@ -172,6 +172,21 @@ with lib;
         mode = "0400";
       };
 
+      # ── Environment file for freellmpool ─────────────────────────
+      sops.templates."freellmpool-env" = lib.mkIf config.services.ai-services.freellmpool.enable {
+        content = ''
+          # freellmpool provider keys — extend as needed
+          GROQ_API_KEY=${config.sops.placeholder.groq_api_key}
+          CEREBRAS_API_KEY=${config.sops.placeholder.cerebras_api_key}
+          GITHUB_TOKEN=${config.sops.placeholder.github_models_api}
+          NVIDIA_API_KEY=${config.sops.placeholder.nvidia_api_key}
+          OPENROUTER_API_KEY=${config.sops.placeholder.openrouter_api_key_1}
+        '';
+        owner = "freellmpool";
+        group = "freellmpool";
+        mode = "0400";
+      };
+
       # ── Environment file for LangGraph ───────────────────────────────
       sops.templates."langgraph-env" =
         lib.mkIf (config.services.ai-services.langgraph.enable && builtins.pathExists /var/lib/langgraph)

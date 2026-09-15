@@ -286,10 +286,10 @@ final: prev: {
       owner = "alvinunreal";
       repo = "lazyskills";
       rev = "main";
-      hash = "sha256-RobTHBmAAQLCAOthSmPddP/oJRjBtQSHuCH5AodOlwY=";
+      hash = "sha256-uTosunMSnmgV0gr7eYhxbFAPYQu77Ou4Na8wtVEoiP0=";
     };
 
-    vendorHash = "sha256-P8bweTw1Htc3HFWPOJJNSIKlp62LWfKzK3MVAC98Svs=";
+    vendorHash = "sha256-JBia588EtY89+vVGUiOyGwLD+rDqBwa2s/jjtd55DE0=";
 
     # Tests fail in sandbox (network access)
     doCheck = false;

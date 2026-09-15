@@ -24,7 +24,6 @@ _: {
       substituters = [
         "https://cache.nixos.org"
         "http://192.168.1.54:5000"
-        "http://100.72.46.75:5000"
         "https://nix-community.cachix.org"
         "https://numtide.cachix.org"
         "https://vicinae.cachix.org"
@@ -32,8 +31,6 @@ _: {
         "https://niri.cachix.org"
         "https://noctalia.cachix.org"
         "https://yazelix.cachix.org"
-        # "https://cache.garnix.io"  # DOWN: 502 Bad Gateway (2026-08-01) — re-enable when garnix recovers
-        "https://cache.numtide.com" # unreachable from this network — last so timeouts don't delay working caches
       ];
 
       # Set the trusted public keys for the substituters above

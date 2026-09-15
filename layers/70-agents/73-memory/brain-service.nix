@@ -293,10 +293,12 @@
               set -euo pipefail
               # Coexists with honcho's postgresql.initialScript (which owns the
               # global initialScript); provision brain_db's vector extension +
-              # ownership idempotently here via psql as the postgres superuser.
-              ${pkgs.postgresql}/bin/psql -v ON_ERROR_STOP=1 -d postgres -c "ALTER DATABASE ${cfg.dbName} OWNER TO ${cfg.dbUser};"
-              ${pkgs.postgresql}/bin/psql -v ON_ERROR_STOP=1 -d ${cfg.dbName} -c "CREATE EXTENSION IF NOT EXISTS vector;"
-              ${pkgs.postgresql}/bin/psql -v ON_ERROR_STOP=1 -d ${cfg.dbName} -c "GRANT ALL ON SCHEMA public TO ${cfg.dbUser};"
+              # ownership idempotently here. The "+" prefix runs this as root,
+              # so psql must drop to the postgres superuser role explicitly.
+              PSQL() { ${pkgs.util-linux}/bin/runuser -u postgres -- ${pkgs.postgresql}/bin/psql -v ON_ERROR_STOP=1 "$@"; }
+              PSQL -d postgres -c "ALTER DATABASE ${cfg.dbName} OWNER TO ${cfg.dbUser};"
+              PSQL -d ${cfg.dbName} -c "CREATE EXTENSION IF NOT EXISTS vector;"
+              PSQL -d ${cfg.dbName} -c "GRANT ALL ON SCHEMA public TO ${cfg.dbUser};"
             ''}"
           ];
           Restart = "on-failure";
