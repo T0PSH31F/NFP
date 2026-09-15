@@ -1,11 +1,18 @@
 keys:
   - &z0r0 age10ght7h8d49cec9tfasr64ls49qxzv3rn6f0du2fzhrfs4a7u3yysajk9gh
   - &z0r0_host age13ytd3kguxglv2k67mcx298djypxseqx2jkn5vw0zlf2079g28chqw8dm24
-  - &nami_host age139k0yfy79czll5nrqfwl3nn6j3qrgzd6hc570ztlth9asnknj5as4r788j
+  - &nami_host age1xcmj43zfyhuuhw6v5xpzmkvfvvqxf655l2g97v0rjhz6yeaq9ynslle97k
   - &luffy_host age1uzq0cywyyxms3ntsuecpxh0ygrak4n9xenrhxjjyy59h46kaes7s2t4php
 
 creation_rules:
   - path_regex: secrets/.*\.yaml$
+    key_groups:
+      - age:
+          - *z0r0
+          - *z0r0_host
+          - *nami_host
+          - *luffy_host
+  - path_regex: vars/.*
     key_groups:
       - age:
           - *z0r0

@@ -61,7 +61,12 @@ in
   machine.tags = [
     "homelab"
     "pkb-node"
+    "network-router" # Headscale control server + homepage-dashboard (moved from nami 2026-09-15)
   ];
+
+  # Headscale: migrated DB from nami; reachable via LAN + tailnet.
+  # enable is set at line ~181 (services section, mkForce true).
+  services.headscale-server.serverUrl = "http://192.168.1.54:8086";
 
   # Honcho postgres password from sops. The template file is read by the module
   # at runtime via databaseUrlFile (kept out of the nix store).
@@ -169,8 +174,8 @@ in
     # Disable SillyTavern Tag Default to completely disable it
     sillytavern-app.enable = lib.mkForce false;
 
-    # Headscale moved to nami (network-router tag)
-    headscale-server.enable = lib.mkForce false;
+    # Headscale moved BACK to luffy (2026-09-15) — was on nami, unreachable behind Alibaba SG
+    headscale-server.enable = lib.mkForce true;
 
     # Native Postgres (Shared for Nextcloud, Immich, MaxKB etc.)
     postgresql = {
