@@ -21,7 +21,9 @@
     layers.layer-75.mcp.enable = lib.mkDefault true;
     layers.layer-75.mcp.gateway.enable = lib.mkDefault true;
     layers.layer-76.hermes.enable = lib.mkDefault true;
-    layers.layer-76.hermes.enableDesktop = lib.mkDefault (builtins.elem "desktop" config.machine.tags || (config.layers.layer-60.gui.enable or false));
+    layers.layer-76.hermes.enableDesktop = lib.mkDefault (
+      builtins.elem "desktop" config.machine.tags || (config.layers.layer-60.gui.enable or false)
+    );
     layers.layer-76.hermes-workspace.enable = lib.mkDefault true;
     layers.layer-76.hermes-dashboard.enable = lib.mkDefault true;
     layers.layer-76.hermes-live-voice.enable = lib.mkDefault true;

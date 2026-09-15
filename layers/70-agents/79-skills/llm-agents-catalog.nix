@@ -202,10 +202,7 @@ in
             else
               [ ];
         in
-        if isGuiHost then
-          rawNames
-        else
-          filter (name: !(elem name guiCatalogPackages)) rawNames;
+        if isGuiHost then rawNames else filter (name: !(elem name guiCatalogPackages)) rawNames;
 
       resolvedPackages = filter (p: p != null) (
         map (name: llmPkgs.${name} or pkgs.${name} or null) effectivePackageNames

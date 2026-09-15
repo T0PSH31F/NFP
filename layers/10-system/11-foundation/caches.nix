@@ -23,7 +23,7 @@ _: {
       # mic92.cachix.org removed 2026-08-07: timed out during builds (progress.md).
       substituters = [
         "https://cache.nixos.org"
-        "http://192.168.1.54:5000"
+        # "http://192.168.1.54:5000" removed 2026-09-15: unreachable from nami (cloud), use tailnet DNS via Headscale if needed
         "https://nix-community.cachix.org"
         "https://numtide.cachix.org"
         "https://vicinae.cachix.org"

@@ -78,7 +78,7 @@ in
       OPENAI_BASE_URL_EXTREME_DIRECT = "http://127.0.0.1:20128/v1";
     };
 
-    home-manager.users.${user} = { ... }: {
+    home-manager.users.${user} = _: {
       config = {
         xdg.configFile."omp/config.json".text = builtins.toJSON {
           model = cfg.defaultModel;
