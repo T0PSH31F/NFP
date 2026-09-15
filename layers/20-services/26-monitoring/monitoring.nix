@@ -28,8 +28,22 @@ with lib;
       default = 3008;
       description = "Grafana port";
     };
+    fleetNodeTargets = mkOption {
+      type = types.listOf types.str;
+      default = [ ];
+      description = "Extra node-exporter targets (host:port) scraped by this Prometheus (fleet monitoring)";
+    };
   };
-  config = mkIf config.layers.layer-20.services.config.monitoring.enable {
+
+  config = mkMerge [
+    (mkIf true {
+      services.prometheus.exporters.node = {
+        enable = true;
+        port = 9100;
+        enabledCollectors = [ "systemd" "processes" ];
+      };
+    })
+    (mkIf config.layers.layer-20.services.config.monitoring.enable {
     clan.core.vars.generators.grafana = {
       files."secret-key" = {
         secret = true;
@@ -126,6 +140,10 @@ with lib;
         {
           job_name = "node";
           static_configs = [ { targets = [ "localhost:9100" ]; } ];
+        }
+        {
+          job_name = "node-fleet";
+          static_configs = [ { targets = config.layers.layer-20.services.config.monitoring.fleetNodeTargets; } ];
         }
         {
           job_name = "postgres";
@@ -541,5 +559,6 @@ with lib;
         "/var/lib/grafana"
       ];
     };
-  };
+    })
+  ];
 }

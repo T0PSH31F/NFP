@@ -27,6 +27,13 @@
     "ai-agent"
   ];
 
+  # Fleet monitoring: scrape node-exporters on z0r0 + luffy via tailnet IPs.
+  # Requires tailscale mesh up (control = luffy's headscale via luffy's reverse tunnel).
+  layers.layer-20.services.config.monitoring.fleetNodeTargets = [
+    "100.64.0.1:9100" # z0r0
+    "100.64.0.3:9100" # luffy
+  ];
+
   sops.age.keyFile = "/var/lib/sops/nami/key.txt";
 
   # === Headscale — fleet VPN control server (via network-router tag) ===

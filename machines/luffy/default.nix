@@ -582,6 +582,22 @@ in
     };
   };
 
+  # Reverse tunnel: expose luffy's headscale on nami as localhost:8087 so nami's
+  # tailscale client can reach the (migrated) control server over SSH.
+  # Requires luffy's root SSH key on nami (installed 2026-09-15).
+  systemd.services.headscale-tunnel-nami = {
+    description = "Reverse tunnel: expose luffy headscale on nami:8087";
+    after = [ "network-online.target" "headscale.service" ];
+    wants = [ "network-online.target" ];
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      Type = "simple";
+      ExecStart = "${pkgs.openssh}/bin/ssh -N -o ServerAliveInterval=30 -o ServerAliveCountMax=3 -o ExitOnForwardFailure=yes -o StrictHostKeyChecking=no -R 8087:127.0.0.1:8086 root@47.254.90.69";
+      Restart = "always";
+      RestartSec = 5;
+    };
+  };
+
   # Provide a safe-gc convenience script
   environment.systemPackages = [
     (pkgs.writeShellScriptBin "nix-safe-gc" ''
