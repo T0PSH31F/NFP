@@ -461,6 +461,13 @@ in
         enable = true;
         listenPort = cfg.port;
         environmentFiles = optional (cfg.environmentFile != null) cfg.environmentFile;
+        # Allow tailnet clients (100.64.0.0/10) + LAN to access the dashboard
+        allowedHosts = concatStringsSep "," [
+          "localhost:${toString cfg.port}"
+          "127.0.0.1:${toString cfg.port}"
+          "100.64.0.3:${toString cfg.port}"
+          "192.168.1.54:${toString cfg.port}"
+        ];
 
         docker = {
           local = {
