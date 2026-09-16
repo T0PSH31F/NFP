@@ -8,6 +8,12 @@
 
 let
   cfg = config.layers.layer-50.cli;
+  nixvimEnabled = config.layers.layer-50.cli.nixvim.enable or false;
+  editorBin =
+    if nixvimEnabled then
+      "${config.programs.nixvim.finalPackage}/bin/nvim"
+    else
+      "${lib.getExe pkgs.neovim}";
 
   yazelixOrchestrator = pkgs.yazelix-orchestrator or null;
   yazelixPopup = pkgs.yazelix-popup-runner or null;
@@ -604,7 +610,7 @@ in
         default_layout = "opencode";
         simplified_ui = false;
         scrollback_buffer_size = 50000;
-        scrollback_editor = "${lib.getExe pkgs.neovim}";
+        scrollback_editor = editorBin;
         mouse_mode = true;
         copy_command = "zellij-clipboard";
         default_shell = "${pkgs.zsh}/bin/zsh";
