@@ -209,6 +209,7 @@ in
           }
           {
             name = "hyprland";
+            scope = "source.hyprland";
             language-servers = [
               "hyprls"
               "typos"

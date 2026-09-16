@@ -7,11 +7,7 @@
 let
   cfg = config.layers.layer-50.cli;
   nixvimEnabled = config.layers.layer-50.cli.nixvim.enable or false;
-  editorBin =
-    if nixvimEnabled then
-      "${config.programs.nixvim.finalPackage}/bin/nvim"
-    else
-      "${lib.getExe pkgs.neovim}";
+  editorBin = if nixvimEnabled then "nvim" else "${lib.getExe pkgs.neovim}";
 in
 {
   home = lib.mkIf cfg.enable {
