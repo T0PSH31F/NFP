@@ -122,7 +122,12 @@ in
           wl-clipboard
           xdg-user-dirs
           xdg-utils
+          kdePackages.kde-cli-tools
+          kdePackages.kservice
         ];
+
+        xdg.configFile."menus/applications.menu".source =
+          "${pkgs.kdePackages.kde-cli-tools}/etc/xdg/menus/applications.menu";
 
         # Swappy screenshot tool config → save to ~/Pictures/Screenshots
         xdg.configFile."swappy/config".text = ''
