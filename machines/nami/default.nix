@@ -41,6 +41,9 @@
     serverUrl = "http://headscale.lovelain.duckdns.org";
   };
 
+  # === Polyfloor AI company OS (talks to Kong on localhost:8090) ===
+  services.polyfloor.enable = true;
+
   # === Privacy-gate: memory services stay on luffy; DNS filtering stays on luffy ===
   services.honcho.enable = lib.mkForce false;
   services.ai-services.brain-service.enable = lib.mkForce false;
