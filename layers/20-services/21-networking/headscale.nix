@@ -44,6 +44,12 @@ in
           };
         };
         server_url = cfg.serverUrl;
+        # No external DERP fetch — headscale dies without internet DNS
+        # ("getting DERPMap: no such host"). Use built-in DERP only.
+        derp = {
+          auto_update = false;
+          urls = [ ];
+        };
         # Structured ACL policy (group:admin full access, group:guest media/docs only)
         policy = {
           mode = "file";
