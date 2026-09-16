@@ -598,6 +598,18 @@ in
     };
   };
 
+  # === Prowlarr: disable systemd StateDirectory — conflicts with nixarr's
+  # /data/.state/nixarr/prowlarr data dir AND the /var/lib/prowlarr impermanence
+  # bind mount ("Device or resource busy" at STATE_DIRECTORY setup step).
+  # ExecStart already points -data at /data/.state/nixarr/prowlarr.
+  systemd.services.prowlarr.serviceConfig = {
+    StateDirectory = lib.mkForce null;
+    DynamicUser = lib.mkForce false;
+    User = lib.mkForce "prowlarr";
+    Group = lib.mkForce "prowlarr";
+    ReadWritePaths = [ "/data/.state/nixarr/prowlarr" ];
+  };
+
   # Provide a safe-gc convenience script
   environment.systemPackages = [
     (pkgs.writeShellScriptBin "nix-safe-gc" ''
