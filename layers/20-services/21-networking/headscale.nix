@@ -48,6 +48,7 @@ in
         # ("getting DERPMap: no such host"). Use built-in DERP only.
         derp = {
           auto_update = false;
+          auto_update_enabled = false;
           urls = [ ];
         };
         # Structured ACL policy (group:admin full access, group:guest media/docs only)

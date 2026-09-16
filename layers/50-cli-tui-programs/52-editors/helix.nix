@@ -210,6 +210,11 @@ in
           {
             name = "hyprland";
             scope = "source.hyprland";
+            file-types = [
+              "hl"
+              "hypr"
+              "hyprland.conf"
+            ];
             language-servers = [
               "hyprls"
               "typos"

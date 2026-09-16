@@ -20,13 +20,20 @@
           dns = {
             magic_dns = true;
             base_domain = "tailnet.test";
-            nameservers.global = [ "1.1.1.1" "1.0.0.1" ];
+            nameservers.global = [
+              "1.1.1.1"
+              "1.0.0.1"
+            ];
           };
-          # Test VM has no internet — disable DERP map auto-update (startup
-          # fetch from controlplane.tailscale.com fails without DNS).
+          # Test VM has no internet — enable embedded DERP so headscale never
+          # fetches from controlplane.tailscale.com (fails without DNS).
           derp = {
+            server = {
+              enabled = true;
+            };
             auto_update = false;
-            update_frequency = "24h";
+            auto_update_enabled = false;
+            urls = [ ];
           };
         };
       };
