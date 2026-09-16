@@ -62,7 +62,7 @@ in
         "CTRL SHIFT, S, exec, hypr-screenshot edit"
 
         # ── System / Session ───────────────────────────────────────────
-        "$mod, Q, killactive,"
+        "$mod, Q, killactive"
         "$mod CTRL SHIFT, M, exec, hypr-sfx-toggle"
         "$mod, F, fullscreen, 1"
         "$mod ALT, F, fullscreen, 1"
@@ -134,7 +134,7 @@ in
         "$mod, F, fullscreen, 0"
         "$mod SHIFT, F, fullscreen, 1"
 
-        "$mod SHIFT, S, togglespecialworkspace,"
+        "$mod SHIFT, S, togglespecialworkspace"
         "ALT, Tab, cyclenext"
         "ALT, Tab, bringactivetotop,"
 
@@ -187,9 +187,9 @@ in
       ];
 
       bindm = [
-        "SUPER, mouse:272, movewindow"
-        "SUPER, mouse:273, resizewindow"
-        "SUPER, mouse:274, movewindow"
+        "$mod, mouse:272, movewindow"
+        "$mod, mouse:273, resizewindow"
+        "$mod, mouse:274, movewindow"
       ];
 
       # Repeating Media Keys (Volume/Brightness)

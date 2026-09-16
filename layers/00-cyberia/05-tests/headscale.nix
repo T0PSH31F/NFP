@@ -30,6 +30,7 @@
           derp = {
             server = {
               enabled = true;
+              stun_listen_addr = "0.0.0.0:3478";
             };
             auto_update = false;
             auto_update_enabled = false;
