@@ -91,6 +91,9 @@
 
         services-test = pkgs.testers.nixosTest (import ../layers/00-cyberia/05-tests/services.nix);
         n8n-test = pkgs.testers.nixosTest (import ../layers/00-cyberia/05-tests/n8n.nix { inherit pkgs; });
+        prowlarr-test = pkgs.testers.nixosTest (import ../layers/00-cyberia/05-tests/prowlarr.nix);
+        headscale-test = pkgs.testers.nixosTest (import ../layers/00-cyberia/05-tests/headscale.nix);
+        jellyfin-test = pkgs.testers.nixosTest (import ../layers/00-cyberia/05-tests/jellyfin.nix);
         homepage-dashboard-test = pkgs.testers.nixosTest (
           import ../layers/00-cyberia/05-tests/homepage-dashboard.nix
         );
