@@ -91,6 +91,35 @@ in
               fi
             fi
           '';
+
+      # General fix for UI-installed community plugins (not declarative).
+      # Noctalia v5 requires min_noctalia in every plugin manifest; most community
+      # plugins predate this. This activation patches any plugin under
+      # ~/.config/noctalia/plugins/ that is missing the key, so future
+      # "Install" from the store never hits "missing mandatory key 'min_noctalia'".
+      patchAllNoctaliaPlugins = pkgs.writeShellScript "patch-all-noctalia-plugins" ''
+        set -euo pipefail
+        PLUGINS_DIR="$HOME/.config/noctalia/plugins"
+        [ -d "$PLUGINS_DIR" ] || exit 0
+        for pluginDir in "$PLUGINS_DIR"/*; do
+          [ -d "$pluginDir" ] || continue
+          # skip Nix-managed symlinks (declarative plugins already patched via patchPlugin)
+          [ -L "$pluginDir" ] && continue
+          if [ -f "$pluginDir/plugin.json" ]; then
+            if ! ${pkgs.jq}/bin/jq -e 'has("min_noctalia")' "$pluginDir/plugin.json" >/dev/null 2>&1; then
+              ${pkgs.jq}/bin/jq '. + {"min_noctalia": "5.0.0"}' "$pluginDir/plugin.json" > "$pluginDir/plugin.json.tmp"
+              mv "$pluginDir/plugin.json.tmp" "$pluginDir/plugin.json"
+              echo "patched $pluginDir/plugin.json -> min_noctalia 5.0.0"
+            fi
+          elif [ -f "$pluginDir/manifest.json" ]; then
+            if ! ${pkgs.jq}/bin/jq -e 'has("min_noctalia")' "$pluginDir/manifest.json" >/dev/null 2>&1; then
+              ${pkgs.jq}/bin/jq '. + {"min_noctalia": "5.0.0"}' "$pluginDir/manifest.json" > "$pluginDir/manifest.json.tmp"
+              mv "$pluginDir/manifest.json.tmp" "$pluginDir/manifest.json"
+              echo "patched $pluginDir/manifest.json -> min_noctalia 5.0.0"
+            fi
+          fi
+        done
+      '';
     in
     {
       imports = [
@@ -124,7 +153,11 @@ in
             }
           ]
         );
+        home.activation.patchNoctaliaPlugins = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+          ${patchAllNoctaliaPlugins}
+        '';
         home.packages = with pkgs; [
+          patchAllNoctaliaPlugins
           gst_all_1.gst-plugins-base
           gst_all_1.gst-plugins-good
 
