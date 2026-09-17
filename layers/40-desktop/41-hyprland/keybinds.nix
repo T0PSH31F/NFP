@@ -34,24 +34,16 @@ in
         "$mod SHIFT, B, exec, uwsm app -- mullvad-browser"
         "$mod ALT, B, exec, uwsm app -- dillo"
         "$mod SHIFT, T, exec, uwsm app -- kitty"
-        "$mod SHIFT, Return, exec, uwsm app -- warp-terminal"
+        "$mod SHIFT, A, exec, wlr-which-key agents"
 
         "$mod, Space, exec, vicinae toggle"
         "$mod, slash, exec, cheatsheet"
-        "$mod, BackSlash, exec, wlr-which-key"
+        "$mod, Return, exec, wlr-which-key"
 
-        # Scratchpads (Pyprland)
-        # Ghostty Dropdown (Alt+T or Alt+Enter)
+        # ── Dropdown Scratchpads (Pyprland) ───────────────────────────
         "ALT, T, exec, pypr toggle term"
-        "ALT, Return, exec, pypr toggle term"
-
-        # Gedit Scratchpad (Super+H)
-        "$mod, H, exec, pypr toggle gedit"
-
-        # ── Scratchpads (Pyprland) ─────────────────────────────────────
-        "ALT, T, exec, pypr toggle term"
-        "ALT, Return, exec, pypr toggle term"
-        "$mod, G, exec, pypr toggle gedit"
+        "ALT, N, exec, pypr toggle gedit"
+        "ALT, G, exec, pypr toggle gemini"
 
         # ── Screenshots (save to ~/Pictures/Screenshots + clipboard) ────
         ", Print, exec, hypr-screenshot region"

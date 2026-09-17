@@ -34,14 +34,75 @@ let
     }
   '';
 
+  alphabetical_cheatsheet = pkgs.writeShellScriptBin "alphabetical-cheatsheet" ''
+      ${rofiTheme}
+      ACTIONS="
+    Super+A                 | Noctalia launcher               | Noctalia-specific launcher experience   | noctalia.nix       | local
+    Super+D -> B            | Brave Browser                   | Web browser                             | action-registry    | local
+    Super+D -> C            | Discord / Vesktop               | Communications                          | action-registry    | local
+    Super+D -> E            | Helix / Neovim                  | Editor selector                         | action-registry    | local
+    Super+D -> F            | Dolphin                         | File manager                            | action-registry    | local
+    Super+D -> M            | Spotify                         | Music application                       | action-registry    | local
+    Super+D -> N            | Obsidian                        | PKM Notes                               | action-registry    | local
+    Super+D -> O            | Screenshot Region               | Hypr-screenshot tool                    | action-registry    | local
+    Super+D -> S            | Settings                        | Nwg-look system settings                | action-registry    | local
+    Super+Enter             | wlr-which-key                   | All-map visual keybinding index         | which-key.nix      | local
+    Super+F -> A            | AdGuard Home                    | Fleet DNS shield                        | action-registry    | fleet-remote
+    Super+F -> C            | Clan Command Menu               | Safe Clan machines list                 | action-registry    | local
+    Super+F -> G            | Grafana                         | Observability dashboard                 | action-registry    | fleet-remote
+    Super+F -> H            | Homepage                        | NFP Homepage dashboard                  | action-registry    | fleet-remote
+    Super+F -> L            | Fleet Logs                      | Systemd journal log tail                | action-registry    | local
+    Super+F -> S            | SSH Fleet Host Selector         | SSH to fleet host                       | action-registry    | fleet-remote
+    Super+F -> T            | Tailscale Status                | Network mesh status                     | action-registry    | local
+    Super+G -> G            | Lazygit                         | Git TUI interface                       | action-registry    | local
+    Super+G -> H            | Herdr Sessions                  | Persistent terminal sessions            | action-registry    | local
+    Super+G -> S            | Git Status                      | Check git status in Ghostty             | action-registry    | local
+    Super+M -> D            | Downloads Queue                 | Usenet & Torrent downloads              | action-registry    | fleet-remote
+    Super+M -> J            | Jellyfin                        | Media server                            | action-registry    | fleet-remote
+    Super+M -> K            | Kodi                            | Media center                            | action-registry    | local
+    Super+M -> M            | Strawberry                      | Local music player                      | action-registry    | local
+    Super+M -> R            | Media Requests                  | Jellyseerr requests                     | action-registry    | fleet-remote
+    Super+M -> S            | Spotify                         | Spotify desktop                         | action-registry    | local
+    Super+S -> A            | Pavucontrol                     | Audio volume control                    | action-registry    | local
+    Super+S -> B            | Blueman                         | Bluetooth manager                       | action-registry    | local
+    Super+S -> C            | Theme Selector                  | Matugen / Nwg-look theme control        | action-registry    | local
+    Super+S -> L            | Lock Screen                     | Hyprlock lock screen                    | action-registry    | local
+    Super+S -> P            | Power Menu                      | Wlogout power menu                      | action-registry    | local
+    Super+S -> R            | Reload Compositor               | Reload Hyprland configuration           | action-registry    | local
+    Super+S -> W            | Nmtui                           | Wi-Fi / network TUI                     | action-registry    | local
+    Super+Shift+A           | Agents Map                      | Autonomous AI Agents map root           | action-registry    | local
+    Super+Shift+A -> H      | Hermes Agent                    | Hermes CLI                              | action-registry    | local
+    Super+Shift+A -> L      | Agent Logs                      | Hermes service log tail                 | action-registry    | local
+    Super+Shift+A -> M      | Btop                            | System & Agent monitoring               | action-registry    | local
+    Super+Shift+A -> O      | OpenCode Desktop                | AI coding workspace                     | action-registry    | local
+    Super+Shift+A -> P      | Gemini Chat Panel               | Toggle right Gemini panel               | action-registry    | local
+    Super+Shift+A -> R      | Polyfloor Router                | AI Model Router status                  | action-registry    | fleet-remote
+    Super+Shift+T           | Kitty                           | Fast terminal companion                 | action-registry    | local
+    Super+Space             | Vicinae Launcher                | Primary Vicinae application launcher     | action-registry    | local
+    Super+T                 | Ghostty                         | Primary terminal                        | action-registry    | local
+    Super+W -> F            | Fullscreen                      | Toggle window fullscreen                | action-registry    | local
+    Super+W -> P            | Pin Window                      | Pin window always-on-top                | action-registry    | local
+    Super+W -> Q            | Close Window                    | Close focused window                    | action-registry    | local
+    Super+W -> S            | Toggle Split                    | Toggle split orientation                | action-registry    | local
+    Super+W -> V            | Toggle Floating                 | Toggle floating layout                  | action-registry    | local
+    Super+/                 | Rofi Cheatsheet                 | Alphabetical cheat sheet index          | cheatsheets.nix    | local
+    Alt+G                   | Gemini Chat Panel               | Toggle right Gemini chat panel          | hyprland/pyprland  | local
+    Alt+N                   | Gedit Notepad                   | Toggle right Gedit notepad panel        | hyprland/pyprland  | local
+    Alt+T                   | Ghostty Dropdown                | Toggle top Ghostty dropdown terminal    | hyprland/pyprland  | local
+      "
+      echo "$ACTIONS" | rofi_with_theme -dmenu -i -p "Alphabetical Index"
+  '';
+
   cheatsheet_picker = pkgs.writeShellScriptBin "cheatsheet" ''
         ${rofiTheme}
         while true; do
           SELECTED=$(cat <<CHOICES | rofi_with_theme -dmenu -p "Cheatsheets"
+        🔤 Alphabetical Action Index
         🤠 Herdr AI Harness
+        👻 Ghostty Splits & Terminal Shortcuts
         🧰 z0r0 App & Tool Catalog
         🐚 Nushell
-        ⚡ Zellij
+        ⚡ Zellij (Legacy / Migration)
         📝 Neovim
         ✦ Helix
         📂 Yazi
@@ -65,10 +126,12 @@ let
           SELECTED="$(echo "$SELECTED" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
           [ -z "$SELECTED" ] && break
           case "$SELECTED" in
+            "🔤 Alphabetical Action Index") ${alphabetical_cheatsheet}/bin/alphabetical-cheatsheet ;;
             "🤠 Herdr AI Harness")     ${herdr_cheatsheet}/bin/herdr-cheatsheet ;;
+            "👻 Ghostty Splits & Terminal Shortcuts") ${zsh_cheatsheet}/bin/zsh-cheatsheet ;;
             "🧰 z0r0 App & Tool Catalog") ${z0r0_catalog_cheatsheet}/bin/z0r0-catalog-cheatsheet ;;
             "🐚 Nushell")           ${nushell_cheatsheet}/bin/nushell-cheatsheet ;;
-            "⚡ Zellij")            ${zellij_cheatsheet}/bin/zellij-cheatsheet ;;
+            "⚡ Zellij (Legacy / Migration)") ${zellij_cheatsheet}/bin/zellij-cheatsheet ;;
             "📝 Neovim")            ${nvim_cheatsheet}/bin/nvim-cheatsheet ;;
             "✦ Helix")             ${helix_cheatsheet}/bin/helix-cheatsheet ;;
             "📂 Yazi")             ${yazi_cheatsheet}/bin/yazi-cheatsheet ;;

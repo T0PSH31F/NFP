@@ -22,9 +22,6 @@ in
       "Mod+A" = {
         action = spawn "noctalia" "msg" "panel-toggle" "launcher";
       };
-      "Mod+Return" = {
-        action = spawn "uwsm" "app" "--" "ghostty";
-      };
       "Mod+E" = {
         action = spawn "uwsm" "app" "--" "nemo";
       };
@@ -180,8 +177,14 @@ in
       "Mod+Slash" = {
         action = spawn "cheatsheet";
       };
-      "Mod+BackSlash" = {
+      "Mod+Return" = {
         action = spawn "wlr-which-key";
+      };
+      "Mod+Shift+T" = {
+        action = spawn "kitty";
+      };
+      "Mod+Shift+A" = {
+        action = spawn "wlr-which-key" "agents";
       };
 
       # Monitor Movement (Parity with Hyprland binds)
