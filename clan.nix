@@ -32,7 +32,7 @@ let
         "media"
         "intel-9th-gen"
       ];
-      deploy.targetHost = "root@192.168.1.54"; # LAN IP (Tailscale 100.72.46.75)
+      deploy.targetHost = "root@luffy.nfp.nix"; # MagicDNS via Headscale (LAN 192.168.1.54, Tailscale 100.72.46.75 fallback)
     };
 
     # NAMI — Cloud control-plane (always-on AI gateway, agent orchestration, media)

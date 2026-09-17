@@ -9,7 +9,7 @@
 ExtremeRouter provides LLM routing, token compression, and fallback management.
 
 ### First-Time Setup
-1. **Open dashboard**: `http://nami.local:20128` (or `http://z0r0:20128`)
+1. **Open dashboard**: `http://nami.nfp.nix:20128` (or `http://z0r0:20128`)
 2. **Connect providers** (Dashboard → Providers):
    - **OpenRouter**: API key managed via `sops-nix` (`openrouter_api_key`)
    - **Kiro AI**: Builder ID / Google OAuth
@@ -27,13 +27,13 @@ Kong Gateway operates as the primary fleet ingress for LLM traffic (`layers/70-a
 
 ```bash
 # Check Kong proxy status
-curl -s http://nami.local:8090/health
+curl -s http://nami.nfp.nix:8090/health
 
 # Enumerate routed models
-curl -s http://nami.local:8090/v1/models | jq .
+curl -s http://nami.nfp.nix:8090/v1/models | jq .
 
 # Test coding route to ExtremeRouter
-curl -s -X POST http://nami.local:8090/llm/coding/v1/chat/completions \
+curl -s -X POST http://nami.nfp.nix:8090/llm/coding/v1/chat/completions \
   -H "Content-Type: application/json" \
   -d '{"model":"auto","messages":[{"role":"user","content":"ping"}]}'
 ```
@@ -108,13 +108,13 @@ Run the automated service and Homepage Dashboard link validator script:
 
 | Service | Host | Port | Endpoint URL |
 |---------|------|------|--------------|
-| Kong Gateway (Proxy) | `nami` | 8090 | `http://nami.local:8090` |
-| ExtremeRouter | `nami` / `z0r0` | 20128 | `http://nami.local:20128` |
+| Kong Gateway (Proxy) | `nami` | 8090 | `http://nami.nfp.nix:8090` |
+| ExtremeRouter | `nami` / `z0r0` | 20128 | `http://nami.nfp.nix:20128` |
 | Hermes Workspace | `z0r0` | 3000 | `http://z0r0:3000` |
 | Hermes Dashboard | `z0r0` | 9119 | `http://z0r0:9119` |
-| Brain Service PKB | `luffy` | 8010 | `http://luffy.local:8010` |
-| Open WebUI | `luffy` | 8088 | `http://luffy.local:8088` |
-| Ollama LLM | `luffy` | 11434 | `http://luffy.local:11434` |
+| Brain Service PKB | `luffy` | 8010 | `http://luffy.nfp.nix:8010` |
+| Open WebUI | `luffy` | 8088 | `http://luffy.nfp.nix:8088` |
+| Ollama LLM | `luffy` | 11434 | `http://luffy.nfp.nix:11434` |
 | Grafana | `z0r0` / `luffy` | 3008 | `http://z0r0:3008` |
 | Prometheus | `z0r0` | 9090 | `http://z0r0:9090` |
-| Headscale Control | `nami` | 8086 | `http://nami.local:8086` |
+| Headscale Control | `luffy` | 8086 | `http://luffy.nfp.nix:8086` |

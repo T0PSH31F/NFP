@@ -32,7 +32,7 @@
 
 ## Fleet Overlay Network Specification
 
-- **Authoritative Control Plane**: `nami` (`nami`) running Headscale (`https://headscale.lovelain.duckdns.org`).
+- **Authoritative Control Plane: `luffy` (`luffy.nfp.nix`) running Headscale (`https://headscale.lovelain.duckdns.org`) (`https://headscale.lovelain.duckdns.org`).
 - **Client Overlay Daemon**: Standard `services.tailscale` clients targeting `--login-server=https://headscale.lovelain.duckdns.org`.
 - **Domain & Addressing**: `*.lovelain.duckdns.org` within `100.64.0.0/10` CIDR block.
 - **Decommissioned Overlays**: ZeroTier and Clan WireGuard have been fully decommissioned. Tailscale is the sole inter-node mesh.

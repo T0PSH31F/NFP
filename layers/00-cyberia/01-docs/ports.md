@@ -57,7 +57,7 @@
 | **8083** | FreeLLMPool            | z0r0   | `layers/70-agents/78-llm-routers/freellmpool.nix`  | Free-tier LLM Provider Pool     |
 | **8084** | Paperless-ngx          | luffy  | `machines/luffy/default.nix`                       | Document Archival System        |
 | **8085** | Hermes Agent Gateway   | z0r0   | `layers/70-agents/71-harness/hermes/`              | Hermes Agent MCP Control Gateway|
-| **8086** | Headscale              | nami   | `layers/20-services/21-networking/headscale.nix`  | Tailscale Control Plane         |
+| **8086** | Headscale              | luffy  | `layers/20-services/21-networking/headscale.nix`  | Tailscale Control Plane (migrated from nami 2026-09-15) |         |
 | **8088** | Open WebUI             | luffy  | `layers/70-agents/77-dash-desk-ui/open-webui.nix` | LLM Web Chat Interface          |
 | **8090** | Kong Gateway (proxy)   | nami   | `layers/70-agents/78-llm-routers/kong-gateway.nix` | Unified LLM/API gateway (Polyfloor routerEndpoint `http://127.0.0.1:8090/v1`) |
 | **7777** | Polyfloor API          | nami   | `layers/70-agents/76-orchestrators/polyfloor.nix` | Polyfloor FastAPI (API-only, `host 127.0.0.1`, `dataDir /var/lib/polyfloor`, `routerEndpoint http://127.0.0.1:8090/v1`, systemd `polyfloor.service`) — **authoritative port** |
