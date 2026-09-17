@@ -119,3 +119,4 @@
 3. **Document immediately** when assigning a port to a new service
 4. **Services should use the same port across machines** — use module defaults, don't override per-machine
 5. **Prefer high ports** (8000+) for custom services to avoid system conflicts
+6. **Media band 7100-7199 reserved** for user-data media services (CalibreWeb `7119`, future Kavita/Jellyfin sidecars, etc.) — keeps `8090-9000` from re-filling. `8090-9000` is crowded (`8090 proxy`, `8091 admin`, `8092 EverOS`, `8093 manager`, `8094 ContextForge`, `8095 qBittorrent`, `8096 Jellyfin`, `8098 RomM` — only `8094`/`8097`/`8098`/`8099` left free). Next media service would have hit `8094`/`8095` and re-created the `8093` double-book within 6 months.
