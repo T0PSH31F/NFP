@@ -175,7 +175,7 @@ in
     # Headscale moved BACK to luffy (2026-09-15) — was on nami, unreachable behind Alibaba SG
     headscale-server = {
       enable = lib.mkForce true;
-      serverUrl = "http://192.168.1.54:8086";
+      serverUrl = "http://luffy.nfp.nix:8086";
     };
 
     # Native Postgres (Shared for Nextcloud, Immich, MaxKB etc.)
