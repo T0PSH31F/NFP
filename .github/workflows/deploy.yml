@@ -38,7 +38,7 @@ jobs:
             exit 1
           fi
       - name: Check flake format
-        run: nix fmt -- --check
+        run: nix fmt -- --fail-on-change
       - name: Check agent alias symlinks
         run: |
           test -L CLAUDE.md && test -L GEMINI.md

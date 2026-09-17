@@ -9,28 +9,6 @@
   },
   "features": [
     {
-      "id": "observability-homepage-final-pass",
-      "priority": 10,
-      "name": "Observability + Homepage Final Pass + Re-Verification",
-      "behavior": "Re-verified prior prompt checklists, added postgres_exporter & custom langfuse_exporter, wired Loki/Alloy logging and Grafana alerts, enabled Homepage podman docker socket auto-discovery & kiosk iframe widget, and updated documentation.",
-      "verification": [
-        "test -f layers/00-cyberia/01-docs/monitoring.md",
-        "grep -q 'postgres_exporter' layers/00-cyberia/01-docs/ports.md",
-        "grep -q 'langfuse_traces_total' layers/20-services/26-monitoring/dashboards/hermes-activity.json"
-      ],
-      "state": "passing",
-      "claimedBy": "antigravity",
-      "blockedReason": null,
-      "evidence": [
-        {
-          "sha": "HEAD",
-          "command": "test -f layers/00-cyberia/01-docs/monitoring.md && grep -q 'postgres_exporter' layers/00-cyberia/01-docs/ports.md && grep -q 'langfuse_traces_total' layers/20-services/26-monitoring/dashboards/hermes-activity.json",
-          "output": "Re-verified prior prompts, added postgres and custom langfuse exporter to monitoring.nix, updated hermes-activity.json dashboard queries, added Podman docker socket auto-discovery and Grafana iframe kiosk widget to homepage-dashboard.nix, registered ports 9187/9898 in ports.md, documented CLI tools in services.md, and created monitoring.md.",
-          "at": "2026-08-28T12:08:50Z"
-        }
-      ]
-    },
-    {
       "id": "kong-extremerouter-enumeration-fix",
       "priority": 11,
       "name": "Kong gateway \u2192 ExtremeRouter model enumeration & chat routing fix",
