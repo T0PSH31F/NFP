@@ -742,68 +742,76 @@ in
     };
   };
 
-  config = mkIf cfg.enable {
-    sops.templates."homepage-dashboard-env" = {
-      content = ''
-        SONARR_API_KEY=""
-        RADARR_API_KEY=""
-        LIDARR_API_KEY=""
-        PROWLARR_API_KEY=""
-        BAZARR_API_KEY=""
-        OVERSEERR_API_KEY=""
-        READARR_API_KEY=""
-        GRAFANA_API_KEY=""
-        IMMICH_API_KEY=""
-        HEADSCALE_API_KEY=""
-        ADGUARD_API_KEY=""
-        PORTAINER_API_KEY=""
-        JELLYFIN_API_KEY=""
-      '';
-      owner = "homepage-dashboard";
-      group = "homepage-dashboard";
-      mode = "0400";
-    };
-
-    layers.layer-20.services.config.homepage-dashboard.environmentFile =
-      mkDefault
-        config.sops.templates."homepage-dashboard-env".path;
-
-    assertions = [
-      {
-        assertion = secretCheck;
-        message =
-          "homepage-dashboard: The following widgets require secrets via environmentFile, but environmentFile is null: "
-          + concatStringsSep ", " (map (w: w.name) secretRequiringWidgets);
-      }
-    ];
-
-    networking.firewall.allowedTCPPorts = [ cfg.port ];
-
-    users.users.homepage-dashboard = {
-      isSystemUser = true;
-      group = "homepage-dashboard";
-    };
-    users.groups.homepage-dashboard = { };
-
-    systemd.services.homepage-dashboard = {
-      description = "Grandlix Homepage Dashboard Server Daemon";
-      after = [ "network.target" ];
-      wantedBy = [ "multi-user.target" ];
-
-      environment = {
-        HOMEPAGE_PORT = toString cfg.port;
-        HOMEPAGE_STATIC_DIR = "${staticPackage}/public";
-        HOMEPAGE_CONFIG_PATH = "${configJsonFile}";
+  config = mkIf cfg.enable (mkMerge [
+    (mkIf (options ? sops) {
+      sops.templates."homepage-dashboard-env" = {
+        content = ''
+          SONARR_API_KEY=""
+          RADARR_API_KEY=""
+          LIDARR_API_KEY=""
+          PROWLARR_API_KEY=""
+          BAZARR_API_KEY=""
+          OVERSEERR_API_KEY=""
+          READARR_API_KEY=""
+          GRAFANA_API_KEY=""
+          IMMICH_API_KEY=""
+          HEADSCALE_API_KEY=""
+          ADGUARD_API_KEY=""
+          PORTAINER_API_KEY=""
+          JELLYFIN_API_KEY=""
+        '';
+        owner = "homepage-dashboard";
+        group = "homepage-dashboard";
+        mode = "0400";
       };
 
-      serviceConfig = {
-        ExecStart = "${homepageServer}/bin/homepage-dashboard-server";
-        User = "homepage-dashboard";
-        Group = "homepage-dashboard";
-        Restart = "on-failure";
-        RestartSec = "5s";
-        EnvironmentFile = mkIf (cfg.environmentFile != null) cfg.environmentFile;
+      layers.layer-20.services.config.homepage-dashboard.environmentFile =
+        mkDefault
+          config.sops.templates."homepage-dashboard-env".path;
+    })
+
+    {
+      layers.layer-20.services.config.homepage-dashboard.environmentFile = mkDefault (
+        pkgs.writeText "homepage-dummy.env" ""
+      );
+
+      assertions = [
+        {
+          assertion = secretCheck;
+          message =
+            "homepage-dashboard: The following widgets require secrets via environmentFile, but environmentFile is null: "
+            + concatStringsSep ", " (map (w: w.name) secretRequiringWidgets);
+        }
+      ];
+
+      networking.firewall.allowedTCPPorts = [ cfg.port ];
+
+      users.users.homepage-dashboard = {
+        isSystemUser = true;
+        group = "homepage-dashboard";
       };
-    };
-  };
+      users.groups.homepage-dashboard = { };
+
+      systemd.services.homepage-dashboard = {
+        description = "Grandlix Homepage Dashboard Server Daemon";
+        after = [ "network.target" ];
+        wantedBy = [ "multi-user.target" ];
+
+        environment = {
+          HOMEPAGE_PORT = toString cfg.port;
+          HOMEPAGE_STATIC_DIR = "${staticPackage}/public";
+          HOMEPAGE_CONFIG_PATH = "${configJsonFile}";
+        };
+
+        serviceConfig = {
+          ExecStart = "${homepageServer}/bin/homepage-dashboard-server";
+          User = "homepage-dashboard";
+          Group = "homepage-dashboard";
+          Restart = "on-failure";
+          RestartSec = "5s";
+          EnvironmentFile = mkIf (cfg.environmentFile != null) cfg.environmentFile;
+        };
+      };
+    }
+  ]);
 }
