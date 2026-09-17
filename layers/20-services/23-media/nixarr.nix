@@ -62,6 +62,9 @@ in
       plex.enable = false; # Explicitly disabled (conflicts with Jellyfin)
     };
 
+    # Override upstream nixarr setting deprecated services.sabnzbd.configFile
+    services.sabnzbd.configFile = mkForce null;
+
     # Declarative nfp.services contracts for nixarr media services
     nfp.services = {
       jellyfin = {
