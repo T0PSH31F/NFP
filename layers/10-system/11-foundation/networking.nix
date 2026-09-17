@@ -69,7 +69,8 @@
         8089 # Filebrowser
         8090 # Kong Gateway (proxy)
         8091 # Kong Admin API
-        8093 # CalibreWeb
+        7777 # Polyfloor API
+        7119 # CalibreWeb
         8095 # qBittorrent WebUI
         8096 # Jellyfin
         8443 # HTTPS Alt 1 / Nginx SSL

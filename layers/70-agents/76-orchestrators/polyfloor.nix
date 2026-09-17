@@ -31,13 +31,14 @@ in
   # ── Legacy compatibility shim ─────────────────────────────────────
   # Two sibling modules still reference the old option path
   # `services.ai-services.polyfloor`:
-  #   - polyfloor-secrets.nix          → cfg.enable, cfg.port (sops "polyfloor-env")
-  #   - 20-services/21-networking/endpoints.nix
-  #       → config.services.ai-services.polyfloor.port `or` 8001
+  #   - polyfloor-secrets.nix          → cfg.enable (sops "polyfloor-env")
+  #   - 20-services/21-networking/endpoints.nix (now uses services.polyfloor.port directly)
   # Keep a minimal mirror so they keep evaluating while the fleet migrates to
   # the upstream `services.polyfloor`. The mirror is driven from the upstream
   # option: set `services.polyfloor.enable = true` on a host and this shim
   # follows. Do not set `services.ai-services.polyfloor.*` directly on hosts.
+  # Authoritative port is services.polyfloor.port (mkDefault 7777 below), NOT a
+  # duplicate constant — legacy shim mirrors that authoritative value.
   options.services.ai-services.polyfloor = {
     enable = mkOption {
       type = types.bool;
@@ -46,68 +47,72 @@ in
     };
     port = mkOption {
       type = types.port;
-      default = 8001;
-      description = "Legacy compat mirror of services.polyfloor.port (read from the upstream option).";
+      default = 7777;
+      description = "Legacy compat mirror of services.polyfloor.port (mirrors authoritative services.polyfloor.port).";
     };
   };
 
-  config = mkIf config.services.polyfloor.enable {
-    # ── NFP defaults for the upstream module ────────────────────────
-    services.polyfloor = {
-      # Backend daemon built from the flake input.
-      package = polyfloorPkg;
-      host = "127.0.0.1";
-      port = 8001;
-      dataDir = "/var/lib/polyfloor";
+  config = mkMerge [
+    {
+      services.polyfloor.port = mkDefault 7777;
+    }
+    (mkIf config.services.polyfloor.enable {
+      # ── NFP defaults for the upstream module ────────────────────────
+      services.polyfloor = {
+        # Backend daemon built from the flake input.
+        package = polyfloorPkg;
+        host = "127.0.0.1";
+        dataDir = "/var/lib/polyfloor";
 
-      # Polyfloor talks to any OpenAI-compatible router. It enumerates models
-      # via:
-      #     GET  {routerEndpoint}/models          → grouped free|fast|reasoning|frontier
-      # and runs agent inference via:
-      #     POST {routerEndpoint}/chat/completions
-      #
-      # Kong path multiplexer endpoints available (port 8090):
-      #   - kong-er:       http://127.0.0.1:8090/v1 (ExtremeRouter)
-      #   - kong-omni:     http://127.0.0.1:8090/omni/v1 (OmniRoute - TODO: when merged)
-      #   - kong-free:     http://127.0.0.1:8090/llm/free/v1 (FreeLLMPool)
-      #   - kong-frontier: http://127.0.0.1:8090/llm/frontier/v1 (Manifest)
-      #   - extreme-direct: http://127.0.0.1:20128/v1 (ER direct backup)
-      routerEndpoint = "http://127.0.0.1:8090/v1";
+        # Polyfloor talks to any OpenAI-compatible router. It enumerates models
+        # via:
+        #     GET  {routerEndpoint}/models          → grouped free|fast|reasoning|frontier
+        # and runs agent inference via:
+        #     POST {routerEndpoint}/chat/completions
+        #
+        # Kong path multiplexer endpoints available (port 8090):
+        #   - kong-er:       http://127.0.0.1:8090/v1 (ExtremeRouter)
+        #   - kong-omni:     http://127.0.0.1:8090/omni/v1 (OmniRoute - TODO: when merged)
+        #   - kong-free:     http://127.0.0.1:8090/llm/free/v1 (FreeLLMPool)
+        #   - kong-frontier: http://127.0.0.1:8090/llm/frontier/v1 (Manifest)
+        #   - extreme-direct: http://127.0.0.1:20128/v1 (ER direct backup)
+        routerEndpoint = "http://127.0.0.1:8090/v1";
 
-      # Default HR orchestrator model: Xiaomi MiMo-V2.5 Pro.
-      defaultHrModel = "mimo-v2.5-pro";
+        # Default HR orchestrator model: Xiaomi MiMo-V2.5 Pro.
+        defaultHrModel = "mimo-v2.5-pro";
 
-      # sops-rendered environment file (see polyfloor-secrets.nix, template
-      # "polyfloor-env"). Secrets are read from *_FILE paths, never raw values.
-      # When Kong consumer auth is enabled, add POLYFLOOR_ROUTER_API_KEY_FILE
-      # to that env file pointing at a Kong consumer key (sops file secret).
-      environmentFile = config.sops.templates."polyfloor-env".path;
+        # sops-rendered environment file (see polyfloor-secrets.nix, template
+        # "polyfloor-env"). Secrets are read from *_FILE paths, never raw values.
+        # When Kong consumer auth is enabled, add POLYFLOOR_ROUTER_API_KEY_FILE
+        # to that env file pointing at a Kong consumer key (sops file secret).
+        environmentFile = config.sops.templates."polyfloor-env".path;
 
-      # Serve the built frontend SPA. Set this to the built frontend package
-      # path once `inputs.polyfloor.packages.${system}.frontend` builds
-      # (its npmDepsHash is currently a placeholder upstream). Left unset so
-      # the backend runs API-only by default.
-      # staticDir = polyfloorFlake.packages.${pkgs.system}.frontend;
-    };
+        # Serve the built frontend SPA. Set this to the built frontend package
+        # path once `inputs.polyfloor.packages.${system}.frontend` builds
+        # (its npmDepsHash is currently a placeholder upstream). Left unset so
+        # the backend runs API-only by default.
+        # staticDir = polyfloorFlake.packages.${pkgs.system}.frontend;
+      };
 
-    # Mirror the upstream enable/port into the legacy option path so the
-    # sibling modules above keep evaluating.
-    services.ai-services.polyfloor.enable = config.services.polyfloor.enable;
-    services.ai-services.polyfloor.port = config.services.polyfloor.port;
+      # Mirror the upstream enable/port into the legacy option path so the
+      # sibling modules above keep evaluating.
+      services.ai-services.polyfloor.enable = config.services.polyfloor.enable;
+      services.ai-services.polyfloor.port = config.services.polyfloor.port;
 
-    # Persist per-company state across reboots when impermanence is enabled
-    # (matches the previous vendored module's behaviour).
-    environment.persistence."/persist" =
-      mkIf (config.layers.layer-10.system.config.impermanence.enable or false)
-        {
-          directories = [
-            {
-              directory = config.services.polyfloor.dataDir;
-              user = "polyfloor";
-              group = "polyfloor";
-              mode = "0750";
-            }
-          ];
-        };
-  };
+      # Persist per-company state across reboots when impermanence is enabled
+      # (matches the previous vendored module's behaviour).
+      environment.persistence."/persist" =
+        mkIf (config.layers.layer-10.system.config.impermanence.enable or false)
+          {
+            directories = [
+              {
+                directory = config.services.polyfloor.dataDir;
+                user = "polyfloor";
+                group = "polyfloor";
+                mode = "0750";
+              }
+            ];
+          };
+    })
+  ];
 }

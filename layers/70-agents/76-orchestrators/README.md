@@ -13,7 +13,7 @@ The `76-orchestrators` tier is responsible for multi-agent swarm orchestration, 
 | `mission-control.nix` | Mission Control agent fleet status, task dispatch, and telemetry dashboard. | `layers.layer-76.orchestrators.mission-control` | 8099 | Always-on systemd service | `agent-orchestrator`, `homelab` |
 | `opencompany.nix` | OpenCompany autonomous organization platform (Python API + Next.js UI). | `services.ai-services.opencompany` | 5680 (UI), 5681 (API) | Always-on systemd service | `agent-orchestrator`, `homelab` |
 | `paperclip.nix` | Paperclip multi-agent swarm task queuing and goal tracking engine. | `layers.layer-76.orchestrators.paperclip` | 3100 | Always-on systemd service | `agent-orchestrator`, `homelab` |
-| `polyfloor.nix` | Polyfloor AI governance, policy routing, and task allocation control plane. | `services.ai-services.polyfloor` | 8000 (Backend), 3000 (UI) | Always-on systemd service | `agent-orchestrator`, `homelab` |
+| `polyfloor.nix` | Polyfloor AI governance, policy routing, and task allocation control plane. | `services.polyfloor` (upstream `github:T0PSH31F/Polyfloor`) via `services.ai-services.polyfloor` compat shim | 7777 (Backend API-only, `staticDir = null`) | Always-on systemd service `polyfloor.service` on `nami` | `agent-orchestrator` (nami) |
 
 ## Tier Relationships
 

@@ -271,8 +271,8 @@ let
       category = "robin";
       onePieceSub = "Ancient Poneglyphs";
       icon = "/assets/images/Nicorobin.png";
-      url = "http://${luffy}:8093";
-      proxy_url = "http://${luffy}:8093";
+      url = "http://${luffy}:7119";
+      proxy_url = "http://${luffy}:7119";
       secret_env = null;
       requiresSecret = false;
     }

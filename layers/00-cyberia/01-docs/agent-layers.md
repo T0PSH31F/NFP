@@ -44,7 +44,7 @@ The `70-agents` layer structure divides AI capabilities across 9 focused sub-tie
 3. **Memory Store Query** (`73-memory`): Request routes to **Brain-service** (`:8010`) or **EverOS** (`:8092`) to query indexed vector embeddings and Markdown notes stored in `25-data` (PostgreSQL / Qdrant).
 
 ### Flow 3: Multi-Agent Swarm Orchestration
-1. **Fleet Dispatcher** (`76-orchestrators`): Polyfloor (`:8000`) or LangGraph (`:8123`) decomposes a goal into sub-tasks.
+1. **Fleet Dispatcher** (`76-orchestrators`): Polyfloor (`:7777` API-only on `nami`) or LangGraph (`:8123`) decomposes a goal into sub-tasks.
 2. **Task Delegation**: Orchestrator invokes background worker daemons in `71-harness` (Hermes background workers, OpenCode runners).
 3. **Execution & Feedback**: Sub-agents evaluate code in `74-ai-infra` sandboxes, update shared state in `73-memory` (Honcho/EverOS), and report completion status back to Polyfloor.
 
@@ -74,7 +74,7 @@ Below is the canonical port allocation registry for all `70-agents` services acr
 
 | Port | Service Name | Module Location | Service Description | Machine(s) |
 | :--- | :--- | :--- | :--- | :--- |
-| **3000** | Langfuse / Polyfloor UI | `73-memory/langfuse.nix`, `76-orchestrators/polyfloor.nix` | Observability UI & Polyfloor Next.js app | `luffy`, `nami` |
+| **3000** | Langfuse UI | `73-memory/langfuse.nix` | Observability UI (Langfuse) | `luffy` |
 | **3002** | Manifest | `78-llm-routers/manifest.nix` | Frontier LLM fallback router | `nami` |
 | **3003** | FreeLLMAPI | `78-llm-routers/freellmapi.nix` | Aggregated free-tier LLM API pool | `nami` |
 | **3004** | FreeLLMPool | `78-llm-routers/freellmpool.nix` | Connection pool for free providers | `nami` |
@@ -85,7 +85,8 @@ Below is the canonical port allocation registry for all `70-agents` services acr
 | **5680** | OpenCompany UI | `76-orchestrators/opencompany.nix` | AI Organization frontend canvas | `nami`, `luffy` |
 | **5681** | OpenCompany Backend | `76-orchestrators/opencompany.nix` | AI Organization Python API | `nami`, `luffy` |
 | **7998** | Hermes Daemon | `71-harness/hermes/hermes.nix` | Hermes background agent runner | `luffy` |
-| **8000** | Polyfloor API / vLLM | `76-orchestrators/polyfloor.nix`, `74-ai-infra/vllm.nix` | Polyfloor FastAPI / vLLM inference server | `nami`, `luffy` |
+| **7777** | Polyfloor API | `76-orchestrators/polyfloor.nix` | Polyfloor FastAPI (API-only, `staticDir = null`, no UI) | `nami` |
+| **8000** | vLLM | `74-ai-infra/vllm.nix` | vLLM inference server | `luffy` |
 | **8010** | Brain-service | `73-memory/brain-service.nix` | PKB RAG ingestion & query API | `luffy` |
 | **8080** | llama.cpp / LocalAI | `74-ai-infra/llama-cpp.nix`, `74-ai-infra/localai.nix` | GGUF / multi-modal local inference | `luffy` |
 | **8082** | llama-swap | `74-ai-infra/llama-swap.nix` | Dynamic model loading proxy | `luffy` |

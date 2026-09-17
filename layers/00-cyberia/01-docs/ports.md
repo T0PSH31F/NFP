@@ -59,10 +59,12 @@
 | **8085** | Hermes Agent Gateway   | z0r0   | `layers/70-agents/71-harness/hermes/`              | Hermes Agent MCP Control Gateway|
 | **8086** | Headscale              | nami   | `layers/20-services/21-networking/headscale.nix`  | Tailscale Control Plane         |
 | **8088** | Open WebUI             | luffy  | `layers/70-agents/77-dash-desk-ui/open-webui.nix` | LLM Web Chat Interface          |
-| **8090** | Kong Gateway (proxy)   | nami   | `layers/70-agents/78-llm-routers/kong-gateway.nix` | Unified LLM/API gateway         |
-| **8091** | Kong Admin API         | nami   | `layers/70-agents/78-llm-routers/kong-gateway.nix` | Kong declarative admin API      |
+| **8090** | Kong Gateway (proxy)   | nami   | `layers/70-agents/78-llm-routers/kong-gateway.nix` | Unified LLM/API gateway (Polyfloor routerEndpoint `http://127.0.0.1:8090/v1`) |
+| **7777** | Polyfloor API          | nami   | `layers/70-agents/76-orchestrators/polyfloor.nix` | Polyfloor FastAPI (API-only, `host 127.0.0.1`, `dataDir /var/lib/polyfloor`, `routerEndpoint http://127.0.0.1:8090/v1`, systemd `polyfloor.service`) — **authoritative port** |
+| **8091** | Kong Admin API         | nami   | `layers/70-agents/78-llm-routers/kong-gateway.nix` | Kong declarative admin API
 | **8092** | EverOS Memory Server   | z0r0   | `layers/70-agents/73-memory/everos.nix`           | Memory consolidation engine     |
-| **8093** | CalibreWeb (luffy) / Kong Manager GUI (z0r0, loopback) | luffy  | `layers/20-services/26-monitoring/` | E-book Web Reader (luffy); Kong dashboard is loopback-only on z0r0 at `http://127.0.0.1:8093` |
+| **7119** | CalibreWeb             | luffy  | `layers/20-services/23-media/calibre-web.nix`   | E-book Web Reader |
+| **8093** | Kong Manager GUI       | z0r0   | `layers/70-agents/78-llm-routers/kong-gateway.nix` | Kong dashboard loopback-only `http://127.0.0.1:8093` |
 | **8095** | qBittorrent WebUI      | luffy  | `layers/20-services/23-media/download-clients.nix`| Torrent Client Web Interface    |
 | **8096** | Jellyfin               | luffy  | `layers/20-services/23-media/media-stack.nix`     | Media Streaming Server          |
 | **8098** | RomM                   | luffy  | `layers/20-services/23-media/romm.nix`             | ROM Manager & Web Emulator      |

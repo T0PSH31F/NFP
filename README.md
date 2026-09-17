@@ -51,7 +51,7 @@ NFP includes a production-grade multi-agent autonomous framework structured acro
 * **LLM Routing** (`78-llm-routers`): Kong Gateway (`:8090`), ExtremeRouter (`:20128`), LiteLLM, FreeLLMAPI.
 * **Memory & PKB** (`73-memory`): Brain-service (`:8010`), EverOS (`:8092`), ContextForge (`:8094`), Honcho, GNO.
 * **Inference Runtimes** (`74-ai-infra`): Ollama (`:11434`), llama.cpp (`:8080`), vLLM (`:8000`), LocalAI.
-* **Orchestration & UIs** (`76-orchestrators`, `77-dash-desk-ui`): Polyfloor (`:8000`), Open WebUI (`:8088`), AionUI, Mission Control.
+* **Orchestration & UIs** (`76-orchestrators`, `77-dash-desk-ui`): Polyfloor (`:7777` API-only on `nami`), Open WebUI (`:8088`), AionUI, Mission Control.
 
 ---
 
