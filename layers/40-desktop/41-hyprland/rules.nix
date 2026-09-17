@@ -1,4 +1,9 @@
-{ osConfig, lib, ... }:
+{
+  osConfig ? config,
+  lib,
+  config ? { },
+  ...
+}:
 let
   isLuffy = osConfig.networking.hostName == "luffy";
 in
