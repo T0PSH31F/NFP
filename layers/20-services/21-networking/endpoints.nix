@@ -40,9 +40,7 @@ in
       signal = mkEndpoint "127.0.0.1" 8080 "";
       langfuse = mkEndpoint "127.0.0.1" 3005 "";
       matrix = mkEndpoint "matrix.local" 8008 "";
-      polyfloor = mkEndpoint "127.0.0.1" (
-        if config.services.polyfloor.enable then config.services.polyfloor.port else 8001
-      ) "";
+      polyfloor = mkEndpoint "127.0.0.1" (config.services.polyfloor.port or 8001) "";
       gno = mkEndpoint "127.0.0.1" (config.layers.layer-73.memory.gno.port or 3456) "";
     };
     description = "Central registry for service network endpoints across the fleet.";
