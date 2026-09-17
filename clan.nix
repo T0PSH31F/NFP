@@ -16,12 +16,14 @@ let
       deploy.targetHost = "root@127.0.0.1";
     };
 
-    # LUFFY — Homelab server (memory, media, private data)
+    # LUFFY — Homelab server + local GUI desktop (memory, media, private data)
     # Always-on services: brain-service, Honcho, Matrix, n8n, Kavita, media
+    # Desktop: retains local Noctalia-Hyprland GUI via desktop tag (hybrid server+desktop)
     luffy = {
       tags = [
         "server"
         "homelab"
+        "desktop"
         "ai-agent"
         "ai-server"
         "pkb-node"

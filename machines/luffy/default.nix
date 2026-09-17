@@ -113,19 +113,17 @@ in
   };
   services.rustdesk-server.signal.relayHosts = [ "192.168.1.54" ];
 
-  # Noctalia Greeter (native Wayland login)
-  layers.layer-30.theming.themes.greeter = {
-    # Options: "sddm" | "greetd" | "noctalia-greeter"
-    type = "noctalia-greeter";
-    noctalia-greeter.session = "hyprland-uwsm";
-  };
+  # Desktop experience: owned by tag/profile architecture.
+  # luffy is hybrid server+desktop: desktop tag enables base Hyprland/Noctalia
+  # via layers/90-profiles/tags/desktop.nix, and experience selector owns the
+  # Noctalia-Hyprland adapter. Do NOT set hyprland.enable / noctalia.enable
+  # directly here — they derive from desktop.experience.
+  # Explicit machine boundary selection required for hybrid server+desktop.
+  layers.desktop.experience = "noctalia-hyprland";
 
-  # xserver not needed with cage greeter
-
-  layers.layer-40.desktop = {
-    hyprland.enable = true;
-    noctalia.backend = "hyprland";
-  };
+  # Greeter follows desktop tag default (noctalia-greeter / hyprland-uwsm);
+  # keep explicit only if diverging from tag default — currently redundant,
+  # so rely on tag profile. Remove duplicate greeter config to avoid drift.
 
   layers.layer-20.services.config = {
     monitoring = {

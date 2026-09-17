@@ -13,7 +13,7 @@ The table below maps every machine (`z0r0`, `luffy`, `nami`, `T14`) against all 
 | `ai-server` | `[ ]` | `[X]` | `[ ]` | `[ ]` | Enabled on luffy as the local inference and memory host (Brain-service, Ollama, EverOS). Omitted on z0r0 to prevent daily-driver RAM thrashing. |
 | `agent-orchestrator` | `[ ]` | `[ ]` | `[X]` | `[ ]` | Enabled on nami as the central swarm orchestrator (Polyfloor, Paperclip, Mission Control, AionUI, OpenCompany). Omitted on z0r0/luffy. |
 | `cache-server` | `[ ]` | `[X]` | `[ ]` | `[ ]` | Enabled on luffy to host the Harmonia Nix binary cache server for the local network. |
-| `desktop` | `[X]` | `[ ]` | `[ ]` | `[X]` | Enabled on z0r0 and T14 for Wayland (Hyprland/Niri), PipeWire audio, GUI apps, and desktop environment shells (Noctalia). Omitted on headless servers. |
+| `desktop` | `[X]` | `[X]` | `[ ]` | `[X]` | Enabled on z0r0, T14, and **luffy (hybrid server+desktop)** for Wayland (Hyprland/Niri), PipeWire audio, GUI apps, and Noctalia. luffy retains `server`+`homelab` for homelab services while also exposing local GUI via `desktop` + `desktop.experience = "noctalia-hyprland"`. Omitted only on headless `nami`. |
 | `development` | `[X]` | `[ ]` | `[ ]` | `[X]` | Enabled on workstation clients for developer CLI tools, compilers, IDEs, and SDKs. Omitted on production servers. |
 | `gaming` | `[X]` | `[ ]` | `[ ]` | `[ ]` | Enabled exclusively on z0r0 for Steam, GameMode, Lutris, and graphics drivers. |
 | `gpu-compute` | `[ ]` | `[X]` | `[ ]` | `[ ]` | Enabled on luffy for hardware-accelerated local model execution (Ollama, llama.cpp, vLLM). |
