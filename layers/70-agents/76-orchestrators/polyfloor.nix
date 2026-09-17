@@ -17,7 +17,7 @@
 with lib;
 let
   polyfloorFlake = inputs.polyfloor;
-  polyfloorPkg = polyfloorFlake.packages.${pkgs.system}.default;
+  polyfloorPkg = polyfloorFlake.packages.${pkgs.stdenv.hostPlatform.system}.default;
 in
 {
   # ── Import the upstream Polyfloor flake module ────────────────────
@@ -96,7 +96,7 @@ in
         # path once `inputs.polyfloor.packages.${system}.frontend` builds
         # (its npmDepsHash is currently a placeholder upstream). Left unset so
         # the backend runs API-only by default.
-        # staticDir = polyfloorFlake.packages.${pkgs.system}.frontend;
+        # staticDir = polyfloorFlake.packages.${pkgs.stdenv.hostPlatform.system}.frontend;
       };
 
       # Mirror the upstream enable/port into the legacy option path so the
@@ -118,6 +118,20 @@ in
               }
             ];
           };
+
+      # Tailnet contract: polyfloor.lovelain.duckdns.org via Tailscale only (Headscale ACL tag:control-plane)
+      # Caddy on nami will proxy polyfloor.lovelain.duckdns.org -> 127.0.0.1:7777 but firewall + Headscale ensures only tailnet can reach 7777
+      # Health: fleet-healthcheck probes /healthz on 7777
+      nfp.services.polyfloor = {
+        enable = true;
+        host = "nami";
+        port = config.services.polyfloor.port;
+        healthcheck = {
+          enable = true;
+          path = "/healthz";
+          expectedStatus = 200;
+        };
+      };
     })
   ];
 }
