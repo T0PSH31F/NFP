@@ -1,4 +1,4 @@
-# Module evaluation check — verifies homepage-dashboard module evaluates correctly
+# Module evaluation & VM check — verifies homepage-dashboard module evaluates and runs correctly
 {
   name = "homepage-dashboard-module";
   nodes.machine =
@@ -6,7 +6,6 @@
     {
       imports = [ ../../20-services/26-monitoring/homepage-dashboard.nix ];
 
-      # Mock requirements for homepage-dashboard.nix to work in isolation
       options = {
         layers.layer-10.system.config.impermanence.enable = lib.mkEnableOption "impermanence";
         environment.persistence = lib.mkOption {
@@ -18,16 +17,33 @@
       config = {
         layers.layer-20.services.config.homepage-dashboard = {
           enable = true;
-          lovable.enable = true;
+          port = 3007;
         };
         layers.layer-10.system.config.impermanence.enable = false;
-        networking.hostName = "z0r0";
+        networking.hostName = "luffy";
         system.stateVersion = "25.05";
       };
     };
+
   testScript = ''
     machine.wait_for_unit("homepage-dashboard.service")
-    machine.wait_for_open_port(8082)
-    machine.succeed("curl -s http://localhost:8082 | grep -q 'Nix Flake Pirates'")
+    machine.wait_for_open_port(3007)
+
+    # 1. Dashboard HTML serves with theme assets and vendored fonts (no external URLs)
+    html = machine.succeed("curl -s http://localhost:3007")
+    assert "GRANDLIX" in html, "HTML missing brand title"
+    assert "/assets/css/theme.css" in html, "HTML missing theme CSS link"
+    assert "/assets/js/app.js" in html, "HTML missing app JS link"
+    assert "http://" not in html and "https://" not in html, "HTML contains external URL references"
+
+    # 2. /api/config lists categories, bookmarks, and widgets
+    config_json = machine.succeed("curl -s http://localhost:3007/api/config")
+    assert "categories" in config_json, "/api/config missing categories"
+    assert "bookmarks" in config_json, "/api/config missing bookmarks"
+    assert "widget_map" in config_json, "/api/config missing widget_map"
+
+    # 3. Stubbed /api/widget/ returns JSON
+    widget_json = machine.succeed("curl -s http://localhost:3007/api/widget/glances")
+    assert "status" in widget_json or "error" in widget_json, "/api/widget/ response invalid"
   '';
 }

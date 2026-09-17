@@ -33,7 +33,7 @@ fi
 
 # 2. Check Node Reachability (ping)
 NODES=("z0r0" "luffy" "nami")
-DOMAIN="grandlix.net"
+DOMAIN="nfp.nix"
 
 log_info "Probing Tailnet Node IPs and Hostnames..."
 for node in "${NODES[@]}"; do

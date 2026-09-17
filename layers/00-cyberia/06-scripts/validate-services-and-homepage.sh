@@ -30,44 +30,37 @@ fi
 
 # Target node mappings
 declare -A NODE_IPS=(
-  ["z0r0"]="127.0.0.1"
-  ["luffy"]="192.168.1.54"
-  ["nami"]="nami.local"
+  ["z0r0"]="z0r0.nfp.nix"
+  ["luffy"]="luffy.nfp.nix"
+  ["nami"]="nami.nfp.nix"
 )
 
-# Defined homepage service targets: Name | Machine | Port
-declare -a SERVICES=(
-  "Grafana|z0r0|3008"
-  "Prometheus|z0r0|9090"
-  "Loki|z0r0|3100"
-  "Hermes Workspace|z0r0|3000"
-  "Hermes Dashboard|z0r0|9119"
-  "SillyTavern|z0r0|8000"
-  "brain-service|z0r0|8010"
-  "ExtremeRouter|z0r0|20128"
-  "FreeLLMPool|z0r0|8082"
-  "FreeLLMApi|z0r0|3003"
-  "Polyfloor|z0r0|8001"
-  "EverOS|z0r0|8092"
-  "ContextForge|z0r0|8094"
+# Dynamically load service targets from contract healthcheck registry (/run/nfp/healthcheck-targets.json or nfp.services)
+declare -a SERVICES=()
+TARGETS_JSON="/run/nfp/healthcheck-targets.json"
 
-  "Open WebUI|luffy|8088"
-  "Ollama|luffy|11434"
-  "SearXNG|luffy|8888"
-  "Vaultwarden|luffy|8222"
-  "AdGuard Home|luffy|3002"
-  "Jellyfin|luffy|8096"
-  "Sonarr|luffy|8989"
-  "Radarr|luffy|7878"
-  "n8n|luffy|5678"
-  "Kavita|luffy|5050"
+if [ -f "$TARGETS_JSON" ]; then
+  while IFS= read -r line; do
+    [ -n "$line" ] && SERVICES+=("$line")
+  done < <(python3 -c '
+import json, sys
+with open("'"$TARGETS_JSON"'") as f:
+    for t in json.load(f):
+        print(f"{t.get(\"name\")}|{t.get(\"host\")}|{t.get(\"port\")}")
+' 2>/dev/null || true)
+fi
 
-  "Kong Gateway|nami|8090"
-  "Headscale|nami|8086"
-  "Paperclip|nami|3101"
-  "Mission Control|nami|3099"
-  "OmniRoute|nami|20128"
-)
+if [ ${#SERVICES[@]} -eq 0 ]; then
+  while IFS= read -r line; do
+    [ -n "$line" ] && SERVICES+=("$line")
+  done < <(nix eval --json "$REPO_ROOT#nixosConfigurations.luffy.config.nfp.services" 2>/dev/null | python3 -c '
+import json, sys
+data = json.load(sys.stdin)
+for k, v in data.items():
+    if v.get("enable"):
+        print(f"{k}|{v.get(\"host\", \"luffy\")}|{v.get(\"port\", 0)}")
+' 2>/dev/null || true)
+fi
 
 echo "[1/2] Probing service ports and HTTP endpoints across fleet..."
 echo "--------------------------------------------------------------------------"

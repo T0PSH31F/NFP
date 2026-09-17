@@ -100,6 +100,9 @@
         ai-services-test = pkgs.testers.nixosTest (
           import ../layers/00-cyberia/05-tests/ai-services-tests.nix
         );
+        fleet-healthcheck-test = pkgs.testers.nixosTest (
+          import ../layers/00-cyberia/05-tests/fleet-healthcheck.nix { inherit pkgs; }
+        );
       };
     };
 }

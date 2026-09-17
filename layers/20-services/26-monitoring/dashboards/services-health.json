@@ -37,11 +37,11 @@
     {
       "title": "Service Blackbox Probes",
       "type": "stat",
-      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 8 },
+      "gridPos": { "h": 4, "w": 24, "x": 0, "y": 8 },
       "targets": [
         {
-          "expr": "probe_success{target=\"http://127.0.0.1:8642/health\"}",
-          "legendFormat": "Hermes",
+          "expr": "probe_success{job=~\"blackbox-.*\"}",
+          "legendFormat": "{{service}} ({{machine}})",
           "datasource": { "type": "prometheus", "uid": "prometheus" }
         }
       ]

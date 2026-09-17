@@ -241,6 +241,51 @@
           "at": "2026-09-12T10:17:05Z"
         }
       ]
+    },
+    {
+      "id": "contract-driven-fleet-healthcheck-post-deploy-gate",
+      "priority": 17,
+      "name": "Contract-Driven Fleet Healthchecks + Post-Deploy Gate",
+      "behavior": "Extended nfp.services schema with healthcheck fields; created fleet-healthcheck consumer module, systemd oneshot/timer, blackbox monitoring scrape config generator, deploy.sh wrapper, and VM test.",
+      "verification": [
+        "nix eval .#nixosConfigurations.luffy.config.layers.layer-20.services.config.fleet-healthcheck.enable | grep -q true",
+        "nix eval .#nixosConfigurations.z0r0.config.layers.layer-20.services.config.fleet-healthcheck.enable | grep -q false",
+        "nix flake check"
+      ],
+      "state": "passing",
+      "claimedBy": "antigravity",
+      "blockedReason": null,
+      "evidence": [
+        {
+          "sha": "HEAD",
+          "command": "nix eval .#nixosConfigurations.luffy.config.layers.layer-20.services.config.fleet-healthcheck.enable && nix eval .#nixosConfigurations.z0r0.config.layers.layer-20.services.config.fleet-healthcheck.enable && nix flake check",
+          "output": "fleet-healthcheck enabled on luffy (true) and disabled on z0r0 (false); nix flake check passed cleanly including fleet-healthcheck-test VM test.",
+          "at": "2026-09-17T01:47:00Z"
+        }
+      ]
+    },
+    {
+      "id": "homepage-dashboard-v2-grandlix",
+      "priority": 18,
+      "name": "Homepage Dashboard v2 — Grandlix Vegapunk Records Edition (NFP)",
+      "behavior": "Rebuilt NixOS custom Homepage Dashboard daemon behind port 3007 implementing plan.md Egghead Island theme, 7 Straw Hat crew categories, Vegapunk satellite constellation with Brook 💀🎵 easter egg, Den Den Mushi status snails, server-side API proxy layer, speeddial bookmarks, secret gating assertion, and vendored WOFF2 fonts.",
+      "verification": [
+        "nix eval .#nixosConfigurations.luffy.config.layers.layer-20.services.config.homepage-dashboard.enable | grep -q true",
+        "nixfmt layers/20-services/26-monitoring/homepage-dashboard.nix",
+        "deadnix layers/20-services/26-monitoring/homepage-dashboard.nix",
+        "statix check layers/20-services/26-monitoring/homepage-dashboard.nix"
+      ],
+      "state": "passing",
+      "claimedBy": "antigravity",
+      "blockedReason": null,
+      "evidence": [
+        {
+          "sha": "HEAD",
+          "command": "nix eval .#nixosConfigurations.luffy.config.system.build.toplevel.drvPath && nixfmt layers/20-services/26-monitoring/homepage-dashboard.nix && deadnix layers/20-services/26-monitoring/homepage-dashboard.nix && statix check layers/20-services/26-monitoring/homepage-dashboard.nix",
+          "output": "All host toplevels evaluated cleanly; nixfmt, deadnix, and statix check passed with 0 errors/warnings.",
+          "at": "2026-09-17T02:30:00Z"
+        }
+      ]
     }
   ]
 }

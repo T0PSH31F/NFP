@@ -32,6 +32,7 @@
 ### Also on z0r0 (no web UI):
 - **Jellyfin** — if enabled via media-stack tag, port 8096
 - **Ollama** — runs on luffy (port 11434), not z0r0. Access via Tailscale: `http://100.72.46.75:11434`
+- **Fleet Healthcheck Runner** — CLI `fleet-healthcheck-runner` (service `fleet-healthcheck.service`, probe targets generated from `nfp.services` contracts)
 
 ---
 

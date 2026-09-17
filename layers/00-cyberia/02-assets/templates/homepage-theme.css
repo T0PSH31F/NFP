@@ -1,532 +1,807 @@
-/* Homepage Dashboard Lovable Theme — Enhanced for 6-Group Layout */
+/* ==========================================================================
+   Grandlix × One Piece Cyberpunk Dashboard — Vegapunk Records Edition
+   Core Design System (homepage-theme.css)
+   ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Exo+2:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
-
-:root {
-  --background: hsl(240 67% 8%);
-  --foreground: hsl(210 40% 98%);
-  --card: hsla(240, 50%, 10%, 0.7);
-  --card-foreground: hsl(210 40% 98%);
-  --popover: hsl(240 50% 10%);
-  --popover-foreground: hsl(210 40% 98%);
-  --primary: hsl(340 100% 50%);
-  --primary-foreground: hsl(210 40% 98%);
-  --secondary: hsl(260 100% 50%);
-  --secondary-foreground: hsl(210 40% 98%);
-  --muted: hsl(240 30% 15%);
-  --muted-foreground: hsl(215 20% 65%);
-  --accent: hsl(190 100% 50%);
-  --accent-foreground: hsl(240 67% 8%);
-  --destructive: hsl(0 84% 60%);
-  --destructive-foreground: hsl(210 40% 98%);
-  --border: hsl(260 30% 20%);
-  --input: hsl(260 30% 20%);
-  --ring: hsl(340 100% 50%);
-  --radius: 0.75rem;
-
-  /* Crew Colors */
-  --luffy-red: hsl(340 100% 50%);
-  --zoro-green: hsl(110 100% 54%);
-  --nami-orange: hsl(35 100% 50%);
-  --sanji-yellow: hsl(51 100% 50%);
-  --vegapunk-purple: hsl(280 100% 50%);
-  --robin-teal: hsl(190 100% 50%);
-  --chopper-pink: hsl(300 100% 50%);
-
-  /* Group accent colors (One Piece crew themed) */
-  --group-obs: hsl(190 100% 50%);
-  --group-ai: hsl(280 100% 50%);
-  --group-infra: hsl(220 100% 60%);
-  --group-comms: hsl(110 100% 54%);
-  --group-media: hsl(340 100% 50%);
-  --group-auto: hsl(35 100% 50%);
-
-  /* Host badge colors */
-  --badge-z0r0-bg: hsla(110, 100%, 54%, 0.15);
-  --badge-z0r0-fg: hsl(110 100% 54%);
-  --badge-luffy-bg: hsla(340, 100%, 50%, 0.15);
-  --badge-luffy-fg: hsl(340 100% 50%);
-
-  /* Status colors */
-  --status-up: hsl(110 100% 54%);
-  --status-down: hsl(0 84% 60%);
-  --status-pending: hsl(35 100% 50%);
+/* --------------------------------------------------------------------------
+   1. Font Declarations (100% Offline / Vendored from Nix Store)
+   -------------------------------------------------------------------------- */
+@font-face {
+  font-family: 'Orbitron';
+  font-style: normal;
+  font-weight: 400 900;
+  font-display: swap;
+  src: url('/assets/fonts/Orbitron.ttf') format('truetype');
 }
 
-body {
-  background-color: var(--background);
-  color: var(--foreground);
-  font-family: 'Space Grotesk', sans-serif;
+@font-face {
+  font-family: 'Exo 2';
+  font-style: normal;
+  font-weight: 300 800;
+  font-display: swap;
+  src: url('/assets/fonts/Exo2.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url('/assets/fonts/SpaceGrotesk.ttf') format('truetype');
+}
+
+/* --------------------------------------------------------------------------
+   2. Design System Variables
+   -------------------------------------------------------------------------- */
+:root {
+  --bg-dark: #0a0a1f;
+  --bg-gradient-end: #1a0a2e;
+  --text-main: #f0f4f8;
+  --text-muted: #94a3b8;
+  --text-dim: #64748b;
+
+  /* Category Neon Accent Colors */
+  --c-luffy: #ff0055;
+  --c-zoro: #39ff14;
+  --c-nami: #ff9500;
+  --c-sanji: #ffd700;
+  --c-vegapunk: #bf00ff;
+  --c-robin: #00d9ff;
+  --c-chopper: #ff00ff;
+  --c-speeddial: #38bdf8;
+
+  /* Card Surfaces */
+  --card-bg: rgba(15, 23, 42, 0.75);
+  --card-border: rgba(255, 255, 255, 0.12);
+  --card-hover-border: rgba(255, 255, 255, 0.3);
+
+  /* Status Colors */
+  --status-online: #22c55e;
+  --status-warning: #f59e0b;
+  --status-offline: #64748b;
+  --status-error: #ef4444;
+
+  /* Global Fonts */
+  --font-header: 'Orbitron', sans-serif;
+  --font-sub: 'Exo 2', sans-serif;
+  --font-body: 'Space Grotesk', sans-serif;
+
+  --radius-lg: 12px;
+  --radius-md: 8px;
+  --radius-sm: 4px;
+}
+
+/* --------------------------------------------------------------------------
+   3. Base Body & Accessibility
+   -------------------------------------------------------------------------- */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  min-height: 100vh;
+  background: radial-gradient(circle at top center, var(--bg-dark), var(--bg-gradient-end));
+  color: var(--text-main);
+  font-family: var(--font-body);
   letter-spacing: 0.05em;
   overflow-x: hidden;
 }
 
-/* ============================================================
-   TITLE
-   ============================================================ */
-h1, h2, h3, h4, h5, h6, .title {
-  font-family: 'Orbitron', sans-serif;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
+:focus-visible {
+  outline: 2px solid var(--c-robin);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
 }
 
-/* ============================================================
-   SERVICE CARDS — Ballooning Containment Fix
-   ============================================================ */
-.service-card, .services-group .service, .card {
-  background-color: hsla(240, 50%, 10%, 0.7) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  backdrop-filter: blur(12px);
-  border-radius: var(--radius);
-  transition: all 0.3s ease;
-  clip-path: polygon(0 0, 98% 0, 100% 3%, 100% 97%, 99% 100%, 2% 100%, 0 98%, 0 2%);
-  position: relative;
-  max-height: 180px !important;
-  overflow: hidden !important;
-  contain: paint content !important;
-}
-
-.service-card:hover, .services-group .service:hover {
-  transform: translateY(-4px) scale(1.02);
-  border-color: rgba(255, 255, 255, 0.2) !important;
-  box-shadow: 0 0 20px rgba(139, 92, 246, 0.15);
-  z-index: 10;
-}
-
-/* Shimmer effect */
-.service-card::before, .services-group .service::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 200%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.05),
-    transparent
-  );
-  transition: 0.5s;
-  pointer-events: none;
-}
-
-.service-card:hover::before, .services-group .service:hover::before {
-  left: 100%;
-  transition: 0.5s;
-}
-
-/* Restrain decorative circles & background elements inside card boundaries */
-.service-card::after, .card::after, .service::after,
-div[class*="rounded-full"] {
-  max-width: 100% !important;
-  max-height: 100% !important;
-  overflow: hidden !important;
-}
-
-/* Compact API Error Box styling to prevent visual card explosions */
-.service-widget-error, .widget-error, [class*="widget-error"], [class*="ErrorInformation"] {
-  max-height: 26px !important;
-  overflow: hidden !important;
-  padding: 2px 6px !important;
-  font-size: 0.7rem !important;
-  background: rgba(239, 68, 68, 0.15) !important;
-  border: 1px solid rgba(239, 68, 68, 0.3) !important;
-  border-radius: 4px !important;
-  color: #fca5a5 !important;
-}
-
-.service-widget-error *, .widget-error *, [class*="ErrorInformation"] * {
-  font-size: 0.7rem !important;
-  white-space: nowrap !important;
-  text-overflow: ellipsis !important;
-  overflow: hidden !important;
-  margin: 0 !important;
-}
-
-/* ============================================================
-   STATUS DOTS  —  visual up/down indicators
-   ============================================================ */
-.status-dot, .MuiSnackbar-root .dot {
-  width: 10px !important;
-  height: 10px !important;
-  border-radius: 50% !important;
-  display: inline-block !important;
-  transition: all 0.3s ease;
-  min-width: 10px !important;
-  min-height: 10px !important;
-  max-width: 10px !important;
-  max-height: 10px !important;
-}
-
-/* Green dot for UP services */
-.service-card:has([class*="dot"][style*="green"]),
-.service-card:has(.bg-emerald) {
-  border-left: 3px solid var(--status-up) !important;
-}
-
-/* Red dot/border for DOWN services */
-.service-card:has([class*="dot"][style*="red"]),
-.service-card:has(.bg-rose),
-.service-card:has(.bg-red) {
-  border-left: 3px solid var(--status-down) !important;
-  box-shadow: 0 0 12px hsla(0, 84%, 60%, 0.15) !important;
-}
-
-/* Animate the status dot */
-@keyframes status-pulse-up {
-  0%, 100% { box-shadow: 0 0 4px var(--status-up); }
-  50% { box-shadow: 0 0 10px var(--status-up); }
-}
-
-@keyframes status-pulse-down {
-  0%, 100% { box-shadow: 0 0 4px var(--status-down); }
-  50% { box-shadow: 0 0 10px var(--status-down); }
-}
-
-/* ============================================================
-   SECTION SEPARATORS  —  boxes and lines around groups
-   ============================================================ */
-.services-group {
-  border: 1px solid hsla(260, 30%, 20%, 0.6);
-  border-radius: 1rem;
-  padding: 1.5rem 1rem 1rem 1rem;
-  margin-bottom: 2rem;
-  position: relative;
-  background: hsla(240, 50%, 8%, 0.3);
-  backdrop-filter: blur(4px);
-  box-shadow: 0 4px 30px hsla(240, 50%, 5%, 0.3);
-  animation: group-fade-in 0.6s ease-out backwards;
-}
-
-.services-group:nth-of-type(1) { animation-delay: 0.1s; }
-.services-group:nth-of-type(2) { animation-delay: 0.2s; }
-.services-group:nth-of-type(3) { animation-delay: 0.3s; }
-.services-group:nth-of-type(4) { animation-delay: 0.4s; }
-.services-group:nth-of-type(5) { animation-delay: 0.5s; }
-.services-group:nth-of-type(6) { animation-delay: 0.6s; }
-.services-group:nth-of-type(7) { animation-delay: 0.7s; }
-
-@keyframes group-fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Section accent line at top of each group */
-.services-group::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 10%;
-  right: 10%;
-  height: 2px;
-  border-radius: 999px;
-  opacity: 0.6;
-}
-
-.services-group:nth-of-type(1)::before { background: var(--group-speeddial); box-shadow: 0 0 10px var(--group-speeddial); }
-.services-group:nth-of-type(2)::before { background: var(--group-obs); box-shadow: 0 0 10px var(--group-obs); }
-.services-group:nth-of-type(3)::before { background: var(--group-ai); box-shadow: 0 0 10px var(--group-ai); }
-.services-group:nth-of-type(4)::before { background: var(--group-infra); box-shadow: 0 0 10px var(--group-infra); }
-.services-group:nth-of-type(5)::before { background: var(--group-comms); box-shadow: 0 0 10px var(--group-comms); }
-.services-group:nth-of-type(6)::before { background: var(--group-media); box-shadow: 0 0 10px var(--group-media); }
-.services-group:nth-of-type(7)::before { background: var(--group-auto); box-shadow: 0 0 10px var(--group-auto); }
-
-/* ============================================================
-   GROUP TITLES  —  One Piece crew colors by position
-   ============================================================ */
-.services-group:nth-of-type(1) .group-title,
-.services-group:nth-of-type(1) h2 {
-  color: var(--group-speeddial) !important;
-  text-shadow: 0 0 12px hsla(340, 100%, 50%, 0.4);
-}
-.services-group:nth-of-type(2) .group-title,
-.services-group:nth-of-type(2) h2 {
-  color: var(--group-obs) !important;
-  text-shadow: 0 0 12px hsla(190, 100%, 50%, 0.4);
-}
-.services-group:nth-of-type(3) .group-title,
-.services-group:nth-of-type(3) h2 {
-  color: var(--group-ai) !important;
-  text-shadow: 0 0 12px hsla(280, 100%, 50%, 0.4);
-}
-.services-group:nth-of-type(4) .group-title,
-.services-group:nth-of-type(4) h2 {
-  color: var(--group-infra) !important;
-  text-shadow: 0 0 12px hsla(220, 100%, 60%, 0.4);
-}
-.services-group:nth-of-type(5) .group-title,
-.services-group:nth-of-type(5) h2 {
-  color: var(--group-comms) !important;
-  text-shadow: 0 0 12px hsla(110, 100%, 54%, 0.4);
-}
-.services-group:nth-of-type(6) .group-title,
-.services-group:nth-of-type(6) h2 {
-  color: var(--group-media) !important;
-  text-shadow: 0 0 12px hsla(340, 100%, 50%, 0.4);
-}
-.services-group:nth-of-type(7) .group-title,
-.services-group:nth-of-type(7) h2 {
-  color: var(--group-auto) !important;
-  text-shadow: 0 0 12px hsla(35, 100%, 50%, 0.4);
-}
-
-/* ============================================================
-   HOST BADGES
-   ============================================================ */
-.host-badge {
-  display: inline-block;
-  font-size: 0.65rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  padding: 0.15em 0.55em;
-  border-radius: 999px;
-  margin-left: 0.4em;
-  vertical-align: middle;
-  font-family: 'Orbitron', sans-serif;
-  text-transform: uppercase;
-}
-
-.host-badge--z0r0 {
-  background: var(--badge-z0r0-bg);
-  color: var(--badge-z0r0-fg);
-  border: 1px solid hsla(110, 100%, 54%, 0.3);
-}
-
-.host-badge--luffy {
-  background: var(--badge-luffy-bg);
-  color: var(--badge-luffy-fg);
-  border: 1px solid hsla(340, 100%, 50%, 0.3);
-}
-
-/* ============================================================
-   STATUS INDICATORS
-   ============================================================ */
-.status-indicator {
-  transition: opacity 0.3s ease;
-}
-
-.status-indicator[status="down"] {
-  filter: drop-shadow(0 0 4px hsla(0, 84%, 60%, 0.5));
-}
-
-.status-indicator[status="up"] {
-  filter: drop-shadow(0 0 4px hsla(110, 100%, 54%, 0.3));
-  animation: pulse-green 3s ease-in-out infinite;
-}
-
-@keyframes pulse-green {
-  0%, 100% { filter: drop-shadow(0 0 4px hsla(110, 100%, 54%, 0.3)); }
-  50% { filter: drop-shadow(0 0 8px hsla(110, 100%, 54%, 0.5)); }
-}
-
-/* ============================================================
-   SEARCH BARS  —  perpendicular (stacked) with banner labels
-   ============================================================ */
-
-/* Container for all widgets — stack search bars vertically */
-.widgets-list {
-  flex-direction: column !important;
-  align-items: stretch !important;
-  gap: 0.75rem !important;
-}
-
-/* Each search bar wrapper gets a banner label injected by JS */
-.search-banner-label {
-  display: block;
-  font-family: 'Orbitron', sans-serif;
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  padding: 0.3rem 0 0.15rem 0.25rem;
-  margin-bottom: 0.15rem;
-  border-left: 3px solid var(--accent);
-  padding-left: 0.5rem;
-  animation: label-slide-in 0.4s ease-out backwards;
-}
-
-.search-banner-label--perplexity {
-  color: hsl(190, 100%, 60%);
-  border-left-color: hsl(190, 100%, 50%);
-}
-
-.search-banner-label--searxng {
-  color: hsl(280, 100%, 60%);
-  border-left-color: hsl(280, 100%, 50%);
-}
-
-@keyframes label-slide-in {
-  from {
-    opacity: 0;
-    transform: translateX(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-.search-bar,
-input[type="text"],
-input[type="search"] {
-  background-color: var(--muted) !important;
-  border: 1px solid var(--border) !important;
-  color: var(--foreground) !important;
-  font-family: 'Space Grotesk', sans-serif;
-  border-radius: 9999px;
-  padding: 0.75rem 1.5rem;
-  width: 100% !important;
-}
-
-.search-bar:focus-within,
-input:focus {
-  border-color: var(--primary) !important;
-  box-shadow: 0 0 0 2px rgba(236, 72, 153, 0.2);
-}
-
-/* ============================================================
-   HEADER / NAV
-   ============================================================ */
-header {
-  background-color: hsla(240, 50%, 8%, 0.8) !important;
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--border);
-}
-
-/* ============================================================
-   RESOURCE & DATETIME WIDGETS  —  enhanced styling
-   ============================================================ */
-.resource-widget,
-.datetime-widget,
-.glances-widget {
-  background: hsla(240, 50%, 10%, 0.6) !important;
-  border: 1px solid hsla(260, 30%, 25%, 0.5) !important;
-  border-radius: var(--radius);
-  backdrop-filter: blur(8px);
-  padding: 0.75rem;
-}
-
-/* Datetime — make it stand out */
-.datetime-widget {
-  text-align: center;
-  border-left: 3px solid var(--accent) !important;
-  padding: 1rem !important;
-}
-
-.datetime-widget .text-3xl,
-.datetime-widget [class*="text-xl"] {
-  font-family: 'Orbitron', sans-serif !important;
-  letter-spacing: 0.08em !important;
-  background: linear-gradient(135deg, var(--accent), var(--secondary));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* Resource widget labels */
-.resource-widget [class*="label"],
-.glances-widget [class*="label"] {
-  font-family: 'Orbitron', sans-serif !important;
-  font-size: 0.65rem !important;
-  letter-spacing: 0.1em !important;
-  text-transform: uppercase !important;
-  color: var(--muted-foreground) !important;
-}
-
-/* Resource bars */
-.resource-widget [class*="bar"],
-.glances-widget [class*="bar"] {
-  border-radius: 999px !important;
-  overflow: hidden !important;
-}
-
-/* ============================================================
-   ANIMATIONS
-   ============================================================ */
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-5px); }
-}
-
-@keyframes pulse-glow {
-  0%, 100% { opacity: 0.5; }
-  50% { opacity: 0.8; }
-}
-
-@keyframes gradient-shift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-/* ============================================================
-   BACKGROUND EFFECTS  —  CSS gradient (no remote image for fast load)
-   ============================================================ */
-#lovable-background {
+/* --------------------------------------------------------------------------
+   4. Background & Atmosphere — Egghead Island
+   -------------------------------------------------------------------------- */
+.atmosphere-container {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: -1;
+  inset: 0;
   pointer-events: none;
+  z-index: 0;
   overflow: hidden;
-  background: linear-gradient(180deg, #0a0a1f 0%, #1a0a2e 50%, #0a0a1f 100%);
 }
 
 .holographic-grid {
   position: absolute;
   inset: 0;
-  opacity: 0.03;
-  background-image:
-    linear-gradient(hsl(280,100%,50%,0.3) 1px, transparent 1px),
-    linear-gradient(90deg, hsl(280,100%,50%,0.3) 1px, transparent 1px);
-  background-size: 80px 80px;
-  animation: pulse-glow 4s ease-in-out infinite;
+  background-image: 
+    linear-gradient(to right, rgba(0, 217, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(191, 0, 255, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  animation: gridPulse 8s ease-in-out infinite alternate;
+}
+
+@keyframes gridPulse {
+  0% { opacity: 0.3; transform: scale(1); }
+  100% { opacity: 0.7; transform: scale(1.02); }
 }
 
 .fog-layer {
   position: absolute;
-  width: 100%;
-  opacity: 0.03;
+  width: 200%;
+  height: 250px;
+  background: radial-gradient(ellipse at center, rgba(191, 0, 255, 0.08), transparent 70%);
   filter: blur(40px);
+}
+.fog-1 { top: 20%; animation: fogDrift 60s ease-in-out infinite alternate; }
+.fog-2 { top: 60%; animation: fogDrift 90s ease-in-out infinite alternate-reverse; }
+
+@keyframes fogDrift {
+  0% { transform: translateX(-10%); }
+  100% { transform: translateX(10%); }
+}
+
+.atmosphere-silhouette {
+  position: absolute;
+  opacity: 0.04;
+  filter: drop-shadow(0 0 15px var(--c-vegapunk));
+}
+.sunny-silhouette {
+  bottom: 10%;
+  left: -200px;
+  width: 180px;
+  animation: sunnyDrift 120s linear infinite;
+}
+.egghead-silhouette {
+  top: 15%;
+  right: -250px;
+  width: 220px;
+  animation: domeDrift 90s linear infinite;
+}
+
+@keyframes sunnyDrift {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(calc(100vw + 400px)); }
+}
+@keyframes domeDrift {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(calc(-100vw - 500px)); }
 }
 
 .particle {
   position: absolute;
   border-radius: 50%;
-  opacity: 0.4;
-  animation: float 6s ease-in-out infinite;
+  opacity: 0.6;
+  animation: particleFloat infinite linear;
 }
 
-/* ============================================================
-   NEON TEXT UTILITIES
-   ============================================================ */
-.neon-text-red    { text-shadow: 0 0 7px hsl(340 100% 50% / 0.8); color: var(--luffy-red) !important; }
-.neon-text-green  { text-shadow: 0 0 7px hsl(110 100% 54% / 0.8); color: var(--zoro-green) !important; }
-.neon-text-orange { text-shadow: 0 0 7px hsl(35 100% 50% / 0.8); color: var(--nami-orange) !important; }
-.neon-text-yellow { text-shadow: 0 0 7px hsl(51 100% 50% / 0.8); color: var(--sanji-yellow) !important; }
-.neon-text-purple { text-shadow: 0 0 7px hsl(280 100% 50% / 0.8); color: var(--vegapunk-purple) !important; }
-.neon-text-teal   { text-shadow: 0 0 7px hsl(190 100% 50% / 0.8); color: var(--robin-teal) !important; }
-.neon-text-pink   { text-shadow: 0 0 7px hsl(300 100% 50% / 0.8); color: var(--chopper-pink) !important; }
-
-/* Status dot & ping indicator height cap fix */
-.service-ping,
-.service-status,
-.ping-dot,
-.status-dot,
-.service-status-dot,
-[class*="ping-"],
-[class*="status-"] {
-  max-height: 1.5rem !important;
-  max-width: 1.5rem !important;
-  overflow: hidden !important;
+@keyframes particleFloat {
+  0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+  20% { opacity: 0.7; }
+  80% { opacity: 0.7; }
+  100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
 }
 
+/* --------------------------------------------------------------------------
+   5. Navbar — Straw Hat Command Bar
+   -------------------------------------------------------------------------- */
+.command-bar {
+  position: sticky;
+  top: 0;
+  height: 72px;
+  width: 100%;
+  z-index: 100;
+  background: rgba(10, 10, 31, 0.85);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+}
+
+.command-bar::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, var(--c-luffy), var(--c-zoro), var(--c-nami), var(--c-vegapunk), var(--c-robin));
+  animation: neonLineSweep 6s linear infinite;
+}
+
+@keyframes neonLineSweep {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+.brand-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.jolly-roger-icon {
+  width: 40px;
+  height: 40px;
+  filter: drop-shadow(0 0 8px var(--c-luffy));
+  animation: jollyPulse 3s ease-in-out infinite;
+}
+
+@keyframes jollyPulse {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 8px var(--c-luffy)); }
+  50% { transform: scale(1.05); filter: drop-shadow(0 0 16px var(--c-luffy)); }
+}
+
+.brand-title {
+  font-family: var(--font-header);
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 0 0 10px var(--c-luffy), 0 0 20px rgba(255, 0, 85, 0.5);
+  letter-spacing: 0.15em;
+}
+
+.log-pose-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+}
+
+.log-pose-needle {
+  transform-origin: center;
+  animation: logPoseSpin 8s linear infinite;
+}
+
+@keyframes logPoseSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.search-container {
+  position: relative;
+  width: 320px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px 16px 10px 42px;
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 24px;
+  color: var(--text-main);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--c-robin);
+  box-shadow: 0 0 15px rgba(0, 217, 255, 0.4);
+}
+
+.search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  fill: var(--text-muted);
+}
+
+.nav-stats-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-family: var(--font-header);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.stat-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.stat-pill-val {
+  color: var(--c-zoro);
+  font-weight: 700;
+}
+
+/* --------------------------------------------------------------------------
+   6. Main Content & Layout
+   -------------------------------------------------------------------------- */
+.dashboard-main {
+  position: relative;
+  z-index: 1;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+/* Section Crew Header */
+.category-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.crew-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.08);
+  position: relative;
+}
+
+.crew-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.crew-avatar-img {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--accent-color, var(--c-luffy));
+  box-shadow: 0 0 12px var(--accent-color, var(--c-luffy));
+}
+
+.crew-title-group h2 {
+  font-family: var(--font-header);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.1em;
+}
+
+.crew-subtitle {
+  font-family: var(--font-sub);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.vivre-card-summary {
+  font-family: var(--font-header);
+  font-size: 0.8rem;
+  padding: 4px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--accent-color, var(--c-luffy));
+  border-radius: 20px;
+  color: var(--accent-color, var(--c-luffy));
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Service Grid Layout */
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+/* --------------------------------------------------------------------------
+   7. Cyberpunk Wanted Posters Service Cards
+   -------------------------------------------------------------------------- */
+.wanted-card {
+  position: relative;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(12px);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1rem;
+  overflow: hidden;
+  clip-path: polygon(0 0, 96% 0, 100% 4%, 100% 96%, 96% 100%, 4% 100%, 0 96%, 0 4%);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.wanted-card::before {
+  content: 'WANTED';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-25deg);
+  font-family: var(--font-header);
+  font-size: 4rem;
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.03);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.wanted-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent-color, var(--c-robin));
+  box-shadow: 0 0 24px rgba(0, 217, 255, 0.2);
+}
+
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.card-icon-container {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 0 10px var(--accent-color, rgba(255, 255, 255, 0.1));
+}
+
+.card-icon-container img, .card-icon-container svg {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
+.card-identity {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-title {
+  font-family: var(--font-sub);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.card-onepiece-sub {
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* Den Den Mushi Snail Indicator */
+.den-den-mushi-container {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+}
+
+.snail-svg {
+  width: 100%;
+  height: 100%;
+  transition: transform 0.3s ease;
+}
+
+.snail-online {
+  filter: drop-shadow(0 0 6px var(--status-online));
+  animation: snailBob 2.5s ease-in-out infinite;
+}
+
+.snail-warning {
+  filter: drop-shadow(0 0 6px var(--status-warning));
+  animation: snailSweat 1.5s ease-in-out infinite;
+}
+
+.snail-offline {
+  filter: grayscale(1) opacity(0.5);
+}
+
+@keyframes snailBob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+@keyframes snailSweat {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+/* Bounty Metric Display */
+.card-bounty-box {
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.bounty-label {
+  font-family: var(--font-header);
+  font-size: 0.7rem;
+  color: var(--text-dim);
+}
+
+.bounty-value {
+  font-family: var(--font-header);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--c-sanji);
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
+}
+
+/* Card Action Buttons */
+.card-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.action-btn {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-main);
+  font-family: var(--font-header);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-decoration: none;
+  text-align: center;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.action-btn-primary {
+  background: linear-gradient(135deg, rgba(255, 0, 85, 0.2), rgba(191, 0, 255, 0.2));
+  border-color: rgba(255, 0, 85, 0.4);
+}
+.action-btn-primary:hover {
+  background: linear-gradient(135deg, rgba(255, 0, 85, 0.4), rgba(191, 0, 255, 0.4));
+  box-shadow: 0 0 12px rgba(255, 0, 85, 0.4);
+}
+
+.action-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* Bounded Widget Error Container (Prevents Ballooning) */
+.widget-error-pill {
+  max-height: 80px;
+  overflow-y: auto;
+  padding: 6px 10px;
+  font-size: 0.75rem;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--radius-sm);
+  color: #fca5a5;
+  line-height: 1.3;
+}
+
+/* --------------------------------------------------------------------------
+   8. Category 5: Vegapunk Records Satellite Constellation
+   -------------------------------------------------------------------------- */
+.constellation-container {
+  position: relative;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(191, 0, 255, 0.3);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  box-shadow: inset 0 0 30px rgba(191, 0, 255, 0.1);
+}
+
+.constellation-layout {
+  position: relative;
+  min-height: 480px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.constellation-lines-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.constellation-stella-center {
+  position: relative;
+  z-index: 10;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(191, 0, 255, 0.4), rgba(10, 10, 31, 0.9));
+  border: 2px solid var(--c-vegapunk);
+  box-shadow: 0 0 30px var(--c-vegapunk);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.constellation-stella-center:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 50px var(--c-vegapunk);
+}
+
+.satellite-grid {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  align-content: space-between;
+}
+
+.satellite-card {
+  position: relative;
+  z-index: 5;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(191, 0, 255, 0.25);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.satellite-card:hover {
+  border-color: var(--c-vegapunk);
+  box-shadow: 0 0 20px rgba(191, 0, 255, 0.3);
+}
+
+/* Brook 💀🎵 Soul King Easter Egg */
+.brook-card {
+  border-color: #f1f5f9;
+  box-shadow: 0 0 15px rgba(241, 245, 249, 0.2);
+}
+.brook-card:hover {
+  box-shadow: 0 0 30px rgba(241, 245, 249, 0.5);
+}
+
+.musical-note {
+  position: absolute;
+  font-size: 1.2rem;
+  color: #f1f5f9;
+  opacity: 0;
+  pointer-events: none;
+  animation: noteFloat 2s ease-out forwards;
+}
+
+@keyframes noteFloat {
+  0% { transform: translateY(0) scale(0.8); opacity: 1; }
+  100% { transform: translateY(-40px) scale(1.2); opacity: 0; }
+}
+
+.brook-speech-bubble {
+  position: absolute;
+  top: -36px;
+  right: -10px;
+  background: #f1f5f9;
+  color: #0f172a;
+  font-family: var(--font-header);
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+  pointer-events: none;
+  animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn {
+  0% { transform: scale(0); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* --------------------------------------------------------------------------
+   9. Speeddial Internet Bookmarks Section
+   -------------------------------------------------------------------------- */
+.speeddial-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.speeddial-tile {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: var(--text-main);
+  transition: all 0.25s ease;
+}
+
+.speeddial-tile:hover {
+  background: rgba(56, 189, 248, 0.15);
+  border-color: var(--c-speeddial);
+  transform: translateY(-2px);
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.25);
+}
+
+.speeddial-favicon {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.speeddial-letter-tile {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: var(--c-speeddial);
+  color: #0f172a;
+  font-family: var(--font-header);
+  font-size: 1rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.speeddial-info {
+  display: flex;
+  flex-direction: column;
+}
+.speeddial-name {
+  font-family: var(--font-sub);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+.speeddial-cat {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+/* --------------------------------------------------------------------------
+   10. Media Queries & Motion Reduction
+   -------------------------------------------------------------------------- */
+@media (max-width: 1024px) {
+  .services-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+  .satellite-grid { grid-template-columns: repeat(2, 1fr); }
+  .constellation-layout { min-height: auto; flex-direction: column; gap: 2rem; }
+  .satellite-grid { position: relative; }
+}
+
+@media (max-width: 768px) {
+  .command-bar { padding: 0 1rem; }
+  .search-container { width: 180px; }
+  .nav-stats-bar { display: none; }
+  .services-grid { grid-template-columns: 1fr; }
+  .satellite-grid { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

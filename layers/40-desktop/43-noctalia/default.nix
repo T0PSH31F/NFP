@@ -97,7 +97,7 @@ in
       # plugins predate this. This activation patches any plugin under
       # ~/.config/noctalia/plugins/ that is missing the key, so future
       # "Install" from the store never hits "missing mandatory key 'min_noctalia'".
-      patchAllNoctaliaPlugins = pkgs.writeShellScript "patch-all-noctalia-plugins" ''
+      patchAllNoctaliaPlugins = pkgs.writeShellScriptBin "patch-all-noctalia-plugins" ''
         set -euo pipefail
         PLUGINS_DIR="$HOME/.config/noctalia/plugins"
         [ -d "$PLUGINS_DIR" ] || exit 0
@@ -154,7 +154,7 @@ in
           ]
         );
         home.activation.patchNoctaliaPlugins = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-          ${patchAllNoctaliaPlugins}
+          ${patchAllNoctaliaPlugins}/bin/patch-all-noctalia-plugins
         '';
         home.packages = with pkgs; [
           patchAllNoctaliaPlugins

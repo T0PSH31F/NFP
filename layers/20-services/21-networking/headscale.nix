@@ -22,7 +22,7 @@ in
     };
     baseDomain = mkOption {
       type = types.str;
-      default = "grandlix.net";
+      default = "nfp.nix";
       description = "Magic DNS base domain for the tailnet";
     };
   };
@@ -87,7 +87,7 @@ in
     systemd.tmpfiles.rules = [
       "d /var/lib/headscale 0750 headscale headscale -"
       "d /var/lib/headscale/acl 0750 headscale headscale -"
-      ''f+ /var/lib/headscale/acl/hujson 0640 headscale headscale - {\n  "groups": {\n    "group:admin": ["t0psh31f@grandlix.net"],\n    "group:guest": []\n  },\n  "tagOwners": {\n    "tag:control-plane": ["group:admin"],\n    "tag:router": ["group:admin"],\n    "tag:pkb": ["group:admin"],\n    "tag:media": ["group:admin"],\n    "tag:docs": ["group:admin"],\n    "tag:monitoring": ["group:admin"],\n    "tag:desktop": ["group:admin"]\n  },\n  "acls": [\n    {\n      "action": "accept",\n      "src": ["group:admin"],\n      "dst": ["*:*"]\n    },\n    {\n      "action": "accept",\n      "src": ["group:guest"],\n      "dst": ["tag:media:80,443,8096,5000", "tag:docs:80,443,3007"]\n    }\n  ]\n}''
+      ''f+ /var/lib/headscale/acl/hujson 0640 headscale headscale - {\n  "groups": {\n    "group:admin": ["t0psh31f@nfp.nix"],\n    "group:guest": []\n  },\n  "tagOwners": {\n    "tag:control-plane": ["group:admin"],\n    "tag:router": ["group:admin"],\n    "tag:pkb": ["group:admin"],\n    "tag:media": ["group:admin"],\n    "tag:docs": ["group:admin"],\n    "tag:monitoring": ["group:admin"],\n    "tag:desktop": ["group:admin"]\n  },\n  "acls": [\n    {\n      "action": "accept",\n      "src": ["group:admin"],\n      "dst": ["*:*"]\n    },\n    {\n      "action": "accept",\n      "src": ["group:guest"],\n      "dst": ["tag:media:80,443,8096,5000", "tag:docs:80,443,3007"]\n    }\n  ]\n}''
     ];
 
     # Persistence

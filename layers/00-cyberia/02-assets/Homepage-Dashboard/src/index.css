@@ -1,0 +1,217 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Exo+2:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 240 67% 8%;
+    --foreground: 210 40% 98%;
+
+    --card: 240 50% 10%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 240 50% 10%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 340 100% 50%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 260 100% 50%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 240 30% 15%;
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 190 100% 50%;
+    --accent-foreground: 240 67% 8%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 260 30% 20%;
+    --input: 260 30% 20%;
+    --ring: 340 100% 50%;
+
+    --radius: 0.75rem;
+
+    /* Crew Colors */
+    --luffy-red: 340 100% 50%;
+    --zoro-green: 110 100% 54%;
+    --nami-orange: 35 100% 50%;
+    --sanji-yellow: 51 100% 50%;
+    --vegapunk-purple: 280 100% 50%;
+    --robin-teal: 190 100% 50%;
+    --chopper-pink: 300 100% 50%;
+
+    /* Satellite Personality Tints */
+    --shaka-light: 0 0% 100%;
+    --lilith-dark: 0 100% 27%;
+    --brook-bone: 60 56% 91%;
+    --edison-bright: 60 100% 50%;
+    --pythagoras-wise: 210 100% 39%;
+    --york-greed: 51 100% 50%;
+    --atlas-power: 348 83% 47%;
+
+    --sidebar-background: 240 50% 10%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 340 100% 50%;
+    --sidebar-primary-foreground: 210 40% 98%;
+    --sidebar-accent: 260 30% 15%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 260 30% 20%;
+    --sidebar-ring: 340 100% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Space Grotesk', sans-serif;
+    letter-spacing: 0.05em;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Orbitron', sans-serif;
+  }
+}
+
+@layer components {
+  .font-orbitron {
+    font-family: 'Orbitron', sans-serif;
+  }
+  .font-exo {
+    font-family: 'Exo 2', sans-serif;
+  }
+  .font-space {
+    font-family: 'Space Grotesk', sans-serif;
+  }
+}
+
+/* Neon text glow utility */
+.neon-text-red {
+  text-shadow: 0 0 7px hsl(340 100% 50% / 0.8), 0 0 20px hsl(340 100% 50% / 0.4), 0 0 40px hsl(340 100% 50% / 0.2);
+}
+.neon-text-green {
+  text-shadow: 0 0 7px hsl(110 100% 54% / 0.8), 0 0 20px hsl(110 100% 54% / 0.4);
+}
+.neon-text-orange {
+  text-shadow: 0 0 7px hsl(35 100% 50% / 0.8), 0 0 20px hsl(35 100% 50% / 0.4);
+}
+.neon-text-yellow {
+  text-shadow: 0 0 7px hsl(51 100% 50% / 0.8), 0 0 20px hsl(51 100% 50% / 0.4);
+}
+.neon-text-purple {
+  text-shadow: 0 0 7px hsl(280 100% 50% / 0.8), 0 0 20px hsl(280 100% 50% / 0.4);
+}
+.neon-text-teal {
+  text-shadow: 0 0 7px hsl(190 100% 50% / 0.8), 0 0 20px hsl(190 100% 50% / 0.4);
+}
+.neon-text-pink {
+  text-shadow: 0 0 7px hsl(300 100% 50% / 0.8), 0 0 20px hsl(300 100% 50% / 0.4);
+}
+
+/* Grain overlay */
+.grain-overlay::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  opacity: 0.06;
+  pointer-events: none;
+  z-index: 1000;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+}
+
+/* Wanted poster watermark */
+.wanted-watermark::before {
+  content: 'WANTED';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-15deg);
+  font-family: 'Orbitron', sans-serif;
+  font-size: 3rem;
+  font-weight: 900;
+  opacity: 0.03;
+  pointer-events: none;
+  white-space: nowrap;
+  letter-spacing: 0.2em;
+}
+
+/* Shimmer sweep */
+@keyframes shimmer-sweep {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.shimmer-border {
+  background-size: 200% 100%;
+  animation: shimmer-sweep 3.5s linear infinite;
+}
+
+/* Den Den Mushi bob */
+@keyframes denden-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+/* Log Pose rotation */
+@keyframes log-pose-rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Jolly Roger pulse */
+@keyframes jolly-pulse {
+  0%, 100% { filter: drop-shadow(0 0 8px hsl(340 100% 50% / 0.6)); }
+  50% { filter: drop-shadow(0 0 20px hsl(340 100% 50% / 0.9)); }
+}
+
+/* Floating notes for Brook */
+@keyframes float-note {
+  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(-40px) rotate(20deg); opacity: 0; }
+}
+
+/* Card float */
+@keyframes card-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+
+/* Fog drift */
+@keyframes fog-drift-right {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+@keyframes fog-drift-left {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+
+/* Neon gradient border animation */
+@keyframes gradient-border {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.7; }
+}
+
+/* Particle float */
+@keyframes particle-float {
+  0%, 100% { transform: translateY(0) translateX(0); opacity: 0.4; }
+  25% { transform: translateY(-20px) translateX(10px); opacity: 0.8; }
+  50% { transform: translateY(-40px) translateX(-5px); opacity: 0.4; }
+  75% { transform: translateY(-20px) translateX(15px); opacity: 0.7; }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

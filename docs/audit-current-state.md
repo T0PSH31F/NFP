@@ -18,7 +18,7 @@
 - **Headscale Control Plane**: Active on `nami` (`headscale.nix`, port 8086).
 - **Tailscale Clients**: Configured via `layers/20-services/21-networking/tailscale.nix` targeting `https://headscale.lovelain.duckdns.org`.
 - **Legacy Meshes**: ZeroTier and Clan WireGuard fully decommissioned across `networking.nix` and `network-setup-guide.md`.
-- **ACLs & MagicDNS**: Wildcard ACL currently applied (`/var/lib/headscale/acl/hujson`). Basic DNS enabled in Headscale options (`base_domain = "grandlix.net"`). Needs hardening for admin vs guest scopes and canonical hostname alignment.
+- **ACLs & MagicDNS**: Wildcard ACL currently applied (`/var/lib/headscale/acl/hujson`). Basic DNS enabled in Headscale options (`base_domain = "lovelain.duckdns.org"`). Needs hardening for admin vs guest scopes and canonical hostname alignment.
 
 ### B. SSH & Emergency Access
 - **Primary Admin Access**: OpenSSH over Tailnet. Key-only auth enforced on `nami` (`PasswordAuthentication = false`, `PermitRootLogin = "prohibit-password"`).

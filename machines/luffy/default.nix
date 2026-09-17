@@ -134,8 +134,9 @@ in
       prometheus.port = 9090;
     };
     homepage-dashboard = {
+      enable = true;
       port = 3007;
-      lovable.enable = true;
+      environmentFile = config.sops.templates."homepage-api-env".path;
     };
     adguard = {
       enable = true;
@@ -512,6 +513,26 @@ in
   services.matrix-synapse.extraConfigFiles = [
     config.sops.templates."synapse-email-config".path
   ];
+
+  sops.templates."homepage-api-env" = {
+    content = ''
+      IMMICH_API_KEY=""
+      HEADSCALE_API_KEY=""
+      ADGUARD_AUTH=""
+      PORTAINER_API_KEY=""
+      JELLYFIN_API_KEY=""
+      SONARR_API_KEY=""
+      RADARR_API_KEY=""
+      LIDARR_API_KEY=""
+      PROWLARR_API_KEY=""
+      BAZARR_API_KEY=""
+      OVERSEERR_API_KEY=""
+      READARR_API_KEY=""
+      GRAFANA_API_KEY=""
+    '';
+    mode = "0640";
+    owner = "homepage-dashboard";
+  };
 
   # Bind Synapse HTTP listener to 0.0.0.0 so z0r0's hermes can reach it via Tailscale
   services.matrix-synapse.settings.listeners = [

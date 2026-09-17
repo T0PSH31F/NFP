@@ -48,6 +48,7 @@ with lib;
         kong_key_codex = mkSecret "kong_key_codex";
         kong_key_cursor = mkSecret "kong_key_cursor";
         kong_key_deerflow = mkSecret "kong_key_deerflow";
+        kong_key_polyfloor = mkSecret "kong_key_polyfloor";
 
         # ExtremeRouter & OmniRoute remote API keys
         extremerouter_api_key = mkSecret "extremerouter_api_key";
@@ -77,6 +78,7 @@ with lib;
           KONG_KEY_CODEX=${config.sops.placeholder.kong_key_codex}
           KONG_KEY_CURSOR=${config.sops.placeholder.kong_key_cursor}
           KONG_KEY_DEERFLOW=${config.sops.placeholder.kong_key_deerflow}
+          KONG_KEY_POLYFLOOR=${config.sops.placeholder.kong_key_polyfloor}
         '';
         owner = "root";
         group = "root";

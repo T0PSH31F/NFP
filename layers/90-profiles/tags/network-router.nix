@@ -8,6 +8,7 @@
     services.caddy-server.enable = lib.mkDefault true;
     layers.layer-20.services.config = {
       homepage-dashboard.enable = lib.mkDefault true;
+      fleet-healthcheck.enable = lib.mkDefault true;
       tailscale.enable = lib.mkDefault true;
     };
   };

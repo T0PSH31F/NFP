@@ -28,8 +28,8 @@
 
 2. **Phase 1 (FINISH & HARDEN)**:
    - Harden Headscale ACL hujson rules in `layers/20-services/21-networking/headscale.nix` (`group:admin` vs `group:guest`).
-   - Verify MagicDNS / internal domain routing (`.grandlix.net`).
+   - Verify MagicDNS / internal domain routing (`.lovelain.duckdns.org`).
 
 3. **Phase 3 & Phase 8 (DOCUMENTATION & BROWSER ROUTING)**:
-   - Ensure browser home page on `z0r0` points to `http://home.grandlix.net` or `http://100.72.46.75:3007`.
+   - Ensure browser home page on `z0r0` points to `http://home.lovelain.duckdns.org` or `http://100.72.46.75:3007`.
    - Document Syncthing configuration, Headscale ACLs, and maintenance routines across READMEs.
