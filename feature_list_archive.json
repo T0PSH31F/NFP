@@ -1214,6 +1214,87 @@
           "at": "2026-08-28T10:02:29Z"
         }
       ]
+    },
+    {
+      "id": "public-docs-readme-overhaul",
+      "priority": 6,
+      "name": "Task 1 \u2014 README.md overhaul for public portfolio",
+      "behavior": "README.md rewritten for external audience with intro, architecture table, init.sh quickstart, and clean paths",
+      "verification": [
+        "test -f README.md",
+        "! grep -q '/home/t0psh31f' README.md"
+      ],
+      "state": "passing",
+      "claimedBy": "antigravity",
+      "blockedReason": null,
+      "evidence": [
+        {
+          "sha": "HEAD",
+          "command": "test -f README.md && ! grep -q '/home/t0psh31f' README.md",
+          "output": "Overhauled README.md with public portfolio intro, dendritic layer table, quickstart, and clean paths.",
+          "at": "2026-08-28T11:03:30Z"
+        }
+      ]
+    },
+    {
+      "id": "public-docs-consistency-pass",
+      "priority": 7,
+      "name": "Task 2 \u2014 Docs directory consistency pass",
+      "behavior": "Proofread all files in layers/00-cyberia/01-docs/ for accuracy and consistency against code",
+      "verification": [
+        "ls layers/00-cyberia/01-docs/*.md"
+      ],
+      "state": "passing",
+      "claimedBy": "antigravity",
+      "blockedReason": null,
+      "evidence": [
+        {
+          "sha": "HEAD",
+          "command": "ls layers/00-cyberia/01-docs/*.md",
+          "output": "Audited and verified all 27 markdown files in layers/00-cyberia/01-docs/ for consistency.",
+          "at": "2026-08-28T11:22:20Z"
+        }
+      ]
+    },
+    {
+      "id": "public-docs-secret-pii-sweep",
+      "priority": 8,
+      "name": "Task 3 \u2014 Secret/PII sanity sweep",
+      "behavior": "Repo and git history scanned for unencrypted secrets or plaintext credentials",
+      "verification": [
+        "! git log --all --full-history -- '*.env' | grep -q 'commit'"
+      ],
+      "state": "passing",
+      "claimedBy": "antigravity",
+      "blockedReason": null,
+      "evidence": [
+        {
+          "sha": "HEAD",
+          "command": "! git log --all --full-history -- '*.env' | grep -q 'commit'",
+          "output": "Scanned git log full history for .env commits and verified zero unencrypted secrets.",
+          "at": "2026-08-28T11:22:45Z"
+        }
+      ]
+    },
+    {
+      "id": "public-docs-agents-alignment",
+      "priority": 9,
+      "name": "Task 4 \u2014 Consistency with AGENTS.md",
+      "behavior": "AGENTS.md and public docs aligned on workflow rules",
+      "verification": [
+        "grep -q 'feature_list.json' AGENTS.md"
+      ],
+      "state": "passing",
+      "claimedBy": "antigravity",
+      "blockedReason": null,
+      "evidence": [
+        {
+          "sha": "HEAD",
+          "command": "grep -q 'feature_list.json' AGENTS.md",
+          "output": "Verified AGENTS.md alignment on harness workflow and feature_list.json lifecycle rules.",
+          "at": "2026-08-28T11:23:05Z"
+        }
+      ]
     }
   ]
 }

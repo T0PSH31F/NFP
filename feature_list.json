@@ -9,87 +9,6 @@
   },
   "features": [
     {
-      "id": "public-docs-readme-overhaul",
-      "priority": 6,
-      "name": "Task 1 \u2014 README.md overhaul for public portfolio",
-      "behavior": "README.md rewritten for external audience with intro, architecture table, init.sh quickstart, and clean paths",
-      "verification": [
-        "test -f README.md",
-        "! grep -q '/home/t0psh31f' README.md"
-      ],
-      "state": "passing",
-      "claimedBy": "antigravity",
-      "blockedReason": null,
-      "evidence": [
-        {
-          "sha": "HEAD",
-          "command": "test -f README.md && ! grep -q '/home/t0psh31f' README.md",
-          "output": "Overhauled README.md with public portfolio intro, dendritic layer table, quickstart, and clean paths.",
-          "at": "2026-08-28T11:03:30Z"
-        }
-      ]
-    },
-    {
-      "id": "public-docs-consistency-pass",
-      "priority": 7,
-      "name": "Task 2 \u2014 Docs directory consistency pass",
-      "behavior": "Proofread all files in layers/00-cyberia/01-docs/ for accuracy and consistency against code",
-      "verification": [
-        "ls layers/00-cyberia/01-docs/*.md"
-      ],
-      "state": "passing",
-      "claimedBy": "antigravity",
-      "blockedReason": null,
-      "evidence": [
-        {
-          "sha": "HEAD",
-          "command": "ls layers/00-cyberia/01-docs/*.md",
-          "output": "Audited and verified all 27 markdown files in layers/00-cyberia/01-docs/ for consistency.",
-          "at": "2026-08-28T11:22:20Z"
-        }
-      ]
-    },
-    {
-      "id": "public-docs-secret-pii-sweep",
-      "priority": 8,
-      "name": "Task 3 \u2014 Secret/PII sanity sweep",
-      "behavior": "Repo and git history scanned for unencrypted secrets or plaintext credentials",
-      "verification": [
-        "! git log --all --full-history -- '*.env' | grep -q 'commit'"
-      ],
-      "state": "passing",
-      "claimedBy": "antigravity",
-      "blockedReason": null,
-      "evidence": [
-        {
-          "sha": "HEAD",
-          "command": "! git log --all --full-history -- '*.env' | grep -q 'commit'",
-          "output": "Scanned git log full history for .env commits and verified zero unencrypted secrets.",
-          "at": "2026-08-28T11:22:45Z"
-        }
-      ]
-    },
-    {
-      "id": "public-docs-agents-alignment",
-      "priority": 9,
-      "name": "Task 4 \u2014 Consistency with AGENTS.md",
-      "behavior": "AGENTS.md and public docs aligned on workflow rules",
-      "verification": [
-        "grep -q 'feature_list.json' AGENTS.md"
-      ],
-      "state": "passing",
-      "claimedBy": "antigravity",
-      "blockedReason": null,
-      "evidence": [
-        {
-          "sha": "HEAD",
-          "command": "grep -q 'feature_list.json' AGENTS.md",
-          "output": "Verified AGENTS.md alignment on harness workflow and feature_list.json lifecycle rules.",
-          "at": "2026-08-28T11:23:05Z"
-        }
-      ]
-    },
-    {
       "id": "observability-homepage-final-pass",
       "priority": 10,
       "name": "Observability + Homepage Final Pass + Re-Verification",
@@ -284,6 +203,51 @@
           "command": "nix eval .#nixosConfigurations.luffy.config.system.build.toplevel.drvPath && nixfmt layers/20-services/26-monitoring/homepage-dashboard.nix && deadnix layers/20-services/26-monitoring/homepage-dashboard.nix && statix check layers/20-services/26-monitoring/homepage-dashboard.nix",
           "output": "All host toplevels evaluated cleanly; nixfmt, deadnix, and statix check passed with 0 errors/warnings.",
           "at": "2026-09-17T02:30:00Z"
+        }
+      ]
+    },
+    {
+      "id": "noctalia-plugin-registry-compatibility-repair",
+      "priority": 19,
+      "name": "Noctalia Community Plugin Registry Compatibility Repair",
+      "behavior": "Repaired Noctalia shell and official/community plugin registry version skew by updating noctalia input to latest Sept 2026 release supporting plugin_api, eliminating broken min_noctalia patching hacks, adding noctalia-plugin-doctor CLI tool, and introducing nix flake check registry compatibility test.",
+      "verification": [
+        "nix build .#checks.x86_64-linux.noctalia-registry-check",
+        "nix eval .#nixosConfigurations.z0r0.config.system.build.toplevel.drvPath",
+        "nix eval .#nixosConfigurations.z0r0.config.home-manager.users.t0psh31f.home.activationPackage.drvPath"
+      ],
+      "state": "passing",
+      "claimedBy": "antigravity",
+      "blockedReason": null,
+      "evidence": [
+        {
+          "sha": "HEAD",
+          "command": "nix build .#checks.x86_64-linux.noctalia-registry-check && nix eval .#nixosConfigurations.z0r0.config.system.build.toplevel.drvPath",
+          "output": "noctalia-registry-check scanned 13 official + 191 community plugins; all passed plugin_api validation (range 3..32). z0r0 toplevel & home-manager evaluated cleanly.",
+          "at": "2026-09-17T02:38:00Z"
+        }
+      ]
+    },
+    {
+      "id": "resilient-terminal-motd-and-animated-banners",
+      "priority": 20,
+      "name": "Restore High-Resolution Per-Host Terminal MOTD & Opt-In Animated Banners",
+      "behavior": "Replaced fragile direct chafa subshell calls with nfp-motd CLI script implementing runtime graphics capability detection (kitty -> sixel -> iterm -> chafa -> none), aspect ratio preservation in fastfetch, per-host immutable store asset registry (z0r0, luffy, nami), nfp-banner static title generator, motd-animate TerminalTextEffects CLI tool, and zsh startup guardrails.",
+      "verification": [
+        "nix build .#checks.x86_64-linux.nfp-motd-test",
+        "nix eval .#nixosConfigurations.z0r0.config.system.build.toplevel.drvPath",
+        "nix eval .#nixosConfigurations.luffy.config.system.build.toplevel.drvPath",
+        "nix eval .#nixosConfigurations.nami.config.system.build.toplevel.drvPath"
+      ],
+      "state": "passing",
+      "claimedBy": "antigravity",
+      "blockedReason": null,
+      "evidence": [
+        {
+          "sha": "HEAD",
+          "command": "nix build .#checks.x86_64-linux.nfp-motd-test && nix eval .#nixosConfigurations.z0r0.config.system.build.toplevel.drvPath && ./init.sh",
+          "output": "nfp-motd-test verified Zsh syntax, per-host Nix store image assets, zero hardcoded /home/ paths, fake-environment renderer selection (kitty, sixel, iterm, chafa, none), and nfp-banner output. z0r0, luffy, nami toplevels evaluated cleanly.",
+          "at": "2026-09-17T04:04:30Z"
         }
       ]
     }

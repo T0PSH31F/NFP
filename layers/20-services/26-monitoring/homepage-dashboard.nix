@@ -743,6 +743,31 @@ in
   };
 
   config = mkIf cfg.enable {
+    sops.templates."homepage-dashboard-env" = {
+      content = ''
+        SONARR_API_KEY=""
+        RADARR_API_KEY=""
+        LIDARR_API_KEY=""
+        PROWLARR_API_KEY=""
+        BAZARR_API_KEY=""
+        OVERSEERR_API_KEY=""
+        READARR_API_KEY=""
+        GRAFANA_API_KEY=""
+        IMMICH_API_KEY=""
+        HEADSCALE_API_KEY=""
+        ADGUARD_API_KEY=""
+        PORTAINER_API_KEY=""
+        JELLYFIN_API_KEY=""
+      '';
+      owner = "homepage-dashboard";
+      group = "homepage-dashboard";
+      mode = "0400";
+    };
+
+    layers.layer-20.services.config.homepage-dashboard.environmentFile =
+      mkDefault
+        config.sops.templates."homepage-dashboard-env".path;
+
     assertions = [
       {
         assertion = secretCheck;

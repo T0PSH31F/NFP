@@ -69,6 +69,15 @@
           inherit (pkgs) lib;
         };
 
+        noctalia-registry-check = import ../layers/00-cyberia/05-tests/noctalia-registry-check.nix {
+          inherit pkgs inputs;
+        };
+
+        nfp-motd-test = import ../layers/00-cyberia/05-tests/nfp-motd-test.nix {
+          inherit pkgs;
+          inherit (pkgs) lib;
+        };
+
         layer-numbering-check =
           pkgs.runCommand "check-layer-numbering"
             {

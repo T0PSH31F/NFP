@@ -49,7 +49,7 @@ in
   };
 
   home =
-    { config, lib, ... }:
+    { lib, ... }:
     let
       communityPluginsSrc =
         inputs.noctalia-community-plugins or (pkgs.fetchFromGitHub {
@@ -66,59 +66,85 @@ in
           hash = "sha256-gb4YgbRAismjl3Cur4ERFDfU2pR33ynRw0/CCAFw+Pw=";
         });
 
-      patchPlugin =
-        pluginName: rawSrc:
-        pkgs.runCommand "noctalia-plugin-${builtins.replaceStrings [ "/" ] [ "-" ] pluginName}"
-          {
-            nativeBuildInputs = [ pkgs.jq ];
-          }
-          ''
-            if [ -d "${rawSrc}" ]; then
-              cp -r "${rawSrc}/." $out
-            else
-              mkdir -p $out
-            fi
-            chmod -R u+w $out
-            if [ -f "$out/plugin.json" ]; then
-              if ! jq -e 'has("min_noctalia")' "$out/plugin.json" >/dev/null 2>&1; then
-                jq '. + {"min_noctalia": "5.0.0"}' "$out/plugin.json" > "$out/plugin.json.tmp"
-                mv "$out/plugin.json.tmp" "$out/plugin.json"
-              fi
-            elif [ -f "$out/manifest.json" ]; then
-              if ! jq -e 'has("min_noctalia")' "$out/manifest.json" >/dev/null 2>&1; then
-                jq '. + {"min_noctalia": "5.0.0"}' "$out/manifest.json" > "$out/manifest.json.tmp"
-                mv "$out/manifest.json.tmp" "$out/manifest.json"
-              fi
-            fi
-          '';
-
-      # General fix for UI-installed community plugins (not declarative).
-      # Noctalia v5 requires min_noctalia in every plugin manifest; most community
-      # plugins predate this. This activation patches any plugin under
-      # ~/.config/noctalia/plugins/ that is missing the key, so future
-      # "Install" from the store never hits "missing mandatory key 'min_noctalia'".
-      patchAllNoctaliaPlugins = pkgs.writeShellScriptBin "patch-all-noctalia-plugins" ''
+      noctaliaPluginDoctor = pkgs.writeShellScriptBin "noctalia-plugin-doctor" ''
         set -euo pipefail
         PLUGINS_DIR="$HOME/.config/noctalia/plugins"
-        [ -d "$PLUGINS_DIR" ] || exit 0
-        for pluginDir in "$PLUGINS_DIR"/*; do
-          [ -d "$pluginDir" ] || continue
-          # skip Nix-managed symlinks (declarative plugins already patched via patchPlugin)
-          [ -L "$pluginDir" ] && continue
-          if [ -f "$pluginDir/plugin.json" ]; then
-            if ! ${pkgs.jq}/bin/jq -e 'has("min_noctalia")' "$pluginDir/plugin.json" >/dev/null 2>&1; then
-              ${pkgs.jq}/bin/jq '. + {"min_noctalia": "5.0.0"}' "$pluginDir/plugin.json" > "$pluginDir/plugin.json.tmp"
-              mv "$pluginDir/plugin.json.tmp" "$pluginDir/plugin.json"
-              echo "patched $pluginDir/plugin.json -> min_noctalia 5.0.0"
-            fi
-          elif [ -f "$pluginDir/manifest.json" ]; then
-            if ! ${pkgs.jq}/bin/jq -e 'has("min_noctalia")' "$pluginDir/manifest.json" >/dev/null 2>&1; then
-              ${pkgs.jq}/bin/jq '. + {"min_noctalia": "5.0.0"}' "$pluginDir/manifest.json" > "$pluginDir/manifest.json.tmp"
-              mv "$pluginDir/manifest.json.tmp" "$pluginDir/manifest.json"
-              echo "patched $pluginDir/manifest.json -> min_noctalia 5.0.0"
-            fi
+
+        echo "=========================================================================="
+        echo " 🩺 NOCTALIA PLUGIN DOCTOR — COMPATIBILITY AUDIT"
+        echo "=========================================================================="
+        echo "Pinned Shell: ${cfg.package.name or "noctalia"}"
+        echo "Expected Manifest Protocol: plugin_api (Supported Range: 3 .. 32)"
+        echo "Configured Official Plugins Rev: ${inputs.noctalia-official-plugins.rev or "flake.lock"}"
+        echo "Configured Community Plugins Rev: ${inputs.noctalia-community-plugins.rev or "flake.lock"}"
+        echo "UI Plugins Directory: $PLUGINS_DIR"
+        echo "--------------------------------------------------------------------------"
+
+        if [ ! -d "$PLUGINS_DIR" ]; then
+          echo "No plugins directory found at $PLUGINS_DIR."
+          exit 0
+        fi
+
+        TOTAL=0
+        PASSED=0
+        FAILED=0
+
+        for pdir in "$PLUGINS_DIR"/*; do
+          [ -d "$pdir" ] || continue
+          TOTAL=$((TOTAL + 1))
+          pname=$(basename "$pdir")
+
+          manifest="$pdir/plugin.toml"
+          if [ ! -f "$manifest" ]; then
+            echo "❌ [$pname]: MISSING plugin.toml manifest"
+            FAILED=$((FAILED + 1))
+            continue
           fi
+
+          if grep -q "min_noctalia" "$manifest"; then
+            echo "❌ [$pname]: DEPRECATED LEGACY PROTOCOL ('min_noctalia' key instead of 'plugin_api')"
+            FAILED=$((FAILED + 1))
+            continue
+          fi
+
+          api_val=$(grep -E "^plugin_api[[:space:]]*=" "$manifest" | awk -F '=' '{print $2}' | tr -d ' "')
+          if [ -z "$api_val" ]; then
+            echo "❌ [$pname]: MISSING MANDATORY KEY 'plugin_api'"
+            FAILED=$((FAILED + 1))
+            continue
+          fi
+
+          if ! [[ "$api_val" =~ ^[0-9]+$ ]]; then
+            echo "❌ [$pname]: MALFORMED 'plugin_api' value ($api_val)"
+            FAILED=$((FAILED + 1))
+            continue
+          fi
+
+          if [ "$api_val" -lt 3 ] || [ "$api_val" -gt 32 ]; then
+            echo "❌ [$pname]: INCOMPATIBLE plugin_api=$api_val (supported range: 3..32)"
+            FAILED=$((FAILED + 1))
+            continue
+          fi
+
+          echo "✅ [$pname]: COMPATIBLE (plugin_api=$api_val)"
+          PASSED=$((PASSED + 1))
         done
+
+        echo "--------------------------------------------------------------------------"
+        echo "Results: $PASSED / $TOTAL plugins compatible."
+        if [ "$FAILED" -gt 0 ]; then
+          echo ""
+          echo "⚠️ DETECTED $FAILED INCOMPATIBLE PLUGINS IN $PLUGINS_DIR"
+          echo ""
+          echo "Safe Cache Cleanup Procedure:"
+          echo "  1. Backup existing plugins:"
+          echo "     cp -r ~/.config/noctalia/plugins ~/.config/noctalia/plugins.bak-\$(date +%Y%m%d%H%M%S)"
+          echo "  2. Remove stale unmanaged downloaded community plugins (preserving Nix symlinks):"
+          echo "     find ~/.config/noctalia/plugins/ -mindepth 1 -maxdepth 1 ! -type l -exec rm -rf {} +"
+          echo "  3. Restart Noctalia desktop session:"
+          echo "     systemctl --user restart noctalia"
+          exit 1
+        fi
       '';
     in
     {
@@ -135,16 +161,10 @@ in
         home.file = lib.mkMerge (
           map (pluginName: {
             ".config/noctalia/plugins/${pluginName}".source =
-              let
-                raw =
-                  if builtins.pathExists "${officialPluginsSrc}/${pluginName}" then
-                    "${officialPluginsSrc}/${pluginName}"
-                  else if builtins.pathExists "${communityPluginsSrc}/${pluginName}" then
-                    "${communityPluginsSrc}/${pluginName}"
-                  else
-                    "${communityPluginsSrc}/${pluginName}";
-              in
-              patchPlugin pluginName raw;
+              if builtins.pathExists "${officialPluginsSrc}/${pluginName}" then
+                "${officialPluginsSrc}/${pluginName}"
+              else
+                "${communityPluginsSrc}/${pluginName}";
           }) cfg.plugins
           ++ [
             {
@@ -153,11 +173,8 @@ in
             }
           ]
         );
-        home.activation.patchNoctaliaPlugins = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-          ${patchAllNoctaliaPlugins}/bin/patch-all-noctalia-plugins
-        '';
         home.packages = with pkgs; [
-          patchAllNoctaliaPlugins
+          noctaliaPluginDoctor
           gst_all_1.gst-plugins-base
           gst_all_1.gst-plugins-good
 
@@ -241,7 +258,7 @@ in
           enable = true;
           systemd.enable = true;
           inherit (cfg) package;
-          validateConfig = true;
+          checkConfig = true;
 
           settings = {
             # ── Shell ────────────────────────────────────────────────

@@ -6,41 +6,6 @@
 }:
 let
   cfg = config.layers.layer-50.cli;
-  hostName = config.networking.hostName or "nix";
-
-  # ── Per-machine MOTD using fastfetch ──
-  # Fastfetch renders the PNG logo natively (kitty/sixel/iterm2/chafa) with
-  # far better quality than viu's raw escape codes, and shows system info.
-  motdAssets = {
-    z0r0 = {
-      image = ../../../layers/00-cyberia/02-assets/png-ico/roronoa-zoro-monkey-d-luffy-one-piece-vinsmoke-sanji-one-piece-f28baea931e3d454307ef781771688d6.png;
-      label = "ZORO";
-    };
-    luffy = {
-      image = ../../../layers/00-cyberia/02-assets/png-ico/Luffyrave.png;
-      label = "LUFFY";
-    };
-  };
-
-  # Fall back to Nami for unknown hosts
-  currentAsset =
-    motdAssets.${hostName} or {
-      image = ../../../layers/00-cyberia/02-assets/png-ico/Nami2.png;
-      label = "NFP";
-    };
-
-  motdPkg =
-    pkgs.runCommand "nixos-motd-${hostName}"
-      {
-        buildInputs = [
-          pkgs.figlet
-          pkgs.lolcat
-        ];
-      }
-      ''
-        mkdir -p $out
-        figlet -c -f isometric2 ${currentAsset.label} | lolcat -f > $out/banner.txt
-      '';
 in
 {
   home = lib.mkIf (cfg.enable && cfg.shells.zsh.enable) {
@@ -91,11 +56,9 @@ in
         any-nix-shell zsh --info-right | source /dev/stdin
         bindkey '^Y' autosuggest-accept
         bindkey '^E' autosuggest-clear
-        if [[ $- == *i* ]] && [[ -z "$TMUX" ]] && [[ -z "$STY" ]] && [[ "$TERM_PROGRAM" != "vscode" ]]; then
-          # Render high-resolution PNG natively using Kitty/Sixel graphics protocol in Ghostty/Kitty
-          ${pkgs.chafa}/bin/chafa --format=auto --size=60x30 ${currentAsset.image} 2>/dev/null || true
-          echo ""
-          cat ${motdPkg}/banner.txt
+        if [[ $- == *i* ]] && [[ -t 1 ]] && [[ -z "''${NFP_MOTD_EXECUTED:-}" ]]; then
+          export NFP_MOTD_EXECUTED=1
+          nfp-motd || true
         fi
         ${lib.optionalString cfg.theming.enable "[ -f ~/.config/fzf/matugen.conf ] && source ~/.config/fzf/matugen.conf"}
         if command -v starship >/dev/null 2>&1; then
