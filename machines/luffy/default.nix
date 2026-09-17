@@ -65,8 +65,7 @@ in
   ];
 
   # Headscale: migrated DB from nami; reachable via LAN + tailnet.
-  # enable is set at line ~181 (services section, mkForce true).
-  services.headscale-server.serverUrl = "http://192.168.1.54:8086";
+  # enable + serverUrl set in services block below (mkForce true).
 
   # Honcho postgres password from sops. The template file is read by the module
   # at runtime via databaseUrlFile (kept out of the nix store).
@@ -175,7 +174,10 @@ in
     sillytavern-app.enable = lib.mkForce false;
 
     # Headscale moved BACK to luffy (2026-09-15) — was on nami, unreachable behind Alibaba SG
-    headscale-server.enable = lib.mkForce true;
+    headscale-server = {
+      enable = lib.mkForce true;
+      serverUrl = "http://192.168.1.54:8086";
+    };
 
     # Native Postgres (Shared for Nextcloud, Immich, MaxKB etc.)
     postgresql = {
@@ -587,7 +589,10 @@ in
   # Requires luffy's root SSH key on nami (installed 2026-09-15).
   systemd.services.headscale-tunnel-nami = {
     description = "Reverse tunnel: expose luffy headscale on nami:8087";
-    after = [ "network-online.target" "headscale.service" ];
+    after = [
+      "network-online.target"
+      "headscale.service"
+    ];
     wants = [ "network-online.target" ];
     wantedBy = [ "multi-user.target" ];
     serviceConfig = {
