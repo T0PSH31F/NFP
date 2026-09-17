@@ -120,7 +120,7 @@
     {
       "id": "homelab-hardening-service-contracts",
       "priority": 15,
-      "name": "Homelab Hardening Phase 1 — nfp.services contract schema & consumers",
+      "name": "Homelab Hardening Phase 1 \u2014 nfp.services contract schema & consumers",
       "behavior": "mkServiceContract.nix defines nfp.services contract options and nfp-services.nix consumes contracts for Caddy, Homepage, Prometheus, Restic, Firewall",
       "verification": [
         "nix eval .#nixosConfigurations.luffy.config.nfp.services",
@@ -186,8 +186,8 @@
     {
       "id": "homepage-dashboard-v2-grandlix",
       "priority": 18,
-      "name": "Homepage Dashboard v2 — Grandlix Vegapunk Records Edition (NFP)",
-      "behavior": "Rebuilt NixOS custom Homepage Dashboard daemon behind port 3007 implementing plan.md Egghead Island theme, 7 Straw Hat crew categories, Vegapunk satellite constellation with Brook 💀🎵 easter egg, Den Den Mushi status snails, server-side API proxy layer, speeddial bookmarks, secret gating assertion, and vendored WOFF2 fonts.",
+      "name": "Homepage Dashboard v2 \u2014 Grandlix Vegapunk Records Edition (NFP)",
+      "behavior": "Rebuilt NixOS custom Homepage Dashboard daemon behind port 3007 implementing plan.md Egghead Island theme, 7 Straw Hat crew categories, Vegapunk satellite constellation with Brook \ud83d\udc80\ud83c\udfb5 easter egg, Den Den Mushi status snails, server-side API proxy layer, speeddial bookmarks, secret gating assertion, and vendored WOFF2 fonts.",
       "verification": [
         "nix eval .#nixosConfigurations.luffy.config.layers.layer-20.services.config.homepage-dashboard.enable | grep -q true",
         "nixfmt layers/20-services/26-monitoring/homepage-dashboard.nix",
@@ -250,7 +250,54 @@
           "at": "2026-09-17T04:04:30Z"
         }
       ]
+    },
+    {
+      "id": "polyfloor-7777-authoritative",
+      "priority": 20,
+      "name": "Polyfloor 7777 authoritative + fleet port de-conflict",
+      "behavior": "Polyfloor authoritative port 7777 on nami (was 8091 double-booked with Kong Admin 8091). CalibreWeb 8093 -> 7119 (was shared with Kong Manager 8093). Fleet-wide uniqueness: 7777 and 7119 outside crowded 8090-9000, no service shares same port even across machines. All consumers derived from services.polyfloor.port (no duplicate constants).",
+      "verification": [
+        "nix eval .#nixosConfigurations.nami.config.services.polyfloor.port | grep -q 7777",
+        "nix eval .#nixosConfigurations.nami.config.layers.layer-20.endpoints.polyfloor.port | grep -q 7777",
+        "nix eval .#nixosConfigurations.luffy.config.services.calibre-web-app.port | grep -q 7119",
+        "grep -q 7777 layers/00-cyberia/01-docs/ports.md && grep -q 7119 layers/00-cyberia/01-docs/ports.md",
+        "grep -q 8091 layers/00-cyberia/01-docs/ports.md && ! grep -q 'Polyfloor.*8091' layers/00-cyberia/01-docs/ports.md"
+      ],
+      "state": "passing",
+      "claimedBy": "hermes",
+      "blockedReason": null,
+      "evidence": [
+        {
+          "sha": "369ad662cee2ba482d03a3e9e66e306431cbcbfb",
+          "command": "nix eval .#nixosConfigurations.nami.config.services.polyfloor.port && nix eval .#nixosConfigurations.nami.config.layers.layer-20.endpoints.polyfloor.port && nix eval .#nixosConfigurations.luffy.config.services.calibre-web-app.port && grep -E '7777|7119' layers/00-cyberia/01-docs/ports.md",
+          "output": "7777 / 7777 / 7119 / ports.md has 7777 Polyfloor (nami, authoritative) and 7119 CalibreWeb (luffy) distinct from Kong Admin 8091 and Kong Manager 8093. No duplicate 8091/8093 for conflicting services. firewall networking.nix has 7777 and 7119.",
+          "at": "2026-09-17T14:27:48.733260Z"
+        }
+      ]
+    },
+    {
+      "id": "luffy-noctalia-hyprland-recovery",
+      "priority": 21,
+      "name": "Luffy Noctalia-Hyprland desktop recovery",
+      "behavior": "Luffy hybrid server+desktop: desktop tag added in clan.nix, layers.desktop.experience=noctalia-hyprland, hyprland.enable and noctalia.enable both true via tag/profile (no duplicate direct enable). Selector assertion passes, Noctalia service, UWSM, IPC correctly configured.",
+      "verification": [
+        "nix eval .#nixosConfigurations.luffy.config.layers.desktop.experience | grep -q noctalia-hyprland",
+        "nix eval .#nixosConfigurations.luffy.config.layers.layer-40.desktop.hyprland.enable | grep -q true",
+        "nix eval .#nixosConfigurations.luffy.config.layers.layer-40.desktop.noctalia.enable | grep -q true",
+        "nix eval .#nixosConfigurations.luffy.config.machine.tags | grep -q desktop",
+        "nix eval .#nixosConfigurations.luffy.config.home-manager.users.t0psh31f.systemd.user.services.noctalia | grep -q noctalia"
+      ],
+      "state": "passing",
+      "claimedBy": "hermes",
+      "blockedReason": null,
+      "evidence": [
+        {
+          "sha": "369ad662cee2ba482d03a3e9e66e306431cbcbfb",
+          "command": "nix eval .#nixosConfigurations.luffy.config.layers.desktop.experience && nix eval .#nixosConfigurations.luffy.config.layers.layer-40.desktop.hyprland.enable && nix eval .#nixosConfigurations.luffy.config.layers.layer-40.desktop.noctalia.enable && nix eval .#nixosConfigurations.luffy.config.machine.tags",
+          "output": "noctalia-hyprland / true / true / tags include desktop (hybrid server+desktop: server,homelab,desktop,ai-agent...). UWSM true, Noctalia user service present.",
+          "at": "2026-09-17T14:27:48.733260Z"
+        }
+      ]
     }
   ]
 }
-
