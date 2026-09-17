@@ -12,6 +12,10 @@
           type = lib.types.attrs;
           default = { };
         };
+        sops.templates = lib.mkOption {
+          type = lib.types.attrs;
+          default = { };
+        };
       };
 
       config = {
