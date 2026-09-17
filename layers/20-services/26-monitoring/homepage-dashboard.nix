@@ -522,16 +522,22 @@ let
     import http.server
     import json
     import os
-    import sys
     import time
-    import urllib.request
     import urllib.error
+    import urllib.request
 
     PORT = int(os.environ.get("HOMEPAGE_PORT", "3007"))
-    STATIC_DIR = os.environ.get("HOMEPAGE_STATIC_DIR", "${staticPackage}/public")
-    CONFIG_PATH = os.environ.get("HOMEPAGE_CONFIG_PATH", "${configJsonFile}")
+    STATIC_DIR = os.environ.get(
+        "HOMEPAGE_STATIC_DIR",
+        "${staticPackage}/public",
+    )
+    CONFIG_PATH = os.environ.get(
+        "HOMEPAGE_CONFIG_PATH",
+        "${configJsonFile}",
+    )
 
     CACHE = {}
+
 
     class HomepageHandler(http.server.BaseHTTPRequestHandler):
         def log_message(self, format, *args):
@@ -548,7 +554,8 @@ let
                     with open(CONFIG_PATH, "r") as f:
                         self.wfile.write(f.read().encode("utf-8"))
                 except Exception as e:
-                    self.wfile.write(json.dumps({"error": str(e)}).encode("utf-8"))
+                    err_msg = json.dumps({"error": str(e)}).encode("utf-8")
+                    self.wfile.write(err_msg)
                 return
 
             if path.startswith("/api/widget/"):
@@ -595,7 +602,8 @@ let
 
             now = time.time()
             if widget_id in CACHE and (now - CACHE[widget_id][0] < 10):
-                self.wfile.write(json.dumps(CACHE[widget_id][1]).encode("utf-8"))
+                cached_data = json.dumps(CACHE[widget_id][1]).encode("utf-8")
+                self.wfile.write(cached_data)
                 return
 
             try:
@@ -620,7 +628,7 @@ let
 
                     req = urllib.request.Request(target_url, headers=headers)
                     with urllib.request.urlopen(req, timeout=5) as response:
-                        raw_data = json.loads(response.read().decode("utf-8"))
+                        _ = json.loads(response.read().decode("utf-8"))
                         res = {"status": "ok", "bountyStat": "OPERATIONAL"}
 
                 CACHE[widget_id] = (now, res)
@@ -638,16 +646,20 @@ let
                 try:
                     with open(hc_file, "r") as f:
                         targets = json.load(f)
-                    self.wfile.write(json.dumps({"status": "ok", "targets": targets}).encode("utf-8"))
+                    payload = json.dumps({"status": "ok", "targets": targets})
+                    self.wfile.write(payload.encode("utf-8"))
                     return
                 except Exception:
                     pass
-            self.wfile.write(json.dumps({"status": "ok", "uptime": "99.9%"}).encode("utf-8"))
+            fallback = json.dumps({"status": "ok", "uptime": "99.9%"})
+            self.wfile.write(fallback.encode("utf-8"))
+
 
     def run():
         server = http.server.HTTPServer(("0.0.0.0", PORT), HomepageHandler)
         print(f"Homepage Dashboard Server listening on port {PORT}...")
         server.serve_forever()
+
 
     if __name__ == "__main__":
         run()

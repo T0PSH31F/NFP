@@ -263,7 +263,6 @@ in
           settings = {
             # ── Shell ────────────────────────────────────────────────
             shell = {
-              ui_scale = 1.1;
               corner_radius_scale = 1.0;
               font_family = "JetBrainsMono NF Medium";
               lang = "";
@@ -287,7 +286,6 @@ in
               categories = true;
               show_icons = true;
               sort_by_usage = true;
-              session_search = true;
               app_grid = true;
               compact = true;
             };
@@ -685,7 +683,6 @@ in
               show_caps_lock = true;
               show_keyboard_layout = true;
               show_login_button = true;
-              show_password_hint = true;
             };
             lockscreen_widgets.widget."lockscreen-login-box@DP-2" = {
               box_height = 70.0;
@@ -705,17 +702,6 @@ in
               show_caps_lock = true;
               show_keyboard_layout = true;
               show_login_button = true;
-              show_password_hint = true;
-            };
-
-            # ── Night Light ──────────────────────────────────────────
-            night_light = {
-              enabled = true;
-              auto_schedule = true;
-              night_temp = "4000";
-              day_temp = "6500";
-              manual_sunrise = "06:30";
-              manual_sunset = "18:30";
             };
 
             # ── Notifications ─────────────────────────────────────────
@@ -792,26 +778,13 @@ in
                 name = "official";
                 kind = "git";
                 location = "https://github.com/noctalia-dev/official-plugins";
-                auto_update = false;
               }
               {
                 name = "community";
                 kind = "git";
                 location = "https://github.com/noctalia-dev/community-plugins";
-                auto_update = false;
               }
             ];
-
-            # ── Session ──────────────────────────────────────────────
-            session_menu = {
-              enable_countdown = true;
-              countdown_duration = 10000;
-              position = "center";
-              show_header = true;
-              show_keybinds = true;
-              large_buttons_style = true;
-              large_buttons_layout = "single-row";
-            };
 
             # ── System Monitor ───────────────────────────────────────
             system.monitor = {
@@ -844,20 +817,6 @@ in
             widget.brightness = {
               enabled = false;
               show_label = false;
-            };
-            widget.cat = {
-              audio_spectrum = true;
-              capsule = true;
-              capsule_border = "primary";
-              capsule_fill = "on_primary";
-              capsule_foreground = "secondary";
-              capsule_opacity = 0.92;
-              color = "primary";
-              icon_color = "on_primary";
-              rave_mode = true;
-              scale = 1.4;
-              tappy_mode = true;
-              type = "noctalia/bongocat:cat";
             };
             widget.clipboard = {
               capsule = true;
@@ -901,8 +860,7 @@ in
               capsule_opacity = 0.93;
               color = "primary";
               hide_when_no_media = true;
-              icon_color = "primary";
-              max_length = 235;
+              accent_color = "primary";
               min_length = 116;
               title_scroll = "always";
             };
@@ -958,7 +916,8 @@ in
               capsule_foreground = "secondary";
               capsule_opacity = 0.90;
               color = "primary";
-              display = "name";
+              label_source = "name";
+              show_labels = true;
               empty_color = "tertiary";
               icon_color = "primary";
               labels_only_when_occupied = true;
