@@ -3,6 +3,7 @@
   lib,
   pkgs,
   inputs,
+  osConfig ? config,
   ...
 }:
 let
@@ -47,7 +48,7 @@ in
             color_red = lib.mkDefault "#cc241d";
             color_yellow = lib.mkDefault "#d79921";
           }
-          (lib.mkIf cfg.headless (
+          (lib.mkIf (cfg.headless || (osConfig.layers.layer-40.desktop.noctalia.enable or false)) (
             let
               allThemes = import ../58-theming/_themes.nix { inherit lib; };
               selectedThemeName = cfg.theming.theme or "tokyo-night";
