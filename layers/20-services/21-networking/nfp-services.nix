@@ -12,7 +12,7 @@ let
     let
       hostDomain = "${svc.tailnetName}.${config.layers.meta.tailnetDomain}";
     in
-    nameValuePair "http://${hostDomain}" {
+    nameValuePair "${hostDomain}" {
       extraConfig = ''
         reverse_proxy ${svc.bind}:${toString svc.port}
       '';
