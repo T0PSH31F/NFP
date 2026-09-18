@@ -101,7 +101,10 @@ in
         enable = true;
         host = "luffy";
         bind = "127.0.0.1";
-        port = 13378;
+        # Port 13378 is nixarr's Audiobookshelf Tailnet contract;
+        # actual Audiobookshelf service (nixpkgs) listens on 8000 on luffy.
+        # Keep contract on 8000 so Tailnet healthcheck probes the real listener.
+        port = 8000;
         tailnetName = "audiobookshelf";
         tls = "headscale";
         backup.paths = [ "${cfg.stateDir}/audiobookshelf" ];
@@ -109,6 +112,14 @@ in
           enable = true;
           group = "Media";
           icon = "audiobookshelf";
+        };
+        healthcheck = {
+          enable = true;
+          path = "/";
+          expectedStatus = [
+            200
+            302
+          ];
         };
       };
 
@@ -124,6 +135,14 @@ in
           enable = true;
           group = "Media";
           icon = "sonarr";
+        };
+        healthcheck = {
+          enable = true;
+          path = "/";
+          expectedStatus = [
+            200
+            401
+          ];
         };
       };
 

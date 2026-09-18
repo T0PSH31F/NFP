@@ -17,10 +17,17 @@ let
     config.layers.meta.tailnetDomain or config.services.headscale-server.baseDomain or "nfp.nix";
 
   # Build JSON list of targets from enabled contract healthchecks
+  # For tls != "none" (Tailnet via Caddy), probe via tailnetName (audiobookshelf.nfp.nix)
+  # rather than host:port direct — keeps upstream (127.0.0.1:8000) and Caddy tailnet separate
   targetsList = mapAttrsToList (
     name: svc:
     let
-      targetUrl = "http://${svc.host}.${baseDomain}:${toString svc.port}${svc.healthcheck.path}";
+      targetHost = if svc.tls != "none" then svc.tailnetName else svc.host;
+      targetUrl =
+        if svc.tls != "none" then
+          "http://${targetHost}.${baseDomain}${svc.healthcheck.path}"
+        else
+          "http://${svc.host}.${baseDomain}:${toString svc.port}${svc.healthcheck.path}";
     in
     {
       inherit name;
