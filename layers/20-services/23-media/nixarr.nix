@@ -101,10 +101,9 @@ in
         enable = true;
         host = "luffy";
         bind = "127.0.0.1";
-        # Port 13378 is nixarr's Audiobookshelf Tailnet contract;
-        # actual Audiobookshelf service (nixpkgs) listens on 8000 on luffy.
-        # Keep contract on 8000 so Tailnet healthcheck probes the real listener.
-        port = 8000;
+        # Audiobookshelf (nixarr) actually listens on 9292 (confirmed via journalctl).
+        # Healthcheck probes directly via bind:port (local service, no MagicDNS needed).
+        port = 9292;
         tailnetName = "audiobookshelf";
         tls = "headscale";
         backup.paths = [ "${cfg.stateDir}/audiobookshelf" ];
