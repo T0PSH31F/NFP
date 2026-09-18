@@ -61,7 +61,7 @@ in
       services.polyfloor = {
         # Backend daemon built from the flake input.
         package = polyfloorPkg;
-        host = "127.0.0.1";
+        host = lib.mkForce "0.0.0.0"; # Tailnet-reachable (firewall restricts to tailscale0/loopback via trustedInterfaces) — healthcheck probes nami.nfp.nix:7777
         dataDir = "/var/lib/polyfloor";
 
         # Polyfloor talks to any OpenAI-compatible router. It enumerates models
