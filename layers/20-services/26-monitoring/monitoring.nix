@@ -48,7 +48,9 @@ with lib;
     })
     (mkIf config.layers.layer-20.services.config.monitoring.enable (
       let
-        baseDomain = config.services.headscale-server.baseDomain or "nfp.nix";
+        # Tailnet authority: Prometheus blackbox probes use MagicDNS (nfp.nix)
+        baseDomain =
+          config.layers.meta.tailnetDomain or config.services.headscale-server.baseDomain or "nfp.nix";
         enabledServices = filterAttrs (_name: svc: svc.enable) (config.nfp.services or { });
         httpServices = filterAttrs (
           _name: svc: svc.healthcheck.enable && svc.healthcheck.skipReason == null

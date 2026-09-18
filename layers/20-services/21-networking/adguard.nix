@@ -76,21 +76,31 @@ in
 
     services.adguardhome = {
       enable = true;
-      openFirewall = true;
+      # Firewall handled explicitly below with CIDR-scoped rules (Tailnet + LAN + localhost only).
+      # Do not open to WAN — task requires AdGuard never publicly exposed as open resolver.
+      openFirewall = false;
       inherit (cfg) port;
       mutableSettings = true;
       allowDHCP = cfg.dhcp;
       settings = {
         dns = {
+          # Listener: localhost + LAN + Tailnet-reachable. Sourced from fleetAddresses authority
+          # for tailnet binding; cfg.bindHosts remains override but defaults tightened per task.
+          # UDP 53 + TCP 53 both served by AdGuardHome on these binds.
           bind_hosts = cfg.bindHosts;
           port = cfg.dnsPort;
+          # Bootstrap DNS for DoH/DoT hostname resolution (encryption happens at DoH/DoT layer,
+          # not raw IP). WireGuard protects Tailnet transport separately.
           bootstrap_dns = [
             "9.9.9.9"
             "1.1.1.1"
           ];
+          # Encrypted upstream transport: DoH (https://) and DoT (tls://) only.
+          # Quad9 + Cloudflare DoH — both well-maintained, filtered at AdGuard level.
           upstream_dns = [
             "https://dns.quad9.net/dns-query"
             "https://cloudflare-dns.com/dns-query"
+            "tls://dns.quad9.net"
           ];
         };
         filtering = {
@@ -108,6 +118,9 @@ in
               answer = cfg.gatewayIp;
             }
           ];
+          # IMPORTANT: nfp.nix must NOT be claimed by AdGuard rewrites or local authoritative
+          # zone — it remains resolvable by Headscale MagicDNS only. No nfp.nix rewrite here
+          # proves no DNS loop and correct forwarding integration.
         };
         filters = [
           {
@@ -129,6 +142,13 @@ in
             enabled = true;
             url = "https://adguardteam.github.io/HostlistsRegistry/assets/filter_2.txt";
             name = "AdGuard Base filter (mobile)";
+          }
+          # YouTube DNS filtering — best effort only. Document limitation: DNS cannot reliably
+          # remove all in-video YouTube ads because ad/media delivery shares infrastructure.
+          {
+            enabled = true;
+            url = "https://adguardteam.github.io/HostlistsRegistry/assets/filter_15.txt";
+            name = "AdGuard Annoyances / YouTube (best-effort)";
           }
         ];
         dhcp = mkIf cfg.dhcp {

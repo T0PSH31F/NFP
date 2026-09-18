@@ -85,8 +85,8 @@ in
 
       hostName = mkOption {
         type = types.str;
-        default = "feishin.${config.layers.meta.domain or "lovelain.duckdns.org"}";
-        description = "Virtual hostname for Caddy reverse proxy";
+        default = "feishin.${config.layers.meta.publicDomain}";
+        description = "Virtual hostname for Caddy reverse proxy (public WAN via lovelain.duckdns.org)";
       };
 
       useACME = mkOption {

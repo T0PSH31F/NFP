@@ -27,19 +27,19 @@
     "ai-agent"
   ];
 
-  # Fleet monitoring: scrape node-exporters on z0r0 + luffy via tailnet IPs.
-  # Requires tailscale mesh up (control = luffy's headscale via luffy's reverse tunnel).
+  # Fleet monitoring: scrape node-exporters via Tailnet MagicDNS.
+  # Uses fleetAddresses authority; Tailnet IPs derived from single source (tailnetDomain=nfp.nix).
   layers.layer-20.services.config.monitoring.fleetNodeTargets = [
-    "100.64.0.1:9100" # z0r0
-    "100.64.0.3:9100" # luffy
+    "${config.layers.meta.fleetAddresses.z0r0}:9100" # z0r0 via nfp.nix
+    "${config.layers.meta.fleetAddresses.luffy}:9100" # luffy via nfp.nix
   ];
 
   sops.age.keyFile = "/var/lib/sops/nami/key.txt";
 
-  # === Headscale — fleet VPN control server (via network-router tag) ===
-  services.headscale-server = {
-    serverUrl = "http://headscale.lovelain.duckdns.org";
-  };
+  # === Headscale — disabled on nami; authoritative control plane is luffy (nfp.nix) ===
+  # luffy runs Headscale + AdGuard (global DNS 100.64.0.3). Nami retains network-router tag
+  # for Caddy/HP but must not run a second control plane.
+  services.headscale-server.enable = lib.mkForce false;
 
   # === Polyfloor AI company OS (talks to Kong on localhost:8090) ===
   services.polyfloor.enable = true;

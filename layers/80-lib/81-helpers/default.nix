@@ -1,5 +1,7 @@
-# Helper functions library — imported as specialArgs, not NixOS modules.
+# Helper functions library — dendritic helpers
 { ... }:
 {
-  imports = [ ];
+  imports = [
+    ./fleet-domains.nix
+  ];
 }

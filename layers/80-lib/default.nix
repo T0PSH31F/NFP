@@ -2,6 +2,7 @@
 { ... }:
 {
   imports = [
+    ./81-helpers
     ./82-overlays
   ];
 }

@@ -18,10 +18,12 @@
     firewall = {
       enable = true;
 
-      # Master Fleet Port List (z0r0 & luffy)
+      # Master Fleet Port List (z0r0 & luffy) — DNS never WAN-exposed.
+      # Per Phase 4: DNS (53) only from LAN 192.168.1.0/24,
+      # Tailnet 100.64.0.0/10 (via trustedInterfaces tailscale0), and localhost.
+      # No global exposure of DNS port.
       allowedTCPPorts = [
         22 # SSH Access
-        53 # AdGuard DNS
         80 # HTTP
         389 # Vaultwarden LDAP
         443 # HTTPS
@@ -99,7 +101,7 @@
       ];
 
       allowedUDPPorts = [
-        53 # DNS
+        # 53 DNS not globally open — restricted to LAN/Tailnet/localhost via extraInputRules + trustedInterfaces
         67 # DHCP
         443 # QUIC / HTTP/3
         5353 # mDNS / Avahi
@@ -116,9 +118,11 @@
       allowPing = true;
       logRefusedConnections = false;
 
-      # Allow full traffic from trusted LAN subnet
+      # Allow full traffic from trusted LAN subnet + Tailnet CIDR (Phase 4 firewall)
+      # DNS (53) only reachable from LAN, Tailnet (tailscale0 trustedInterface), and localhost — never WAN.
       extraInputRules = ''
-        ip saddr 192.168.1.0/24 accept;
+        ip saddr 192.168.1.0/24 accept
+        ip saddr 100.64.0.0/10 accept
       '';
     };
   };

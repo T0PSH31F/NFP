@@ -68,9 +68,11 @@ with lib;
             }
           ) config.services.caddy-server.virtualHosts;
 
+          # Registry routes are public Caddy routes via *.publicDomain (lovelain.duckdns.org).
+          # Tailnet-only routes must NOT use this registry — they use nfp.services + tailnetDomain.
           registryRoutes = mapAttrs' (
             subdomain: port:
-            nameValuePair "http://${subdomain}.${config.layers.meta.domain or "lovelain.duckdns.org"}" {
+            nameValuePair "http://${subdomain}.${config.layers.meta.publicDomain}" {
               extraConfig = ''
                 reverse_proxy localhost:${toString port}
               '';

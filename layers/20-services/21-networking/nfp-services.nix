@@ -5,11 +5,12 @@ with lib;
 let
   enabledServices = filterAttrs (_name: svc: svc.enable) (config.nfp.services or { });
 
-  # Caddy reverse-proxy virtual hosts generated from service contracts with tls != "none"
+  # Caddy reverse-proxy virtual hosts — tailnet contracts use tailnetDomain, never generic domain.
+  # Public WAN routes remain on publicDomain via explicit Caddy virtualHosts in machine configs.
   contractVirtualHosts = mapAttrs' (
     _name: svc:
     let
-      hostDomain = "${svc.tailnetName}.${config.layers.meta.domain or "lovelain.duckdns.org"}";
+      hostDomain = "${svc.tailnetName}.${config.layers.meta.tailnetDomain}";
     in
     nameValuePair "http://${hostDomain}" {
       extraConfig = ''

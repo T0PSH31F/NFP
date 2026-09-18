@@ -139,9 +139,12 @@ in
     adguard = {
       enable = true;
       port = 3002;
+      # Phase 4: Bind to localhost + LAN + Tailnet-reachable (100.64.0.3) as
+      # supported by AdGuard config. Firewall restricts DNS to LAN/Tailnet/localhost only, never WAN.
       bindHosts = [
-        "127.0.0.1" # Localhost for Caddy reverse proxy
-        "192.168.1.54" # LAN IP for network clients
+        "127.0.0.1"
+        "192.168.1.54"
+        "100.64.0.3"
       ];
       dhcp = false; # Spectrum router handles DHCP
       gatewayIp = "192.168.1.54"; # Luffy's reserved LAN IP
@@ -343,8 +346,9 @@ in
           @kavita host kavita.lovelain.duckdns.org
           handle @kavita { reverse_proxy localhost:5000 }
 
+          # Headscale now on luffy (tailnet authority luffy.nfp.nix:8086). Public Caddy route remains on lovelain.
           @headscale host headscale.lovelain.duckdns.org
-          handle @headscale { reverse_proxy http://47.254.90.69:8086 }
+          handle @headscale { reverse_proxy localhost:8086 }
 
           @chat host chat.lovelain.duckdns.org
           handle @chat { reverse_proxy localhost:3004 }

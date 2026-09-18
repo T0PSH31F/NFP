@@ -109,10 +109,12 @@
     age.keyFile = "/persist/home/t0psh31f/.config/sops/age/keys.txt";
   };
 
-  # Matrix homeserver (luffy) + nix cache reachable via Tailscale
+  # Matrix homeserver (luffy) reachable via Tailnet MagicDNS (nfp.nix)
+  # Historical extraHosts with raw 100.72 retained only for matrix.local bootstrap
+  # (matrix.local flagged as later migration per Hermes task — do not extend)
   networking.extraHosts = ''
-    100.72.46.75 matrix.local element.local
-    100.72.46.75 luffy.d luffy-1
+    ${config.layers.meta.fleetAddresses.luffy} matrix.local element.local
+    ${config.layers.meta.fleetAddresses.luffy} luffy.d luffy-1
   '';
 
   # ============================================================================

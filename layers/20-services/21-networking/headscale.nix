@@ -35,17 +35,30 @@ in
       settings = {
         dns = {
           magic_dns = true;
-          base_domain = cfg.baseDomain;
+          # Authoritative MagicDNS suffix — derived from layers.meta.tailnetDomain (nfp.nix).
+          # Static check fails if this drifts from layers.meta.tailnetDomain.
+          base_domain = config.layers.meta.tailnetDomain;
+          # Global DNS pushed to all Tailnet clients (except luffy loop-avoidance).
+          # AdGuard on luffy (Tailnet-reachable) is the single fleet resolver.
+          # Sourced once from fleetAddresses authority; never inlined elsewhere.
           nameservers = {
             global = [
-              "1.1.1.1"
-              "1.0.0.1"
+              config.layers.meta.fleetAddresses.luffy
             ];
           };
+          # override_local_dns: when true, Tailnet clients that accept-dns=true
+          # override their local /etc/resolv.conf stub and use the global resolver
+          # above for all non-MagicDNS queries. Required for Headscale to enforce
+          # AdGuard fleet-wide. Documented behavior: MagicDNS records always win
+          # over global; global used for public Internet names via AdGuard.
+          override_local_dns = true;
         };
         server_url = cfg.serverUrl;
-        # No external DERP fetch — headscale dies without internet DNS
-        # ("getting DERPMap: no such host"). Use built-in DERP only.
+        # Bootstrap resolver path: Headscale itself must resolve DERP map hostnames
+        # (controlplane.tailscale.com) via public DNS, not via the Tailnet global
+        # resolver it advertises. Systemd-resolved bootstrap + AdGuard bootstrap_dns
+        # (9.9.9.9, 1.1.1.1) handles this without creating a loop. Keep Derp URLs
+        # minimal and rely on built-in DERP if AdGuard bootstrap fails.
         derp = {
           auto_update_enabled = true;
           urls = [ "https://controlplane.tailscale.com/derpmap/default" ];

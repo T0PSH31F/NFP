@@ -12,7 +12,9 @@ let
   enabledServices = filterAttrs (_name: svc: svc.enable) (config.nfp.services or { });
   healthcheckServices = filterAttrs (_name: svc: svc.healthcheck.enable) enabledServices;
 
-  baseDomain = config.services.headscale-server.baseDomain or "nfp.nix";
+  # Tailnet authority: derive from layers.meta.tailnetDomain (nfp.nix). Fallback only for early eval before meta wired.
+  baseDomain =
+    config.layers.meta.tailnetDomain or config.services.headscale-server.baseDomain or "nfp.nix";
 
   # Build JSON list of targets from enabled contract healthchecks
   targetsList = mapAttrsToList (
