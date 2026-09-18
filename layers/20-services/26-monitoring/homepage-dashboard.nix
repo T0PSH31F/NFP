@@ -529,7 +529,10 @@ let
     PORT = int(os.environ.get("HOMEPAGE_PORT", "3007"))
     STATIC_DIR = os.environ.get(
         "HOMEPAGE_STATIC_DIR",
-        "${staticPackage}/public",
+        (
+            "${staticPackage}"
+            "/public"
+        ),
     )
     CONFIG_PATH = os.environ.get(
         "HOMEPAGE_CONFIG_PATH",
