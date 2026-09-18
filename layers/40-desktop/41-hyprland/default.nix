@@ -149,9 +149,9 @@ in
           # Disabled: UWSM manages systemd integration (targets, env vars, session lifecycle).
           # Enabling this causes exec-once/exec-shutdown to fight UWSM over hyprland-session.target.
           systemd.enable = false;
-          plugins = [
-            inputs.hypr-dynamic-cursors.packages.${pkgs.stdenv.hostPlatform.system}.hypr-dynamic-cursors
-          ];
+          # hypr-dynamic-cursors temporarily disabled: upstream 0.55 API break (CursorManager.hpp missing)
+          # TODO: re-enable after hyprland 0.55 compatible release
+          plugins = [ ];
 
           settings = {
             source = [
