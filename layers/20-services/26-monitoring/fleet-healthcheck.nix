@@ -15,18 +15,25 @@ let
   # Tailnet authority: derive from layers.meta.tailnetDomain (nfp.nix). Fallback only for early eval before meta wired.
   baseDomain =
     config.layers.meta.tailnetDomain or config.services.headscale-server.baseDomain or "nfp.nix";
+  localHost = config.networking.hostName;
 
   # Build JSON list of targets from enabled contract healthchecks
-  # For tls != "none" (Tailnet via Caddy), probe via tailnetName (audiobookshelf.nfp.nix)
-  # rather than host:port direct — keeps upstream (127.0.0.1:8000) and Caddy tailnet separate
+  # Local services (svc.host == this host): probe directly via bind:port.
+  # Remote services: probe via tailnetName.baseDomain (Caddy Tailnet route).
+  # This avoids requiring MagicDNS resolution on the AdGuard host (luffy has --accept-dns=false).
   targetsList = mapAttrsToList (
     name: svc:
     let
-      targetHost = if svc.tls != "none" then svc.tailnetName else svc.host;
+      isLocal = svc.host == localHost;
       targetUrl =
-        if svc.tls != "none" then
-          "http://${targetHost}.${baseDomain}${svc.healthcheck.path}"
+        if isLocal then
+          # Direct probe via bind address — works even without MagicDNS on resolver host
+          "http://${svc.bind}:${toString svc.port}${svc.healthcheck.path}"
+        else if svc.tls != "none" then
+          # Remote Tailnet service via Caddy hostname
+          "http://${svc.tailnetName}.${baseDomain}${svc.healthcheck.path}"
         else
+          # Remote direct port
           "http://${svc.host}.${baseDomain}:${toString svc.port}${svc.healthcheck.path}";
     in
     {
