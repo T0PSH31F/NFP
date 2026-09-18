@@ -2,12 +2,14 @@
 
 Use this the first time the full stack is up after a rebuild (nixarr + Caddy + Headscale + AdGuard + telemetry + restic). Do the sections **in order**. Later rebuilds skip wizards unless state was wiped.
 
-Replace:
+Replace (NFP canonical values — do not use generic placeholders in committed docs):
 
-- `{TAILNET}` — Headscale MagicDNS suffix (from `headscale.nix` / `endpoints.nix`)
-- `{LUFFY}` — luffy’s tailnet name or `100.x` IP (`tailscale status`)
+- `{TAILNET}` — `nfp.nix` Headscale MagicDNS suffix (`layers.meta.tailnetDomain`, `headscale.nix` `base_domain = nfp.nix`)
+- Public WAN — `lovelain.duckdns.org` via Caddy/ACME on luffy (`layers.meta.publicDomain`), **not** `{TAILNET}`
+- `{LUFFY}` — `luffy.nfp.nix` (`100.64.0.3`, `layers.meta.fleetAddresses.luffy`) or `100.64.0.3` from `tailscale status`; Tailnet transport via WireGuard
+- AdGuard — luffy `100.64.0.3:53` Tailnet + `192.168.1.54:53` LAN + `127.0.0.1:53` loopback, DoH/DoT upstream `https://dns.quad9.net`/`tls://dns.quad9.net` (Headscale `dns.nameservers.global`), luffy `--accept-dns=false` (loopback + bootstrap `9.9.9.9`) vs clients `--accept-dns=true`
 - `{MEDIADIR}` — nixarr `mediaDir` (upstream default `/data/media`)
-- `{URL}` — `https://<service>.{TAILNET}` if Caddy is wired; otherwise `http://{LUFFY}:<port>`
+- `{URL}` — Tailnet via Caddy: `https://<service>.nfp.nix` (e.g. `https://jellyfin.nfp.nix`, `https://audiobookshelf.nfp.nix`) with `tls=headscale`; WAN via Caddy: `https://<service>.lovelain.duckdns.org`
 
 On luffy, API keys:
 

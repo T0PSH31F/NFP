@@ -5,9 +5,11 @@
 > **NOTE:** This port allocation registry MUST be regenerated/updated whenever service port assignments or module defaults change.
 
 ## Legend
-- **z0r0** = LG laptop workstation (`127.0.0.1` / Tailscale)
-- **luffy** = Intel 9th-gen homelab server (`100.80.146.120` / Tailscale)
+- **z0r0** = LG laptop workstation (`127.0.0.1` / Tailnet `100.64.0.1` `z0r0.nfp.nix`)
+- **luffy** = Intel 9th-gen homelab server (`100.64.0.3` `luffy.nfp.nix` / Tailnet + LAN `192.168.1.54`)
+- **nami** = Cloud control plane (`47.254.90.69` / Tailnet `100.64.0.4` `nami.nfp.nix`)
 - **Both** = Deployed on both workstation and server
+- **Tailnet** = `nfp.nix` MagicDNS via Headscale on luffy; **WAN** = `lovelain.duckdns.org` via Caddy/ACME on luffy
 
 ---
 
@@ -60,7 +62,7 @@
 | **8086** | Headscale              | luffy  | `layers/20-services/21-networking/headscale.nix`  | Tailscale Control Plane (migrated from nami 2026-09-15) |         |
 | **8088** | Open WebUI             | luffy  | `layers/70-agents/77-dash-desk-ui/open-webui.nix` | LLM Web Chat Interface          |
 | **8090** | Kong Gateway (proxy)   | nami   | `layers/70-agents/78-llm-routers/kong-gateway.nix` | Unified LLM/API gateway (Polyfloor routerEndpoint `http://127.0.0.1:8090/v1`) |
-| **7777** | Polyfloor API          | nami   | `layers/70-agents/76-orchestrators/polyfloor.nix` | Polyfloor FastAPI (API-only, `host 127.0.0.1`, `dataDir /var/lib/polyfloor`, `routerEndpoint http://127.0.0.1:8090/v1`, systemd `polyfloor.service`) — **authoritative port** |
+| **7777** | Polyfloor API (Tailnet-only) | nami | `layers/70-agents/76-orchestrators/polyfloor.nix` | Polyfloor FastAPI `host 0.0.0.0:7777` Tailnet `nami.nfp.nix:7777` (Headscale ACL `tag:control-plane` + firewall `trustedInterfaces tailscale0`), WAN `47.254.90.69:7777` blocked. `dataDir /var/lib/polyfloor`, `routerEndpoint http://127.0.0.1:8090/v1` |
 | **8091** | Kong Admin API         | nami   | `layers/70-agents/78-llm-routers/kong-gateway.nix` | Kong declarative admin API
 | **8092** | EverOS Memory Server   | z0r0   | `layers/70-agents/73-memory/everos.nix`           | Memory consolidation engine     |
 | **7119** | CalibreWeb             | luffy  | `layers/20-services/23-media/calibre-web.nix`   | E-book Web Reader |

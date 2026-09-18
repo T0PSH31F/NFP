@@ -4,19 +4,19 @@
 
 ## Machine Roles
 
-| Machine | LAN IP | Role | Services |
-|---------|--------|------|----------|
-| **z0r0** (LG Gram 17) | 192.168.1.39 | Dev workstation, AI agent, media server | Hermes, monitoring, AdGuard, Jellyfin stack, llama.cpp |
-| **luffy** (Custom Desktop) | 192.168.1.54 | Primary server, homelab, AI, cache | Caddy reverse proxy, Matrix, most *arr/media, all containers |
+| Machine | LAN IP | Tailnet DNS | Role | Services |
+|---------|--------|-------------|------|----------|
+| **z0r0** (LG Gram 17) | 192.168.1.39 | `z0r0.nfp.nix` (100.64.0.1) | Dev workstation, Tailnet client `--accept-dns=true` | Hermes, monitoring, Jellyfin stack, llama.cpp |
+| **luffy** (Custom Desktop) | 192.168.1.54 | `luffy.nfp.nix` (100.64.0.3) | Headscale control plane + AdGuard resolver (`100.64.0.3:53` Tailnet/LAN, DoH/DoT upstream), loopback `127.0.0.1` for luffy `--accept-dns=false` | Caddy (`*.lovelain.duckdns.org` WAN), Matrix, most *arr/media, all containers |
 
 ---
 
-## z0r0 Services
+## z0r0 Services (Tailnet client — no local AdGuard)
 
 | Port | Service | URL | Default Login |
 |------|---------|-----|---------------|
-| 53 | AdGuard Home (DNS) | `http://z0r0:3002` | `admin` / `admin` (change on first login) |
-| 3002 | AdGuard Home (web) | `http://z0r0:3002` | `admin` / `admin` |
+| 53 | *AdGuard via Tailnet* | `http://luffy.nfp.nix:53` (AdGuard on luffy `100.64.0.3:53`, DoH/DoT upstream) | `admin` / `admin` (luffy) |
+| 3002 | AdGuard Home (web via Tailnet) | `http://luffy.nfp.nix:3002` | `admin` / `admin` |
 | 3000 | Hermes Workspace | `http://z0r0:3000` | User `t0psh31f` |
 | 3001 | freellmapi (free LLM router, 339 models) | `http://z0r0:3001/v1` | First-run setup code in journal |
 | 3005 | Langfuse (LLM tracing) | `http://z0r0:3005` | Auto-generated (see sops) |
@@ -31,7 +31,7 @@
 
 ### Also on z0r0 (no web UI):
 - **Jellyfin** — if enabled via media-stack tag, port 8096
-- **Ollama** — runs on luffy (port 11434), not z0r0. Access via Tailscale: `http://100.72.46.75:11434`
+- **Ollama** — runs on luffy (port 11434), not z0r0. Access via Tailnet: `http://luffy.nfp.nix:11434` (`100.64.0.3`)
 - **Fleet Healthcheck Runner** — CLI `fleet-healthcheck-runner` (service `fleet-healthcheck.service`, probe targets generated from `nfp.services` contracts)
 
 ---

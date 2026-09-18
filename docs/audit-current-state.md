@@ -15,10 +15,11 @@
 ## 2. Core Subsystems Audit
 
 ### A. Networking & Mesh Infrastructure
-- **Headscale Control Plane**: Active on `nami` (`headscale.nix`, port 8086).
-- **Tailscale Clients**: Configured via `layers/20-services/21-networking/tailscale.nix` targeting `https://headscale.lovelain.duckdns.org`.
-- **Legacy Meshes**: ZeroTier and Clan WireGuard fully decommissioned across `networking.nix` and `network-setup-guide.md`.
-- **ACLs & MagicDNS**: Wildcard ACL currently applied (`/var/lib/headscale/acl/hujson`). Basic DNS enabled in Headscale options (`base_domain = "lovelain.duckdns.org"`). Needs hardening for admin vs guest scopes and canonical hostname alignment.
+- **Headscale Control Plane**: Authoritative on `luffy` (`luffy.nfp.nix:8086`, `headscale.nix`, port 8086, `base_domain = "nfp.nix"`), public bootstrap `https://headscale.lovelain.duckdns.org` via Caddy on luffy.
+- **Tailscale Clients**: `tailscale.nix` `--login-server=https://headscale.lovelain.duckdns.org` (bootstrap), then MagicDNS `nfp.nix`; `luffy` `--accept-dns=false` (loopback AdGuard), others `--accept-dns=true`.
+- **Fleet Resolver**: AdGuard Home on `luffy` (`100.64.0.3:53` Tailnet, `192.168.1.54:53` LAN, `127.0.0.1:53` loopback, `openFirewall=false`, DoH/DoT upstream `https://dns.quad9.net`/`tls://dns.quad9.net`, bootstrap `9.9.9.9`).
+- **Legacy Meshes**: ZeroTier and Clan WireGuard fully decommissioned.
+- **ACLs & MagicDNS**: Scoped ACL (`group:admin` full `*:*`, `group:guest` media/docs only) at `/var/lib/headscale/acl/hujson`; `magic_dns=true`, `override_local_dns=true`, `base_domain=nfp.nix`.
 
 ### B. SSH & Emergency Access
 - **Primary Admin Access**: OpenSSH over Tailnet. Key-only auth enforced on `nami` (`PasswordAuthentication = false`, `PermitRootLogin = "prohibit-password"`).
