@@ -2,7 +2,7 @@
 {
   name = "homepage-dashboard-module";
   nodes.machine =
-    { config, lib, ... }:
+    { lib, ... }:
     {
       imports = [ ../../20-services/26-monitoring/homepage-dashboard.nix ];
 
