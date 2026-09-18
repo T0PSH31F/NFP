@@ -51,6 +51,7 @@
 
   # === Cloud VM: disable media stack, desktop/GUI apps, Firefox C++ build & bulk agent catalog ===
   layers.layer-20.services.config.media-stack.enable = lib.mkForce false;
+  layers.layer-20.services.config.nixarr-stack.enable = lib.mkForce false;
   layers.layer-20.services.config.download-clients.enable = lib.mkForce false;
   layers.layer-20.services.communication.camofox-browser.enable = lib.mkForce false;
   layers.layer-76.hermes.enableDesktop = lib.mkForce false;

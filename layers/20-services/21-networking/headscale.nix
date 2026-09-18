@@ -47,9 +47,8 @@ in
         # No external DERP fetch — headscale dies without internet DNS
         # ("getting DERPMap: no such host"). Use built-in DERP only.
         derp = {
-          auto_update = false;
-          auto_update_enabled = false;
-          urls = [ ];
+          auto_update_enabled = true;
+          urls = [ "https://controlplane.tailscale.com/derpmap/default" ];
         };
         # Structured ACL policy (group:admin full access, group:guest media/docs only)
         policy = {
