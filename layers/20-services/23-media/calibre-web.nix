@@ -28,6 +28,34 @@ with lib;
   };
 
   config = mkIf config.services.calibre-web-app.enable {
+    nfp.services.calibre-web = {
+      enable = true;
+      host = "luffy";
+      bind = "127.0.0.1";
+      port = config.services.calibre-web-app.port;
+      tailnetName = "calibre-web";
+      tls = "headscale";
+      healthcheck = {
+        enable = true;
+        path = "/";
+        expectedStatus = [
+          200
+          302
+        ];
+      };
+      homepage = {
+        enable = true;
+        category = "robin";
+        order = 15;
+        title = "Calibre-Web";
+        subtitle = "Ancient Poneglyphs Library";
+        icon = "calibre-web";
+        metric = {
+          mode = "health-only";
+        };
+      };
+    };
+
     # Native NixOS Calibre-Web service
     services.calibre-web = {
       enable = true;

@@ -20,6 +20,31 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    nfp.services.searxng = {
+      enable = true;
+      host = "luffy";
+      bind = "127.0.0.1";
+      inherit (cfg) port;
+      tailnetName = "searxng";
+      tls = "headscale";
+      healthcheck = {
+        enable = true;
+        path = "/healthz";
+        expectedStatus = [ 200 ];
+      };
+      homepage = {
+        enable = true;
+        category = "nami";
+        order = 10;
+        title = "SearXNG";
+        subtitle = "Grand Line Map";
+        icon = "searxng";
+        metric = {
+          mode = "health-only";
+        };
+      };
+    };
+
     clan.core.vars.generators.searxng = {
       files."searxng.env" = {
         secret = true;

@@ -200,4 +200,7 @@
       echo "Done. No unreferenced-but-needed paths were harmed."
     '')
   ];
+
+  # Enable netdata real-time metrics on z0r0
+  layers.layer-20.services.config.netdata.enable = true;
 }

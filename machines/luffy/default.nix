@@ -105,6 +105,17 @@ in
     };
   };
   layers.layer-20.services.config.your-spotify.enable = true;
+  layers.layer-20.services.config.searxng.enable = true;
+  services.calibre-web-app.enable = true;
+  layers.layer-20.services.config.readarr.enable = true;
+  layers.layer-20.services.config.lidarr.enable = true;
+  layers.layer-20.services.config.bazarr.enable = true;
+  layers.layer-20.services.config.jackett.enable = true;
+  layers.layer-20.services.config.netdata.enable = true;
+  layers.layer-70.ai-infra.ollama.enable = true;
+  layers.layer-70.dash-desk-ui.open-webui.enable = true;
+  layers.layer-70.dash-desk-ui.sillytavern.enable = true;
+  layers.layer-70.llm-routers.kong-gateway.enable = true;
 
   layers.layer-20.services.communication.rustdesk = {
     enable = true;

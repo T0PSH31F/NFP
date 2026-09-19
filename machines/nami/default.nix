@@ -109,4 +109,11 @@
 
   # === Restic backups ===
   layers.layer-20.services.backups.restic.enable = lib.mkDefault true;
+
+  # === Enable netdata and agent services on nami ===
+  layers.layer-20.services.config.netdata.enable = true;
+  layers.layer-70.ai-infra.ollama.enable = true;
+  layers.layer-70.dash-desk-ui.open-webui.enable = true;
+  layers.layer-70.dash-desk-ui.sillytavern.enable = true;
+  layers.layer-70.llm-routers.kong-gateway.enable = true;
 }

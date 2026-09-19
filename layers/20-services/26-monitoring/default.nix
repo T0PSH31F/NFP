@@ -6,6 +6,7 @@
     (mkDendriticModule "glances" ./glances.nix)
     (mkDendriticModule "homepage-dashboard" ./homepage-dashboard.nix)
     (mkDendriticModule "monitoring" ./monitoring.nix)
+    (mkDendriticModule "netdata" ./netdata.nix)
     (mkDendriticModule "ntfy-sh" ./ntfy-sh.nix)
   ];
 }
