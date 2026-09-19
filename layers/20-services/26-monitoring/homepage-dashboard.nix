@@ -276,179 +276,172 @@ let
   '';
 
   # Python HTTP Daemon Server Script
-  homepageServer =
-    pkgs.writers.writePython3Bin "homepage-dashboard-server"
-      {
-        flake8Flags = [
-          "--ignore=E501,E302,E305,W293,F841"
-        ];
-      }
-      ''
-        import http.server
-        import json
-        import os
-        import time
-        import urllib.error
-        import urllib.request
+  homepageServer = pkgs.writers.writePython3Bin "homepage-dashboard-server" { } ''
+    import http.server
+    import json
+    import os
+    import time
+    import urllib.error
+    import urllib.request
 
-        PORT = int(os.environ.get("HOMEPAGE_PORT", "3007"))
-        STATIC_DIR = os.environ.get(
-            "HOMEPAGE_STATIC_DIR",
-            "${staticPackage}/public"
-        )
-        CONFIG_PATH = os.environ.get(
-            "HOMEPAGE_CONFIG_PATH",
-            "${configJsonFile}"
-        )
+    PORT = int(os.environ.get("HOMEPAGE_PORT", "3007"))
+    STATIC_DIR = os.environ.get(
+        "HOMEPAGE_STATIC_DIR",
+        "${staticPackage}/public"
+    )
+    CONFIG_PATH = os.environ.get(
+        "HOMEPAGE_CONFIG_PATH",
+        "${configJsonFile}"
+    )
 
-        CACHE = {}
+    CACHE = {}
 
 
-        class HomepageHandler(http.server.BaseHTTPRequestHandler):
-            def log_message(self, format, *args):
-                pass
+    class HomepageHandler(http.server.BaseHTTPRequestHandler):
+        def log_message(self, format, *args):
+            pass
 
-            def do_GET(self):
-                path = self.path.split('?')[0]
+        def do_GET(self):
+            path = self.path.split('?')[0]
 
-                if path == "/api/config":
-                    self.send_response(200)
-                    self.send_header("Content-Type", "application/json")
-                    self.end_headers()
-                    try:
-                        with open(CONFIG_PATH, "r") as f:
-                            self.wfile.write(f.read().encode("utf-8"))
-                    except Exception:
-                        err = {"error": "Config unavailable"}
-                        self.wfile.write(json.dumps(err).encode("utf-8"))
-                    return
-
-                if path.startswith("/api/widget/"):
-                    widget_id = path[12:]
-                    self.handle_widget(widget_id)
-                    return
-
-                if path == "/api/healthcheck":
-                    self.handle_healthcheck()
-                    return
-
-                if path == "/":
-                    file_path = os.path.join(STATIC_DIR, "index.html")
-                else:
-                    rel_path = path.lstrip("/")
-                    file_path = os.path.join(STATIC_DIR, rel_path)
-
-                if os.path.exists(file_path) and os.path.isfile(file_path):
-                    self.send_response(200)
-                    if file_path.endswith(".html"):
-                        self.send_header("Content-Type", "text/html; charset=utf-8")
-                    elif file_path.endswith(".css"):
-                        self.send_header("Content-Type", "text/css")
-                    elif file_path.endswith(".js"):
-                        self.send_header("Content-Type", "application/javascript")
-                    elif file_path.endswith(".ttf"):
-                        self.send_header("Content-Type", "font/ttf")
-                    elif file_path.endswith(".png"):
-                        self.send_header("Content-Type", "image/png")
-                    elif file_path.endswith(".svg"):
-                        self.send_header("Content-Type", "image/svg+xml")
-                    self.end_headers()
-                    with open(file_path, "rb") as f:
-                        self.wfile.write(f.read())
-                else:
-                    self.send_response(404)
-                    self.end_headers()
-                    self.wfile.write(b"404 Not Found")
-
-            def handle_widget(self, widget_id):
+            if path == "/api/config":
                 self.send_response(200)
                 self.send_header("Content-Type", "application/json")
                 self.end_headers()
-
-                now = time.time()
-                if widget_id in CACHE and (now - CACHE[widget_id][0] < 10):
-                    cached_data = json.dumps(CACHE[widget_id][1]).encode("utf-8")
-                    self.wfile.write(cached_data)
-                    return
-
-                res = {"status": "ok", "bountyStat": "OPERATIONAL"}
                 try:
                     with open(CONFIG_PATH, "r") as f:
-                        config = json.load(f)
-                    widget_map = config.get("widget_map", {})
-                    svc_info = widget_map.get(widget_id)
-
-                    if svc_info:
-                        target_url = svc_info.get("proxy_url")
-                        headers = {"User-Agent": "NFP-Homepage-Dashboard/2.0"}
-
-                        req = urllib.request.Request(target_url, headers=headers)
-                        try:
-                            with urllib.request.urlopen(req, timeout=3) as resp:
-                                _ = resp.read()
-                                res = {
-                                    "status": "ok",
-                                    "bountyStat": "OPERATIONAL"
-                                }
-                        except urllib.error.HTTPError as e:
-                            if e.code in [401, 403]:
-                                res = {
-                                    "status": "ok",
-                                    "bountyStat": "OPERATIONAL",
-                                    "metricStatus": "Auth Required"
-                                }
-                            elif e.code == 404:
-                                res = {
-                                    "status": "ok",
-                                    "bountyStat": "OPERATIONAL",
-                                    "metricStatus": "Unconfigured"
-                                }
-                            else:
-                                res = {
-                                    "status": "ok",
-                                    "bountyStat": "OPERATIONAL",
-                                    "metricStatus": f"HTTP {e.code}"
-                                }
-                        except Exception:
-                            res = {
-                                "status": "offline",
-                                "bountyStat": "OFFLINE",
-                                "error": "Unreachable"
-                            }
-
-                    CACHE[widget_id] = (now, res)
-                    self.wfile.write(json.dumps(res).encode("utf-8"))
+                        self.wfile.write(f.read().encode("utf-8"))
                 except Exception:
-                    res = {"status": "ok", "bountyStat": "OPERATIONAL"}
-                    self.wfile.write(json.dumps(res).encode("utf-8"))
+                    err = {"error": "Config unavailable"}
+                    self.wfile.write(json.dumps(err).encode("utf-8"))
+                return
 
-            def handle_healthcheck(self):
+            if path.startswith("/api/widget/"):
+                widget_id = path[12:]
+                self.handle_widget(widget_id)
+                return
+
+            if path == "/api/healthcheck":
+                self.handle_healthcheck()
+                return
+
+            if path == "/":
+                file_path = os.path.join(STATIC_DIR, "index.html")
+            else:
+                rel_path = path.lstrip("/")
+                file_path = os.path.join(STATIC_DIR, rel_path)
+
+            if os.path.exists(file_path) and os.path.isfile(file_path):
                 self.send_response(200)
-                self.send_header("Content-Type", "application/json")
+                if file_path.endswith(".html"):
+                    self.send_header("Content-Type", "text/html; charset=utf-8")
+                elif file_path.endswith(".css"):
+                    self.send_header("Content-Type", "text/css")
+                elif file_path.endswith(".js"):
+                    self.send_header("Content-Type", "application/javascript")
+                elif file_path.endswith(".ttf"):
+                    self.send_header("Content-Type", "font/ttf")
+                elif file_path.endswith(".png"):
+                    self.send_header("Content-Type", "image/png")
+                elif file_path.endswith(".svg"):
+                    self.send_header("Content-Type", "image/svg+xml")
                 self.end_headers()
-                hc_file = "/run/nfp/healthcheck-targets.json"
-                if os.path.exists(hc_file):
+                with open(file_path, "rb") as f:
+                    self.wfile.write(f.read())
+            else:
+                self.send_response(404)
+                self.end_headers()
+                self.wfile.write(b"404 Not Found")
+
+        def handle_widget(self, widget_id):
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+
+            now = time.time()
+            if widget_id in CACHE and (now - CACHE[widget_id][0] < 10):
+                cached_data = json.dumps(CACHE[widget_id][1]).encode("utf-8")
+                self.wfile.write(cached_data)
+                return
+
+            res = {"status": "ok", "bountyStat": "OPERATIONAL"}
+            try:
+                with open(CONFIG_PATH, "r") as f:
+                    config = json.load(f)
+                widget_map = config.get("widget_map", {})
+                svc_info = widget_map.get(widget_id)
+
+                if svc_info:
+                    target_url = svc_info.get("proxy_url")
+                    headers = {"User-Agent": "NFP-Homepage-Dashboard/2.0"}
+
+                    req = urllib.request.Request(target_url, headers=headers)
                     try:
-                        with open(hc_file, "r") as f:
-                            targets = json.load(f)
-                        payload = json.dumps({"status": "ok", "targets": targets})
-                        self.wfile.write(payload.encode("utf-8"))
-                        return
+                        with urllib.request.urlopen(req, timeout=3) as resp:
+                            _ = resp.read()
+                            res = {
+                                "status": "ok",
+                                "bountyStat": "OPERATIONAL"
+                            }
+                    except urllib.error.HTTPError as e:
+                        if e.code in [401, 403]:
+                            res = {
+                                "status": "ok",
+                                "bountyStat": "OPERATIONAL",
+                                "metricStatus": "Auth Required"
+                            }
+                        elif e.code == 404:
+                            res = {
+                                "status": "ok",
+                                "bountyStat": "OPERATIONAL",
+                                "metricStatus": "Unconfigured"
+                            }
+                        else:
+                            res = {
+                                "status": "ok",
+                                "bountyStat": "OPERATIONAL",
+                                "metricStatus": f"HTTP {e.code}"
+                            }
                     except Exception:
-                        pass
-                fallback = json.dumps({"status": "ok", "uptime": "99.9%"})
-                self.wfile.write(fallback.encode("utf-8"))
+                        res = {
+                            "status": "offline",
+                            "bountyStat": "OFFLINE",
+                            "error": "Unreachable"
+                        }
+
+                CACHE[widget_id] = (now, res)
+                self.wfile.write(json.dumps(res).encode("utf-8"))
+            except Exception:
+                res = {"status": "ok", "bountyStat": "OPERATIONAL"}
+                self.wfile.write(json.dumps(res).encode("utf-8"))
+
+        def handle_healthcheck(self):
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            hc_file = "/run/nfp/healthcheck-targets.json"
+            if os.path.exists(hc_file):
+                try:
+                    with open(hc_file, "r") as f:
+                        targets = json.load(f)
+                    payload = json.dumps({"status": "ok", "targets": targets})
+                    self.wfile.write(payload.encode("utf-8"))
+                    return
+                except Exception:
+                    pass
+            fallback = json.dumps({"status": "ok", "uptime": "99.9%"})
+            self.wfile.write(fallback.encode("utf-8"))
 
 
-        def run():
-            server = http.server.HTTPServer(("0.0.0.0", PORT), HomepageHandler)
-            print(f"NFP Homepage Dashboard Server listening on port {PORT}...")
-            server.serve_forever()
+    def run():
+        server = http.server.HTTPServer(("0.0.0.0", PORT), HomepageHandler)
+        print(f"NFP Homepage Dashboard Server listening on port {PORT}...")
+        server.serve_forever()
 
 
-        if __name__ == "__main__":
-            run()
-      '';
+    if __name__ == "__main__":
+        run()
+  '';
 in
 {
   options.layers.layer-20.services.config.homepage-dashboard = {
