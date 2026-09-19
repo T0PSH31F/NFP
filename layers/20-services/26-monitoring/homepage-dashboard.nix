@@ -276,23 +276,19 @@ let
   '';
 
   # Python HTTP Daemon Server Script
-  homepageServer = pkgs.writers.writePython3Bin "homepage-dashboard-server" { } ''
+  homepageServer = pkgs.writeShellScriptBin "homepage-dashboard-server" ''
+        exec ${pkgs.python3}/bin/python3 -u - ${toString cfg.port} "${staticPackage}/public" "${configJsonFile}" << 'EOF'
     import http.server
     import json
     import os
+    import sys
     import time
     import urllib.error
     import urllib.request
 
-    PORT = int(os.environ.get("HOMEPAGE_PORT", "3007"))
-    STATIC_DIR = os.environ.get(
-        "HOMEPAGE_STATIC_DIR",
-        "${staticPackage}/public"
-    )
-    CONFIG_PATH = os.environ.get(
-        "HOMEPAGE_CONFIG_PATH",
-        "${configJsonFile}"
-    )
+    PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 3007
+    STATIC_DIR = sys.argv[2] if len(sys.argv) > 2 else ""
+    CONFIG_PATH = sys.argv[3] if len(sys.argv) > 3 else ""
 
     CACHE = {}
 
@@ -441,6 +437,7 @@ let
 
     if __name__ == "__main__":
         run()
+    EOF
   '';
 in
 {
