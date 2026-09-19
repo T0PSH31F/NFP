@@ -118,11 +118,12 @@
   }
 
   function createServiceCardHtml(svc, catColor) {
+    const hasLogs = svc.logs && svc.logs.enable && svc.logs.url;
     return `
       <article class="wanted-card" data-service-id="${svc.id}" data-search-terms="${svc.name.toLowerCase()} ${svc.onePieceSub.toLowerCase()}" style="--accent-color: ${catColor}">
         <div class="card-top">
           <div class="card-icon-container">
-            ${svc.icon.endsWith('.png') ? `<img src="${svc.icon}" alt="${svc.name}">` : `<span class="service-icon-text">${svc.icon}</span>`}
+            ${(svc.icon.endsWith('.png') || svc.icon.endsWith('.svg')) ? `<img src="${svc.icon}" alt="${svc.name}">` : `<span class="service-icon-text">${svc.icon}</span>`}
           </div>
           <div class="card-identity">
             <h3 class="card-title">${svc.name}</h3>
@@ -142,7 +143,7 @@
 
         <div class="card-actions">
           <a href="${svc.url}" target="_blank" rel="noopener noreferrer" class="action-btn action-btn-primary" aria-label="Board ${svc.name}">BOARD SHIP</a>
-          <a href="${svc.url}" target="_blank" rel="noopener noreferrer" class="action-btn action-btn-secondary" aria-label="View logs for ${svc.name}">LOGS</a>
+          ${hasLogs ? `<a href="${svc.logs.url}" target="_blank" rel="noopener noreferrer" class="action-btn action-btn-secondary" aria-label="View logs for ${svc.name}">LOGS</a>` : ''}
         </div>
       </article>
     `;

@@ -88,6 +88,62 @@ with lib;
         }) httpServices;
       in
       {
+        nfp.services.prometheus = {
+          enable = true;
+          host = config.networking.hostName;
+          bind = "127.0.0.1";
+          port = config.layers.layer-20.services.config.monitoring.prometheus.port;
+          tailnetName = "prometheus";
+          tls = "headscale";
+          healthcheck = {
+            enable = true;
+            path = "/-/healthy";
+            expectedStatus = [ 200 ];
+          };
+          homepage = {
+            enable = true;
+            category = "chopper";
+            order = 10;
+            title = "Prometheus";
+            subtitle = "Medical Scanner";
+            icon = "prometheus";
+            metric = {
+              mode = "native-api";
+              adapter = "prometheus";
+              fields = [
+                "targetsUp"
+                "targetsTotal"
+                "alertsActive"
+              ];
+            };
+          };
+        };
+
+        nfp.services.grafana = {
+          enable = true;
+          host = config.networking.hostName;
+          bind = "127.0.0.1";
+          port = config.layers.layer-20.services.config.monitoring.grafana.port;
+          tailnetName = "grafana";
+          tls = "headscale";
+          healthcheck = {
+            enable = true;
+            path = "/api/health";
+            expectedStatus = [ 200 ];
+          };
+          homepage = {
+            enable = true;
+            category = "chopper";
+            order = 20;
+            title = "Grafana + Loki";
+            subtitle = "Medical Records";
+            icon = "grafana";
+            metric = {
+              mode = "health-only";
+            };
+          };
+        };
+
         clan.core.vars.generators.grafana = {
           files."secret-key" = {
             secret = true;

@@ -67,6 +67,40 @@ in
   };
 
   config = mkIf cfg.enable {
+    nfp.services.adguard = {
+      enable = true;
+      host = "luffy";
+      bind = "127.0.0.1";
+      inherit (cfg) port;
+      tailnetName = "adguard";
+      tls = "headscale";
+      healthcheck = {
+        enable = true;
+        path = "/control/stats";
+        expectedStatus = [
+          200
+          401
+        ];
+      };
+      homepage = {
+        enable = true;
+        category = "zoro";
+        order = 10;
+        title = "AdGuard Home";
+        subtitle = "First Mate's Shield";
+        icon = "adguard";
+        metric = {
+          mode = "native-api";
+          adapter = "adguard";
+          fields = [
+            "queriesToday"
+            "blockedCount"
+            "blockedPercent"
+          ];
+        };
+      };
+    };
+
     # Disable systemd-resolved listener to free up port 53 for AdGuard Home
     services.resolved.settings = {
       Resolve = {

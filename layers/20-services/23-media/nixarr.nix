@@ -77,8 +77,22 @@ in
         backup.paths = [ "${cfg.stateDir}/jellyfin" ];
         homepage = {
           enable = true;
-          group = "Media";
+          category = "vegapunk";
+          order = 10;
+          title = "Jellyfin";
+          subtitle = "Stella — Genius Center";
           icon = "jellyfin";
+          satellite = "stella";
+          metric = {
+            mode = "native-api";
+            adapter = "jellyfin";
+            fields = [
+              "activeStreams"
+              "movies"
+              "series"
+              "musicAlbums"
+            ];
+          };
         };
       };
 
@@ -92,8 +106,14 @@ in
         backup.paths = [ "${cfg.stateDir}/komga" ];
         homepage = {
           enable = true;
-          group = "Media";
+          category = "robin";
+          order = 10;
+          title = "Komga";
+          subtitle = "Manga Scrolls Archive";
           icon = "komga";
+          metric = {
+            mode = "health-only";
+          };
         };
       };
 
@@ -101,16 +121,20 @@ in
         enable = true;
         host = "luffy";
         bind = "127.0.0.1";
-        # Audiobookshelf (nixarr) actually listens on 9292 (confirmed via journalctl).
-        # Healthcheck probes directly via bind:port (local service, no MagicDNS needed).
         port = 9292;
         tailnetName = "audiobookshelf";
         tls = "headscale";
         backup.paths = [ "${cfg.stateDir}/audiobookshelf" ];
         homepage = {
           enable = true;
-          group = "Media";
+          category = "robin";
+          order = 20;
+          title = "Audiobookshelf";
+          subtitle = "Ancient Audio Archives";
           icon = "audiobookshelf";
+          metric = {
+            mode = "health-only";
+          };
         };
         healthcheck = {
           enable = true;
@@ -132,8 +156,20 @@ in
         backup.paths = [ "${cfg.stateDir}/sonarr" ];
         homepage = {
           enable = true;
-          group = "Media";
+          category = "vegapunk";
+          order = 20;
+          title = "Sonarr";
+          subtitle = "Shaka — Good";
           icon = "sonarr";
+          satellite = "shaka";
+          metric = {
+            mode = "native-api";
+            adapter = "sonarr";
+            fields = [
+              "series"
+              "episodes"
+            ];
+          };
         };
         healthcheck = {
           enable = true;
@@ -155,8 +191,17 @@ in
         backup.paths = [ "${cfg.stateDir}/radarr" ];
         homepage = {
           enable = true;
-          group = "Media";
+          category = "vegapunk";
+          order = 30;
+          title = "Radarr";
+          subtitle = "Lilith — Evil";
           icon = "radarr";
+          satellite = "lilith";
+          metric = {
+            mode = "native-api";
+            adapter = "radarr";
+            fields = [ "movies" ];
+          };
         };
       };
 
@@ -170,8 +215,17 @@ in
         backup.paths = [ "${cfg.stateDir}/prowlarr" ];
         homepage = {
           enable = true;
-          group = "Media";
+          category = "vegapunk";
+          order = 40;
+          title = "Prowlarr";
+          subtitle = "Edison — Thinking";
           icon = "prowlarr";
+          satellite = "edison";
+          metric = {
+            mode = "native-api";
+            adapter = "prowlarr";
+            fields = [ "indexers" ];
+          };
         };
       };
 
@@ -185,8 +239,17 @@ in
         backup.paths = [ "${cfg.stateDir}/seerr" ];
         homepage = {
           enable = true;
-          group = "Media";
+          category = "vegapunk";
+          order = 50;
+          title = "Overseerr";
+          subtitle = "York — Greed";
           icon = "overseerr";
+          satellite = "york";
+          metric = {
+            mode = "native-api";
+            adapter = "seerr";
+            fields = [ "requests" ];
+          };
         };
       };
 
@@ -200,8 +263,21 @@ in
         backup.paths = [ "${cfg.stateDir}/qbittorrent" ];
         homepage = {
           enable = true;
-          group = "Downloaders";
+          category = "vegapunk";
+          order = 60;
+          title = "qBittorrent";
+          subtitle = "Pythagoras — Wisdom";
           icon = "qbittorrent";
+          satellite = "pythagoras";
+          metric = {
+            mode = "native-api";
+            adapter = "qbittorrent";
+            fields = [
+              "torrentCount"
+              "dlSpeed"
+              "ulSpeed"
+            ];
+          };
         };
       };
     };

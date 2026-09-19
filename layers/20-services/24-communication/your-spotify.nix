@@ -55,6 +55,34 @@ in
   };
 
   config = mkIf cfg.enable {
+    nfp.services.your-spotify = {
+      enable = true;
+      host = "luffy";
+      bind = "127.0.0.1";
+      inherit (cfg) port;
+      tailnetName = "your-spotify";
+      tls = "headscale";
+      healthcheck = {
+        enable = true;
+        path = "/";
+        expectedStatus = [
+          200
+          302
+        ];
+      };
+      homepage = {
+        enable = true;
+        category = "sanji";
+        order = 30;
+        title = "Your Spotify";
+        subtitle = "Galley Music History";
+        icon = "your-spotify";
+        metric = {
+          mode = "health-only";
+        };
+      };
+    };
+
     clan.core.vars.generators.your-spotify = {
       files."spotify-secret" = {
         secret = true;

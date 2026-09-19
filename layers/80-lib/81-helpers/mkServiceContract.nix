@@ -77,20 +77,92 @@ let
         homepage = {
           enable = mkOption {
             type = types.bool;
-            default = true;
+            default = false;
             description = "Include service entry on Homepage dashboard.";
           };
 
-          group = mkOption {
+          category = mkOption {
+            type = types.enum [
+              "luffy"
+              "zoro"
+              "nami"
+              "sanji"
+              "robin"
+              "chopper"
+              "vegapunk"
+              "agents"
+            ];
+            default = "luffy";
+            description = "Homepage category group / crew member assignment.";
+          };
+
+          order = mkOption {
+            type = types.int;
+            default = 100;
+            description = "Ordering priority within category.";
+          };
+
+          title = mkOption {
             type = types.str;
-            default = "Services";
-            description = "Homepage category group.";
+            default = name;
+            description = "Display title on Homepage card.";
+          };
+
+          subtitle = mkOption {
+            type = types.str;
+            default = "";
+            description = "One Piece / Cyberpunk subtitle or tag.";
           };
 
           icon = mkOption {
             type = types.str;
             default = name;
             description = "Dashboard service icon identifier.";
+          };
+
+          satellite = mkOption {
+            type = types.nullOr types.str;
+            default = null;
+            description = "Optional Vegapunk satellite tag.";
+          };
+
+          logs = {
+            enable = mkOption {
+              type = types.bool;
+              default = false;
+              description = "Enable LOGS button targeting real log backend.";
+            };
+
+            url = mkOption {
+              type = types.nullOr types.str;
+              default = null;
+              description = "Target log URL.";
+            };
+          };
+
+          metric = {
+            mode = mkOption {
+              type = types.enum [
+                "health-only"
+                "prometheus-query"
+                "native-api"
+                "static-info"
+              ];
+              default = "health-only";
+              description = "Widget metric adapter mode.";
+            };
+
+            adapter = mkOption {
+              type = types.nullOr types.str;
+              default = null;
+              description = "Metric adapter identifier.";
+            };
+
+            fields = mkOption {
+              type = types.listOf types.str;
+              default = [ ];
+              description = "Declared allowed metric fields.";
+            };
           };
 
           widget = mkOption {

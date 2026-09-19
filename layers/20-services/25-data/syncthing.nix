@@ -28,6 +28,35 @@ in
   };
 
   config = mkIf cfg.enable {
+    nfp.services.syncthing = {
+      enable = true;
+      host = config.networking.hostName;
+      bind = "127.0.0.1";
+      port = 8384;
+      tailnetName = "syncthing";
+      tls = "headscale";
+      healthcheck = {
+        enable = true;
+        path = "/rest/noauth/health";
+        expectedStatus = [
+          200
+          401
+          403
+        ];
+      };
+      homepage = {
+        enable = true;
+        category = "luffy";
+        order = 40;
+        title = "Syncthing";
+        subtitle = "P2P Treasure Mirror";
+        icon = "syncthing";
+        metric = {
+          mode = "health-only";
+        };
+      };
+    };
+
     services.syncthing = {
       enable = true;
       inherit (cfg) user;

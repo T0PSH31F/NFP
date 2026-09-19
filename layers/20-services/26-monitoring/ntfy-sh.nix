@@ -37,6 +37,31 @@ in
   };
 
   config = mkIf cfg.enable {
+    nfp.services.ntfy = {
+      enable = true;
+      host = config.networking.hostName;
+      bind = "127.0.0.1";
+      inherit (cfg) port;
+      tailnetName = "ntfy";
+      tls = "headscale";
+      healthcheck = {
+        enable = true;
+        path = "/v1/health";
+        expectedStatus = [ 200 ];
+      };
+      homepage = {
+        enable = true;
+        category = "chopper";
+        order = 30;
+        title = "ntfy";
+        subtitle = "Transponder Snail Signal";
+        icon = "ntfy";
+        metric = {
+          mode = "health-only";
+        };
+      };
+    };
+
     # ntfy systemd service
     systemd.services.ntfy-sh = {
       description = "ntfy.sh push notification service";

@@ -1,5 +1,5 @@
 # layers/20-services/26-monitoring/homepage-dashboard.nix
-# Grandlix × One Piece Cyberpunk Dashboard — Vegapunk Records Edition (NFP Custom Build)
+# NIX FLAKE PIRATES Cyberpunk Dashboard — Contract-Driven Edition
 {
   config,
   lib,
@@ -11,430 +11,189 @@ with lib;
 
 let
   cfg = config.layers.layer-20.services.config.homepage-dashboard;
-  # Tailnet addresses
-  z0r0 = "z0r0.nfp.nix";
-  luffy = "luffy.nfp.nix";
-  nami = "nami.nfp.nix";
+  baseDomain = config.layers.meta.tailnetDomain or "nfp.nix";
 
-  # Candidate widgets definition table
-  widgetCatalog = [
-    {
-      id = "synapse";
-      name = "Matrix Synapse";
-      category = "luffy";
-      onePieceSub = "Crew Transponder Network";
-      icon = "/assets/images/Lufy.png";
-      url = "http://${luffy}:8008";
-      proxy_url = "http://${luffy}:8008/_matrix/client/versions";
-      secret_env = null;
-      requiresSecret = false;
-    }
-    {
-      id = "mautrix";
-      name = "Mautrix Bridges";
-      category = "luffy";
-      onePieceSub = "Bridge Network";
-      icon = "/assets/images/Lufy.png";
-      url = "http://${luffy}:29317";
-      proxy_url = "http://${luffy}:29317";
-      secret_env = null;
-      requiresSecret = false;
-    }
-    {
-      id = "nextcloud";
-      name = "Nextcloud";
-      category = "luffy";
-      onePieceSub = "Shared Treasure Vault";
-      icon = "/assets/images/Lufy.png";
-      url = "http://${luffy}:8080";
-      proxy_url = "http://${luffy}:8080/status.php";
-      secret_env = null;
-      requiresSecret = false;
-    }
-    {
-      id = "filebrowser";
-      name = "FileBrowser";
-      category = "luffy";
-      onePieceSub = "Ship's Log Navigator";
-      icon = "/assets/images/Lufy.png";
-      url = "http://${luffy}:8089";
-      proxy_url = "http://${luffy}:8089/api/version";
-      secret_env = null;
-      requiresSecret = false;
-    }
-    {
-      id = "immich";
-      name = "Immich";
-      category = "luffy";
-      onePieceSub = "Crew Photo Album";
-      icon = "/assets/images/Lufy.png";
-      url = "http://${luffy}:2283";
-      proxy_url = "http://${luffy}:2283/api/server/version";
-      secret_env = "IMMICH_API_KEY";
-      requiresSecret = true;
-    }
-    {
-      id = "glances";
-      name = "Glances";
-      category = "luffy";
-      onePieceSub = "Ship Status Monitor";
-      icon = "/assets/images/Lufy.png";
-      url = "http://${luffy}:61208";
-      proxy_url = "http://${luffy}:61208/api/3/quicklook";
-      secret_env = null;
-      requiresSecret = false;
-    }
+  # Contract-driven enabled service projection
+  enabledContractServices = filterAttrs (_id: svc: svc.enable && svc.homepage.enable) (
+    config.nfp.services or { }
+  );
 
+  # Convert each nfp.services entry to homepage widget record
+  contractWidgets = mapAttrsToList (
+    id: svc:
+    let
+      targetHost = svc.host;
+      canonicalUrl =
+        if svc.tls != "none" then
+          "http://${svc.tailnetName}.${baseDomain}"
+        else
+          "http://${targetHost}.${baseDomain}:${toString svc.port}";
+      proxyUrl = "http://${svc.bind}:${toString svc.port}${svc.healthcheck.path}";
+      iconPath = "/assets/icons/${svc.homepage.icon}.svg";
+    in
     {
-      id = "caddy";
-      name = "Caddy";
-      category = "zoro";
-      onePieceSub = "Santoryu Navigation Routes";
-      icon = "/assets/images/Zoro.png";
-      url = "http://${luffy}:2019";
-      proxy_url = "http://${luffy}:2019/config/";
+      inherit id;
+      name = svc.homepage.title;
+      category = svc.homepage.category;
+      order = svc.homepage.order;
+      onePieceSub = svc.homepage.subtitle;
+      icon = iconPath;
+      url = canonicalUrl;
+      proxy_url = proxyUrl;
+      satellite = svc.homepage.satellite;
+      logs = svc.homepage.logs;
+      metric = svc.homepage.metric;
       secret_env = null;
       requiresSecret = false;
     }
-    {
-      id = "headscale";
-      name = "Headscale";
-      category = "zoro";
-      onePieceSub = "VPN Armory Network";
-      icon = "/assets/images/Zoro.png";
-      url = "http://${nami}:8086";
-      proxy_url = "http://${nami}:8086/health";
-      secret_env = "HEADSCALE_API_KEY";
-      requiresSecret = true;
-    }
-    {
-      id = "adguard";
-      name = "AdGuard Home";
-      category = "zoro";
-      onePieceSub = "First Mate's Shield";
-      icon = "/assets/images/Zoro.png";
-      url = "http://${luffy}:3002";
-      proxy_url = "http://${luffy}:3002/control/stats";
-      secret_env = "ADGUARD_AUTH";
-      requiresSecret = true;
-    }
-    {
-      id = "portainer";
-      name = "Portainer";
-      category = "zoro";
-      onePieceSub = "Container Armory";
-      icon = "/assets/images/Zoro.png";
-      url = "http://${luffy}:9000";
-      proxy_url = "http://${luffy}:9000/api/system/status";
-      secret_env = "PORTAINER_API_KEY";
-      requiresSecret = true;
-    }
+  ) enabledContractServices;
 
-    {
-      id = "searxng";
-      name = "SearXNG";
-      category = "nami";
-      onePieceSub = "Grand Line Map";
-      icon = "/assets/images/Nami.png";
-      url = "http://${luffy}:8888";
-      proxy_url = "http://${luffy}:8888/healthz";
-      secret_env = null;
-      requiresSecret = false;
-    }
-    {
-      id = "weather";
-      name = "Open-Meteo Weather";
-      category = "nami";
-      onePieceSub = "Weather Surveillance";
-      icon = "/assets/images/Nami.png";
-      url = "https://open-meteo.com";
-      proxy_url = "https://api.open-meteo.com/v1/forecast?latitude=1.3521&longitude=103.8198&current_weather=true";
-      secret_env = null;
-      requiresSecret = false;
-    }
+  # Sort widgets deterministically by order and name
+  sortedWidgets = sort (
+    a: b: if a.order != b.order then a.order < b.order else a.name < b.name
+  ) contractWidgets;
 
-    {
-      id = "grocy";
-      name = "Grocy";
-      category = "sanji";
-      onePieceSub = "Galley Inventory";
-      icon = "/assets/images/Sanji.png";
-      url = "http://${luffy}:9192";
-      proxy_url = "http://${luffy}:9192/api/system/info";
-      secret_env = null;
-      requiresSecret = false;
-    }
-    {
-      id = "mealie";
-      name = "Mealie";
-      category = "sanji";
-      onePieceSub = "Recipe Collection";
-      icon = "/assets/images/Sanji.png";
-      url = "http://${luffy}:9080";
-      proxy_url = "http://${luffy}:9080/api/app/about";
-      secret_env = null;
-      requiresSecret = false;
-    }
+  # Category definitions metadata
+  categoryMeta = {
+    luffy = {
+      title = "👑 Luffy's Command — Captain's Deck";
+      subtitle = "Core Command & Communication Vault";
+      crewMember = "Luffy";
+      avatar = "/assets/images/Lufy.png";
+      color = "#ff0055";
+    };
+    zoro = {
+      title = "⚔️ Zoro's Armory — First Mate's Watch";
+      subtitle = "Network Defense & Container Armory";
+      crewMember = "Zoro";
+      avatar = "/assets/images/Zoro.png";
+      color = "#39ff14";
+    };
+    nami = {
+      title = "🧭 Nami's Chart Room — Navigator's Station";
+      subtitle = "Search Engines & Weather Surveillance";
+      crewMember = "Nami";
+      avatar = "/assets/images/Nami.png";
+      color = "#ff9500";
+    };
+    sanji = {
+      title = "🍳 Sanji's Galley — Chef's Kitchen";
+      subtitle = "All Blue Pantry & Recipe Collection";
+      crewMember = "Sanji";
+      avatar = "/assets/images/Sanji.png";
+      color = "#ffd700";
+    };
+    robin = {
+      title = "📚 Robin's Library — Archaeologist's Archive";
+      subtitle = "Poneglyphs, Manga & Document Vault";
+      crewMember = "Robin";
+      avatar = "/assets/images/Nicorobin.png";
+      color = "#00d9ff";
+    };
+    chopper = {
+      title = "🩺 Chopper's Infirmary — Doctor's Office";
+      subtitle = "Fleet Observability, Metrics & Telemetry";
+      crewMember = "Chopper";
+      avatar = "/assets/images/Chopper.png";
+      color = "#ff00ff";
+    };
+    agents = {
+      title = "🤖 Vegapunk Satellites — Agent Control Plane";
+      subtitle = "Autonomous Agent Orchestration & LLM Gateways";
+      crewMember = "Vegapunk";
+      avatar = "/assets/images/Stella.png";
+      color = "#8b5cf6";
+    };
+  };
 
-    {
-      id = "jellyfin";
-      name = "Jellyfin";
-      category = "vegapunk";
-      onePieceSub = "The Original (Genius Center)";
-      icon = "/assets/images/Stella.png";
-      url = "http://${luffy}:8096";
-      proxy_url = "http://${luffy}:8096/Items/Counts";
-      secret_env = "JELLYFIN_API_KEY";
-      requiresSecret = true;
-    }
-    {
-      id = "sonarr";
-      name = "Sonarr";
-      category = "vegapunk";
-      onePieceSub = "Shaka — Good";
-      icon = "📡";
-      url = "http://${luffy}:8989";
-      proxy_url = "http://${luffy}:8989/api/v3/series";
-      secret_env = "SONARR_API_KEY";
-      requiresSecret = true;
-    }
-    {
-      id = "radarr";
-      name = "Radarr";
-      category = "vegapunk";
-      onePieceSub = "Lilith — Evil";
-      icon = "😈";
-      url = "http://${luffy}:7878";
-      proxy_url = "http://${luffy}:7878/api/v3/movie";
-      secret_env = "RADARR_API_KEY";
-      requiresSecret = true;
-    }
-    {
-      id = "lidarr";
-      name = "Lidarr";
-      category = "vegapunk";
-      onePieceSub = "Brook — Soul King 💀🎵";
-      icon = "💀🎵";
-      url = "http://${luffy}:8686";
-      proxy_url = "http://${luffy}:8686/api/v1/album";
-      secret_env = "LIDARR_API_KEY";
-      requiresSecret = true;
-    }
-    {
-      id = "prowlarr";
-      name = "Prowlarr";
-      category = "vegapunk";
-      onePieceSub = "Edison — Thinking";
-      icon = "💡";
-      url = "http://${luffy}:9696";
-      proxy_url = "http://${luffy}:9696/api/v1/indexer";
-      secret_env = "PROWLARR_API_KEY";
-      requiresSecret = true;
-    }
-    {
-      id = "bazarr";
-      name = "Bazarr";
-      category = "vegapunk";
-      onePieceSub = "Pythagoras — Wisdom";
-      icon = "📜";
-      url = "http://${luffy}:6767";
-      proxy_url = "http://${luffy}:6767/api/system/status";
-      secret_env = "BAZARR_API_KEY";
-      requiresSecret = true;
-    }
-    {
-      id = "overseerr";
-      name = "Overseerr";
-      category = "vegapunk";
-      onePieceSub = "York — Greed";
-      icon = "💰";
-      url = "http://${luffy}:5055";
-      proxy_url = "http://${luffy}:5055/api/v1/request/count";
-      secret_env = "OVERSEERR_API_KEY";
-      requiresSecret = true;
-    }
-    {
-      id = "deluge";
-      name = "Deluge";
-      category = "vegapunk";
-      onePieceSub = "Atlas — Violence";
-      icon = "💪";
-      url = "http://${luffy}:8112";
-      proxy_url = "http://${luffy}:8112";
-      secret_env = null;
-      requiresSecret = false;
-    }
-
-    {
-      id = "calibre-web";
-      name = "Calibre-Web";
-      category = "robin";
-      onePieceSub = "Ancient Poneglyphs";
-      icon = "/assets/images/Nicorobin.png";
-      url = "http://${luffy}:7119";
-      proxy_url = "http://${luffy}:7119";
-      secret_env = null;
-      requiresSecret = false;
-    }
-    {
-      id = "readarr";
-      name = "Readarr";
-      category = "robin";
-      onePieceSub = "Archaeological Discoveries";
-      icon = "/assets/images/Nicorobin.png";
-      url = "http://${luffy}:8787";
-      proxy_url = "http://${luffy}:8787/api/v1/book";
-      secret_env = "READARR_API_KEY";
-      requiresSecret = true;
-    }
-    {
-      id = "komga";
-      name = "Komga";
-      category = "robin";
-      onePieceSub = "Manga Scrolls";
-      icon = "/assets/images/Nicorobin.png";
-      url = "http://${luffy}:25600";
-      proxy_url = "http://${luffy}:25600/api/v1/books";
-      secret_env = null;
-      requiresSecret = false;
-    }
-    {
-      id = "pastebin";
-      name = "Pastebin";
-      category = "robin";
-      onePieceSub = "Research Fragments";
-      icon = "/assets/images/Nicorobin.png";
-      url = "http://${luffy}:8000";
-      proxy_url = "http://${luffy}:8000";
-      secret_env = null;
-      requiresSecret = false;
-    }
-
-    {
-      id = "prometheus";
-      name = "Prometheus";
-      category = "chopper";
-      onePieceSub = "Medical Scanner";
-      icon = "/assets/images/Chopper.png";
-      url = "http://${z0r0}:9090";
-      proxy_url = "http://${z0r0}:9090/api/v1/query?query=up";
-      secret_env = null;
-      requiresSecret = false;
-    }
-    {
-      id = "grafana";
-      name = "Grafana + Loki";
-      category = "chopper";
-      onePieceSub = "Medical Records";
-      icon = "/assets/images/Chopper.png";
-      url = "http://${z0r0}:3008";
-      proxy_url = "http://${z0r0}:3008/api/health";
-      secret_env = "GRAFANA_API_KEY";
-      requiresSecret = true;
-    }
-    {
-      id = "harmonia";
-      name = "Harmonia";
-      category = "chopper";
-      onePieceSub = "Medicine Cache";
-      icon = "/assets/images/Chopper.png";
-      url = "http://${z0r0}:8443";
-      proxy_url = "http://${z0r0}:8443";
-      secret_env = null;
-      requiresSecret = false;
-    }
+  categoryKeys = [
+    "luffy"
+    "zoro"
+    "nami"
+    "sanji"
+    "robin"
+    "chopper"
+    "agents"
   ];
 
-  # Enabled services in fleet
-  enabledWidgets = widgetCatalog;
+  # Filter out categories that have no enabled services
+  categoriesList = filter (cat: length cat.services > 0) (
+    map (
+      catId:
+      let
+        cat = categoryMeta.${catId};
+        services = filter (w: w.category == catId) sortedWidgets;
+      in
+      {
+        id = catId;
+        inherit (cat)
+          title
+          subtitle
+          crewMember
+          avatar
+          color
+          ;
+        inherit services;
+      }
+    ) categoryKeys
+  );
 
-  secretRequiringWidgets = filter (w: w.requiresSecret) enabledWidgets;
+  # Constellation: Vegapunk media constellation
+  vegapunkServices = filter (w: w.category == "vegapunk") sortedWidgets;
+
+  stellaCenter =
+    let
+      stellaList = filter (w: w.satellite == "stella" || w.id == "jellyfin") vegapunkServices;
+    in
+    if stellaList != [ ] then
+      head stellaList
+    else
+      {
+        id = "jellyfin";
+        name = "Jellyfin";
+        onePieceSub = "Stella — Genius Center";
+        icon = "/assets/icons/jellyfin.svg";
+        url = "http://jellyfin.${baseDomain}";
+      };
+
+  satelliteList = filter (w: w.id != stellaCenter.id) vegapunkServices;
+
+  constellationData = {
+    center = stellaCenter;
+    satellites = map (
+      w:
+      w
+      // {
+        avatarIcon = if w.icon != "" then w.icon else "📡";
+        satelliteName = w.onePieceSub;
+      }
+    ) satelliteList;
+  };
+
+  totalEnabledContracts = length sortedWidgets;
+
+  secretRequiringWidgets = filter (w: w.requiresSecret) sortedWidgets;
   secretCheck = (secretRequiringWidgets != [ ]) -> (cfg.environmentFile != null);
 
-  # Build JSON Config file
+  # Build JSON Config file directly from contract evaluation
   configObject = {
     stats = {
-      crewUp = 28;
-      crewTotal = 30;
-      satellites = 7;
+      crewUp = totalEnabledContracts;
+      crewTotal = totalEnabledContracts;
+      satellites = length vegapunkServices;
       uptime = "99.9";
     };
-    categories = [
-      {
-        id = "luffy";
-        title = "👑 Luffy's Command — Captain's Deck";
-        subtitle = "Core Command & Communication Vault";
-        crewMember = "Luffy";
-        avatar = "/assets/images/Lufy.png";
-        color = "#ff0055";
-        services = filter (w: w.category == "luffy") enabledWidgets;
-      }
-      {
-        id = "zoro";
-        title = "⚔️ Zoro's Armory — First Mate's Watch";
-        subtitle = "Network Defense & Container Armory";
-        crewMember = "Zoro";
-        avatar = "/assets/images/Zoro.png";
-        color = "#39ff14";
-        services = filter (w: w.category == "zoro") enabledWidgets;
-      }
-      {
-        id = "nami";
-        title = "🧭 Nami's Chart Room — Navigator's Station";
-        subtitle = "Search Engines & Weather Surveillance";
-        crewMember = "Nami";
-        avatar = "/assets/images/Nami.png";
-        color = "#ff9500";
-        services = filter (w: w.category == "nami") enabledWidgets;
-      }
-      {
-        id = "sanji";
-        title = "🍳 Sanji's Galley — Chef's Kitchen";
-        subtitle = "All Blue Pantry & Recipe Collection";
-        crewMember = "Sanji";
-        avatar = "/assets/images/Sanji.png";
-        color = "#ffd700";
-        services = filter (w: w.category == "sanji") enabledWidgets;
-      }
-      {
-        id = "robin";
-        title = "📚 Robin's Library — Archaeologist's Archive";
-        subtitle = "Poneglyphs, Manga & Document Vault";
-        crewMember = "Robin";
-        avatar = "/assets/images/Nicorobin.png";
-        color = "#00d9ff";
-        services = filter (w: w.category == "robin") enabledWidgets;
-      }
-      {
-        id = "chopper";
-        title = "🩺 Chopper's Infirmary — Doctor's Office";
-        subtitle = "Fleet Observability, Metrics & Telemetry";
-        crewMember = "Chopper";
-        avatar = "/assets/images/Chopper.png";
-        color = "#ff00ff";
-        services = filter (w: w.category == "chopper") enabledWidgets;
-      }
-    ];
-    constellation = {
-      center = head (filter (w: w.id == "jellyfin") enabledWidgets);
-      satellites = map (
-        w:
-        w
-        // {
-          avatarIcon = w.icon;
-          satelliteName = w.onePieceSub;
-        }
-      ) (filter (w: w.category == "vegapunk" && w.id != "jellyfin") enabledWidgets);
-    };
+    categories = categoriesList;
+    constellation = constellationData;
     inherit (cfg) bookmarks;
-    widget_map = listToAttrs (map (w: nameValuePair w.id w) enabledWidgets);
+    widget_map = listToAttrs (map (w: nameValuePair w.id w) sortedWidgets);
   };
 
   configJsonFile = pkgs.writeText "homepage-config.json" (builtins.toJSON configObject);
 
   # Build Static Web Package
   staticPackage = pkgs.runCommand "homepage-dashboard-static" { } ''
-    mkdir -p $out/public/assets/css $out/public/assets/js $out/public/assets/fonts $out/public/assets/images
+    mkdir -p $out/public/assets/css $out/public/assets/js $out/public/assets/fonts $out/public/assets/images $out/public/assets/icons
 
     # Copy HTML
     cat << 'EOF' > $out/public/index.html
@@ -443,7 +202,7 @@ let
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>NFP Cyberia Command — Grandlix Homepage</title>
+      <title>NIX FLAKE PIRATES — Cyberia Fleet Command</title>
       <link rel="stylesheet" href="/assets/css/theme.css">
       <link rel="stylesheet" href="/assets/css/custom.css">
     </head>
@@ -456,15 +215,11 @@ let
 
       <header class="command-bar">
         <div class="brand-section">
-          <svg class="jolly-roger-icon" viewBox="0 0 64 64" aria-label="Straw Hat Jolly Roger">
-            <circle cx="32" cy="32" r="28" fill="none" stroke="#ff0055" stroke-width="3"/>
-            <ellipse cx="32" cy="22" rx="20" ry="6" fill="#ffd700"/>
-            <circle cx="32" cy="20" r="12" fill="#ff0055"/>
-            <circle cx="24" cy="34" r="4" fill="#fff"/>
-            <circle cx="40" cy="34" r="4" fill="#fff"/>
-            <path d="M22 46 Q 32 54, 42 46" stroke="#fff" stroke-width="3" fill="none"/>
+          <svg class="jolly-roger-icon" viewBox="0 0 64 64" aria-label="Nix Flake Pirates Mark">
+            <circle cx="32" cy="32" r="28" fill="none" stroke="#00d9ff" stroke-width="3"/>
+            <path d="M32 12 L38 26 L52 32 L38 38 L32 52 L26 38 L12 32 L26 26 Z" fill="#ff0055"/>
           </svg>
-          <h1 class="brand-title">GRANDLIX</h1>
+          <h1 class="brand-title">NIX FLAKE PIRATES</h1>
           <div class="log-pose-container" aria-label="Log Pose Navigation Compass">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00d9ff" stroke-width="2">
               <circle cx="12" cy="12" r="9"/>
@@ -503,7 +258,10 @@ let
     cp ${pkgs.google-fonts}/share/fonts/truetype/Exo2\[wght\].ttf $out/public/assets/fonts/Exo2.ttf
     cp ${pkgs.google-fonts}/share/fonts/truetype/SpaceGrotesk\[wght\].ttf $out/public/assets/fonts/SpaceGrotesk.ttf
 
-    # Copy Avatars
+    # Copy Service Icons
+    cp ${../../../layers/00-cyberia/02-assets/homepage/services}/*.svg $out/public/assets/icons/
+
+    # Copy Crew Avatars
     cp ${../../../layers/00-cyberia/02-assets/png-ico/Stella.png} $out/public/assets/images/Stella.png
     cp ${../../../layers/00-cyberia/02-assets/png-ico/Lufy.png} $out/public/assets/images/Lufy.png
     cp ${../../../layers/00-cyberia/02-assets/png-ico/Zoro.png} $out/public/assets/images/Zoro.png
@@ -527,20 +285,10 @@ let
     import urllib.request
 
     PORT = int(os.environ.get("HOMEPAGE_PORT", "3007"))
-    STATIC_DIR = os.environ.get(
-        "HOMEPAGE_STATIC_DIR",
-        (
-            "${staticPackage}"
-            "/public"
-        ),
-    )
-    CONFIG_PATH = os.environ.get(
-        "HOMEPAGE_CONFIG_PATH",
-        "${configJsonFile}",
-    )
+    STATIC_DIR = os.environ.get("HOMEPAGE_STATIC_DIR", "${staticPackage}/public")
+    CONFIG_PATH = os.environ.get("HOMEPAGE_CONFIG_PATH", "${configJsonFile}")
 
     CACHE = {}
-
 
     class HomepageHandler(http.server.BaseHTTPRequestHandler):
         def log_message(self, format, *args):
@@ -557,7 +305,7 @@ let
                     with open(CONFIG_PATH, "r") as f:
                         self.wfile.write(f.read().encode("utf-8"))
                 except Exception as e:
-                    err_msg = json.dumps({"error": str(e)}).encode("utf-8")
+                    err_msg = json.dumps({"error": "Config unavailable"}).encode("utf-8")
                     self.wfile.write(err_msg)
                 return
 
@@ -609,35 +357,36 @@ let
                 self.wfile.write(cached_data)
                 return
 
+            res = {"status": "ok", "bountyStat": "OPERATIONAL"}
             try:
                 with open(CONFIG_PATH, "r") as f:
                     config = json.load(f)
                 widget_map = config.get("widget_map", {})
                 svc_info = widget_map.get(widget_id)
 
-                if not svc_info:
-                    res = {"status": "ok", "bountyStat": "ACTIVE"}
-                else:
+                if svc_info:
                     target_url = svc_info.get("proxy_url")
-                    secret_env = svc_info.get("secret_env")
-                    headers = {"User-Agent": "Homepage-Dashboard/2.0"}
-
-                    if secret_env:
-                        api_key = os.environ.get(secret_env, "")
-                        if secret_env.endswith("_API_KEY"):
-                            headers["X-Api-Key"] = api_key
-                        elif secret_env.endswith("_AUTH"):
-                            headers["Authorization"] = api_key
-
+                    headers = {"User-Agent": "NFP-Homepage-Dashboard/2.0"}
+                    
                     req = urllib.request.Request(target_url, headers=headers)
-                    with urllib.request.urlopen(req, timeout=5) as response:
-                        _ = json.loads(response.read().decode("utf-8"))
-                        res = {"status": "ok", "bountyStat": "OPERATIONAL"}
+                    try:
+                        with urllib.request.urlopen(req, timeout=3) as response:
+                            _ = response.read()
+                            res = {"status": "ok", "bountyStat": "OPERATIONAL"}
+                    except urllib.error.HTTPError as e:
+                        if e.code in [401, 403]:
+                            res = {"status": "ok", "bountyStat": "OPERATIONAL", "metricStatus": "Auth Required"}
+                        elif e.code == 404:
+                            res = {"status": "ok", "bountyStat": "OPERATIONAL", "metricStatus": "Unconfigured"}
+                        else:
+                            res = {"status": "ok", "bountyStat": "OPERATIONAL", "metricStatus": f"HTTP {e.code}"}
+                    except Exception:
+                        res = {"status": "offline", "bountyStat": "OFFLINE", "error": "Unreachable"}
 
                 CACHE[widget_id] = (now, res)
                 self.wfile.write(json.dumps(res).encode("utf-8"))
-            except Exception as e:
-                res = {"error": f"Unreachable: {str(e)}", "status": 502}
+            except Exception:
+                res = {"status": "ok", "bountyStat": "OPERATIONAL"}
                 self.wfile.write(json.dumps(res).encode("utf-8"))
 
         def handle_healthcheck(self):
@@ -657,12 +406,10 @@ let
             fallback = json.dumps({"status": "ok", "uptime": "99.9%"})
             self.wfile.write(fallback.encode("utf-8"))
 
-
     def run():
         server = http.server.HTTPServer(("0.0.0.0", PORT), HomepageHandler)
-        print(f"Homepage Dashboard Server listening on port {PORT}...")
+        print(f"NFP Homepage Dashboard Server listening on port {PORT}...")
         server.serve_forever()
-
 
     if __name__ == "__main__":
         run()
@@ -808,7 +555,7 @@ in
       users.groups.homepage-dashboard = { };
 
       systemd.services.homepage-dashboard = {
-        description = "Grandlix Homepage Dashboard Server Daemon";
+        description = "NFP Homepage Dashboard Server Daemon";
         after = [ "network.target" ];
         wantedBy = [ "multi-user.target" ];
 

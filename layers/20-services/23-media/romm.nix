@@ -34,6 +34,35 @@ in
   };
 
   config = mkIf cfg.enable {
+    nfp.services.romm = {
+      enable = true;
+      host = config.networking.hostName;
+      bind = "127.0.0.1";
+      inherit (cfg) port;
+      tailnetName = "romm";
+      tls = "headscale";
+      healthcheck = {
+        enable = true;
+        path = "/";
+        expectedStatus = [
+          200
+          302
+        ];
+      };
+      homepage = {
+        enable = true;
+        category = "vegapunk";
+        order = 30;
+        title = "RomM";
+        subtitle = "Atlas — Retro Memory Station";
+        icon = "romm";
+        satellite = "atlas";
+        metric = {
+          mode = "health-only";
+        };
+      };
+    };
+
     virtualisation.oci-containers.containers.romm = {
       image = "ghcr.io/rommapp/romm:latest";
       autoStart = true;

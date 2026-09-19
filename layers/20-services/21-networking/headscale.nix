@@ -28,6 +28,31 @@ in
   };
 
   config = mkIf cfg.enable {
+    nfp.services.headscale = {
+      enable = true;
+      host = config.networking.hostName;
+      bind = "127.0.0.1";
+      inherit (cfg) port;
+      tailnetName = "headscale";
+      tls = "headscale";
+      healthcheck = {
+        enable = true;
+        path = "/health";
+        expectedStatus = [ 200 ];
+      };
+      homepage = {
+        enable = true;
+        category = "zoro";
+        order = 30;
+        title = "Headscale";
+        subtitle = "VPN Armory Network";
+        icon = "headscale";
+        metric = {
+          mode = "health-only";
+        };
+      };
+    };
+
     services.headscale = {
       enable = true;
       inherit (cfg) port;

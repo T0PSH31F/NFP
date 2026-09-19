@@ -131,6 +131,17 @@ in
           path = "/healthz";
           expectedStatus = 200;
         };
+        homepage = {
+          enable = true;
+          category = "agents";
+          order = 10;
+          title = "Polyfloor";
+          subtitle = "Multi-Agent Orchestrator";
+          icon = "polyfloor";
+          metric = {
+            mode = "health-only";
+          };
+        };
       };
     })
   ];

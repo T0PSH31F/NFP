@@ -50,6 +50,31 @@ with lib;
   };
 
   config = mkIf config.services.caddy-server.enable {
+    nfp.services.caddy = {
+      enable = true;
+      host = config.networking.hostName;
+      bind = "127.0.0.1";
+      port = 2019;
+      tailnetName = "caddy";
+      tls = "headscale";
+      healthcheck = {
+        enable = true;
+        path = "/config/";
+        expectedStatus = [ 200 ];
+      };
+      homepage = {
+        enable = true;
+        category = "zoro";
+        order = 20;
+        title = "Caddy";
+        subtitle = "Santoryu Navigation Routes";
+        icon = "caddy";
+        metric = {
+          mode = "health-only";
+        };
+      };
+    };
+
     security.acme.acceptTerms = true;
 
     services.caddy = {
