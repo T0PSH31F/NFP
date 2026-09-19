@@ -79,6 +79,12 @@
     defaultNetwork.settings.dns_enabled = true;
   };
 
+  # === Services enablement ===
+  layers.layer-20.services.config.netdata.enable = true;
+  services.ai-services.ollama.enable = true;
+  services.ai-services.open-webui.enable = true;
+  services.sillytavern-app.enable = true;
+
   # === AI-router: Kong kept as sole gateway, align freellm ports for side-by-side test ===
   # freellmapi:3001 / freellmpool:8080 are module defaults; Kong previously expected 3003/8083 — align to actual ports
   services.ai-services.kong-gateway.routers.freellmapi.port = lib.mkForce 3001;
@@ -109,11 +115,4 @@
 
   # === Restic backups ===
   layers.layer-20.services.backups.restic.enable = lib.mkDefault true;
-
-  # === Enable netdata and agent services on nami ===
-  layers.layer-20.services.config.netdata.enable = true;
-  layers.layer-70.ai-infra.ollama.enable = true;
-  layers.layer-70.dash-desk-ui.open-webui.enable = true;
-  layers.layer-70.dash-desk-ui.sillytavern.enable = true;
-  layers.layer-70.llm-routers.kong-gateway.enable = true;
 }

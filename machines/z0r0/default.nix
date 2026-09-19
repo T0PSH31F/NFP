@@ -98,6 +98,9 @@
   # Glances server for cross-machine system metrics
   services.glances-server.enable = true;
 
+  # Netdata real-time monitoring
+  layers.layer-20.services.config.netdata.enable = true;
+
   systemd.services.rclone-gdrive-mount.enable = false;
 
   clan.core.postgresql.enable = true;
@@ -200,7 +203,4 @@
       echo "Done. No unreferenced-but-needed paths were harmed."
     '')
   ];
-
-  # Enable netdata real-time metrics on z0r0
-  layers.layer-20.services.config.netdata.enable = true;
 }

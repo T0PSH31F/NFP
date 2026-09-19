@@ -105,17 +105,15 @@ in
     };
   };
   layers.layer-20.services.config.your-spotify.enable = true;
-  layers.layer-20.services.config.searxng.enable = true;
+  services.searxng.enable = true;
   services.calibre-web-app.enable = true;
-  layers.layer-20.services.config.readarr.enable = true;
-  layers.layer-20.services.config.lidarr.enable = true;
-  layers.layer-20.services.config.bazarr.enable = true;
+  layers.layer-20.services.config.nixarr-stack.enable = true;
   layers.layer-20.services.config.jackett.enable = true;
   layers.layer-20.services.config.netdata.enable = true;
-  layers.layer-70.ai-infra.ollama.enable = true;
-  layers.layer-70.dash-desk-ui.open-webui.enable = true;
-  layers.layer-70.dash-desk-ui.sillytavern.enable = true;
-  layers.layer-70.llm-routers.kong-gateway.enable = true;
+  services.ai-services.ollama.enable = true;
+  services.ai-services.open-webui.enable = true;
+  services.sillytavern-app.enable = true;
+  services.ai-services.kong-gateway.enable = true;
 
   layers.layer-20.services.communication.rustdesk = {
     enable = true;
@@ -183,9 +181,6 @@ in
   # 03 - SERVICE SPECIFICS & OVERRIDES (Layer 20)
   # ============================================================================
   services = {
-    # Disable SillyTavern Tag Default to completely disable it
-    sillytavern-app.enable = lib.mkForce false;
-
     # Headscale moved BACK to luffy (2026-09-15) — was on nami, unreachable behind Alibaba SG
     headscale-server = {
       enable = lib.mkForce true;
