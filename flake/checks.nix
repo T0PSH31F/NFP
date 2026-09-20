@@ -55,6 +55,33 @@
           touch $out
         '';
 
+        luffy-service-scope =
+          let
+            luffyConfig = inputs.self.nixosConfigurations.luffy.config;
+            namiConfig = inputs.self.nixosConfigurations.nami.config;
+            z0r0Config = inputs.self.nixosConfigurations.z0r0.config;
+          in
+          if luffyConfig.services.ai-services.ollama.enable then
+            throw "luffy service scope error: Ollama must be disabled on luffy"
+          else if luffyConfig.services.ai-services.open-webui.enable then
+            throw "luffy service scope error: Open WebUI must be disabled on luffy"
+          else if luffyConfig.services.sillytavern-app.enable then
+            throw "luffy service scope error: SillyTavern must be disabled on luffy"
+          else if luffyConfig.services.ai-services.kong-gateway.enable then
+            throw "luffy service scope error: Kong Gateway must be disabled on luffy"
+          else if !luffyConfig.layers.layer-20.services.config.netdata.enable then
+            throw "luffy service scope error: Netdata must be enabled on luffy"
+          else if !namiConfig.layers.layer-20.services.config.netdata.enable then
+            throw "luffy service scope error: Netdata must be enabled on nami"
+          else if !z0r0Config.layers.layer-20.services.config.netdata.enable then
+            throw "luffy service scope error: Netdata must be enabled on z0r0"
+          else if luffyConfig.nfp.services.netdata.homepage.enable then
+            throw "luffy service scope error: Netdata homepage card must be false by default"
+          else
+            pkgs.runCommand "check-luffy-service-scope" { } ''
+              touch $out
+            '';
+
         llm-agents-catalog-completeness =
           let
             llmPkgs = inputs.llm-agents.packages.${system} or { };

@@ -110,10 +110,6 @@ in
   layers.layer-20.services.config.nixarr-stack.enable = true;
   layers.layer-20.services.config.jackett.enable = true;
   layers.layer-20.services.config.netdata.enable = true;
-  services.ai-services.ollama.enable = true;
-  services.ai-services.open-webui.enable = true;
-  services.sillytavern-app.enable = true;
-  services.ai-services.kong-gateway.enable = true;
 
   layers.layer-20.services.communication.rustdesk = {
     enable = true;
@@ -436,13 +432,6 @@ in
     };
   };
 
-  layers.layer-20.services.config.reverseProxy.routes = {
-    ollama = 11434;
-  };
-
-  # ============================================================================
-  # 04 - SYSTEM & PROGRAM OVERRIDES
-  # ============================================================================
   # Podman Rootless Virtualization
   virtualisation.oci-containers.backend = "podman";
   virtualisation.podman = {
@@ -452,8 +441,6 @@ in
   };
 
   # Machine-specific firewall overrides (Master fleet firewall rules defined in layer-10 networking.nix)
-
-  services.ollama.package = lib.mkForce pkgs.ollama;
 
   home-manager = {
     useGlobalPkgs = true;

@@ -44,7 +44,7 @@ in
         expectedStatus = [ 200 ];
       };
       homepage = {
-        enable = true;
+        enable = false;
         category = "chopper";
         order = 40;
         title = "Netdata";
@@ -55,7 +55,5 @@ in
         };
       };
     };
-
-    networking.firewall.allowedTCPPorts = [ cfg.port ];
   };
 }
