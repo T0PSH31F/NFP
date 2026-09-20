@@ -1,5 +1,11 @@
 # layers/50-cli-tui-programs/51-shells/nfp-motd.nix
-# Resilient Nix-native per-host terminal MOTD & banner tools
+# Minimal per-host terminal MOTD & banner tools (kitty-native, Noctalia-synced)
+#
+# Default `nfp-motd` prints ONLY: figlet host banner + PNG + user@host title.
+# No full fastfetch spec dump on shell startup (that was the bloat/slowness).
+# Full specs remain available on demand: `nfp-motd --full`.
+# Image rendering is kitty-graphics / sixel / iTerm native via fastfetch.
+# Chafa is intentionally NOT used anywhere in this module.
 {
   config,
   lib,
@@ -53,10 +59,52 @@ let
       exit 0
     fi
 
+    # Noctalia accent color as "R;G;B" for 24-bit ANSI, or empty when unavailable.
+    # Reads the live Noctalia-generated starship palette so the banner follows
+    # the active desktop theme instead of a hardcoded rainbow.
+    noctalia_accent_rgb() {
+      _pal=""
+      if [ -f "$HOME/.cache/noctalia/starship-palette.toml" ]; then
+        _pal="$HOME/.cache/noctalia/starship-palette.toml"
+      elif [ -f "$HOME/.config/noctalia/templates/starship.toml" ]; then
+        _pal="$HOME/.config/noctalia/templates/starship.toml"
+      else
+        return 1
+      fi
+      _hex=$(grep -E '^[[:space:]]*(pink|mauve|sapphire)[[:space:]]*=' "$_pal" 2>/dev/null | head -n1 | sed -E 's/^[^0-9a-fA-F]*([0-9a-fA-F]{6}).*/\1/' || true)
+      [ -n "$_hex" ] || return 1
+      _r=$((16#''${_hex:0:2})); _g=$((16#''${_hex:2:2})); _b=$((16#''${_hex:4:2}))
+      printf '%s;%s;%s' "$_r" "$_g" "$_b"
+    }
+
+    print_accent() {
+      _rgb="$(noctalia_accent_rgb 2>/dev/null || true)"
+      if [ -n "$_rgb" ]; then
+        while IFS= read -r _line; do
+          printf '\033[38;2;%sm%s\033[0m\n' "$_rgb" "$_line"
+        done
+      else
+        cat
+      fi
+    }
+
     generate_banner_text() {
-      if command -v ${pkgs.figlet}/bin/figlet >/dev/null 2>&1 && command -v ${pkgs.lolcat}/bin/lolcat >/dev/null 2>&1; then
-        ${pkgs.figlet}/bin/figlet -c "$TITLE" | ${pkgs.lolcat}/bin/lolcat -f
-        echo "=== $SUBTITLE ==="
+      if command -v ${pkgs.figlet}/bin/figlet >/dev/null 2>&1; then
+        _fig="$(${pkgs.figlet}/bin/figlet -c "$TITLE" 2>/dev/null || true)"
+        if [ -n "$_fig" ]; then
+          if _rgb="$(noctalia_accent_rgb 2>/dev/null)" && [ -n "$_rgb" ]; then
+            printf '%s\n' "$_fig" | print_accent
+          elif command -v ${pkgs.lolcat}/bin/lolcat >/dev/null 2>&1; then
+            printf '%s\n' "$_fig" | ${pkgs.lolcat}/bin/lolcat -f
+          else
+            printf '%s\n' "$_fig"
+          fi
+          echo "=== $SUBTITLE ==="
+        else
+          echo "=========================================================================="
+          echo "  $TITLE // $SUBTITLE"
+          echo "=========================================================================="
+        fi
       else
         echo "=========================================================================="
         echo "  $TITLE // $SUBTITLE"
@@ -85,7 +133,10 @@ let
     exec ${nfpBannerPkg}/bin/nfp-banner --animate "$@"
   '';
 
-  # MOTD Main Executable Script
+  # MOTD Main Executable Script — minimal by default (banner + PNG + title only).
+  # Usage: nfp-motd [--full] [--help]
+  #   default: figlet banner + PNG via native terminal graphics + user@host
+  #   --full:  banner + full fastfetch spec dump (on demand, not on shell startup)
   nfpMotdPkg = pkgs.writeShellScriptBin "nfp-motd" ''
     set -euo pipefail
 
@@ -93,6 +144,16 @@ let
     MOTD_IMAGE_MODE="''${NFP_MOTD_IMAGE:-auto}"
     MOTD_SIZE_MODE="''${NFP_MOTD_SIZE:-normal}"
     MOTD_DEBUG="''${NFP_MOTD_DEBUG:-0}"
+    MOTD_FULL=0
+    if [ "''${1:-}" = "--full" ] || [ "''${NFP_MOTD_FULL:-0}" = "1" ]; then
+      MOTD_FULL=1
+    fi
+    if [ "''${1:-}" = "--help" ]; then
+      echo "Usage: nfp-motd [--full] [--help]"
+      echo "  default: host banner + PNG + user@host (fast, minimal)"
+      echo "  --full:  host banner + full fastfetch spec dump"
+      exit 0
+    fi
 
     log_debug() {
       if [ "$MOTD_DEBUG" = "1" ]; then
@@ -128,6 +189,10 @@ let
         ;;
     esac
 
+    # Native terminal graphics only — kitty / sixel / iTerm. No chafa.
+    # Kitty graphics pass through SSH and modern tmux/zellij, so no
+    # multiplexer downgrade: banner + name always prints, image renders
+    # wherever the terminal speaks a native graphics protocol.
     RENDERER="none"
 
     if [ "$MOTD_IMAGE_MODE" = "none" ]; then
@@ -135,50 +200,53 @@ let
     elif [ "$MOTD_IMAGE_MODE" != "auto" ]; then
       RENDERER="$MOTD_IMAGE_MODE"
     else
-      if [ -n "''${SSH_CLIENT:-}" ] || [ -n "''${SSH_TTY:-}" ] || [ -n "''${TMUX:-}" ] || [ -n "''${ZELLIJ:-}" ]; then
-        if command -v ${pkgs.chafa}/bin/chafa >/dev/null 2>&1; then
-          RENDERER="chafa"
-        else
+      case "''${KITTY_WINDOW_ID:-}:''${TERM:-}:''${TERM_PROGRAM:-}" in
+        *:*kitty*:*|*:*ghostty*:*|*:*:ghostty|*:*:kitty|*:*:WezTerm)
+          RENDERER="kitty"
+          ;;
+        *:*sixel*:*|*:*foot*:*|*:*mlterm*:*)
+          RENDERER="sixel"
+          ;;
+        *:*:iTerm.app)
+          RENDERER="iterm"
+          ;;
+        *)
           RENDERER="none"
-        fi
-      else
-        case "''${KITTY_WINDOW_ID:-}:''${TERM:-}:''${TERM_PROGRAM:-}" in
-          *:*kitty*:*|*:*ghostty*:*|*:*:ghostty|*:*:kitty|*:*:WezTerm)
-            RENDERER="kitty"
-            ;;
-          *:*sixel*:*|*:*foot*:*|*:*mlterm*:*)
-            RENDERER="sixel"
-            ;;
-          *:*:iTerm.app)
-            RENDERER="iterm"
-            ;;
-          *)
-            if command -v ${pkgs.chafa}/bin/chafa >/dev/null 2>&1; then
-              RENDERER="chafa"
-            fi
-            ;;
-        esac
-      fi
+          ;;
+      esac
     fi
 
-    log_debug "Host: $HOST | Renderer: $RENDERER | Image: $IMAGE_PATH | Size: ''${LOGO_WIDTH}x''${LOGO_HEIGHT}"
+    log_debug "Host: $HOST | Renderer: $RENDERER | Image: $IMAGE_PATH | Size: ''${LOGO_WIDTH}x''${LOGO_HEIGHT} | Full: $MOTD_FULL"
 
-    # Render Banner
+    # Render Banner (PC name)
     ${nfpBannerPkg}/bin/nfp-banner --static 2>/dev/null || echo "=== $HOST_LABEL ==="
 
-    # Render Fastfetch
-    if [ "$RENDERER" != "none" ] && [ -n "$IMAGE_PATH" ] && [ -f "$IMAGE_PATH" ]; then
-      if ! ${pkgs.fastfetch}/bin/fastfetch \
-        --logo "$IMAGE_PATH" \
-        --logo-type "$RENDERER" \
-        --logo-width "$LOGO_WIDTH" \
-        --logo-height "$LOGO_HEIGHT" \
-        --logo-preserve-aspect-ratio true 2>/dev/null; then
-          log_debug "Fastfetch logo rendering failed with renderer '$RENDERER', falling back to logo none"
+    # Render PNG (+ user@host title only by default; full specs only with --full)
+    if [ "$MOTD_FULL" = "1" ]; then
+      if [ "$RENDERER" != "none" ] && [ -n "$IMAGE_PATH" ] && [ -f "$IMAGE_PATH" ]; then
+        ${pkgs.fastfetch}/bin/fastfetch \
+          --logo "$IMAGE_PATH" \
+          --logo-type "$RENDERER" \
+          --logo-width "$LOGO_WIDTH" \
+          --logo-height "$LOGO_HEIGHT" \
+          --logo-preserve-aspect-ratio true 2>/dev/null || \
           ${pkgs.fastfetch}/bin/fastfetch --logo none 2>/dev/null || true
+      else
+        ${pkgs.fastfetch}/bin/fastfetch --logo none 2>/dev/null || true
       fi
     else
-      ${pkgs.fastfetch}/bin/fastfetch --logo none 2>/dev/null || true
+      if [ "$RENDERER" != "none" ] && [ -n "$IMAGE_PATH" ] && [ -f "$IMAGE_PATH" ]; then
+        ${pkgs.fastfetch}/bin/fastfetch \
+          --logo "$IMAGE_PATH" \
+          --logo-type "$RENDERER" \
+          --logo-width "$LOGO_WIDTH" \
+          --logo-height "$LOGO_HEIGHT" \
+          --logo-preserve-aspect-ratio true \
+          -s Title 2>/dev/null || \
+          ${pkgs.fastfetch}/bin/fastfetch --logo none -s Title 2>/dev/null || true
+      else
+        ${pkgs.fastfetch}/bin/fastfetch --logo none -s Title 2>/dev/null || true
+      fi
     fi
   '';
 in

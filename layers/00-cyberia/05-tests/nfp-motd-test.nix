@@ -18,7 +18,6 @@ pkgs.runCommand "check-nfp-motd"
       pkgs.gnugrep
       pkgs.coreutils
       pkgs.fastfetch
-      pkgs.chafa
     ];
   }
   ''
@@ -76,25 +75,35 @@ pkgs.runCommand "check-nfp-motd"
     echo "$OUT" | grep -q "Renderer: iterm" || { echo "ERROR: iTerm.app did not select iterm renderer"; exit 1; }
     echo "  ✅ iTerm protocol selected under iTerm environment."
 
-    # Chafa selection (fallback for standard terminal)
+    # No-graphics fallback (banner + title only, never chafa)
     OUT=$(NFP_MOTD_DEBUG=1 TERM=xterm-256color TERM_PROGRAM="" ${nfpMotdPkg}/bin/nfp-motd 2>&1 || true)
-    echo "$OUT" | grep -q "Renderer: chafa" || { echo "ERROR: generic terminal did not fallback to chafa"; exit 1; }
-    echo "  ✅ Chafa fallback selected for standard terminal environment."
+    echo "$OUT" | grep -q "Renderer: none" || { echo "ERROR: generic terminal did not fallback to none"; exit 1; }
+    echo "  ✅ Graphics-less terminal falls back to banner + title only."
 
     # Image override 'none'
     OUT=$(NFP_MOTD_DEBUG=1 NFP_MOTD_IMAGE=none ${nfpMotdPkg}/bin/nfp-motd 2>&1 || true)
     echo "$OUT" | grep -q "Renderer: none" || { echo "ERROR: NFP_MOTD_IMAGE=none did not disable renderer"; exit 1; }
     echo "  ✅ NFP_MOTD_IMAGE=none correctly disabled image rendering."
 
-    # SSH guard test (falls back to chafa)
+    # SSH guard test (kitty graphics pass through SSH to kitty-family terminals)
     OUT=$(NFP_MOTD_DEBUG=1 TERM_PROGRAM=ghostty SSH_TTY=/dev/pts/1 ${nfpMotdPkg}/bin/nfp-motd 2>&1 || true)
-    echo "$OUT" | grep -q "Renderer: chafa" || { echo "ERROR: SSH session did not fallback to chafa"; exit 1; }
-    echo "  ✅ SSH session safely fell back to chafa."
+    echo "$OUT" | grep -q "Renderer: kitty" || { echo "ERROR: SSH ghostty session did not select kitty renderer"; exit 1; }
+    echo "  ✅ SSH session keeps kitty graphics for kitty-family terminals."
 
-    # Zellij guard test (falls back to chafa)
+    # Zellij guard test (kitty graphics pass through modern zellij)
     OUT=$(NFP_MOTD_DEBUG=1 TERM_PROGRAM=ghostty ZELLIJ=1 ${nfpMotdPkg}/bin/nfp-motd 2>&1 || true)
-    echo "$OUT" | grep -q "Renderer: chafa" || { echo "ERROR: Zellij session did not fallback to chafa"; exit 1; }
-    echo "  ✅ Zellij multiplexer session safely fell back to chafa."
+    echo "$OUT" | grep -q "Renderer: kitty" || { echo "ERROR: Zellij ghostty session did not select kitty renderer"; exit 1; }
+    echo "  ✅ Zellij multiplexer session keeps kitty graphics."
+
+    # Minimal default: banner + PNG + title only, no full spec dump
+    OUT=$(NFP_MOTD_DEBUG=1 TERM_PROGRAM=ghostty ${nfpMotdPkg}/bin/nfp-motd 2>&1 || true)
+    echo "$OUT" | grep -q "Packages:" && { echo "ERROR: default MOTD dumped full specs (Packages:)"; exit 1; }
+    echo "  ✅ Default MOTD is minimal (no full spec dump)."
+
+    # Full specs on demand via --full
+    OUT=$(${nfpMotdPkg}/bin/nfp-motd --full 2>&1 || true)
+    test -n "$OUT" || { echo "ERROR: nfp-motd --full output empty"; exit 1; }
+    echo "  ✅ nfp-motd --full renders on demand."
 
     # 5. Verify nfp-banner outputs expected host title
     echo "Testing nfp-banner output..."
