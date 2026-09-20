@@ -49,82 +49,85 @@ with lib;
     };
   };
 
-  config = mkIf config.services.caddy-server.enable {
-    nfp.services.caddy = {
-      enable = true;
-      host = config.networking.hostName;
-      bind = "127.0.0.1";
-      port = 2019;
-      tailnetName = "caddy";
-      tls = "headscale";
-      healthcheck = {
-        enable = true;
-        path = "/config/";
-        expectedStatus = [ 200 ];
-      };
-      homepage = {
-        enable = true;
-        category = "zoro";
-        order = 20;
-        title = "Caddy";
-        subtitle = "Santoryu Navigation Routes";
-        icon = "caddy";
-        metric = {
-          mode = "health-only";
+  config = mkMerge [
+    {
+      nfp.services.caddy = {
+        enable = config.services.caddy-server.enable;
+        host = config.networking.hostName;
+        bind = "127.0.0.1";
+        port = 2019;
+        tailnetName = "caddy";
+        tls = "headscale";
+        healthcheck = {
+          enable = true;
+          path = "/config/";
+          expectedStatus = [ 200 ];
+        };
+        homepage = {
+          enable = true;
+          category = "zoro";
+          order = 20;
+          title = "Caddy";
+          subtitle = "Santoryu Navigation Routes";
+          icon = "caddy";
+          metric = {
+            mode = "health-only";
+          };
         };
       };
-    };
+    }
+    (mkIf config.services.caddy-server.enable {
+      security.acme.acceptTerms = true;
 
-    security.acme.acceptTerms = true;
+      services.caddy = {
+        enable = true;
 
-    services.caddy = {
-      enable = true;
+        globalConfig = mkIf (config.services.caddy-server.email != "") ''
+          email ${config.services.caddy-server.email}
+        '';
 
-      globalConfig = mkIf (config.services.caddy-server.email != "") ''
-        email ${config.services.caddy-server.email}
-      '';
+        virtualHosts =
+          let
+            baseVirtualHosts = mapAttrs (
+              _name: value:
+              filterAttrs (_: v: v != null) {
+                inherit (value) extraConfig useACMEHost serverAliases;
+              }
+            ) config.services.caddy-server.virtualHosts;
 
-      virtualHosts =
-        let
-          baseVirtualHosts = mapAttrs (
-            _name: value:
-            filterAttrs (_: v: v != null) {
-              inherit (value) extraConfig useACMEHost serverAliases;
-            }
-          ) config.services.caddy-server.virtualHosts;
+            # Registry routes are public Caddy routes via *.publicDomain (lovelain.duckdns.org).
+            # Tailnet-only routes must NOT use this registry — they use nfp.services + tailnetDomain.
+            registryRoutes = mapAttrs' (
+              subdomain: port:
+              nameValuePair "http://${subdomain}.${config.layers.meta.publicDomain}" {
+                extraConfig = ''
+                  reverse_proxy localhost:${toString port}
+                '';
+              }
+            ) config.layers.layer-20.services.config.reverseProxy.routes;
+          in
+          if config.layers.layer-20.services.config.reverseProxy.routes != { } then
+            lib.mkMerge [
+              baseVirtualHosts
+              registryRoutes
+            ]
+          else
+            baseVirtualHosts;
+      };
 
-          # Registry routes are public Caddy routes via *.publicDomain (lovelain.duckdns.org).
-          # Tailnet-only routes must NOT use this registry — they use nfp.services + tailnetDomain.
-          registryRoutes = mapAttrs' (
-            subdomain: port:
-            nameValuePair "http://${subdomain}.${config.layers.meta.publicDomain}" {
-              extraConfig = ''
-                reverse_proxy localhost:${toString port}
-              '';
-            }
-          ) config.layers.layer-20.services.config.reverseProxy.routes;
-        in
-        if config.layers.layer-20.services.config.reverseProxy.routes != { } then
-          lib.mkMerge [
-            baseVirtualHosts
-            registryRoutes
-          ]
-        else
-          baseVirtualHosts;
-    };
-
-    # Firewall
-    networking.firewall.allowedTCPPorts = [
-      80
-      443
-    ];
-    networking.firewall.allowedUDPPorts = [ 443 ]; # For QUIC
-
-    # Ensure data is persisted
-    environment.persistence."/persist" = mkIf config.layers.layer-10.system.config.impermanence.enable {
-      directories = [
-        "/var/lib/caddy"
+      # Firewall
+      networking.firewall.allowedTCPPorts = [
+        80
+        443
       ];
-    };
-  };
+      networking.firewall.allowedUDPPorts = [ 443 ]; # For QUIC
+
+      # Ensure data is persisted
+      environment.persistence."/persist" = mkIf config.layers.layer-10.system.config.impermanence.enable {
+        directories = [
+          "/var/lib/caddy"
+        ];
+      };
+    })
+  ];
 }

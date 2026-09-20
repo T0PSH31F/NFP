@@ -115,56 +115,81 @@ with lib;
         esac
       '';
     in
-    mkIf cfg.enable {
-      environment.systemPackages = [
-        pkgs.podman-compose
-        helperPkg
-      ];
-
-      environment.persistence."/persist" =
-        mkIf (config.layers.layer-10.system.config.impermanence.enable or false)
-          {
-            directories = [
-              {
-                directory = cfg.dataDir;
-                user = "root";
-                group = "root";
-                mode = "0700";
-              }
-            ];
+    mkMerge [
+      {
+        nfp.services.omniroute = {
+          enable = config.services.ai-services.omniroute.enable;
+          host = "nami";
+          port = 20129;
+          homepage = {
+            enable = true;
+            category = "agents";
+            order = 30;
+            title = "OmniRoute";
+            subtitle = "RTK Compression Gateway";
+            icon = "omniroute";
+            metric = {
+              mode = "health-only";
+            };
           };
-
-      systemd.tmpfiles.rules = [
-        "d ${cfg.dataDir} 0700 root root -"
-      ];
-
-      systemd.services.omniroute = {
-        description = "OmniRoute — AI gateway with RTK compression";
-        after = [
-          "network-online.target"
-          "podman.service"
-        ];
-        wants = [ "network-online.target" ];
-        wantedBy = [ "multi-user.target" ];
-
-        path = with pkgs; [
-          podman-compose
-          podman
-          coreutils
-        ];
-
-        script = ''
-          ${helperPkg}/bin/omniroute-ctl up
-        '';
-        preStop = ''
-          ${helperPkg}/bin/omniroute-ctl down
-        '';
-
-        serviceConfig = {
-          Type = "oneshot";
-          RemainAfterExit = true;
-          EnvironmentFile = lib.optional (cfg.environmentFile != null) cfg.environmentFile;
+          healthcheck = {
+            enable = true;
+            path = "/api/health";
+            expectedStatus = 200;
+          };
         };
-      };
-    };
+      }
+      (mkIf cfg.enable {
+        environment.systemPackages = [
+          pkgs.podman-compose
+          helperPkg
+        ];
+
+        environment.persistence."/persist" =
+          mkIf (config.layers.layer-10.system.config.impermanence.enable or false)
+            {
+              directories = [
+                {
+                  directory = cfg.dataDir;
+                  user = "root";
+                  group = "root";
+                  mode = "0700";
+                }
+              ];
+            };
+
+        systemd.tmpfiles.rules = [
+          "d ${cfg.dataDir} 0700 root root -"
+        ];
+
+        systemd.services.omniroute = {
+          description = "OmniRoute — AI gateway with RTK compression";
+          after = [
+            "network-online.target"
+            "podman.service"
+          ];
+          wants = [ "network-online.target" ];
+          wantedBy = [ "multi-user.target" ];
+
+          path = with pkgs; [
+            podman-compose
+            podman
+            coreutils
+          ];
+
+          script = ''
+            ${helperPkg}/bin/omniroute-ctl up
+          '';
+          preStop = ''
+            ${helperPkg}/bin/omniroute-ctl down
+          '';
+
+          serviceConfig = {
+            Type = "oneshot";
+            RemainAfterExit = true;
+            EnvironmentFile = lib.optional (cfg.environmentFile != null) cfg.environmentFile;
+          };
+        };
+      })
+    ];
 }

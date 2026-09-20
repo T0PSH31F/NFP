@@ -7,6 +7,9 @@ let
 
   # Caddy reverse-proxy virtual hosts — tailnet contracts use tailnetDomain, never generic domain.
   # Public WAN routes remain on publicDomain via explicit Caddy virtualHosts in machine configs.
+  # Only generate local Caddy routes for services running on this host.
+  # Remote services (different host) are proxied by their own host's Caddy.
+  localServices = filterAttrs (_: s: s.host == config.networking.hostName) enabledServices;
   contractVirtualHosts = mapAttrs' (
     _name: svc:
     let
@@ -17,7 +20,7 @@ let
         reverse_proxy ${svc.bind}:${toString svc.port}
       '';
     }
-  ) (filterAttrs (_: s: s.tls != "none") enabledServices);
+  ) (filterAttrs (_: s: s.tls != "none") localServices);
 
   # Prometheus scrape configs
   metricsServices = filterAttrs (_: s: s.metrics.enable && s.metrics.port > 0) enabledServices;

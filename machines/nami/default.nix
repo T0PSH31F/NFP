@@ -79,17 +79,13 @@
     defaultNetwork.settings.dns_enabled = true;
   };
 
-  # === Services enablement ===
+  # === Services enablement (tag policy driven via ai-router/ai-agent) ===
   layers.layer-20.services.config.netdata.enable = true;
-  services.ai-services.ollama.enable = true;
-  services.ai-services.open-webui.enable = true;
-  services.sillytavern-app.enable = true;
 
   # === AI-router: Kong kept as sole gateway, align freellm ports for side-by-side test ===
   # freellmapi:3001 / freellmpool:8080 are module defaults; Kong previously expected 3003/8083 — align to actual ports
   services.ai-services.kong-gateway.routers.freellmapi.port = lib.mkForce 3001;
   services.ai-services.kong-gateway.routers.freellmpool.port = lib.mkForce 8080;
-  services.ai-services.kong-gateway.enable = lib.mkDefault true;
 
   # === Home Manager: headless cloud host overrides ===
   home-manager.useUserPackages = lib.mkForce false;

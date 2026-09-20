@@ -55,6 +55,30 @@ in
   config = mkMerge [
     {
       services.polyfloor.port = mkDefault 7777;
+
+      # Fleet-global contract: always declared so dashboard host sees it.
+      # enable tracks actual service state on the evaluating host.
+      nfp.services.polyfloor = {
+        enable = config.services.polyfloor.enable;
+        host = "nami";
+        port = config.services.polyfloor.port;
+        healthcheck = {
+          enable = true;
+          path = "/healthz";
+          expectedStatus = 200;
+        };
+        homepage = {
+          enable = true;
+          category = "agents";
+          order = 10;
+          title = "Polyfloor";
+          subtitle = "Multi-Agent Orchestrator";
+          icon = "polyfloor";
+          metric = {
+            mode = "health-only";
+          };
+        };
+      };
     }
     (mkIf config.services.polyfloor.enable {
       # ── NFP defaults for the upstream module ────────────────────────
@@ -119,30 +143,6 @@ in
             ];
           };
 
-      # Tailnet contract: polyfloor.lovelain.duckdns.org via Tailscale only (Headscale ACL tag:control-plane)
-      # Caddy on nami will proxy polyfloor.lovelain.duckdns.org -> 127.0.0.1:7777 but firewall + Headscale ensures only tailnet can reach 7777
-      # Health: fleet-healthcheck probes /healthz on 7777
-      nfp.services.polyfloor = {
-        enable = true;
-        host = "nami";
-        port = config.services.polyfloor.port;
-        healthcheck = {
-          enable = true;
-          path = "/healthz";
-          expectedStatus = 200;
-        };
-        homepage = {
-          enable = true;
-          category = "agents";
-          order = 10;
-          title = "Polyfloor";
-          subtitle = "Multi-Agent Orchestrator";
-          icon = "polyfloor";
-          metric = {
-            mode = "health-only";
-          };
-        };
-      };
     })
   ];
 }

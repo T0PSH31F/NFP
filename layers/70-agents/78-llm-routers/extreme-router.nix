@@ -71,71 +71,96 @@ with lib;
     let
       cfg = config.layers.layer-78.llm-routers.extreme-router;
     in
-    mkIf cfg.enable {
-      assertions = [
-        {
-          assertion =
-            !(config.fileSystems."/" ? fsType && config.fileSystems."/".fsType == "tmpfs")
-            || (config.layers.layer-10.system.config.impermanence.enable or false);
-          message = "services.ai-services.extreme-router requires impermanence to be enabled (config.layers.layer-10.system.config.impermanence.enable = true) on machines with tmpfs root to prevent API key loss on reboot.";
-        }
-      ];
-
-      # Create data directory with open permissions for container user
-      systemd.tmpfiles.rules = [
-        "d ${cfg.dataDir} 0777 root root -"
-      ];
-
-      # OCI container via podman
-      virtualisation.oci-containers.containers.extreme-router = {
-        inherit (cfg) image;
-        ports = [
-          "${toString cfg.port}:20128"
-        ];
-        environment = {
-          NODE_ENV = "production";
-          PORT = "20128";
-          HOSTNAME = "0.0.0.0";
-          DATA_DIR = "/app/data";
-          NEXT_PUBLIC_BASE_URL = "http://localhost:${toString cfg.port}";
-        }
-        // cfg.extraEnvironment;
-        volumes = [
-          "${cfg.dataDir}:/app/data"
-        ];
-        environmentFiles = optional (cfg.environmentFile != null) cfg.environmentFile;
-        extraOptions = [
-          "--user=root"
-          "--health-cmd=node -e \"fetch('http://127.0.0.1:20128/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""
-          "--health-interval=30s"
-          "--health-timeout=5s"
-          "--health-start-period=60s"
-          "--health-retries=3"
-          "--memory=1g"
-          "--pids-limit=512"
-          "--security-opt=no-new-privileges:true"
-        ];
-        autoStart = true;
-      };
-
-      # Firewall: open port on tailscale0 interface ONLY (loopback is allowed by default)
-      networking.firewall.interfaces."tailscale0".allowedTCPPorts = [ cfg.port ];
-
-      # MITM proxy root CA certificate trust
-      security.pki.certificateFiles = lib.optional (builtins.pathExists "${cfg.dataDir}/ca.crt") "${cfg.dataDir}/ca.crt";
-
-      # Impermanence persistence support
-      environment.persistence."/persist" =
-        mkIf (config.layers.layer-10.system.config.impermanence.enable or false)
-          {
-            directories = [
-              {
-                directory = cfg.dataDir;
-                user = "root";
-                group = "root";
-                mode = "0777";
-              }
-            ];
+    mkMerge [
+      {
+        nfp.services.extreme-router = {
+          enable = config.layers.layer-78.llm-routers.extreme-router.enable;
+          host = "z0r0";
+          port = 20128;
+          homepage = {
+            enable = true;
+            category = "agents";
+            order = 20;
+            title = "ExtremeRouter";
+            subtitle = "154-Provider AI Gateway";
+            icon = "extreme-router";
+            metric = {
+              mode = "health-only";
+            };
           };
-    };
+          healthcheck = {
+            enable = true;
+            path = "/api/health";
+            expectedStatus = 200;
+          };
+        };
+      }
+      (mkIf cfg.enable {
+        assertions = [
+          {
+            assertion =
+              !(config.fileSystems."/" ? fsType && config.fileSystems."/".fsType == "tmpfs")
+              || (config.layers.layer-10.system.config.impermanence.enable or false);
+            message = "services.ai-services.extreme-router requires impermanence to be enabled (config.layers.layer-10.system.config.impermanence.enable = true) on machines with tmpfs root to prevent API key loss on reboot.";
+          }
+        ];
+
+        # Create data directory with open permissions for container user
+        systemd.tmpfiles.rules = [
+          "d ${cfg.dataDir} 0777 root root -"
+        ];
+
+        # OCI container via podman
+        virtualisation.oci-containers.containers.extreme-router = {
+          inherit (cfg) image;
+          ports = [
+            "${toString cfg.port}:20128"
+          ];
+          environment = {
+            NODE_ENV = "production";
+            PORT = "20128";
+            HOSTNAME = "0.0.0.0";
+            DATA_DIR = "/app/data";
+            NEXT_PUBLIC_BASE_URL = "http://localhost:${toString cfg.port}";
+          }
+          // cfg.extraEnvironment;
+          volumes = [
+            "${cfg.dataDir}:/app/data"
+          ];
+          environmentFiles = optional (cfg.environmentFile != null) cfg.environmentFile;
+          extraOptions = [
+            "--user=root"
+            "--health-cmd=node -e \"fetch('http://127.0.0.1:20128/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""
+            "--health-interval=30s"
+            "--health-timeout=5s"
+            "--health-start-period=60s"
+            "--health-retries=3"
+            "--memory=1g"
+            "--pids-limit=512"
+            "--security-opt=no-new-privileges:true"
+          ];
+          autoStart = true;
+        };
+
+        # Firewall: open port on tailscale0 interface ONLY (loopback is allowed by default)
+        networking.firewall.interfaces."tailscale0".allowedTCPPorts = [ cfg.port ];
+
+        # MITM proxy root CA certificate trust
+        security.pki.certificateFiles = lib.optional (builtins.pathExists "${cfg.dataDir}/ca.crt") "${cfg.dataDir}/ca.crt";
+
+        # Impermanence persistence support
+        environment.persistence."/persist" =
+          mkIf (config.layers.layer-10.system.config.impermanence.enable or false)
+            {
+              directories = [
+                {
+                  directory = cfg.dataDir;
+                  user = "root";
+                  group = "root";
+                  mode = "0777";
+                }
+              ];
+            };
+      })
+    ];
 }

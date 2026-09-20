@@ -113,6 +113,14 @@
           inherit (pkgs) lib;
         };
 
+        homepage-contract-coverage =
+          import ../layers/00-cyberia/05-tests/homepage-contract-coverage-test.nix
+            {
+              inherit pkgs;
+              inherit (pkgs) lib;
+              inherit (inputs.self) nixosConfigurations;
+            };
+
         layer-numbering-check =
           pkgs.runCommand "check-layer-numbering"
             {

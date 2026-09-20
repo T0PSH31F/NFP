@@ -657,164 +657,189 @@ in
       cfg = config.services.ai-services.kong-gateway;
       kongYml = mkKongYml cfg;
     in
-    mkIf cfg.enable {
-      # ── Data directory ────────────────────────────────────────────
-      systemd.tmpfiles.rules = [
-        "d ${cfg.dataDir} 0755 root root -"
-        "d ${cfg.dataDir}/logs 0755 root root -"
-      ];
-
-      # ── Persist data across reboots ────────────────────────────────
-      environment.persistence."/persist" = mkIf config.layers.layer-10.system.config.impermanence.enable {
-        directories = [ cfg.dataDir ];
-      };
-
-      # ── Kong container ────────────────────────────────────────────
-      # DB-less mode with merged declarative config file:
-      # ExecStartPre merges structural kongYml + sops-rendered consumers into /var/lib/kong/declarative.json
-      systemd.services.podman-kong = {
-        serviceConfig = {
-          MemoryMax = "1G";
-          MemoryHigh = "800M";
-          ExecStartPre = [
-            "+${pkgs.writeShellScript "kong-merge-declarative-config" ''
-              set -euo pipefail
-              mkdir -p ${cfg.dataDir}
-              FILES=("${kongYml}")
-              for f in "${config.sops.templates."kong-consumers".path}" "${
-                config.sops.templates."kong-extremerouter-auth".path
-              }" "${config.sops.templates."kong-omniroute-auth".path}"; do
-                if [ -f "$f" ]; then
-                  FILES+=("$f")
-                fi
-              done
-              ${pkgs.jq}/bin/jq -s '
-                def deep_merge($a; $b):
-                  if ($a | type) == "object" and ($b | type) == "object" then
-                    reduce ($b | keys_unsorted[]) as $k (
-                      $a;
-                      if (.[$k] | type) == "array" and ($b[$k] | type) == "array" then
-                        .[$k] = (.[$k] + $b[$k])
-                      elif has($k) and (.[$k] | type) == "object" and ($b[$k] | type) == "object" then
-                        .[$k] = deep_merge(.[$k]; $b[$k])
-                      else
-                        .[$k] = $b[$k]
-                      end
-                    )
-                  else
-                    $b
-                  end;
-                reduce .[] as $item ({}; deep_merge(.; $item))
-              ' "''${FILES[@]}" > ${cfg.dataDir}/declarative.json
-              chmod 0644 ${cfg.dataDir}/declarative.json
-            ''}"
-          ];
+    mkMerge [
+      {
+        nfp.services.kong-gateway = {
+          enable = config.services.ai-services.kong-gateway.enable;
+          host = "nami";
+          port = 8091;
+          homepage = {
+            enable = true;
+            category = "agents";
+            order = 40;
+            title = "Kong Gateway";
+            subtitle = "Unified LLM Multiplexer";
+            icon = "kong";
+            metric = {
+              mode = "health-only";
+            };
+          };
+          healthcheck = {
+            enable = true;
+            path = "/status";
+            expectedStatus = 200;
+          };
         };
-      };
-
-      virtualisation.oci-containers.containers.kong = {
-        inherit (cfg) image;
-        ports = [
-          "${toString cfg.proxyPort}:8000"
-          "${toString cfg.proxySslPort}:8443"
-          "127.0.0.1:${toString cfg.adminPort}:8001"
-          "127.0.0.1:${toString cfg.adminSslPort}:8444"
-          "127.0.0.1:${toString cfg.managerPort}:8002"
+      }
+      (mkIf cfg.enable {
+        # ── Data directory ────────────────────────────────────────────
+        systemd.tmpfiles.rules = [
+          "d ${cfg.dataDir} 0755 root root -"
+          "d ${cfg.dataDir}/logs 0755 root root -"
         ];
-        environment = {
-          KONG_DATABASE = "off";
-          KONG_DECLARATIVE_CONFIG = "/etc/kong/declarative.json";
-          KONG_PROXY_LISTEN = "0.0.0.0:${toString cfg.proxyPort}";
-          KONG_PROXY_LISTEN_SSL = "0.0.0.0:${toString cfg.proxySslPort}";
-          KONG_ADMIN_LISTEN = "127.0.0.1:${toString cfg.adminPort}";
-          KONG_ADMIN_LISTEN_SSL = "127.0.0.1:${toString cfg.adminSslPort}";
-          KONG_MANAGER_LISTEN = "127.0.0.1:${toString cfg.managerPort}";
-          KONG_ADMIN_GUI_LISTEN = "127.0.0.1:${toString cfg.managerPort}";
-          KONG_ADMIN_GUI_URL = "http://127.0.0.1:${toString cfg.managerPort}";
-          KONG_ADMIN_API_URI = "http://127.0.0.1:${toString cfg.adminPort}";
-          KONG_LOG_LEVEL = "info";
-          KONG_PROXY_ACCESS_LOG = "/dev/stdout";
-          KONG_ADMIN_ACCESS_LOG = "/dev/stdout";
-          KONG_PROXY_ERROR_LOG = "/dev/stderr";
-          KONG_ADMIN_ERROR_LOG = "/dev/stderr";
-          KONG_PLUGINS = "bundled";
-          KONG_NGINX_WORKER_PROCESSES = "2";
-          KONG_NGINX_EVENTS_WORKER_CONNECTIONS = "1024";
-          # DNS resolver for container networking
-          KONG_DNS_RESOLVER = "127.0.0.11";
-          KONG_DNS_HOSTS = "host.docker.internal";
+
+        # ── Persist data across reboots ────────────────────────────────
+        environment.persistence."/persist" = mkIf config.layers.layer-10.system.config.impermanence.enable {
+          directories = [ cfg.dataDir ];
         };
-        volumes = [
-          "${cfg.dataDir}/declarative.json:/etc/kong/declarative.json:ro"
-          # Logs go to stdout/stderr — no volume mount needed
-        ];
-        extraOptions = [
-          "--network=host"
-          "--add-host=host.docker.internal:host-gateway"
-          "--health-cmd=kong health"
-          "--health-interval=10s"
-          "--health-timeout=5s"
-          "--health-retries=5"
-        ];
-        environmentFiles = lib.optional (cfg.environmentFile != null) cfg.environmentFile;
-      };
 
-      # ── Firewall ──────────────────────────────────────────────────
-      networking.firewall.allowedTCPPorts = [
-        cfg.proxyPort
-        cfg.proxySslPort
-      ];
+        # ── Kong container ────────────────────────────────────────────
+        # DB-less mode with merged declarative config file:
+        # ExecStartPre merges structural kongYml + sops-rendered consumers into /var/lib/kong/declarative.json
+        systemd.services.podman-kong = {
+          serviceConfig = {
+            MemoryMax = "1G";
+            MemoryHigh = "800M";
+            ExecStartPre = [
+              "+${pkgs.writeShellScript "kong-merge-declarative-config" ''
+                set -euo pipefail
+                mkdir -p ${cfg.dataDir}
+                FILES=("${kongYml}")
+                for f in "${config.sops.templates."kong-consumers".path}" "${
+                  config.sops.templates."kong-extremerouter-auth".path
+                }" "${config.sops.templates."kong-omniroute-auth".path}"; do
+                  if [ -f "$f" ]; then
+                    FILES+=("$f")
+                  fi
+                done
+                ${pkgs.jq}/bin/jq -s '
+                  def deep_merge($a; $b):
+                    if ($a | type) == "object" and ($b | type) == "object" then
+                      reduce ($b | keys_unsorted[]) as $k (
+                        $a;
+                        if (.[$k] | type) == "array" and ($b[$k] | type) == "array" then
+                          .[$k] = (.[$k] + $b[$k])
+                        elif has($k) and (.[$k] | type) == "object" and ($b[$k] | type) == "object" then
+                          .[$k] = deep_merge(.[$k]; $b[$k])
+                        else
+                          .[$k] = $b[$k]
+                        end
+                      )
+                    else
+                      $b
+                    end;
+                  reduce .[] as $item ({}; deep_merge(.; $item))
+                ' "''${FILES[@]}" > ${cfg.dataDir}/declarative.json
+                chmod 0644 ${cfg.dataDir}/declarative.json
+              ''}"
+            ];
+          };
+        };
 
-      # ── CLI helpers ──────────────────────────────────────────────────
-      environment.systemPackages = [
-        (pkgs.writeShellScriptBin "kong-ctl" ''
-          DATA_DIR="${cfg.dataDir}"
-          case "''${1:-help}" in
-            status)
-              podman exec kong kong status 2>/dev/null || echo "Kong container not running"
-              ;;
-            health)
-              podman exec kong kong health 2>/dev/null || echo "Kong container not running"
-              ;;
-            reload)
-              podman exec kong kong reload 2>/dev/null || echo "Kong container not running"
-              ;;
-            logs)
-              podman logs -f kong
-              ;;
-            admin)
-              shift
-              curl -s "http://127.0.0.1:${toString cfg.adminPort}/$@" | ${pkgs.jq}/bin/jq .
-              ;;
-            *)
-              echo "Usage: kong-ctl {status|health|reload|logs|admin <path>}"
-              echo "  admin examples:"
-              echo "    kong-ctl admin services"
-              echo "    kong-ctl admin routes"
-              echo "    kong-ctl admin consumers"
-              echo "    kong-ctl admin plugins"
-              echo "    kong-ctl admin upstreams"
-              ;;
-          esac
-        '')
-        (pkgs.writeShellApplication {
-          name = "kong-admin";
-          runtimeInputs = [
-            pkgs.curl
-            pkgs.jq
+        virtualisation.oci-containers.containers.kong = {
+          inherit (cfg) image;
+          ports = [
+            "${toString cfg.proxyPort}:8000"
+            "${toString cfg.proxySslPort}:8443"
+            "127.0.0.1:${toString cfg.adminPort}:8001"
+            "127.0.0.1:${toString cfg.adminSslPort}:8444"
+            "127.0.0.1:${toString cfg.managerPort}:8002"
           ];
-          text = ''
-            ADMIN_URL="http://127.0.0.1:${toString cfg.adminPort}"
+          environment = {
+            KONG_DATABASE = "off";
+            KONG_DECLARATIVE_CONFIG = "/etc/kong/declarative.json";
+            KONG_PROXY_LISTEN = "0.0.0.0:${toString cfg.proxyPort}";
+            KONG_PROXY_LISTEN_SSL = "0.0.0.0:${toString cfg.proxySslPort}";
+            KONG_ADMIN_LISTEN = "127.0.0.1:${toString cfg.adminPort}";
+            KONG_ADMIN_LISTEN_SSL = "127.0.0.1:${toString cfg.adminSslPort}";
+            KONG_MANAGER_LISTEN = "127.0.0.1:${toString cfg.managerPort}";
+            KONG_ADMIN_GUI_LISTEN = "127.0.0.1:${toString cfg.managerPort}";
+            KONG_ADMIN_GUI_URL = "http://127.0.0.1:${toString cfg.managerPort}";
+            KONG_ADMIN_API_URI = "http://127.0.0.1:${toString cfg.adminPort}";
+            KONG_LOG_LEVEL = "info";
+            KONG_PROXY_ACCESS_LOG = "/dev/stdout";
+            KONG_ADMIN_ACCESS_LOG = "/dev/stdout";
+            KONG_PROXY_ERROR_LOG = "/dev/stderr";
+            KONG_ADMIN_ERROR_LOG = "/dev/stderr";
+            KONG_PLUGINS = "bundled";
+            KONG_NGINX_WORKER_PROCESSES = "2";
+            KONG_NGINX_EVENTS_WORKER_CONNECTIONS = "1024";
+            # DNS resolver for container networking
+            KONG_DNS_RESOLVER = "127.0.0.11";
+            KONG_DNS_HOSTS = "host.docker.internal";
+          };
+          volumes = [
+            "${cfg.dataDir}/declarative.json:/etc/kong/declarative.json:ro"
+            # Logs go to stdout/stderr — no volume mount needed
+          ];
+          extraOptions = [
+            "--network=host"
+            "--add-host=host.docker.internal:host-gateway"
+            "--health-cmd=kong health"
+            "--health-interval=10s"
+            "--health-timeout=5s"
+            "--health-retries=5"
+          ];
+          environmentFiles = lib.optional (cfg.environmentFile != null) cfg.environmentFile;
+        };
+
+        # ── Firewall ──────────────────────────────────────────────────
+        networking.firewall.allowedTCPPorts = [
+          cfg.proxyPort
+          cfg.proxySslPort
+        ];
+
+        # ── CLI helpers ──────────────────────────────────────────────────
+        environment.systemPackages = [
+          (pkgs.writeShellScriptBin "kong-ctl" ''
+            DATA_DIR="${cfg.dataDir}"
             case "''${1:-help}" in
-              services|routes|consumers|plugins|upstreams|certificates|snis)
-                curl -s "$ADMIN_URL/''${1}" | jq .
+              status)
+                podman exec kong kong status 2>/dev/null || echo "Kong container not running"
+                ;;
+              health)
+                podman exec kong kong health 2>/dev/null || echo "Kong container not running"
+                ;;
+              reload)
+                podman exec kong kong reload 2>/dev/null || echo "Kong container not running"
+                ;;
+              logs)
+                podman logs -f kong
+                ;;
+              admin)
+                shift
+                curl -s "http://127.0.0.1:${toString cfg.adminPort}/$@" | ${pkgs.jq}/bin/jq .
                 ;;
               *)
-                curl -s "$ADMIN_URL/$1" | jq .
+                echo "Usage: kong-ctl {status|health|reload|logs|admin <path>}"
+                echo "  admin examples:"
+                echo "    kong-ctl admin services"
+                echo "    kong-ctl admin routes"
+                echo "    kong-ctl admin consumers"
+                echo "    kong-ctl admin plugins"
+                echo "    kong-ctl admin upstreams"
                 ;;
             esac
-          '';
-        })
-      ];
-    };
+          '')
+          (pkgs.writeShellApplication {
+            name = "kong-admin";
+            runtimeInputs = [
+              pkgs.curl
+              pkgs.jq
+            ];
+            text = ''
+              ADMIN_URL="http://127.0.0.1:${toString cfg.adminPort}"
+              case "''${1:-help}" in
+                services|routes|consumers|plugins|upstreams|certificates|snis)
+                  curl -s "$ADMIN_URL/''${1}" | jq .
+                  ;;
+                *)
+                  curl -s "$ADMIN_URL/$1" | jq .
+                  ;;
+              esac
+            '';
+          })
+        ];
+      })
+    ];
 }

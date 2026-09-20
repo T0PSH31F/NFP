@@ -29,16 +29,41 @@ with lib;
     let
       cfg = config.services.ai-services.open-webui;
     in
-    mkIf cfg.enable {
-      services.open-webui = {
-        enable = true;
-        inherit (cfg) port;
-        openFirewall = true;
-        environment = {
-          OLLAMA_API_BASE_URL = "http://localhost:11434";
-          WEBUI_AUTH = "false";
-          OPENAI_API_BASE_URLS = "http://127.0.0.1:8642";
+    mkMerge [
+      {
+        nfp.services.open-webui = {
+          enable = config.services.ai-services.open-webui.enable;
+          host = "nami";
+          port = 8088;
+          homepage = {
+            enable = true;
+            category = "agents";
+            order = 60;
+            title = "Open WebUI";
+            subtitle = "LLM Chat Interface";
+            icon = "open-webui";
+            metric = {
+              mode = "health-only";
+            };
+          };
+          healthcheck = {
+            enable = true;
+            path = "/health";
+            expectedStatus = 200;
+          };
         };
-      };
-    };
+      }
+      (mkIf cfg.enable {
+        services.open-webui = {
+          enable = true;
+          inherit (cfg) port;
+          openFirewall = true;
+          environment = {
+            OLLAMA_API_BASE_URL = "http://localhost:11434";
+            WEBUI_AUTH = "false";
+            OPENAI_API_BASE_URLS = "http://127.0.0.1:8642";
+          };
+        };
+      })
+    ];
 }

@@ -32,6 +32,13 @@
     # LLM Routers
     layers.layer-78.llm-routers.extreme-router.enable = lib.mkDefault true;
 
+    # AI backends & user interfaces
+    services.ai-services = {
+      ollama.enable = lib.mkDefault true;
+      open-webui.enable = lib.mkDefault true;
+    };
+    services.sillytavern-app.enable = lib.mkDefault true;
+
     # Orchestration & control plane services
     layers.layer-79.skills.llm-agents-catalog.enable = lib.mkDefault true;
     layers.layer-76.orchestrators.mission-control.enable = lib.mkDefault true;

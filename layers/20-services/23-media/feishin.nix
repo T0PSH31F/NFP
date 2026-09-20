@@ -97,60 +97,85 @@ in
     };
   };
 
-  config = mkIf cfg.enable (mkMerge [
+  config = mkMerge [
     {
-      # Install desktop package if in desktop or both mode
-      environment.systemPackages = optional (
-        (cfg.mode == "desktop" || cfg.mode == "both") && cfg.package != null
-      ) cfg.package;
-
-      # Firewall
-      networking.firewall.allowedTCPPorts = optional cfg.openFirewall cfg.port;
-
-      # Home-Manager configuration seeding for desktop client
-      home-manager.users.${user} =
-        { pkgs, ... }:
-        {
-          config = {
-            xdg.configFile."feishin/server-config.json".text = builtins.toJSON {
-              servers = [
-                {
-                  id = "default-server";
-                  name = cfg.serverConnection.name;
-                  url = cfg.serverConnection.url;
-                  type = cfg.serverConnection.serverType;
-                }
-              ];
-              activeServerId = "default-server";
-            };
+      nfp.services.feishin = {
+        enable = config.services.feishin.enable;
+        host = "luffy";
+        port = 9180;
+        homepage = {
+          enable = true;
+          category = "sanji";
+          order = 20;
+          title = "Feishin";
+          subtitle = "Galley Jukebox";
+          icon = "feishin";
+          metric = {
+            mode = "health-only";
           };
         };
+        healthcheck = {
+          enable = true;
+          path = "/";
+          expectedStatus = 200;
+        };
+      };
     }
+    (mkIf cfg.enable (mkMerge [
+      {
+        # Install desktop package if in desktop or both mode
+        environment.systemPackages = optional (
+          (cfg.mode == "desktop" || cfg.mode == "both") && cfg.package != null
+        ) cfg.package;
 
-    # Containerized web player when mode is "server" or "both"
-    (mkIf (cfg.mode == "server" || cfg.mode == "both") {
-      virtualisation.oci-containers.containers.feishin = {
-        image = "ghcr.io/jeffvli/feishin:latest";
-        autoStart = true;
-        ports = [ "${toString cfg.port}:9180" ];
-        environment = {
-          SERVER_URL = cfg.serverConnection.url;
-          SERVER_TYPE = cfg.serverConnection.serverType;
-          SERVER_NAME = cfg.serverConnection.name;
-        };
-      };
-    })
+        # Firewall
+        networking.firewall.allowedTCPPorts = optional cfg.openFirewall cfg.port;
 
-    # Caddy reverse proxy integration
-    (mkIf cfg.caddy.enable {
-      services.caddy = {
-        enable = true;
-        virtualHosts."http://${cfg.caddy.hostName}" = {
-          extraConfig = ''
-            reverse_proxy 127.0.0.1:${toString cfg.port}
-          '';
+        # Home-Manager configuration seeding for desktop client
+        home-manager.users.${user} =
+          { pkgs, ... }:
+          {
+            config = {
+              xdg.configFile."feishin/server-config.json".text = builtins.toJSON {
+                servers = [
+                  {
+                    id = "default-server";
+                    name = cfg.serverConnection.name;
+                    url = cfg.serverConnection.url;
+                    type = cfg.serverConnection.serverType;
+                  }
+                ];
+                activeServerId = "default-server";
+              };
+            };
+          };
+      }
+
+      # Containerized web player when mode is "server" or "both"
+      (mkIf (cfg.mode == "server" || cfg.mode == "both") {
+        virtualisation.oci-containers.containers.feishin = {
+          image = "ghcr.io/jeffvli/feishin:latest";
+          autoStart = true;
+          ports = [ "${toString cfg.port}:9180" ];
+          environment = {
+            SERVER_URL = cfg.serverConnection.url;
+            SERVER_TYPE = cfg.serverConnection.serverType;
+            SERVER_NAME = cfg.serverConnection.name;
+          };
         };
-      };
-    })
-  ]);
+      })
+
+      # Caddy reverse proxy integration
+      (mkIf cfg.caddy.enable {
+        services.caddy = {
+          enable = true;
+          virtualHosts."http://${cfg.caddy.hostName}" = {
+            extraConfig = ''
+              reverse_proxy 127.0.0.1:${toString cfg.port}
+            '';
+          };
+        };
+      })
+    ]))
+  ];
 }

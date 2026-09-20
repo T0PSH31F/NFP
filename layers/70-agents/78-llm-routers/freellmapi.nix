@@ -118,64 +118,89 @@
         };
       };
     in
-    lib.mkIf cfg.enable {
-      systemd.tmpfiles.rules = [
-        "d ${cfg.dataDir} 0750 freellmapi freellmapi -"
-      ];
-
-      users.users.freellmapi = {
-        isSystemUser = true;
-        group = "freellmapi";
-        description = "FreeLLMAPI service user";
-      };
-      users.groups.freellmapi = { };
-
-      systemd.services.freellmapi = {
-        description = "FreeLLMAPI — free-tier LLM router";
-        after = [ "network.target" ];
-        wantedBy = [ "multi-user.target" ];
-
-        environment = {
-          PORT = toString cfg.port;
-          HOST = cfg.host;
-          FREEAPI_DB_PATH = "${cfg.dataDir}/freeapi.db";
-          NODE_ENV = "production";
-          ENCRYPTION_KEY = "cf3e9ec63ddfe6ad03ef3488d2e159ead1ae60eb34cbd48569199c2b830eedeb";
-        }
-        // lib.optionalAttrs (cfg.configFile != null) {
-          FREEAPI_CONFIG_PATH = cfg.configFile;
-        }
-        // cfg.extraEnv;
-
-        serviceConfig = {
-          ExecStart = "${pkgs.nodejs_24}/bin/node ${freellmapiPkg}/share/freellmapi/dist/index.js";
-          Restart = "on-failure";
-          RestartSec = 5;
-          User = "freellmapi";
-          Group = "freellmapi";
-          WorkingDirectory = "${freellmapiPkg}/share/freellmapi";
-          EnvironmentFile = lib.optional (cfg.environmentFile != null) cfg.environmentFile;
-          # Hardening
-          NoNewPrivileges = true;
-          PrivateTmp = true;
-          ProtectSystem = "strict";
-          ProtectHome = true;
-          ReadWritePaths = [ cfg.dataDir ];
-        };
-      };
-
-      # Impermanence persistence support
-      environment.persistence."/persist" =
-        lib.mkIf (config.layers.layer-10.system.config.impermanence.enable or false)
-          {
-            directories = [
-              {
-                directory = cfg.dataDir;
-                user = "freellmapi";
-                group = "freellmapi";
-                mode = "0750";
-              }
-            ];
+    lib.mkMerge [
+      {
+        nfp.services.freellmapi = {
+          enable = config.services.ai-services.freellmapi.enable;
+          host = "nami";
+          port = 3001;
+          homepage = {
+            enable = true;
+            category = "agents";
+            order = 45;
+            title = "FreeLLMAPI";
+            subtitle = "Free Provider Aggregator";
+            icon = "freellmapi";
+            metric = {
+              mode = "health-only";
+            };
           };
-    };
+          healthcheck = {
+            enable = true;
+            path = "/";
+            expectedStatus = 200;
+          };
+        };
+      }
+      (lib.mkIf cfg.enable {
+        systemd.tmpfiles.rules = [
+          "d ${cfg.dataDir} 0750 freellmapi freellmapi -"
+        ];
+
+        users.users.freellmapi = {
+          isSystemUser = true;
+          group = "freellmapi";
+          description = "FreeLLMAPI service user";
+        };
+        users.groups.freellmapi = { };
+
+        systemd.services.freellmapi = {
+          description = "FreeLLMAPI — free-tier LLM router";
+          after = [ "network.target" ];
+          wantedBy = [ "multi-user.target" ];
+
+          environment = {
+            PORT = toString cfg.port;
+            HOST = cfg.host;
+            FREEAPI_DB_PATH = "${cfg.dataDir}/freeapi.db";
+            NODE_ENV = "production";
+            ENCRYPTION_KEY = "cf3e9ec63ddfe6ad03ef3488d2e159ead1ae60eb34cbd48569199c2b830eedeb";
+          }
+          // lib.optionalAttrs (cfg.configFile != null) {
+            FREEAPI_CONFIG_PATH = cfg.configFile;
+          }
+          // cfg.extraEnv;
+
+          serviceConfig = {
+            ExecStart = "${pkgs.nodejs_24}/bin/node ${freellmapiPkg}/share/freellmapi/dist/index.js";
+            Restart = "on-failure";
+            RestartSec = 5;
+            User = "freellmapi";
+            Group = "freellmapi";
+            WorkingDirectory = "${freellmapiPkg}/share/freellmapi";
+            EnvironmentFile = lib.optional (cfg.environmentFile != null) cfg.environmentFile;
+            # Hardening
+            NoNewPrivileges = true;
+            PrivateTmp = true;
+            ProtectSystem = "strict";
+            ProtectHome = true;
+            ReadWritePaths = [ cfg.dataDir ];
+          };
+        };
+
+        # Impermanence persistence support
+        environment.persistence."/persist" =
+          lib.mkIf (config.layers.layer-10.system.config.impermanence.enable or false)
+            {
+              directories = [
+                {
+                  directory = cfg.dataDir;
+                  user = "freellmapi";
+                  group = "freellmapi";
+                  mode = "0750";
+                }
+              ];
+            };
+      })
+    ];
 }

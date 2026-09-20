@@ -75,55 +75,80 @@ with lib;
         };
       };
     in
-    mkIf cfg.enable {
-      systemd.tmpfiles.rules = [
-        "d ${cfg.dataDir} 0750 freellmpool freellmpool -"
-      ];
-
-      users.users.freellmpool = {
-        isSystemUser = true;
-        group = "freellmpool";
-        description = "freellmpool service user";
-      };
-      users.groups.freellmpool = { };
-
-      environment.persistence."/persist" =
-        mkIf (config.layers.layer-10.system.config.impermanence.enable or false)
-          {
-            directories = [
-              {
-                directory = cfg.dataDir;
-                user = "freellmpool";
-                group = "freellmpool";
-                mode = "0750";
-              }
-            ];
+    mkMerge [
+      {
+        nfp.services.freellmpool = {
+          enable = config.services.ai-services.freellmpool.enable;
+          host = "nami";
+          port = 8080;
+          homepage = {
+            enable = true;
+            category = "agents";
+            order = 46;
+            title = "FreeLLMPool";
+            subtitle = "Provider Socket Pool";
+            icon = "freellmpool";
+            metric = {
+              mode = "health-only";
+            };
           };
-
-      systemd.services.freellmpool = {
-        description = "freellmpool — free-tier LLM pool";
-        after = [ "network.target" ];
-        wantedBy = [ "multi-user.target" ];
-
-        environment = {
-          FREELLMPOOL_DATA_DIR = cfg.dataDir;
-        }
-        // cfg.extraEnv;
-
-        serviceConfig = {
-          ExecStart = "${freellmpoolPkg}/bin/freellmpool proxy --host ${cfg.host} --port ${toString cfg.port}";
-          Restart = "on-failure";
-          RestartSec = 5;
-          User = "freellmpool";
-          Group = "freellmpool";
-          WorkingDirectory = cfg.dataDir;
-          EnvironmentFile = lib.optional (cfg.environmentFile != null) cfg.environmentFile;
-          NoNewPrivileges = true;
-          PrivateTmp = true;
-          ProtectSystem = "strict";
-          ProtectHome = true;
-          ReadWritePaths = [ cfg.dataDir ];
+          healthcheck = {
+            enable = true;
+            path = "/";
+            expectedStatus = 200;
+          };
         };
-      };
-    };
+      }
+      (mkIf cfg.enable {
+        systemd.tmpfiles.rules = [
+          "d ${cfg.dataDir} 0750 freellmpool freellmpool -"
+        ];
+
+        users.users.freellmpool = {
+          isSystemUser = true;
+          group = "freellmpool";
+          description = "freellmpool service user";
+        };
+        users.groups.freellmpool = { };
+
+        environment.persistence."/persist" =
+          mkIf (config.layers.layer-10.system.config.impermanence.enable or false)
+            {
+              directories = [
+                {
+                  directory = cfg.dataDir;
+                  user = "freellmpool";
+                  group = "freellmpool";
+                  mode = "0750";
+                }
+              ];
+            };
+
+        systemd.services.freellmpool = {
+          description = "freellmpool — free-tier LLM pool";
+          after = [ "network.target" ];
+          wantedBy = [ "multi-user.target" ];
+
+          environment = {
+            FREELLMPOOL_DATA_DIR = cfg.dataDir;
+          }
+          // cfg.extraEnv;
+
+          serviceConfig = {
+            ExecStart = "${freellmpoolPkg}/bin/freellmpool proxy --host ${cfg.host} --port ${toString cfg.port}";
+            Restart = "on-failure";
+            RestartSec = 5;
+            User = "freellmpool";
+            Group = "freellmpool";
+            WorkingDirectory = cfg.dataDir;
+            EnvironmentFile = lib.optional (cfg.environmentFile != null) cfg.environmentFile;
+            NoNewPrivileges = true;
+            PrivateTmp = true;
+            ProtectSystem = "strict";
+            ProtectHome = true;
+            ReadWritePaths = [ cfg.dataDir ];
+          };
+        };
+      })
+    ];
 }
