@@ -349,9 +349,13 @@ async def ingest_from_path(path: str, request: Request = None):
 
 
 def _process_directory(directory: str) -> List[Dict[str, Any]]:
-    target_dir = os.path.abspath(os.path.realpath(directory))
-    if not os.path.isdir(target_dir):
+    try:
+        dir_path = Path(directory).resolve(strict=True)
+    except (ValueError, RuntimeError, OSError):
         return []
+    if not dir_path.is_dir():
+        return []
+    target_dir = str(dir_path)
     manifest = load_manifest()
     results = []
     supported = (".pdf", ".epub", ".html", ".htm", ".md", ".txt", ".rst")
@@ -374,10 +378,13 @@ def _process_directory(directory: str) -> List[Dict[str, Any]]:
 @app.post("/ingest/directory")
 async def ingest_directory(directory: str, request: Request = None):
     _require_write(request)
-    resolved_dir = os.path.abspath(os.path.realpath(directory))
-    if not os.path.isdir(resolved_dir):
+    try:
+        dir_path = Path(directory).resolve(strict=True)
+    except (ValueError, RuntimeError, OSError):
         raise HTTPException(status_code=404, detail=f"Directory not found: {directory}")
-    results = await asyncio.to_thread(_process_directory, resolved_dir)
+    if not dir_path.is_dir():
+        raise HTTPException(status_code=404, detail=f"Directory not found: {directory}")
+    results = await asyncio.to_thread(_process_directory, str(dir_path))
     return {"status": "success", "files": len(results), "results": results}
 
 
@@ -677,10 +684,13 @@ def run_mcp():
             return [TextContent(type="text", text=f"Ingested {result['count']} sections from {os.path.basename(path)}")]
         elif name == "brain_ingest_directory":
             directory = arguments["directory"]
-            resolved_dir = os.path.abspath(os.path.realpath(directory))
-            if not os.path.isdir(resolved_dir):
+            try:
+                dir_path = Path(directory).resolve(strict=True)
+            except (ValueError, RuntimeError, OSError):
                 return [TextContent(type="text", text=f"Error: Directory not found: {directory}")]
-            results = await asyncio.to_thread(_process_directory, resolved_dir)
+            if not dir_path.is_dir():
+                return [TextContent(type="text", text=f"Error: Directory not found: {directory}")]
+            results = await asyncio.to_thread(_process_directory, str(dir_path))
             count = sum(r.get("count", 0) for r in results if r.get("status") == "success")
             return [TextContent(type="text", text=f"Ingested {count} new sections from {directory}")]
         elif name == "brain_list_books":
