@@ -350,19 +350,25 @@ async def ingest_from_path(path: str, request: Request = None):
 
 def _process_directory(directory: str) -> List[Dict[str, Any]]:
     try:
-        dir_path = Path(directory).resolve(strict=True)
+        base_path = Path(directory).resolve(strict=True)
     except (ValueError, RuntimeError, OSError):
         return []
-    if not dir_path.is_dir():
+    if not base_path.is_dir():
         return []
-    target_dir = str(dir_path)
+
     manifest = load_manifest()
     results = []
     supported = (".pdf", ".epub", ".html", ".htm", ".md", ".txt", ".rst")
-    for root, dirs, files in os.walk(target_dir):
+    for root, dirs, files in os.walk(base_path):
+        root_path = Path(root).resolve()
+        if not root_path.is_relative_to(base_path):
+            continue
         for fname in sorted(files):
-            fpath = os.path.join(root, fname)
-            ext = Path(fname).suffix.lower()
+            fpath_obj = (root_path / fname).resolve()
+            if not fpath_obj.is_relative_to(base_path):
+                continue
+            fpath = str(fpath_obj)
+            ext = fpath_obj.suffix.lower()
             if ext not in supported:
                 continue
             fhash = file_hash(fpath)
