@@ -642,7 +642,7 @@
               provider: gemini
               model: gemini-3.1-flash-lite-preview
               base_url: ""
-              api_key: "${GEMINI_API_KEY}"
+              api_key: "''${GEMINI_API_KEY}"
               timeout: 120
               extra_body: {}
 
@@ -693,7 +693,7 @@
                 - -y
                 - mistral-mcp@latest
               env:
-                MISTRAL_API_KEY: "${MISTRAL_API_KEY}"
+                MISTRAL_API_KEY: "''${MISTRAL_API_KEY}"
             codegraph:
               command: codegraph
               args:
