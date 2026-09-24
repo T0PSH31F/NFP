@@ -348,11 +348,7 @@ async def ingest_from_path(path: str, request: Request = None):
     return {"status": "success", **result}
 
 
-@app.post("/ingest/directory")
-async def ingest_directory(directory: str, request: Request = None):
-    _require_write(request)
-    if not os.path.isdir(directory):
-        raise HTTPException(status_code=404, detail=f"Directory not found: {directory}")
+def _process_directory(directory: str) -> List[Dict[str, Any]]:
     manifest = load_manifest()
     results = []
     supported = (".pdf", ".epub", ".html", ".htm", ".md", ".txt", ".rst")
@@ -369,6 +365,15 @@ async def ingest_directory(directory: str, request: Request = None):
             result = ingest_file(fpath)
             status = "success" if "count" in result else "error"
             results.append({"file": fname, "status": status, **result})
+    return results
+
+
+@app.post("/ingest/directory")
+async def ingest_directory(directory: str, request: Request = None):
+    _require_write(request)
+    if not os.path.isdir(directory):
+        raise HTTPException(status_code=404, detail=f"Directory not found: {directory}")
+    results = await asyncio.to_thread(_process_directory, directory)
     return {"status": "success", "files": len(results), "results": results}
 
 
@@ -670,20 +675,8 @@ def run_mcp():
             directory = arguments["directory"]
             if not os.path.isdir(directory):
                 return [TextContent(type="text", text=f"Error: Directory not found: {directory}")]
-            manifest = load_manifest()
-            count = 0
-            for root, dirs, files in os.walk(directory):
-                for fname in files:
-                    fpath = os.path.join(root, fname)
-                    ext = Path(fname).suffix.lower()
-                    if ext not in (".pdf", ".epub", ".html", ".htm", ".md", ".txt"):
-                        continue
-                    fhash = file_hash(fpath)
-                    if fpath in manifest["files"] and manifest["files"][fpath]["hash"] == fhash:
-                        continue
-                    result = ingest_file(fpath)
-                    if "count" in result:
-                        count += result["count"]
+            results = await asyncio.to_thread(_process_directory, directory)
+            count = sum(r.get("count", 0) for r in results if r.get("status") == "success")
             return [TextContent(type="text", text=f"Ingested {count} new sections from {directory}")]
         elif name == "brain_list_books":
             docs = list_documents()
