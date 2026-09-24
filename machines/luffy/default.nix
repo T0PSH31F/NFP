@@ -650,4 +650,13 @@ in
       echo "Done. No unreferenced-but-needed paths were harmed."
     '')
   ];
+
+  # Ensure heavy AI services remain disabled on luffy per luffy-service-scope check
+  services.ai-services = {
+    ollama.enable = lib.mkForce false;
+    open-webui.enable = lib.mkForce false;
+    kong-gateway.enable = lib.mkForce false;
+  };
+  services.sillytavern-app.enable = lib.mkForce false;
+
 }
