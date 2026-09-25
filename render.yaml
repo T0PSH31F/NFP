@@ -1,0 +1,5 @@
+services:
+  - type: static
+    name: Agentaflow.space
+    buildCommand: "mkdir -p build && echo '<html><body>NFP Nix Flake Repository</body></html>' > build/index.html"
+    staticPublishPath: ./build
