@@ -11,6 +11,7 @@ in
     programs.fzf = {
       enable = true;
       enableZshIntegration = true;
+      historyWidget.command = "";
       defaultCommand = "fd --hidden --strip-cwd-prefix --exclude .git";
       fileWidget.command = "fd --hidden --strip-cwd-prefix --exclude .git";
       fileWidget.options = [

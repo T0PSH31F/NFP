@@ -24,7 +24,9 @@ with lib;
     # Usage: nom build, nom shell, etc. - prettier build output
     environment.systemPackages = with pkgs; [
       #nil
+      any-nix-shell
       arion
+      cached-nix-shell
       comma
       compose2nix
       deadnix
@@ -38,12 +40,15 @@ with lib;
       nix-forecast
       nix-btm
       nix-health
+      nix-heuristic-gc
       nix-fast-build
       nix-init
       nix-inspect
+      nix-janitor
       nix-olde
       portaudio # libportaudio.so in sw/lib — required by hermes-agent sounddevice Voice mode (nix-ld list alone doesn't expose it)
       nix-output-monitor # nom command
+      nix-search-cli
       nix-search-tv
       nix-serve-ng
       nix-sweep
@@ -51,7 +56,9 @@ with lib;
       nix-tree # Interactive nix dependency tree viewer
       nix-unit
       nix-update
+      nix-visualize
       nix-weather
+      nix-your-shell
       nix-zsh-completions
       nixel
       nixd
@@ -187,6 +194,58 @@ with lib;
       };
     };
 
+    services.angrr = {
+      enable = true;
+      settings = {
+        temporary-root-policies = {
+          direnv = {
+            path-regex = "/\\.direnv/";
+            period = "14d";
+          };
+          result = {
+            path-regex = "/result[^/]*$";
+            period = "3d";
+          };
+          # You can define your own policies
+          # ...
+        };
+        profile-policies = {
+          system = {
+            profile-paths = [ "/nix/var/nix/profiles/system" ];
+            keep-since = "14d";
+            keep-latest-n = 5;
+            keep-booted-system = true;
+            keep-current-system = true;
+            # Since 0.2.4
+            # "Grandfather-father-son" rotation scheme
+            # See `man 5 angrr`
+            keep-n-per-bucket = [
+              {
+                bucket-window = "1 day";
+                bucket-amount = 7;
+              }
+              {
+                bucket-window = "1 week";
+                bucket-amount = 4;
+              }
+            ];
+          };
+          user = {
+            enable = false; # Policies can be individually disabled
+            profile-paths = [
+              # `~` at the beginning will be expanded to the home directory of each discovered user
+              "~/.local/state/nix/profiles/profile"
+              "/nix/var/nix/profiles/per-user/root/profile"
+            ];
+            keep-since = "1d";
+            keep-latest-n = 1;
+          };
+          # You can define your own policies
+          # ...
+        };
+      };
+    };
+
     # Helpful shell aliases for home-manager users
     home-manager.users.t0psh31f = {
       config = {
@@ -194,27 +253,10 @@ with lib;
           nix-your-shell = {
             enable = true;
             enableZshIntegration = true;
+            enableNushellIntegration = true;
             nix-output-monitor.enable = true;
           };
           nix-init.enable = true;
-        };
-        home.shellAliases = {
-          cunt = "clan machines update nami";
-          cumz = "clan machines update z0r0";
-          cum = "clan machines update";
-          # NH shortcuts
-          nos = "nh os switch";
-          nob = "nh os boot";
-          not = "nh os test";
-          noc = "nh clean all";
-
-          # Nom shortcuts
-          nb = "nom build";
-          ndev = "nom develop";
-
-          # Nix helpers
-          ndiff = "nvd diff /run/current-system result";
-          ntree = "nix-tree";
         };
       };
     };

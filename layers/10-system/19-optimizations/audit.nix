@@ -36,6 +36,13 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    environment.systemPackages = [ sysauditPkg ];
+    environment.systemPackages = [
+      sysauditPkg
+      # Forensics toolkit for incident response (e.g. auditctl kill-trap
+      # for unexplained SIGKILLs, bpftrace/sysdig for syscall tracing).
+      pkgs.audit
+      pkgs.bpftrace
+      pkgs.sysdig
+    ];
   };
 }

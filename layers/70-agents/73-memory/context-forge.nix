@@ -87,8 +87,6 @@ with lib;
             ];
           };
         };
-
-        networking.firewall.allowedTCPPorts = [ cfg.port ];
       }
     )
   ];

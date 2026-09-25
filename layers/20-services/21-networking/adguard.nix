@@ -140,8 +140,11 @@ in
         filtering = {
           rewrites = [
             {
+              # Headscale control plane moved back to luffy (2026-09-15);
+              # must resolve to luffy LAN (Caddy :443 -> :8086), not nami.
+              # 2026-09-23: stale nami IP here broke LAN bootstrap.
               domain = "headscale.lovelain.duckdns.org";
-              answer = "47.254.90.69";
+              answer = cfg.gatewayIp;
             }
             {
               domain = "mission-control.lovelain.duckdns.org";
@@ -194,6 +197,19 @@ in
         };
       };
     };
+
+    # AdGuard DNS (TCP+UDP 53) must be reachable from localhost, LAN, and
+    # Tailnet — never WAN. NixOS has no CIDR-scoped port primitive, so add
+    # idempotent iptables rules (2026-09-23: tailnet outage root cause was
+    # port 53 firewalled everywhere except podman).
+    networking.firewall.extraCommands = ''
+      for _proto in udp tcp; do
+        for _src in 127.0.0.0/8 ${cfg.subnet} ${config.layers.meta.fleetNetwork}; do
+          iptables -C nixos-fw -p $_proto -s $_src --dport 53 -j nixos-fw-accept 2>/dev/null \
+            || iptables -I nixos-fw 1 -p $_proto -s $_src --dport 53 -j nixos-fw-accept
+        done
+      done
+    '';
 
     users.users.adguardhome = {
       isSystemUser = true;

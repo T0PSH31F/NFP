@@ -32,6 +32,7 @@
     git # (Installed via gitFull in dev-packages or other suites)
 
     # Disk management
+    btrfs-assistant
     btrfs-progs
     exfatprogs
     gparted

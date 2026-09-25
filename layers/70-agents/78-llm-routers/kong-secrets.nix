@@ -162,6 +162,7 @@ with lib;
       sops.templates."freellmapi-env" = lib.mkIf config.services.ai-services.freellmapi.enable {
         content = ''
           # FreeLLMAPI provider keys
+          ENCRYPTION_KEY=c3f1a098b7e2d4f5c6a8b9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0
           OPENROUTER_API_KEY=${config.sops.placeholder.openrouter_api_key_1}
           GROQ_API_KEY=${config.sops.placeholder.groq_api_key}
           CEREBRAS_API_KEY=${config.sops.placeholder.cerebras_api_key}

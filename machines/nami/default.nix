@@ -20,11 +20,20 @@
   networking.hostName = "nami";
   system.stateVersion = "25.05";
 
+  # Cloud VM has no route to LAN AdGuard (192.168.1.54) — the fleet default
+  # nameservers would stall every resolution on a dead server.
+  # 2026-09-23: 1000+ cache timeouts during deploy traced to this.
+  networking.nameservers = lib.mkForce [
+    "1.1.1.1"
+    "8.8.8.8"
+  ];
+
   machine.tags = [
     "network-router"
     "ai-router"
     "agent-orchestrator"
     "ai-agent"
+    "ai-ui"
   ];
 
   # Fleet monitoring: scrape node-exporters via Tailnet MagicDNS.
@@ -40,6 +49,7 @@
   # luffy runs Headscale + AdGuard (global DNS 100.64.0.3). Nami retains network-router tag
   # for Caddy/HP but must not run a second control plane.
   services.headscale-server.enable = lib.mkForce false;
+  layers.layer-20.services.config.headplane.enable = true;
 
   # === Polyfloor AI company OS (talks to Kong on localhost:8090) ===
   services.polyfloor.enable = true;

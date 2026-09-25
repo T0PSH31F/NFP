@@ -12,7 +12,14 @@
 }:
 with lib;
 {
-  options.services.ai-services.headroom = {
+  imports = [
+    (mkRenamedOptionModule
+      [ "services" "ai-services" "headroom" ]
+      [ "layers" "layer-75" "mcp" "headroom" ]
+    )
+  ];
+
+  options.layers.layer-75.mcp.headroom = {
     enable = mkEnableOption "Headroom — context compression proxy for AI agents";
 
     port = mkOption {
@@ -26,11 +33,23 @@ with lib;
       default = pkgs.headroom-ai;
       description = "Headroom package";
     };
+
+    maxResultBytes = mkOption {
+      type = types.int;
+      default = 1048576; # 1MB limit
+      description = "Maximum response size cap in bytes for context compression proxy";
+    };
+
+    cacheTtlSeconds = mkOption {
+      type = types.int;
+      default = 300; # 5 minutes default
+      description = "Cache TTL in seconds for compressed context responses";
+    };
   };
 
   config =
     let
-      cfg = config.services.ai-services.headroom;
+      cfg = config.layers.layer-75.mcp.headroom;
     in
     mkIf cfg.enable {
       # Install headroom globally
@@ -43,12 +62,14 @@ with lib;
         wantedBy = [ "multi-user.target" ];
 
         serviceConfig = {
-          ExecStart = "${cfg.package}/bin/headroom proxy --port ${toString cfg.port}";
+          ExecStart = "${lib.getExe cfg.package} proxy --port ${toString cfg.port}";
           Restart = "always";
           RestartSec = 5;
           Environment = [
             "HEADROOM_PORT=${toString cfg.port}"
             "HEADROOM_HOST=127.0.0.1"
+            "HEADROOM_MAX_RESULT_BYTES=${toString cfg.maxResultBytes}"
+            "HEADROOM_CACHE_TTL=${toString cfg.cacheTtlSeconds}"
             "OPENAI_BASE_URL=http://127.0.0.1:20128/v1"
             "EXTREMEROUTER_BASE_URL=http://127.0.0.1:20128/v1"
           ];

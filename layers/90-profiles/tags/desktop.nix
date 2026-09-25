@@ -12,6 +12,7 @@
           bluetooth.enable = lib.mkDefault true;
         };
       };
+      layer-72.voice.hyprwhspr.enable = lib.mkDefault true;
       layer-30.theming = {
         cursor.enable = lib.mkDefault true;
         gtk.enable = lib.mkDefault true;

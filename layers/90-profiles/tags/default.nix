@@ -8,10 +8,12 @@
 }:
 let
   validTags = [
+    "agent-orchestrator"
     "ai-agent"
+    "ai-inference"
     "ai-router"
     "ai-server"
-    "agent-orchestrator"
+    "ai-ui"
     "cache-server"
     "desktop"
     "development"

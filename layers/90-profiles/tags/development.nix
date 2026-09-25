@@ -13,6 +13,7 @@
         antigravity.enable = lib.mkDefault true;
         claude-code.enable = lib.mkDefault true;
         codex.enable = lib.mkDefault true;
+        crush.enable = lib.mkDefault true;
         dsh.enable = lib.mkDefault true;
         gemini-cli.enable = lib.mkDefault true;
         kiro-cli.enable = lib.mkDefault true;

@@ -6,6 +6,7 @@
     ./caddy.nix
     ./endpoints.nix
     ./gateway.nix
+    ./headplane.nix
     ./headscale.nix
     ./ssh-agent.nix
     ./tailscale.nix

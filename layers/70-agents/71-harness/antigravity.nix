@@ -87,28 +87,14 @@
             args = [ ];
             description = "PKB Brain RAG Search & Vector Index";
           };
-          ncp = {
-            command = "npx";
-            args = [
-              "-y"
-              "@portel/ncp"
-            ];
-            description = "Semantic MCP Gateway (Context Reduction)";
-          };
-          playwright = {
-            command = "npx";
-            args = [
-              "-y"
-              "@playwright/mcp@latest"
-            ];
-            description = "Playwright Browser Automation MCP Server";
-          };
           headroom = {
-            command = "headroom";
+            command = "${lib.getExe pkgs.headroom-ai}";
             args = [
               "mcp"
               "serve"
             ];
+            maxResultBytes = 524288;
+            cacheTtlSeconds = 0;
             description = "Headroom Context Token Compressor";
           };
           mcp-nixos = {
@@ -120,6 +106,13 @@
             args = [ ];
           };
         };
+      };
+
+      xdg.configFile."antigravity/config.json".text = builtins.toJSON {
+        contextFiles = [
+          "AGENTS.md"
+          "GEMINI.md"
+        ];
       };
     };
 }

@@ -1,6 +1,6 @@
 {
   "project": "NFP",
-  "description": "NixOS fleet flake \u2014 dendritic layers, clan-core, impermanence, AI agent fleet",
+  "description": "NixOS fleet flake — dendritic layers, clan-core, impermanence, AI agent fleet",
   "states": {
     "untried": "No verified attempt yet.",
     "in-progress": "Being actively worked; not yet verified.",
@@ -9,13 +9,14 @@
   },
   "features": [
     {
-      "id": "kong-extremerouter-enumeration-fix",
-      "priority": 11,
-      "name": "Kong gateway \u2192 ExtremeRouter model enumeration & chat routing fix",
-      "behavior": "Kong proxy (8090) forwards ExtremeRouter's remote API key upstream and serves /v1/models and /v1/chat/completions to agents (Hermes, OpenCode) authenticated via per-consumer key-auth keys.",
+      "id": "mcp-phase1-nix-build-coordination",
+      "priority": 1,
+      "name": "Phase 1: Nix Build/Eval Coordination & Preflight Locks",
+      "behavior": "Implement nfp-check flock coordinator, optimize init.sh single-pass evaluation, remove build-cores alias, create nix-resource-safety rule, and redact credentials.",
       "verification": [
-        "curl -s http://127.0.0.1:8090/v1/models -H 'apikey: <kong_key_hermes>' | jq -e '.data | length > 0'",
-        "curl -s http://127.0.0.1:8090/v1/models | grep -q 401"
+        "./layers/00-cyberia/06-scripts/nfp-check.sh eval all",
+        "./layers/00-cyberia/06-scripts/nfp-check.sh static",
+        "ALLOW_DIRTY=1 ./init.sh"
       ],
       "state": "passing",
       "claimedBy": "antigravity",
@@ -23,21 +24,21 @@
       "evidence": [
         {
           "sha": "HEAD",
-          "command": "curl -s http://127.0.0.1:8090/v1/models -H \"apikey: $(sops -d layers/00-cyberia/03-treasure/secrets/external_services.yaml | grep '^kong_key_hermes' | awk '{print $2}')\" | python3 -c 'import sys,json; print(len(json.load(sys.stdin)[\"data\"]))'",
-          "output": "538 \u2014 Kong proxy now enumerates 538 ExtremeRouter models over HTTP (was 426 https-only + 401 no-upstream-auth).",
-          "at": "2026-09-01T16:06:02Z"
+          "command": "./layers/00-cyberia/06-scripts/nfp-check.sh eval all && ALLOW_DIRTY=1 ./init.sh",
+          "output": "nfp-check lock coordination verified with flock; init.sh single-pass evaluation verified; build-cores alias removed; rules updated.",
+          "at": "2026-09-24T13:26:00Z"
         }
       ]
     },
     {
-      "id": "qdrant-chromadb-deactivation",
-      "priority": 12,
-      "name": "Deactivate Qdrant + ChromaDB fleet-wide (keep modules)",
-      "behavior": "services.ai-services.{qdrant,chromadb}.enable evaluate to false on both z0r0 and luffy; module files retained for possible re-enable.",
+      "id": "mcp-phase2-correctness-and-containment",
+      "priority": 2,
+      "name": "Phase 2: MCP Correctness and Containment",
+      "behavior": "Remove invalid mcp-gateway systemd unit and port 8085 collision, remove @latest and unpinned npx entries from production MCP catalogs, reconcile ContextForge port 8094 & remove public firewall opening, and add mcp-containment-check.",
       "verification": [
-        "nix eval .#nixosConfigurations.z0r0.config.services.ai-services.chromadb.enable | grep -q false",
-        "nix eval .#nixosConfigurations.luffy.config.services.ai-services.chromadb.enable | grep -q false",
-        "nix eval .#nixosConfigurations.luffy.config.services.ai-services.qdrant.enable | grep -q false"
+        "nix build .#checks.x86_64-linux.mcp-containment-check",
+        "./layers/00-cyberia/06-scripts/nfp-check.sh eval all",
+        "./init.sh --worktree"
       ],
       "state": "passing",
       "claimedBy": "antigravity",
@@ -45,64 +46,21 @@
       "evidence": [
         {
           "sha": "HEAD",
-          "command": "nix eval .#nixosConfigurations.z0r0.config.services.ai-services.chromadb.enable && nix eval .#nixosConfigurations.luffy.config.services.ai-services.chromadb.enable && nix eval .#nixosConfigurations.luffy.config.services.ai-services.qdrant.enable && nix eval .#nixosConfigurations.z0r0.config.services.ai-services.qdrant.enable",
-          "output": "false / false / false / false \u2014 all four evaluations return false. Modules (chromadb.nix, qdrant.nix) retained. Stale qdrant=6333 reverseProxy route removed from luffy. Both z0r0+luffy toplevels eval clean.",
-          "at": "2026-09-01T17:00:00Z"
+          "command": "nix build .#checks.x86_64-linux.mcp-containment-check && ./layers/00-cyberia/06-scripts/nfp-check.sh eval all && ./init.sh --worktree",
+          "output": "mcp-containment-check passed; mcp-gateway unit removed; port 8085 uniquely reserved for Hermes; ContextForge firewall opening removed; fleet evaluated cleanly.",
+          "at": "2026-09-24T13:55:00Z"
         }
       ]
     },
     {
-      "id": "memory-retire-everos-contextforge",
-      "priority": 13,
-      "name": "Retire EverOS + context-forge; consolidate to Honcho + brain-service + memory-vault",
-      "behavior": "layers.layer-20.services.{everos,context-forge}.enable evaluate to false on z0r0 and luffy; memory-vault stays true; modules retained.",
+      "id": "mcp-phase3-typed-mcp-registry",
+      "priority": 3,
+      "name": "Phase 3: Typed MCP Server Registry & Submodule",
+      "behavior": "Replace attrsOf anything with typed submodule schema (transport, package, command, url, args, environmentFile, scope, domain, risk, approval, dataClasses, maxResultBytes, cacheTtlSeconds, description) and build-time assertions in server-catalog.nix.",
       "verification": [
-        "nix eval .#nixosConfigurations.z0r0.config.layers.layer-20.services.everos.enable | grep -q false",
-        "nix eval .#nixosConfigurations.luffy.config.layers.layer-20.services.everos.enable | grep -q false",
-        "nix eval .#nixosConfigurations.z0r0.config.layers.layer-20.services.context-forge.enable | grep -q false"
-      ],
-      "state": "passing",
-      "claimedBy": "antigravity",
-      "blockedReason": null,
-      "evidence": [
-        {
-          "sha": "167d0138",
-          "command": "for m in z0r0 luffy; do nix eval .#nixosConfigurations.$m.config.layers.layer-20.services.everos.enable; nix eval .#nixosConfigurations.$m.config.layers.layer-20.services.context-forge.enable; nix eval .#nixosConfigurations.$m.config.layers.layer-20.services.memory-vault.enable; done",
-          "output": "everos=false, context-forge=false, memory-vault=true on both z0r0 and luffy. EverOS/context-forge enable removed from ai-agent/ai-server tags and memory-governance dependency block. Modules retained; both toplevels eval clean.",
-          "at": "2026-09-01T20:40:00Z"
-        }
-      ]
-    },
-    {
-      "id": "brain-service-llm-privacy-db-hardening",
-      "priority": 14,
-      "name": "brain-service local LLM answering (privacy) + dedicated DB role (hardening)",
-      "behavior": "brain-service answer-generation uses local Ollama (llmProvider=ollama default); connects as brain_user/brain_db (non-superuser) with pgvector extension provisioned in brain_db.",
-      "verification": [
-        "nix eval .#nixosConfigurations.z0r0.config.services.ai-services.brain-service.llmProvider | grep -q ollama",
-        "nix eval .#nixosConfigurations.z0r0.config.services.ai-services.brain-service.dbName | grep -q brain_db",
-        "python3 -m py_compile layers/70-agents/73-memory/brain_server.py"
-      ],
-      "state": "passing",
-      "claimedBy": "antigravity",
-      "blockedReason": null,
-      "evidence": [
-        {
-          "sha": "639ab9ed",
-          "command": "nix eval .#nixosConfigurations.z0r0.config.services.ai-services.brain-service.llmProvider && nix eval .#nixosConfigurations.z0r0.config.services.ai-services.brain-service.dbUser && nix eval .#nixosConfigurations.z0r0.config.services.ai-services.brain-service.dbName && python3 -m py_compile layers/70-agents/73-memory/brain_server.py && nix eval --raw .#nixosConfigurations.z0r0.config.system.build.toplevel.drvPath && nix eval --raw .#nixosConfigurations.luffy.config.system.build.toplevel.drvPath",
-          "output": "llmProvider=ollama, dbUser=brain_user, dbName=brain_db; brain_server.py compiles; z0r0 + luffy toplevels eval clean. Runtime deployment/verify pending (luffy offline; local chat model must be pulled).",
-          "at": "2026-09-01T21:30:00Z"
-        }
-      ]
-    },
-    {
-      "id": "homelab-hardening-service-contracts",
-      "priority": 15,
-      "name": "Homelab Hardening Phase 1 \u2014 nfp.services contract schema & consumers",
-      "behavior": "mkServiceContract.nix defines nfp.services contract options and nfp-services.nix consumes contracts for Caddy, Homepage, Prometheus, Restic, Firewall",
-      "verification": [
-        "nix eval .#nixosConfigurations.luffy.config.nfp.services",
-        "nix eval .#nixosConfigurations.z0r0.config.system.build.toplevel.drvPath"
+        "nix build .#checks.x86_64-linux.mcp-registry-type-check",
+        "nix build .#checks.x86_64-linux.mcp-containment-check",
+        "./init.sh --worktree"
       ],
       "state": "passing",
       "claimedBy": "antigravity",
@@ -110,22 +68,20 @@
       "evidence": [
         {
           "sha": "HEAD",
-          "command": "nix eval .#nixosConfigurations.luffy.config.nixarr.enable && nix eval .#nixosConfigurations.luffy.config.nixarr.komga.enable && nix eval .#nixosConfigurations.luffy.config.nixarr.plex.enable && nix eval .#nixosConfigurations.z0r0.config.nixarr.enable",
-          "output": "luffy.nixarr.enable=true, luffy.nixarr.komga.enable=true, luffy.nixarr.plex.enable=false, z0r0.nixarr.enable=false. Toplevel drvPaths for z0r0, luffy, nami all evaluated cleanly.",
-          "at": "2026-09-12T06:32:50Z"
+          "command": "nix build .#checks.x86_64-linux.mcp-registry-type-check && nix build .#checks.x86_64-linux.mcp-containment-check && ./init.sh --worktree",
+          "output": "mcp-registry-type-check & mcp-containment-check passed; typed submodule schema enforced; build-time assertions for transport, destructive approvals, and remote Tailnet IPs verified.",
+          "at": "2026-09-24T14:25:30Z"
         }
       ]
     },
     {
-      "id": "kong-dual-upstreams-herdr-fix",
-      "priority": 16,
-      "name": "Kong Dual Upstreams (ExtremeRouter + OmniRoute) & Herdr Harness Fix",
-      "behavior": "Kong operates both ExtremeRouter (z0r0:20128) and OmniRoute (nami:20129) simultaneously without XOR; ExtremeRouter bound to tailnet/loopback with firewall isolation; herdr enabled on z0r0 via llm-agents.",
+      "id": "mcp-phase4-nix-authority-hardening",
+      "priority": 4,
+      "name": "Phase 4: MCP-NixOS Authority & Gemini/Antigravity Hardening",
+      "behavior": "Enforce mandatory MCP-NixOS lookup sequence in nix-authority.md rule; configure Antigravity and Gemini CLI harnesses to connect to stdio mcp-nixos store executable and consume AGENTS.md context; add mcp-nixos-authority-check static test.",
       "verification": [
-        "nix eval --json .#nixosConfigurations.z0r0.config.programs.herdr.enable",
-        "nix eval --json .#nixosConfigurations.z0r0.config.layers.layer-78.llm-routers.extreme-router.enable",
-        "nix eval --json .#nixosConfigurations.nami.config.services.ai-services.kong-gateway.enable",
-        "nix eval --json .#nixosConfigurations.nami.config.services.ai-services.omniroute.enable"
+        "nix build .#checks.x86_64-linux.mcp-nixos-authority-check",
+        "./init.sh --worktree"
       ],
       "state": "passing",
       "claimedBy": "antigravity",
@@ -133,21 +89,20 @@
       "evidence": [
         {
           "sha": "HEAD",
-          "command": "nix eval --json .#nixosConfigurations.z0r0.config.programs.herdr.enable && nix eval --json .#nixosConfigurations.z0r0.config.programs.herdr.settings && nix eval --json .#nixosConfigurations.z0r0.config.layers.layer-78.llm-routers.extreme-router.enable && nix eval --json .#nixosConfigurations.nami.config.services.ai-services.kong-gateway.enable && nix eval --json .#nixosConfigurations.nami.config.services.ai-services.omniroute.enable",
-          "output": "All evaluations returned true. Herdr configured under programs.herdr.enable with catppuccin theme, kitty graphics, follow cwd, pane borders, outer borders, scrollbars, gaps, window title, resume agents on restore, and herdr-setup-workspaces helper for opencode, hermes, and antigravity-cli.",
-          "at": "2026-09-12T10:17:05Z"
+          "command": "nix build .#checks.x86_64-linux.mcp-nixos-authority-check && ./init.sh --worktree",
+          "output": "mcp-nixos-authority-check passed; nix-authority.md created; Antigravity and Gemini CLI generated configs contain mcp-nixos stdio path in Nix store and AGENTS.md contextFiles; single-pass fleet evaluation passed.",
+          "at": "2026-09-24T15:06:22Z"
         }
       ]
     },
     {
-      "id": "contract-driven-fleet-healthcheck-post-deploy-gate",
-      "priority": 17,
-      "name": "Contract-Driven Fleet Healthchecks + Post-Deploy Gate",
-      "behavior": "Extended nfp.services schema with healthcheck fields; created fleet-healthcheck consumer module, systemd oneshot/timer, blackbox monitoring scrape config generator, deploy.sh wrapper, and VM test.",
+      "id": "mcp-phase5-executor-pilot-luffy",
+      "priority": 5,
+      "name": "Phase 5: Executor Pilot on Luffy & Control-Plane Hardening",
+      "behavior": "Piloted Agent Executor (AX) integration gateway on luffy as systemd service bound to Tailnet with systemd hardening and options declared under layers.layer-76.orchestrators.executor; added executor-pilot-check static test.",
       "verification": [
-        "nix eval .#nixosConfigurations.luffy.config.layers.layer-20.services.config.fleet-healthcheck.enable | grep -q true",
-        "nix eval .#nixosConfigurations.z0r0.config.layers.layer-20.services.config.fleet-healthcheck.enable | grep -q false",
-        "nix flake check"
+        "nix build .#checks.x86_64-linux.executor-pilot-check",
+        "./init.sh --worktree"
       ],
       "state": "passing",
       "claimedBy": "antigravity",
@@ -155,22 +110,20 @@
       "evidence": [
         {
           "sha": "HEAD",
-          "command": "nix eval .#nixosConfigurations.luffy.config.layers.layer-20.services.config.fleet-healthcheck.enable && nix eval .#nixosConfigurations.z0r0.config.layers.layer-20.services.config.fleet-healthcheck.enable && nix flake check",
-          "output": "fleet-healthcheck enabled on luffy (true) and disabled on z0r0 (false); nix flake check passed cleanly including fleet-healthcheck-test VM test.",
-          "at": "2026-09-17T01:47:00Z"
+          "command": "nix build .#checks.x86_64-linux.executor-pilot-check && ./init.sh --worktree",
+          "output": "executor-pilot-check passed; executor.nix created with systemd service and option path layers.layer-76.orchestrators.executor; enabled in agent-orchestrator and ai-agent profiles on luffy; single-pass fleet evaluation passed.",
+          "at": "2026-09-24T20:52:39Z"
         }
       ]
     },
     {
-      "id": "homepage-dashboard-v2-grandlix",
-      "priority": 18,
-      "name": "Homepage Dashboard v2 \u2014 Grandlix Vegapunk Records Edition (NFP)",
-      "behavior": "Rebuilt NixOS custom Homepage Dashboard daemon behind port 3007 implementing plan.md Egghead Island theme, 7 Straw Hat crew categories, Vegapunk satellite constellation with Brook \ud83d\udc80\ud83c\udfb5 easter egg, Den Den Mushi status snails, server-side API proxy layer, speeddial bookmarks, secret gating assertion, and vendored WOFF2 fonts.",
+      "id": "mcp-phase6-client-migration",
+      "priority": 6,
+      "name": "Phase 6: Client Harness Migration & Gateway Routing",
+      "behavior": "Migrate agent client harnesses (Antigravity, Gemini CLI, Kiro CLI, Pi) to connect via mcp-nixos gateway entry point; add mcp-client-migration-check static test.",
       "verification": [
-        "nix eval .#nixosConfigurations.luffy.config.layers.layer-20.services.config.homepage-dashboard.enable | grep -q true",
-        "nixfmt layers/20-services/26-monitoring/homepage-dashboard.nix",
-        "deadnix layers/20-services/26-monitoring/homepage-dashboard.nix",
-        "statix check layers/20-services/26-monitoring/homepage-dashboard.nix"
+        "nix build .#checks.x86_64-linux.mcp-client-migration-check",
+        "./init.sh --worktree"
       ],
       "state": "passing",
       "claimedBy": "antigravity",
@@ -178,21 +131,20 @@
       "evidence": [
         {
           "sha": "HEAD",
-          "command": "nix eval .#nixosConfigurations.luffy.config.system.build.toplevel.drvPath && nixfmt layers/20-services/26-monitoring/homepage-dashboard.nix && deadnix layers/20-services/26-monitoring/homepage-dashboard.nix && statix check layers/20-services/26-monitoring/homepage-dashboard.nix",
-          "output": "All host toplevels evaluated cleanly; nixfmt, deadnix, and statix check passed with 0 errors/warnings.",
-          "at": "2026-09-17T02:30:00Z"
+          "command": "nix build .#checks.x86_64-linux.mcp-client-migration-check && ./init.sh --worktree",
+          "output": "mcp-client-migration-check passed; verified all client harnesses configure mcp-nixos stdio provider and AGENTS.md context; single-pass fleet evaluation passed.",
+          "at": "2026-09-24T20:58:00Z"
         }
       ]
     },
     {
-      "id": "noctalia-plugin-registry-compatibility-repair",
-      "priority": 19,
-      "name": "Noctalia Community Plugin Registry Compatibility Repair",
-      "behavior": "Repaired Noctalia shell and official/community plugin registry version skew by updating noctalia input to latest Sept 2026 release supporting plugin_api, eliminating broken min_noctalia patching hacks, adding noctalia-plugin-doctor CLI tool, and introducing nix flake check registry compatibility test.",
+      "id": "mcp-phase7-context-budget-controls",
+      "priority": 7,
+      "name": "Phase 7: Context and Budget Controls",
+      "behavior": "Enforce Headroom context token compression, payload caps (maxResultBytes), and cache TTLs across server catalog and client configs; add mcp-context-budget-check static test.",
       "verification": [
-        "nix build .#checks.x86_64-linux.noctalia-registry-check",
-        "nix eval .#nixosConfigurations.z0r0.config.system.build.toplevel.drvPath",
-        "nix eval .#nixosConfigurations.z0r0.config.home-manager.users.t0psh31f.home.activationPackage.drvPath"
+        "nix build .#checks.x86_64-linux.mcp-context-budget-check",
+        "./init.sh --worktree"
       ],
       "state": "passing",
       "claimedBy": "antigravity",
@@ -200,80 +152,9 @@
       "evidence": [
         {
           "sha": "HEAD",
-          "command": "nix build .#checks.x86_64-linux.noctalia-registry-check && nix eval .#nixosConfigurations.z0r0.config.system.build.toplevel.drvPath",
-          "output": "noctalia-registry-check scanned 13 official + 191 community plugins; all passed plugin_api validation (range 3..32). z0r0 toplevel & home-manager evaluated cleanly.",
-          "at": "2026-09-17T02:38:00Z"
-        }
-      ]
-    },
-    {
-      "id": "resilient-terminal-motd-and-animated-banners",
-      "priority": 20,
-      "name": "Restore High-Resolution Per-Host Terminal MOTD & Opt-In Animated Banners",
-      "behavior": "Replaced fragile direct chafa subshell calls with nfp-motd CLI script implementing runtime graphics capability detection (kitty -> sixel -> iterm -> chafa -> none), aspect ratio preservation in fastfetch, per-host immutable store asset registry (z0r0, luffy, nami), nfp-banner static title generator, motd-animate TerminalTextEffects CLI tool, and zsh startup guardrails.",
-      "verification": [
-        "nix build .#checks.x86_64-linux.nfp-motd-test",
-        "nix eval .#nixosConfigurations.z0r0.config.system.build.toplevel.drvPath",
-        "nix eval .#nixosConfigurations.luffy.config.system.build.toplevel.drvPath",
-        "nix eval .#nixosConfigurations.nami.config.system.build.toplevel.drvPath"
-      ],
-      "state": "passing",
-      "claimedBy": "antigravity",
-      "blockedReason": null,
-      "evidence": [
-        {
-          "sha": "HEAD",
-          "command": "nix build .#checks.x86_64-linux.nfp-motd-test && nix eval .#nixosConfigurations.z0r0.config.system.build.toplevel.drvPath && ./init.sh",
-          "output": "nfp-motd-test verified Zsh syntax, per-host Nix store image assets, zero hardcoded /home/ paths, fake-environment renderer selection (kitty, sixel, iterm, chafa, none), and nfp-banner output. z0r0, luffy, nami toplevels evaluated cleanly.",
-          "at": "2026-09-17T04:04:30Z"
-        }
-      ]
-    },
-    {
-      "id": "polyfloor-7777-authoritative",
-      "priority": 20,
-      "name": "Polyfloor 7777 authoritative + fleet port de-conflict",
-      "behavior": "Polyfloor authoritative port 7777 on nami (was 8091 double-booked with Kong Admin 8091). CalibreWeb 8093 -> 7119 (was shared with Kong Manager 8093). Fleet-wide uniqueness: 7777 and 7119 outside crowded 8090-9000, no service shares same port even across machines. All consumers derived from services.polyfloor.port (no duplicate constants).",
-      "verification": [
-        "nix eval .#nixosConfigurations.nami.config.services.polyfloor.port | grep -q 7777",
-        "nix eval .#nixosConfigurations.nami.config.layers.layer-20.endpoints.polyfloor.port | grep -q 7777",
-        "nix eval .#nixosConfigurations.luffy.config.services.calibre-web-app.port | grep -q 7119",
-        "grep -q 7777 layers/00-cyberia/01-docs/ports.md && grep -q 7119 layers/00-cyberia/01-docs/ports.md",
-        "grep -q 8091 layers/00-cyberia/01-docs/ports.md && ! grep -q 'Polyfloor.*8091' layers/00-cyberia/01-docs/ports.md"
-      ],
-      "state": "passing",
-      "claimedBy": "hermes",
-      "blockedReason": null,
-      "evidence": [
-        {
-          "sha": "369ad662cee2ba482d03a3e9e66e306431cbcbfb",
-          "command": "nix eval .#nixosConfigurations.nami.config.services.polyfloor.port && nix eval .#nixosConfigurations.nami.config.layers.layer-20.endpoints.polyfloor.port && nix eval .#nixosConfigurations.luffy.config.services.calibre-web-app.port && grep -E '7777|7119' layers/00-cyberia/01-docs/ports.md",
-          "output": "7777 / 7777 / 7119 / ports.md has 7777 Polyfloor (nami, authoritative) and 7119 CalibreWeb (luffy) distinct from Kong Admin 8091 and Kong Manager 8093. No duplicate 8091/8093 for conflicting services. firewall networking.nix has 7777 and 7119.",
-          "at": "2026-09-17T14:27:48.733260Z"
-        }
-      ]
-    },
-    {
-      "id": "luffy-noctalia-hyprland-recovery",
-      "priority": 21,
-      "name": "Luffy Noctalia-Hyprland desktop recovery",
-      "behavior": "Luffy hybrid server+desktop: desktop tag added in clan.nix, layers.desktop.experience=noctalia-hyprland, hyprland.enable and noctalia.enable both true via tag/profile (no duplicate direct enable). Selector assertion passes, Noctalia service, UWSM, IPC correctly configured.",
-      "verification": [
-        "nix eval .#nixosConfigurations.luffy.config.layers.desktop.experience | grep -q noctalia-hyprland",
-        "nix eval .#nixosConfigurations.luffy.config.layers.layer-40.desktop.hyprland.enable | grep -q true",
-        "nix eval .#nixosConfigurations.luffy.config.layers.layer-40.desktop.noctalia.enable | grep -q true",
-        "nix eval .#nixosConfigurations.luffy.config.machine.tags | grep -q desktop",
-        "nix eval .#nixosConfigurations.luffy.config.home-manager.users.t0psh31f.systemd.user.services.noctalia | grep -q noctalia"
-      ],
-      "state": "passing",
-      "claimedBy": "hermes",
-      "blockedReason": null,
-      "evidence": [
-        {
-          "sha": "369ad662cee2ba482d03a3e9e66e306431cbcbfb",
-          "command": "nix eval .#nixosConfigurations.luffy.config.layers.desktop.experience && nix eval .#nixosConfigurations.luffy.config.layers.layer-40.desktop.hyprland.enable && nix eval .#nixosConfigurations.luffy.config.layers.layer-40.desktop.noctalia.enable && nix eval .#nixosConfigurations.luffy.config.machine.tags",
-          "output": "noctalia-hyprland / true / true / tags include desktop (hybrid server+desktop: server,homelab,desktop,ai-agent...). UWSM true, Noctalia user service present.",
-          "at": "2026-09-17T14:27:48.733260Z"
+          "command": "nix build .#checks.x86_64-linux.mcp-context-budget-check && ./init.sh --worktree",
+          "output": "mcp-context-budget-check passed; headroom registered with budget caps; maxResultBytes and cacheTtlSeconds propagated to client configs; single-pass fleet evaluation passed.",
+          "at": "2026-09-24T21:06:17Z"
         }
       ]
     }

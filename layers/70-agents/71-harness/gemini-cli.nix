@@ -28,8 +28,34 @@
     enable = lib.mkEnableOption "Gemini CLI agent (alias for Antigravity)";
   };
 
-  config = lib.mkIf config.layers.layer-71.harness.gemini-cli.enable {
-    layers.layer-71.harness.antigravity.enable = true;
-    environment.systemPackages = lib.optional (pkgs ? gemini-cli) pkgs.gemini-cli;
-  };
+  nixos =
+    let
+      cfg = config.layers.layer-71.harness.gemini-cli;
+    in
+    lib.mkIf cfg.enable {
+      layers.layer-71.harness.antigravity.enable = true;
+      environment.systemPackages = lib.optional (pkgs ? gemini-cli) pkgs.gemini-cli;
+    };
+
+  home =
+    let
+      cfg = config.layers.layer-71.harness.gemini-cli;
+    in
+    lib.mkIf cfg.enable {
+      xdg.configFile."gemini/mcp_config.json".text = builtins.toJSON {
+        mcpServers = {
+          mcp-nixos = {
+            command = "${lib.getExe pkgs.mcp-nixos}";
+            args = [ ];
+          };
+        };
+      };
+
+      xdg.configFile."gemini/config.json".text = builtins.toJSON {
+        contextFiles = [
+          "AGENTS.md"
+          "GEMINI.md"
+        ];
+      };
+    };
 }

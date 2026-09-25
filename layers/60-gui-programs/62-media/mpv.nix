@@ -76,8 +76,6 @@ in
         radiant-player
       ];
 
-      home.shellAliases.mvi = "mpv --config-dir=$HOME/.config/mvi";
-
       xdg.configFile."mvi/mpv.conf".text = ''
         ## IMAGE
         scale=spline36

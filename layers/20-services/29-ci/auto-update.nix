@@ -16,6 +16,11 @@ in
     # ── Weekly: update ALL flake inputs ──────────────────────────────
     systemd.services.nfp-auto-update = {
       description = "Update all NFP flake inputs and push";
+      path = with pkgs; [
+        nix
+        git
+        openssh
+      ];
       serviceConfig = {
         Type = "oneshot";
         User = "root";
@@ -43,6 +48,11 @@ in
     # ── Daily: update nixpkgs-ai only (faster AI package cadence) ───
     systemd.services.nfp-update-ai = {
       description = "Update nixpkgs-ai input and push";
+      path = with pkgs; [
+        nix
+        git
+        openssh
+      ];
       serviceConfig = {
         Type = "oneshot";
         User = "root";

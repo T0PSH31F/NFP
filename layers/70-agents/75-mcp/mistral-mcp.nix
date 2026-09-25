@@ -64,7 +64,7 @@
         };
 
         serviceConfig = {
-          ExecStart = "${pkgs.nodejs_22}/bin/npx -y mistral-mcp@latest";
+          ExecStart = "${pkgs.nodejs_22}/bin/npx -y mistral-mcp";
           Restart = "on-failure";
           RestartSec = 5;
           DynamicUser = true;

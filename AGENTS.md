@@ -24,7 +24,7 @@ Never mark work complete without recorded evidence. Never expand scope mid-sessi
 
 The `layers/00-cyberia/01-docs/` directory is the canonical knowledge base.
 - **Key Docs**: `AGENT_ONBOARDING.md` (system overview & boot flow), `harness.md` (harness spec & workflow), `ports.md` (port allocation registry), `services.md` (service ports & URLs), `deployment.md` (deployment commands).
-- **Rules**: Read before changing; update when modifying features/services; check `.agents/rules/` for triggered rules (`clan-architecture.md`, `organization.md`, `recovery.md`).
+- **Rules**: Read before changing; update when modifying features/services; check `.agents/rules/` for triggered rules (`clan-architecture.md`, `mcp-nixos-bible.md`, `nix-build-safety.md`, `organization.md`, `recovery.md`).
 
 ---
 

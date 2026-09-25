@@ -62,6 +62,7 @@ in
     "homelab"
     "pkb-node"
     "network-router" # Headscale control server + homepage-dashboard (moved from nami 2026-09-15)
+    "desktop"
   ];
 
   # Headscale: migrated DB from nami; reachable via LAN + tailnet.
@@ -99,6 +100,7 @@ in
       # Options: "latest" | "cachyos" | "zen"
       hardware.kernel = "cachyos"; # Maximum performance for desktop
       config.impermanence.enable = true;
+      config.nas-mount.enable = true;
       virtualization.enable = true;
       mobile.android.enable = true;
       peripherals.razer.enable = lib.mkForce false; # Disabled: openrazer driver incompatible with linux 7.0.10
@@ -599,6 +601,18 @@ in
       IOSchedulingClass = "idle";
     };
   };
+
+  # Persist luffy's root SSH keypair across impermanence rollbacks.
+  # 2026-09-23: /root/.ssh was wiped by the btrfs rollback, killing the
+  # headscale-tunnel-nami reverse tunnel (21k restart loop, auth denied) and
+  # taking nami offline. The tunnel reuses this key; without persistence every
+  # reboot breaks nami's control-plane path.
+  environment.persistence."/persist".directories = [
+    {
+      directory = "/root/.ssh";
+      mode = "0700";
+    }
+  ];
 
   # Reverse tunnel: expose luffy's headscale on nami as localhost:8087 so nami's
   # tailscale client can reach the (migrated) control server over SSH.

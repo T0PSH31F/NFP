@@ -690,7 +690,7 @@
               command: npx
               args:
                 - -y
-                - mistral-mcp@latest
+                - mistral-mcp
               env:
                 MISTRAL_API_KEY: ""
             codegraph:
@@ -704,12 +704,6 @@
               args:
                 - mcp
                 - serve
-              env: {}
-            playwright:
-              command: npx
-              args:
-                - -y
-                - "@playwright/mcp@latest"
               env: {}
         '';
       };

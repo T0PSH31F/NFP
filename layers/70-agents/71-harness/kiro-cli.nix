@@ -65,16 +65,8 @@ with lib;
                 description = "Hermes Autonomous Worker A2A Gateway";
               };
               context-forge = {
-                url = "http://127.0.0.1:8083/mcp";
+                url = osConfig.layers.layer-20.endpoints.context-forge.baseUrl;
                 description = "ContextForge Universal MCP/A2A Gateway";
-              };
-              playwright = {
-                command = "npx";
-                args = [
-                  "-y"
-                  "@playwright/mcp@latest"
-                ];
-                description = "Playwright Browser Automation MCP Server";
               };
               mcp-nixos = {
                 command = "${lib.getExe pkgs.mcp-nixos}";

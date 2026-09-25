@@ -16,15 +16,118 @@ let
   sys = pkgs.stdenv.hostPlatform.system;
   llmPkgs = inputs.llm-agents.packages.${sys} or { };
 
-  # Default enabled package set for ai-agent or ai-server tags (lean core essentials)
-  defaultCatalogPackages = [
-    "herdr"
-    "hermes-one"
-    "open-code-review"
-    "openskills"
-    "rtk"
-    "sidecar"
-  ];
+  # Categorized catalog of LLM agent packages from numtide/llm-agents.nix & nixpkgs
+  catalogCategories = {
+    harnessesAndAgents = [
+      "bb-app"
+      "freebuff"
+      "jcode"
+      "jules"
+      "kilocode-cli" # — The open-source AI coding agent. Now available in your terminal.
+      "kimi-code" # - The Starting Point for Next-Gen Agents
+      "letta-code"
+      "localgpt"
+      "mistral-vibe"
+      #"nanocoder"
+      #"mimo-code"
+      #"omp"
+      #"openclaw"
+      "opencode2"
+      "openfang"
+      "picoclaw"
+      "prime-agent"
+      "qoder-cli"
+      #"qwen-code"
+      #"reasonix"
+      #"vix"
+      #"zaly"
+      #"zcode"
+      #"zeroclaw"
+    ];
+
+    orchestratorsAndSwarms = [
+      #"aionui"
+      "agent-deck"
+      "agentdesk"
+      "gascity"
+      "gastown"
+      "gnhf"
+      "herdr"
+      #"kandev"
+      "luvus"
+      #"oh-my-claudecode"
+      #"oh-my-codex"
+      #"oh-my-opencode"
+      "openhands-agent-canvas"
+      "orca"
+      #"paperclip"
+      #"vibe-kanban"
+    ];
+
+    codeReviewAndInspection = [
+      "ast-grep"
+      "code-review-graph"
+      "diffnav"
+      "fastedit"
+      "hunk"
+      "jscpd"
+      "open-code-review"
+      "plannotator"
+      "showboat"
+      "tuicr"
+      "zat"
+    ];
+
+    contextAndKnowledge = [
+      "openskills"
+      "openspec"
+      "openspec-ui"
+      "qmd"
+      "rtk"
+      "skills"
+      "skills-installer"
+      "semble"
+      "spec-kit"
+      "toon"
+    ];
+
+    toolsAndUtilities = [
+      "agent-browser"
+      "agentburn"
+      "annot"
+      "aven"
+      "ax" # Agent Executor — lightweight runner for AI task execution
+      "browser-use"
+      "chatterbox" # Open-source voice assistant and TTS engine for AI agents
+      "collie"
+      "cpa-usage-keeper"
+      "executor" # - lightweight runner for AI task execution
+      "file-organizer-2000"
+      "format-junkie"
+      "greptile"
+      "handy"
+      "mcptoon"
+      "parallel-cli"
+      "pdfvision"
+      "sub2api"
+      "trellis"
+    ];
+
+    guiApps = [
+      "agentdesk"
+      #"antigravity-ide"
+      #"claude-desktop"
+      #hermes-desktop"
+      "hermes-hud"
+      "hermes-one"
+      "multica-desktop"
+      "kandev-desktop"
+      "paseo-desktop"
+      "voxtype"
+    ];
+  };
+
+  defaultCatalogPackages = concatLists (attrValues catalogCategories);
 in
 {
   options.layers.layer-79.skills.llm-agents-catalog = {
@@ -154,16 +257,12 @@ in
         # toon — Rust implementation of TOON - Token-Oriented Object Notation for LLM prompts
         # trellis — An out-of-the-box engineering framework for AI coding.
         # tuicr — Review AI-generated diffs like a GitHub pull request, right from your terminal
-        # unpinCargoMsrvHook — Setup hook that removes rust-version (MSRV) constraints from Cargo manifests
-        # unpinGoModVersionHook — Setup hook that relaxes go.mod version constraints to match the build toolchain
-        # versionCheckHomeHook — Setup hook that provides a writable HOME for versionCheckHook
         # vessel-browser — Agent-oriented browser with durable state and MCP control
         # vibe-kanban — Kanban board to orchestrate AI coding agents like Claude Code, Codex, and Gemini CLI
         # vix — Sleek, Fast and Token Efficient AI Coding Agent
         # voxterm — Local real-time voice transcription TUI with speaker diarization
         # voxtype — Push-to-talk voice-to-text for Wayland
         # workmux — Git worktrees + tmux windows for zero-friction parallel dev
-        # wrapBuddy — Setup hook that patches ELF binaries with stub loader
         # zaly — Hackable terminal coding agent
         # zat — Code outline viewer for LLM coding agents — shows exported symbols with line numbers
         # zcode — Agentic development environment (ADE) by Z.ai
@@ -205,7 +304,8 @@ in
         if isGuiHost then rawNames else filter (name: !(elem name guiCatalogPackages)) rawNames;
 
       resolvedPackages = filter (p: p != null) (
-        map (name: llmPkgs.${name} or pkgs.${name} or null) effectivePackageNames
+        (map (name: llmPkgs.${name} or pkgs.${name} or null) effectivePackageNames)
+        ++ [ (inputs.hister.packages.${sys}.default or inputs.hister.defaultPackage.${sys} or null) ]
       );
 
       voxtypeEnabled = elem "voxtype" effectivePackageNames && cfg.enable;

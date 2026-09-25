@@ -31,7 +31,7 @@
   home =
     { config, osConfig, ... }:
     let
-      pluginLabel = "oh-my-opencode-slim@latest";
+      pluginLabel = "oh-my-opencode-slim";
     in
     {
       config = lib.mkIf osConfig.layers.layer-71.harness.opencode.enable {
@@ -121,7 +121,7 @@
               command = [
                 "npx"
                 "-y"
-                "mistral-mcp@latest"
+                "mistral-mcp"
               ];
               enabled = true;
               type = "local";
@@ -138,15 +138,6 @@
               enabled = true;
               type = "local";
             };
-            playwright = {
-              command = [
-                "npx"
-                "-y"
-                "@playwright/mcp@latest"
-              ];
-              enabled = true;
-              type = "local";
-            };
 
             # ── Disabled ───────────────────────────────────────────
             browser-use.enabled = false; # 100% error rate, not needed
@@ -158,7 +149,7 @@
           plugin = [
             pluginLabel
             "@pantheon-ai/opencode-warcraft-notifications"
-            "opencode-antigravity-auth@latest"
+            "opencode-antigravity-auth"
             "octto"
             "file:~/.config/opencode/plugins/context-capture"
           ];
@@ -799,7 +790,7 @@
               '';
           "opencode/oh-my-opencode-slim.json".source = ./opencode/oh-my-opencode-slim.json;
 
-          # Context-capture plugin — automatic session persistence to context-mode FTS5
+          # Context-capture plugin — automatic session persistence to context-forge FTS5
           "opencode/plugins/context-capture/package.json".text = builtins.toJSON {
             name = "opencode-context-capture";
             version = "1.0.0";
@@ -822,10 +813,10 @@
 
             # oh-my-opencode-slim CLI + companion binary
             (pkgs.writeShellScriptBin "omos" ''
-              exec ${pkgs.nodejs}/bin/npx oh-my-opencode-slim@latest "$@"
+              exec ${pkgs.nodejs}/bin/npx oh-my-opencode-slim "$@"
             '')
             (pkgs.writeShellScriptBin "oh-my-opencode-slim" ''
-              exec ${pkgs.nodejs}/bin/npx oh-my-opencode-slim@latest "$@"
+              exec ${pkgs.nodejs}/bin/npx oh-my-opencode-slim "$@"
             '')
           ];
       };

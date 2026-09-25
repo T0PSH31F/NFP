@@ -35,7 +35,7 @@ with lib;
     {
       nfp.services.sillytavern = {
         enable = config.services.sillytavern-app.enable;
-        host = "nami";
+        host = config.networking.hostName;
         port = 8000;
         homepage = {
           enable = true;
@@ -60,16 +60,13 @@ with lib;
       services.sillytavern = {
         enable = true;
         port = config.services.sillytavern-app.port;
-        listen = true; # Listen on all interfaces
+        listen = false; # Localhost only
       };
 
       # Ensure the extensions directory exists before BindPaths tries to mount it
       systemd.tmpfiles.rules = [
         "d ${config.services.sillytavern-app.dataDir}/extensions 0755 sillytavern sillytavern -"
       ];
-
-      # Firewall
-      networking.firewall.allowedTCPPorts = [ config.services.sillytavern-app.port ];
 
       # Ensure data is persisted
       environment.persistence."/persist" =

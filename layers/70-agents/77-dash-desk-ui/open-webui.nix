@@ -33,7 +33,7 @@ with lib;
       {
         nfp.services.open-webui = {
           enable = config.services.ai-services.open-webui.enable;
-          host = "nami";
+          host = config.networking.hostName;
           port = 8088;
           homepage = {
             enable = true;
@@ -56,11 +56,12 @@ with lib;
       (mkIf cfg.enable {
         services.open-webui = {
           enable = true;
+          host = "127.0.0.1";
           inherit (cfg) port;
-          openFirewall = true;
+          openFirewall = false;
           environment = {
             OLLAMA_API_BASE_URL = "http://localhost:11434";
-            WEBUI_AUTH = "false";
+            WEBUI_AUTH = "true";
             OPENAI_API_BASE_URLS = "http://127.0.0.1:8642";
           };
         };

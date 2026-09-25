@@ -21,8 +21,6 @@
       # CRITICAL: Build resource limits for 16GB RAM system
       max-jobs = lib.mkDefault 4; # Limit parallel jobs to 4
       cores = lib.mkDefault 2; # Max 2 cores per job
-      # Let Nix decide per-job threads, respecting 'cores'
-      build-cores = lib.mkDefault 0;
 
       # Trusted users allowed to manage store
       trusted-users = lib.mkDefault [
@@ -36,6 +34,7 @@
         "nix-command"
         "flakes"
       ];
+      accept-flake-config = lib.mkDefault true;
 
       connect-timeout = lib.mkDefault 5; # fail fast on dead caches (numtide, etc.)
 

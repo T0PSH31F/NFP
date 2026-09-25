@@ -98,16 +98,7 @@ in
               name = "ExtremeRouter Direct (Backup)";
             };
           };
-          mcpServers = {
-            playwright = {
-              command = "npx";
-              args = [
-                "-y"
-                "@playwright/mcp@latest"
-              ];
-              description = "Playwright Browser Automation MCP Server";
-            };
-          };
+          mcpServers = { };
         };
       };
     };

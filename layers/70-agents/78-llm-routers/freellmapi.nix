@@ -8,7 +8,6 @@
   config,
   lib,
   pkgs,
-  inputs,
   ...
 }:
 {
@@ -122,7 +121,7 @@
       {
         nfp.services.freellmapi = {
           enable = config.services.ai-services.freellmapi.enable;
-          host = "nami";
+          host = config.networking.hostName;
           port = 3001;
           homepage = {
             enable = true;
@@ -164,7 +163,6 @@
             HOST = cfg.host;
             FREEAPI_DB_PATH = "${cfg.dataDir}/freeapi.db";
             NODE_ENV = "production";
-            ENCRYPTION_KEY = "cf3e9ec63ddfe6ad03ef3488d2e159ead1ae60eb34cbd48569199c2b830eedeb";
           }
           // lib.optionalAttrs (cfg.configFile != null) {
             FREEAPI_CONFIG_PATH = cfg.configFile;
@@ -178,7 +176,11 @@
             User = "freellmapi";
             Group = "freellmapi";
             WorkingDirectory = "${freellmapiPkg}/share/freellmapi";
-            EnvironmentFile = lib.optional (cfg.environmentFile != null) cfg.environmentFile;
+            EnvironmentFile =
+              if cfg.environmentFile != null then
+                cfg.environmentFile
+              else
+                config.sops.templates."freellmapi-env".path;
             # Hardening
             NoNewPrivileges = true;
             PrivateTmp = true;

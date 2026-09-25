@@ -55,6 +55,185 @@
           touch $out
         '';
 
+        mcp-containment-check =
+          pkgs.runCommand "check-mcp-containment"
+            {
+              nativeBuildInputs = [
+                pkgs.gnugrep
+                pkgs.coreutils
+              ];
+            }
+            ''
+              # 1. No @latest in production layer-70 modules
+              if grep -r "@latest" ${../layers/70-agents} >/dev/null 2>&1; then
+                echo "ERROR: @latest unpinned npm dependency found in layers/70-agents"
+                exit 1
+              fi
+
+              # 2. No invalid mcp-gateway systemd service unit claiming port 8085
+              if grep -r "systemd\.services\.mcp-gateway" ${../layers/70-agents} >/dev/null 2>&1; then
+                echo "ERROR: Invalid mcp-gateway systemd unit found in layers/70-agents"
+                exit 1
+              fi
+
+              # 3. No nonexistent package references in Nix/JSON configs
+              if grep -r --include="*.nix" --include="*.json" -E "context-mode|@executor/mcp|@modelcontextprotocol/server-browser-use" ${../layers/70-agents} >/dev/null 2>&1; then
+                echo "ERROR: Known nonexistent npm package referenced in layers/70-agents"
+                exit 1
+              fi
+
+              # 4. ContextForge must not open public firewall
+              if grep -q "allowedTCPPorts" ${../layers/70-agents/73-memory/context-forge.nix} 2>/dev/null; then
+                echo "ERROR: ContextForge opens public firewall port"
+                exit 1
+              fi
+
+              touch $out
+            '';
+
+        mcp-registry-type-check =
+          let
+            z0r0Config = inputs.self.nixosConfigurations.z0r0.config;
+            servers = z0r0Config.layers.layer-75.mcp.servers;
+          in
+          if !(servers ? mcp-nixos) then
+            throw "mcp-registry-type-check error: mcp-nixos missing from typed servers"
+          else if !(servers ? github) then
+            throw "mcp-registry-type-check error: github missing from typed servers"
+          else if !(servers ? ha-mcp) then
+            throw "mcp-registry-type-check error: ha-mcp missing from typed servers"
+          else
+            pkgs.runCommand "check-mcp-registry-type" { } ''
+              touch $out
+            '';
+
+        mcp-nixos-authority-check =
+          let
+            z0r0Config = inputs.self.nixosConfigurations.z0r0.config;
+            userConfig = z0r0Config.home-manager.users.t0psh31f;
+
+            antigravityMcpText =
+              builtins.unsafeDiscardStringContext
+                userConfig.xdg.configFile."antigravity/mcp_config.json".text;
+            geminiMcpText =
+              builtins.unsafeDiscardStringContext
+                userConfig.xdg.configFile."gemini/mcp_config.json".text;
+
+            antigravityMcp = builtins.fromJSON antigravityMcpText;
+            geminiMcp = builtins.fromJSON geminiMcpText;
+
+            antigravityConfText =
+              builtins.unsafeDiscardStringContext
+                userConfig.xdg.configFile."antigravity/config.json".text;
+            geminiConfText =
+              builtins.unsafeDiscardStringContext
+                userConfig.xdg.configFile."gemini/config.json".text;
+
+            antigravityConf = builtins.fromJSON antigravityConfText;
+            geminiConf = builtins.fromJSON geminiConfText;
+
+            antigravityMcpNixos = antigravityMcp.mcpServers.mcp-nixos or null;
+            geminiMcpNixos = geminiMcp.mcpServers.mcp-nixos or null;
+
+            isStorePath = path: pkgs.lib.hasPrefix "/nix/store/" path;
+          in
+          if antigravityMcpNixos == null then
+            throw "mcp-nixos-authority-check error: antigravity mcp_config.json missing mcp-nixos server"
+          else if !(isStorePath antigravityMcpNixos.command) then
+            throw "mcp-nixos-authority-check error: antigravity mcp-nixos command '${antigravityMcpNixos.command}' does not point to Nix store"
+          else if geminiMcpNixos == null then
+            throw "mcp-nixos-authority-check error: gemini mcp_config.json missing mcp-nixos server"
+          else if !(isStorePath geminiMcpNixos.command) then
+            throw "mcp-nixos-authority-check error: gemini mcp-nixos command '${geminiMcpNixos.command}' does not point to Nix store"
+          else if !(pkgs.lib.elem "AGENTS.md" (antigravityConf.contextFiles or [ ])) then
+            throw "mcp-nixos-authority-check error: antigravity config.json missing AGENTS.md context file"
+          else if !(pkgs.lib.elem "AGENTS.md" (geminiConf.contextFiles or [ ])) then
+            throw "mcp-nixos-authority-check error: gemini config.json missing AGENTS.md context file"
+          else
+            pkgs.runCommand "check-mcp-nixos-authority" { } ''
+              touch $out
+            '';
+
+        executor-pilot-check =
+          let
+            luffyConfig = inputs.self.nixosConfigurations.luffy.config;
+            executorEnabled = luffyConfig.layers.layer-76.orchestrators.executor.enable or false;
+            executorService = luffyConfig.systemd.services.executor or null;
+          in
+          if !executorEnabled then
+            throw "executor-pilot-check error: Executor service must be enabled on luffy"
+          else if executorService == null then
+            throw "executor-pilot-check error: systemd.services.executor missing from luffy config"
+          else
+            pkgs.runCommand "check-executor-pilot" { } ''
+              touch $out
+            '';
+
+        mcp-client-migration-check =
+          let
+            z0r0Config = inputs.self.nixosConfigurations.z0r0.config;
+            userConfig = z0r0Config.home-manager.users.t0psh31f;
+
+            antigravityMcpText =
+              builtins.unsafeDiscardStringContext
+                userConfig.xdg.configFile."antigravity/mcp_config.json".text;
+            geminiMcpText =
+              builtins.unsafeDiscardStringContext
+                userConfig.xdg.configFile."gemini/mcp_config.json".text;
+            kiroMcpText = builtins.unsafeDiscardStringContext userConfig.xdg.configFile."kiro/mcp.json".text;
+            piMcpText = builtins.unsafeDiscardStringContext userConfig.xdg.configFile."pi/config.json".text;
+
+            antigravityMcp = builtins.fromJSON antigravityMcpText;
+            geminiMcp = builtins.fromJSON geminiMcpText;
+            kiroMcp = builtins.fromJSON kiroMcpText;
+            piMcp = builtins.fromJSON piMcpText;
+
+            allHaveNixos =
+              (antigravityMcp.mcpServers ? mcp-nixos)
+              && (geminiMcp.mcpServers ? mcp-nixos)
+              && (kiroMcp.mcpServers ? mcp-nixos)
+              && (piMcp.mcpServers ? mcp-nixos);
+          in
+          if !allHaveNixos then
+            throw "mcp-client-migration-check error: one or more agent client harnesses are missing mcp-nixos gateway entry"
+          else
+            pkgs.runCommand "check-mcp-client-migration" { } ''
+              touch $out
+            '';
+
+        mcp-context-budget-check =
+          let
+            z0r0Config = inputs.self.nixosConfigurations.z0r0.config;
+            userConfig = z0r0Config.home-manager.users.t0psh31f;
+            servers = z0r0Config.layers.layer-75.mcp.servers;
+
+            mcpConfigText =
+              builtins.unsafeDiscardStringContext
+                userConfig.xdg.configFile."mcp/config.json".text;
+            mcpConfig = builtins.fromJSON mcpConfigText;
+            clientConfigs = mcpConfig.mcpServers;
+
+            hasHeadroom = servers ? headroom && servers.headroom.enable;
+
+            invalidServers = pkgs.lib.filterAttrs (
+              _n: s: s.enable && (s.maxResultBytes <= 0 || s.maxResultBytes > 10485760)
+            ) servers;
+
+            missingBudgetFields = pkgs.lib.filterAttrs (
+              _n: c: !(c ? maxResultBytes) || !(c ? cacheTtlSeconds)
+            ) clientConfigs;
+          in
+          if !hasHeadroom then
+            throw "mcp-context-budget-check error: headroom server entry missing or disabled"
+          else if (builtins.length (builtins.attrNames invalidServers)) > 0 then
+            throw "mcp-context-budget-check error: servers with invalid maxResultBytes found: ${builtins.concatStringsSep ", " (builtins.attrNames invalidServers)}"
+          else if (builtins.length (builtins.attrNames missingBudgetFields)) > 0 then
+            throw "mcp-context-budget-check error: client configs missing budget attributes: ${builtins.concatStringsSep ", " (builtins.attrNames missingBudgetFields)}"
+          else
+            pkgs.runCommand "check-mcp-context-budget" { } ''
+              touch $out
+            '';
+
         luffy-service-scope =
           let
             luffyConfig = inputs.self.nixosConfigurations.luffy.config;

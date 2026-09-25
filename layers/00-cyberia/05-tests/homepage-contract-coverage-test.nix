@@ -205,9 +205,46 @@ let
         echo "FAIL: ${svc.name} port is 0"
         exit 1
       fi
-      echo "PASS ${svc.name}: homepage contract valid (icon=${contract.homepage.icon or "?"}, port=${toString (contract.port or 0)})"
+      if [ "${contract.host or ""}" != "${svc.host}" ]; then
+        echo "FAIL: ${svc.name} contract.host (${contract.host or ""}) != expected host (${svc.host})"
+        exit 1
+      fi
+      ${lib.optionalString (svc.name == "kong-gateway") ''
+        if [ "${toString (contract.port or 0)}" = "8091" ]; then
+          echo "FAIL: kong-gateway contract uses admin port 8091 instead of proxy port"
+          exit 1
+        fi
+      ''}
+      echo "PASS ${svc.name}: homepage contract valid (host=${contract.host or "?"}, icon=${contract.homepage.icon or "?"}, port=${toString (contract.port or 0)})"
     ''
   ) requiredServices;
+
+  # Additional Architectural & Security Assertions
+  luffyOllama = luffyConfig.services.ai-services.ollama.enable or false;
+  luffyOpenWebUI = luffyConfig.services.ai-services.open-webui.enable or false;
+  luffySillyTavern = luffyConfig.services.sillytavern-app.enable or false;
+  luffyKong = luffyConfig.services.ai-services.kong-gateway.enable or false;
+
+  openWebuiFirewall = namiConfig.services.open-webui.openFirewall or false;
+
+  architecturalAssertions = ''
+    if [ "${
+      if luffyOllama then "1" else "0"
+    }" = "1" ]; then echo "FAIL: Ollama enabled on luffy" && exit 1; fi
+    if [ "${
+      if luffyOpenWebUI then "1" else "0"
+    }" = "1" ]; then echo "FAIL: Open WebUI enabled on luffy" && exit 1; fi
+    if [ "${
+      if luffySillyTavern then "1" else "0"
+    }" = "1" ]; then echo "FAIL: SillyTavern enabled on luffy" && exit 1; fi
+    if [ "${
+      if luffyKong then "1" else "0"
+    }" = "1" ]; then echo "FAIL: Kong enabled on luffy" && exit 1; fi
+    if [ "${
+      if openWebuiFirewall then "1" else "0"
+    }" = "1" ]; then echo "FAIL: Open WebUI openFirewall is true (WAN exposed)" && exit 1; fi
+    echo "PASS Architectural assertions: luffy isolation clean, Open WebUI firewall safe."
+  '';
 
 in
 pkgs.runCommand "homepage-contract-coverage-test" { } ''
@@ -215,5 +252,7 @@ pkgs.runCommand "homepage-contract-coverage-test" { } ''
   ${testCoverageScript}
   echo "Running homepage contract validity tests..."
   ${testValidityScript}
+  echo "Running architectural & security checks..."
+  ${architecturalAssertions}
   touch $out
 ''

@@ -60,7 +60,7 @@ in
       # enable tracks actual service state on the evaluating host.
       nfp.services.polyfloor = {
         enable = config.services.polyfloor.enable;
-        host = "nami";
+        host = config.networking.hostName;
         port = config.services.polyfloor.port;
         healthcheck = {
           enable = true;

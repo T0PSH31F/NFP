@@ -16,13 +16,13 @@ in
   nixos = { };
 
   home = lib.mkIf cfg.enable {
+    # `crush` not listed here — provided by layers.layer-71.harness.crush.
     home.packages = with pkgs; [
       abtop
       angryoxide
       angryipscanner
       beadwork
       cc-switch
-      crush
       curlie
       cyberstrike
       devin-desktop

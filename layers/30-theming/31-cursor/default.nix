@@ -50,6 +50,7 @@ in
       home.packages = with pkgs; [
         hyprcursor
         sonic-hyprcursor
+        rose-pine-hyprcursor
       ];
 
       home.activation.cleanSonicCursor = lib.hm.dag.entryBefore [ "checkLinkTargets" ] ''

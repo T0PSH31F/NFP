@@ -661,8 +661,8 @@ in
       {
         nfp.services.kong-gateway = {
           enable = config.services.ai-services.kong-gateway.enable;
-          host = "nami";
-          port = 8091;
+          host = config.networking.hostName;
+          port = config.services.ai-services.kong-gateway.proxyPort;
           homepage = {
             enable = true;
             category = "agents";

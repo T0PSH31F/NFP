@@ -143,14 +143,13 @@ in
         wayland.windowManager.hyprland = {
           enable = true;
           configType = "hyprlang";
-          package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
-          portalPackage =
-            inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
+          package = pkgs.hyprland;
+          portalPackage = pkgs.xdg-desktop-portal-hyprland;
           # Disabled: UWSM manages systemd integration (targets, env vars, session lifecycle).
           # Enabling this causes exec-once/exec-shutdown to fight UWSM over hyprland-session.target.
           systemd.enable = false;
-          # hypr-dynamic-cursors temporarily disabled: upstream 0.55 API break (CursorManager.hpp missing)
-          # TODO: re-enable after hyprland 0.55 compatible release
+          # hypr-dynamic-cursors available in nixpkgs via pkgs.hyprlandPlugins.hypr-dynamic-cursors.
+          # Temporarily disabled pending upstream hyprland API alignment.
           plugins = [ ];
 
           settings = {

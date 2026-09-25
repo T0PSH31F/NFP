@@ -75,7 +75,7 @@ with lib;
       {
         nfp.services.extreme-router = {
           enable = config.layers.layer-78.llm-routers.extreme-router.enable;
-          host = "z0r0";
+          host = config.networking.hostName;
           port = 20128;
           homepage = {
             enable = true;

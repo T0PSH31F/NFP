@@ -24,27 +24,45 @@
       home.packages = with pkgs; [
         adw-gtk3
         nwg-look
-        candy-icons
         hicolor-icon-theme
+        whitesur-icon-theme
+        papirus-icon-theme
+        rose-pine-icon-theme
       ];
 
       gtk = {
-        gtk4.theme = null;
         enable = true;
+        gtk4.theme = null;
         theme = {
           name = "adw-gtk3-dark";
           package = pkgs.adw-gtk3;
         };
         iconTheme = {
-          name = "candy-icons";
-          package = pkgs.candy-icons;
+          name = "whitesur-icons";
+          package = pkgs.whitesur-icon-theme;
         };
-        gtk4.extraConfig = {
-          gtk-application-prefer-dark-theme = 1;
+        font = {
+          name = "JetBrainsMono Nerd Font";
+          size = 15;
         };
         gtk3.extraConfig = {
           gtk-application-prefer-dark-theme = 1;
+          gtk-cursor-blink = true;
         };
+        gtk4.extraConfig = {
+          gtk-application-prefer-dark-theme = 1;
+          gtk-cursor-blink = true;
+        };
+        gtk2.extraConfig = ''
+          gtk-application-prefer-dark-theme = 1
+        '';
+      };
+
+      dconf.settings."org/gnome/desktop/interface" = {
+        color-scheme = "prefer-dark";
+        gtk-theme = "adw-gtk3-dark";
+        icon-theme = "whitesur-icons";
+        font-name = "JetBrainsMono Nerd Font 15";
       };
     };
 }

@@ -14,7 +14,7 @@ the `mount`/`login`/`swap` sibling outputs of `util-linux-2.42-bin`.
 
 **Quick fix from live USB:**
 ```bash
-echo 'Neonknightowlerik' | sudo cryptsetup open /dev/nvme0n1p3 cryptroot
+sudo cryptsetup open /dev/nvme0n1p3 cryptroot
 sudo mount -t btrfs -o subvol=@nix /dev/mapper/cryptroot /mnt/nix
 sudo nix build --store /mnt --no-link --print-out-paths \
   /nix/store/bq88bkx76z609nxa7851j39n4b619y7q-util-linux-minimal-2.42-mount
@@ -39,8 +39,8 @@ diagnosis checklist.
 ## 3. Recovery Environment
 
 - **Live USB**: NixOS minimal ISO, user `t0psh31f` with passwordless sudo
-- **LUKS password**: `Neonknightowlerik`
-- **Root password**: `5677`
+- **LUKS password**: Specified in secure local credentials store / sops
+- **Root password**: Specified in secure local credentials store / sops
 - **Flake location**: `/persist/home/t0psh31f/Clan/NFP` (on @persist subvol)
 - **Mount helper**: `./tools/mount-nfp.sh z0r0`
 - **Full guide**: `docs/AGENT_ONBOARDING.md`

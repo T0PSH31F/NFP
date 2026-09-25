@@ -50,11 +50,15 @@ in
       config = {
         common = {
           default = [ "gtk" ];
+          "org.freedesktop.impl.portal.AppChooser" = [ "gtk" ];
+          "org.freedesktop.impl.portal.FileChooser" = [ "gtk" ];
+          "org.freedesktop.impl.portal.OpenURI" = [ "gtk" ];
         };
 
         # Matches XDG_CURRENT_DESKTOP=Hyprland
         hyprland = {
           default = [ "gtk" ];
+          "org.freedesktop.impl.portal.AppChooser" = [ "gtk" ];
           "org.freedesktop.impl.portal.FileChooser" = [ "gtk" ];
           "org.freedesktop.impl.portal.OpenURI" = [ "gtk" ];
           "org.freedesktop.impl.portal.Print" = [ "gtk" ];
@@ -66,6 +70,7 @@ in
         # Matches XDG_CURRENT_DESKTOP=niri
         niri = {
           default = [ "gtk" ];
+          "org.freedesktop.impl.portal.AppChooser" = [ "gtk" ];
           "org.freedesktop.impl.portal.FileChooser" = [ "gtk" ];
           "org.freedesktop.impl.portal.OpenURI" = [ "gtk" ];
           "org.freedesktop.impl.portal.Print" = [ "gtk" ];
@@ -79,6 +84,8 @@ in
     environment.systemPackages = with pkgs; [
       polkit_gnome
       xdg-utils
+      desktop-file-utils
+      shared-mime-info
       seahorse
     ];
 

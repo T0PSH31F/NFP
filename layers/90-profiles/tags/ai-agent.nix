@@ -11,15 +11,16 @@
       codegraph.enable = lib.mkDefault true;
       kiro-cli.enable = lib.mkDefault true;
       dsh.enable = lib.mkDefault true;
+      crush.enable = lib.mkDefault true;
       herdr.enable = lib.mkDefault true;
       pi-coding-agent.enable = lib.mkDefault true;
       aider-chat.enable = lib.mkDefault true;
+      gitlab.enable = lib.mkDefault true;
     };
 
     layers.layer-72.voice.voice.enable = lib.mkDefault false;
 
     layers.layer-75.mcp.enable = lib.mkDefault true;
-    layers.layer-75.mcp.gateway.enable = lib.mkDefault true;
     layers.layer-76.hermes.enable = lib.mkDefault true;
     layers.layer-76.hermes.enableDesktop = lib.mkDefault (
       builtins.elem "desktop" config.machine.tags || (config.layers.layer-60.gui.enable or false)
@@ -32,15 +33,9 @@
     # LLM Routers
     layers.layer-78.llm-routers.extreme-router.enable = lib.mkDefault true;
 
-    # AI backends & user interfaces
-    services.ai-services = {
-      ollama.enable = lib.mkDefault true;
-      open-webui.enable = lib.mkDefault true;
-    };
-    services.sillytavern-app.enable = lib.mkDefault true;
-
     # Orchestration & control plane services
     layers.layer-79.skills.llm-agents-catalog.enable = lib.mkDefault true;
+    layers.layer-76.orchestrators.executor.enable = lib.mkDefault true;
     layers.layer-76.orchestrators.mission-control.enable = lib.mkDefault true;
     layers.layer-76.orchestrators.aionui.enable = lib.mkDefault true;
     layers.layer-76.orchestrators.paperclip.enable = lib.mkDefault true;

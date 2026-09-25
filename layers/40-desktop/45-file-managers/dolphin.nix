@@ -17,6 +17,11 @@
     home.packages = with pkgs; [
       kdePackages.dolphin
       kdePackages.dolphin-plugins
+      kdePackages.kservice
     ];
+
+    home.activation.kbuildsycoca = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      $DRY_RUN_CMD ${pkgs.kdePackages.kservice}/bin/kbuildsycoca6 --noincremental || true
+    '';
   };
 }
