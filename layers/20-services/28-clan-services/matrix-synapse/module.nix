@@ -81,43 +81,45 @@ in
             services.nginx.virtualHosts.${settings.app_domain} = {
               enableACME = true;
               forceSSL = true;
-              root = pkgs.runCommand "element-web-custom" { } ''
-                cp -a ${pkgs.element-web} $out
-                chmod +w $out/config.json
-                cp ${
-                  builtins.toFile "config.json" (
-                    builtins.toJSON {
-                      default_server_config = {
-                        "${"m.homeserver"}" = {
-                          base_url = "https://${settings.app_domain}:443";
-                          server_name = settings.server_tld;
+              root = lib.mkDefault (
+                pkgs.runCommand "element-web-custom" { } ''
+                  cp -a ${pkgs.element-web} $out
+                  chmod +w $out/config.json
+                  cp ${
+                    builtins.toFile "config.json" (
+                      builtins.toJSON {
+                        default_server_config = {
+                          "${"m.homeserver"}" = {
+                            base_url = "https://${settings.app_domain}:443";
+                            server_name = settings.server_tld;
+                          };
                         };
-                      };
-                      disable_custom_urls = false;
-                      disable_guests = true;
-                      disable_login_language_selector = false;
-                      disable_3pid_login = false;
-                      force_verification = false;
-                      brand = "Element";
-                      integrations_ui_url = "";
-                      integrations_rest_url = "";
-                      integrations_widgets_urls = [ ];
-                      default_widget_container_height = 280;
-                      default_country_code = "US";
-                      show_labs_settings = false;
-                      features = { };
-                      default_federate = true;
-                      default_theme = "dark";
-                      setting_defaults.breadcrumbs = true;
-                      jitsi.preferred_domain = "meet.element.io";
-                      element_call = {
-                        url = "https://call.element.io";
-                        brand = "Element Call";
-                      };
-                    }
-                  )
-                } $out/config.json
-              '';
+                        disable_custom_urls = false;
+                        disable_guests = true;
+                        disable_login_language_selector = false;
+                        disable_3pid_login = false;
+                        force_verification = false;
+                        brand = "Element";
+                        integrations_ui_url = "";
+                        integrations_rest_url = "";
+                        integrations_widgets_urls = [ ];
+                        default_widget_container_height = 280;
+                        default_country_code = "US";
+                        show_labs_settings = false;
+                        features = { };
+                        default_federate = true;
+                        default_theme = "dark";
+                        setting_defaults.breadcrumbs = true;
+                        jitsi.preferred_domain = "meet.element.io";
+                        element_call = {
+                          url = "https://call.element.io";
+                          brand = "Element Call";
+                        };
+                      }
+                    )
+                  } $out/config.json
+                ''
+              );
             };
 
             # Infrastructure requirements

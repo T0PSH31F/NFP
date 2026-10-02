@@ -4,22 +4,24 @@
   nixConfig = {
     extra-substituters = [
       "https://cache.nixos.org"
+      "https://cache.numtide.com"
+      "https://hyprland.cachix.org"
       "https://nix-community.cachix.org"
+      "https://noctalia.cachix.org"
       "https://numtide.cachix.org"
       "https://vicinae.cachix.org"
-      "https://hyprland.cachix.org"
       "https://niri.cachix.org"
-      "https://noctalia.cachix.org"
       "https://yazelix.cachix.org"
     ];
     extra-trusted-public-keys = [
       "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+      "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="
+      "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+      "noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4="
       "numtide.cachix.org-1:vSxzZPSh9OCpqJc572Mk9BdbrGMNSbR4F5O4/jVtHK8="
       "vicinae.cachix.org-1:1kDrfienkGHPYbkpNj1mWTr7Fm1+zcenzgTizIcI3oc="
-      "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
       "niri.cachix.org-1:Wv0OmO7PsuocRKzfDoJ3mulSl7Z6oezYhGhR+3W2964="
-      "noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4="
       "yazelix.cachix.org-1:ZgxIjQvaP0VTWL8Racx27mpUNzDJ97xC2y7QWYjmGNM="
     ];
   };
@@ -107,11 +109,6 @@
     };
 
     # ── AI & Agents ────────────────────────────────────────────
-    antigravity = {
-      url = "github:Jacopone/Antigravity-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-utils.follows = "flake-utils";
-    };
     camoufox-nix = {
       url = "github:maximoffua/camoufox-nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -132,10 +129,9 @@
       inputs.treefmt-nix.follows = "clan-core/treefmt-nix";
       inputs.systems.follows = "systems";
     };
-    nixai = {
-      url = "github:olafkfreund/nix-ai-help";
+    nixos-passthru-cache = {
+      url = "github:numtide/nixos-passthru-cache";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-utils.follows = "flake-utils";
     };
     omp = {
       url = "github:can1357/oh-my-pi";
@@ -148,6 +144,16 @@
       inputs.systems.follows = "systems";
       inputs.clan-core.follows = "clan-core";
       inputs.sops-nix.follows = "sops-nix";
+    };
+    lxconnect = {
+      url = "github:olafkfreund/lxconnect";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "flake-utils";
+    };
+    nix-skills = {
+      url = "github:olafkfreund/nix-skills";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
     };
 
     hister = {
@@ -233,7 +239,20 @@
             system:
             import inputs.nixpkgs {
               localSystem = system;
-              config.allowUnfree = true;
+              config = {
+                allowUnfree = true;
+                permittedInsecurePackages = [
+                  "beekeeper-studio-5.5.7"
+                  "olm-3.2.16"
+                  "nodejs-20.20.2"
+                  "nodejs-slim-20.20.2"
+                  "webull-desktop-9.3.0"
+                  "electron-40.10.5"
+                  "electron-41.10.3"
+                  "electron-41.10.6"
+                  "pnpm-10.29.2"
+                ];
+              };
             };
         };
 

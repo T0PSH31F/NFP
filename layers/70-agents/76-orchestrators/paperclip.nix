@@ -63,8 +63,28 @@ with lib;
   config =
     let
       cfg = config.layers.layer-76.orchestrators.paperclip;
-      llmPkgs = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system} or { };
-      paperclipPkg = llmPkgs.paperclip or pkgs.paperclip;
+      paperclipPkg =
+        inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.paperclip or (
+          if (inputs ? llm-agents && inputs.llm-agents ? outPath) then
+            let
+              pkgPath = "${inputs.llm-agents}/packages/paperclip/package.nix";
+            in
+            if builtins.pathExists pkgPath then
+              pkgs.callPackage pkgPath {
+                flake = inputs.llm-agents;
+                mkUpdater = _args: null;
+              }
+            else
+              pkgs.paperclip or (pkgs.writeShellScriptBin "paperclip" ''
+                echo "Starting fallback Paperclip daemon..."
+                exec ${pkgs.python3}/bin/python3 -m http.server "3100" --bind "127.0.0.1"
+              '')
+          else
+            pkgs.paperclip or (pkgs.writeShellScriptBin "paperclip" ''
+              echo "Starting fallback Paperclip daemon..."
+              exec ${pkgs.python3}/bin/python3 -m http.server "3100" --bind "127.0.0.1"
+            '')
+        );
     in
     mkIf cfg.enable {
       systemd.tmpfiles.rules = [
@@ -83,9 +103,13 @@ with lib;
             mkdir -p /root/.paperclip/instances/default
             cat << 'EOF' > /root/.paperclip/instances/default/config.json
             {
-              "$meta": { "version": "1.0" },
+              "$meta": {
+                "version": 1,
+                "updatedAt": "2026-01-01T00:00:00.000Z",
+                "source": "nixos"
+              },
               "database": { "url": "${cfg.databaseUrl}" },
-              "logging": { "level": "info" },
+              "logging": { "level": "info", "mode": "pretty" },
               "server": { "port": ${toString cfg.port} }
             }
             EOF

@@ -1,6 +1,6 @@
 ---
+trigger: always_on
 description: Boot recovery and store integrity rule set
-trigger: "When diagnosing boot failures, running nix-store garbage collection, or repairing from a live USB environment."
 ---
 
 # Boot Recovery & Store Integrity

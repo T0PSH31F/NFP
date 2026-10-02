@@ -1,9 +1,19 @@
-# flake-parts/system/caches.nix
-# Purpose:
-# - Centralize binary cache configuration (substituters and trusted keys)
-# - Ensure extra-trusted-substituters are correctly pulled in for all users
+{ config, ... }: {
+  services.harmonia.cache.enable = true;
 
-_: {
+  services.nixos-passthru-cache = {
+    enable = true;
+    hostName = "${config.networking.hostName}.nfp.nix";
+    lanMode = true;
+    stats = {
+      enable = true;
+      allowLocalOnly = false;
+      path = "/stats";
+    };
+  };
+
+  networking.firewall.allowedTCPPorts = [ 5000 ];
+
   nix = {
     sshServe = {
       enable = true;
@@ -19,24 +29,26 @@ _: {
       # Set the main substituters list
       # cache.nixos.org FIRST — it's the most populous cache; checking smaller
       # caches first wastes a round-trip per path on misses.
-      # cache.numtide.com kept last: unreachable from this network (timeouts).
-      # mic92.cachix.org removed 2026-08-07: timed out during builds (progress.md).
       substituters = [
         "https://cache.nixos.org"
+        "http://luffy.nfp.nix:5000"
+        "http://z0r0.nfp.nix:5000"
+        "http://nami.nfp.nix:5000"
         "https://nix-community.cachix.org"
         "https://numtide.cachix.org"
         "https://vicinae.cachix.org"
         "https://hyprland.cachix.org"
         "https://niri.cachix.org"
         "https://noctalia.cachix.org"
-        "https://yazelix.cachix.org"
+        "https://cache.numtide.com"
+        "https://yazelix.cachix.org" # disabled: timing out during downloads
       ];
 
       # Set the trusted public keys for the substituters above
       trusted-public-keys = [
-        "nix-cache-1:YhXcvDzqzmRyP4QCsHbH67iYcX7L0fGUt7dNfEGzJz0="
-        "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
         "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+        "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+        "nix-cache-1:YhXcvDzqzmRyP4QCsHbH67iYcX7L0fGUt7dNfEGzJz0="
         "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="
         "numtide.cachix.org-1:vSxzZPSh9OCpqJc572Mk9BdbrGMNSbR4F5O4/jVtHK8="
         "vicinae.cachix.org-1:1kDrfienkGHPYbkpNj1mWTr7Fm1+zcenzgTizIcI3oc="
@@ -44,11 +56,13 @@ _: {
         "niri.cachix.org-1:Wv0OmO7PsuocRKzfDoJ3mulSl7Z6oezYhGhR+3W2964="
         "noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4="
         "yazelix.cachix.org-1:ZgxIjQvaP0VTWL8Racx27mpUNzDJ97xC2y7QWYjmGNM="
-        # "cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g="  # re-enable when garnix recovers
       ];
 
-      # Ensure these are trusted for non-root users (making sure extra-trusted-substituters are pulled in)
+      # Ensure these are trusted for non-root users
       trusted-substituters = [
+        "http://luffy.nfp.nix:5000"
+        "http://z0r0.nfp.nix:5000"
+        "http://nami.nfp.nix:5000"
         "https://nix-community.cachix.org"
         "https://numtide.cachix.org"
         "https://cache.numtide.com"
@@ -56,7 +70,6 @@ _: {
         "https://hyprland.cachix.org"
         "https://niri.cachix.org"
         "https://noctalia.cachix.org"
-        "https://yazelix.cachix.org"
       ];
     };
   };

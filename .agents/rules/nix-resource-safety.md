@@ -1,6 +1,6 @@
 ---
+trigger: always_on
 description: Nix concurrency, resource safety, and flock coordination rules
-trigger: "always_on"
 ---
 
 # Nix Resource Safety & Concurrency Protocol

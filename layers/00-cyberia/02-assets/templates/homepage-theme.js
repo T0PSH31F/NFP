@@ -176,7 +176,7 @@
           <div class="constellation-stella-center" id="stella-center" aria-label="Vegapunk Stella Center">
             <img src="${constellation.center.icon}" alt="Stella" style="width: 44px; height: 44px;">
             <h3 style="font-family: var(--font-header); font-size: 0.9rem; color: #fff; margin-top: 4px;">STELLA</h3>
-            <span style="font-size: 0.7rem; color: var(--c-vegapunk);" id="bounty-jellyfin">฿ 12K RECORDS</span>
+            <span style="font-size: 0.7rem; color: var(--c-vegapunk);" id="bounty-jellyfin">฿ FETCHING...</span>
           </div>
 
           <div class="satellite-grid">
@@ -198,6 +198,37 @@
       </div>
     `;
     main.appendChild(sec);
+    setTimeout(drawConstellationLines, 100);
+    window.addEventListener('resize', drawConstellationLines);
+  }
+
+  function drawConstellationLines() {
+    const svg = document.getElementById('constellation-svg');
+    const centerEl = document.getElementById('stella-center');
+    if (!svg || !centerEl) return;
+
+    const layout = svg.closest('.constellation-layout');
+    if (!layout) return;
+
+    const layoutRect = layout.getBoundingClientRect();
+    const centerRect = centerEl.getBoundingClientRect();
+
+    if (layoutRect.width === 0 || layoutRect.height === 0) return;
+
+    const cx = centerRect.left + centerRect.width / 2 - layoutRect.left;
+    const cy = centerRect.top + centerRect.height / 2 - layoutRect.top;
+
+    const satCards = layout.querySelectorAll('.satellite-card');
+    let paths = '';
+
+    satCards.forEach(sat => {
+      const satRect = sat.getBoundingClientRect();
+      const sx = satRect.left + satRect.width / 2 - layoutRect.left;
+      const sy = satRect.top + satRect.height / 2 - layoutRect.top;
+      paths += `<line x1="${cx}" y1="${cy}" x2="${sx}" y2="${sy}" stroke="rgba(191,0,255,0.4)" stroke-width="2" stroke-dasharray="4 4"/>`;
+    });
+
+    svg.innerHTML = paths;
   }
 
   function renderSpeeddial(bookmarks) {
@@ -253,17 +284,30 @@
         const bountyEl = document.getElementById(`bounty-${svc.id}`);
         const errorEl = document.getElementById(`error-${svc.id}`);
 
-        if (data.error) {
-          if (snailEl) snailEl.innerHTML = DEN_DEN_MUSHI_SVGS.offline;
-          if (bountyEl) bountyEl.textContent = '฿ OFFLINE';
-          if (errorEl) {
+        const isOnline = data.status === 'online';
+        if (snailEl) {
+          snailEl.innerHTML = isOnline ? DEN_DEN_MUSHI_SVGS.online : DEN_DEN_MUSHI_SVGS.offline;
+        }
+
+        if (bountyEl) {
+          let statText = data.bountyStat || 'OPERATIONAL';
+          if (!isOnline && statText === 'OPERATIONAL') {
+            statText = 'OFFLINE';
+          }
+          if (statText.startsWith('⚡') || statText.startsWith('฿')) {
+            bountyEl.textContent = statText;
+          } else {
+            bountyEl.textContent = `฿ ${statText}`;
+          }
+        }
+
+        if (errorEl) {
+          if (data.error && data.error !== 'Metrics unavailable' && data.error !== 'Metrics credential unavailable') {
             errorEl.style.display = 'block';
             errorEl.innerHTML = `<div class="widget-error-pill">⚠️ ${data.error}</div>`;
+          } else {
+            errorEl.style.display = 'none';
           }
-        } else {
-          if (snailEl) snailEl.innerHTML = DEN_DEN_MUSHI_SVGS.online;
-          if (bountyEl) bountyEl.textContent = `฿ ${data.bountyStat || 'ONLINE'}`;
-          if (errorEl) errorEl.style.display = 'none';
         }
       } catch (err) {
         const snailEl = document.getElementById(`snail-${svc.id}`);
@@ -272,8 +316,7 @@
         if (snailEl) snailEl.innerHTML = DEN_DEN_MUSHI_SVGS.offline;
         if (bountyEl) bountyEl.textContent = '฿ UNREACHABLE';
         if (errorEl) {
-          errorEl.style.display = 'block';
-          errorEl.innerHTML = `<div class="widget-error-pill">⚠️ Connection Failed</div>`;
+          errorEl.style.display = 'none';
         }
       }
     }

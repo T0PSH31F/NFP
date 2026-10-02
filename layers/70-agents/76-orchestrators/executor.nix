@@ -81,13 +81,15 @@ with lib;
         serviceConfig = {
           User = primaryUser;
           Group = "users";
-          ExecStart = "${lib.getExe executorPkg} --port ${toString cfg.port} --host ${cfg.host}";
+          ExecStart = "${lib.getExe executorPkg}";
           Restart = "always";
           RestartSec = 5;
           WorkingDirectory = cfg.dataDir;
           Environment = [
             "EXECUTOR_PORT=${toString cfg.port}"
             "EXECUTOR_HOST=${cfg.host}"
+            "PORT=${toString cfg.port}"
+            "HOST=${cfg.host}"
             "HOME=/home/${primaryUser}"
           ];
           # Hardening

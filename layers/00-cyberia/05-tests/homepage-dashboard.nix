@@ -45,6 +45,42 @@
             title = "Caddy";
             subtitle = "Santoryu Navigation Routes";
             icon = "caddy";
+            metric = {
+              mode = "health-only";
+            };
+          };
+        };
+
+        nfp.services.adguard = {
+          enable = true;
+          host = "luffy";
+          bind = "127.0.0.1";
+          port = 3000;
+          tailnetName = "adguard";
+          tls = "headscale";
+          healthcheck = {
+            enable = true;
+            path = "/control/stats";
+            expectedStatus = [
+              200
+              401
+            ];
+          };
+          homepage = {
+            enable = true;
+            category = "zoro";
+            title = "AdGuard";
+            subtitle = "First Mate's Third Sword";
+            icon = "adguard";
+            metric = {
+              mode = "native-api";
+              adapter = "adguard";
+              fields = [
+                "queriesToday"
+                "blockedCount"
+                "blockedPercent"
+              ];
+            };
           };
         };
 
@@ -72,9 +108,15 @@
     assert "bookmarks" in config_json, "/api/config missing bookmarks"
     assert "widget_map" in config_json, "/api/config missing widget_map"
     assert "caddy" in config_json, "/api/config missing enabled caddy contract"
+    assert "adguard" in config_json, "/api/config missing enabled adguard contract"
 
-    # 3. Stubbed /api/widget/ returns clean status JSON without raw exception dumps
-    widget_json = machine.succeed("curl -s http://localhost:3007/api/widget/caddy")
-    assert "status" in widget_json or "bountyStat" in widget_json, "/api/widget/ response invalid"
+    # 3. Per-service widget endpoints return clean structured JSON with status, metric, and updatedAt
+    widget_caddy = machine.succeed("curl -s http://localhost:3007/api/widget/caddy")
+    assert "status" in widget_caddy and "metric" in widget_caddy, "/api/widget/caddy response invalid"
+    assert "updatedAt" in widget_caddy, "/api/widget/caddy missing updatedAt"
+
+    widget_adguard = machine.succeed("curl -s http://localhost:3007/api/widget/adguard")
+    assert "status" in widget_adguard and "metric" in widget_adguard, "/api/widget/adguard response invalid"
+    assert "updatedAt" in widget_adguard, "/api/widget/adguard missing updatedAt"
   '';
 }

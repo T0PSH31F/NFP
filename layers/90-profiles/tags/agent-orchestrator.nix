@@ -14,5 +14,6 @@
     layers.layer-76.orchestrators.executor.enable = lib.mkDefault true;
     layers.layer-76.orchestrators.mission-control.enable = lib.mkDefault true;
     layers.layer-76.orchestrators.paperclip.enable = lib.mkDefault true;
+    layers.layer-76.orchestrators.polyfloor.enable = lib.mkDefault true;
   };
 }

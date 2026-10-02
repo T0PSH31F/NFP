@@ -123,14 +123,7 @@ in
         # zellij tab-mode is ctrl+t → h/l ; this direct binding is more ergonomic.
         previous_tab = mkDefault "alt+shift+left";
         next_tab = mkDefault "alt+shift+right";
-        move_tab_previous = mkDefault "ctrl+shift+left";
-        move_tab_next = mkDefault "ctrl+shift+right";
 
-        # Direct resize without entering resize_mode (like holding Alt in zellij)
-        resize_pane_left = mkDefault "ctrl+alt+left";
-        resize_pane_down = mkDefault "ctrl+alt+down";
-        resize_pane_up = mkDefault "ctrl+alt+up";
-        resize_pane_right = mkDefault "ctrl+alt+right";
         # Modal resize (zellij ctrl+n analog) — prefix+r then h/j/k/l, Esc to exit
         resize_mode = mkDefault "prefix+r";
 

@@ -34,7 +34,7 @@ let
       #"openclaw"
       "opencode2"
       "openfang"
-      "picoclaw"
+      #"picoclaw"
       "prime-agent"
       "qoder-cli"
       #"qwen-code"
@@ -51,7 +51,7 @@ let
       "agentdesk"
       "gascity"
       "gastown"
-      "gnhf"
+      #"gnhf"
       "herdr"
       #"kandev"
       "luvus"
@@ -115,9 +115,9 @@ let
 
     guiApps = [
       "agentdesk"
-      #"antigravity-ide"
-      #"claude-desktop"
-      #hermes-desktop"
+      "antigravity-ide"
+      "claude-desktop"
+      "hermes-desktop"
       "hermes-hud"
       "hermes-one"
       "multica-desktop"
@@ -279,14 +279,23 @@ in
 
       guiCatalogPackages = [
         "agentdesk"
+        # "aionui"
         "antigravity-ide"
-        "chatgpt"
+        # "aperant"
+        # "claude-code-router"
         "claude-desktop"
-        "hermes-desktop"
+        # "hermes-desktop"
         "hermes-hud"
+        "hermes-one"
         "kandev-desktop"
+        "multica-desktop"
+        "openhands-agent-canvas"
+        "openspec-ui"
+        "openspecui"
         "paseo-desktop"
+        #"vessel-browser"
         "voxtype"
+        # "zcode"
       ];
 
       isGuiHost = hasTag "desktop" || (config.layers.layer-60.gui.enable or false);
@@ -303,9 +312,37 @@ in
         in
         if isGuiHost then rawNames else filter (name: !(elem name guiCatalogPackages)) rawNames;
 
+      customCallPackage =
+        path:
+        let
+          fn = import path;
+          fnArgs = builtins.functionArgs fn;
+          providedArgs = pkgs // {
+            flake = inputs.llm-agents;
+            systemdLibs = pkgs.systemdLibs or pkgs.systemd;
+            formatelf = llmPkgs.formatelf or null;
+          };
+          missingRequired = filter (arg: (!fnArgs.${arg}) && (!providedArgs ? ${arg})) (
+            builtins.attrNames fnArgs
+          );
+        in
+        if missingRequired == [ ] then fn (builtins.intersectAttrs fnArgs providedArgs) else null;
+
       resolvedPackages = filter (p: p != null) (
-        (map (name: llmPkgs.${name} or pkgs.${name} or null) effectivePackageNames)
-        ++ [ (inputs.hister.packages.${sys}.default or inputs.hister.defaultPackage.${sys} or null) ]
+        map (
+          name:
+          let
+            pkgPath = "${inputs.llm-agents}/packages/${name}/package.nix";
+          in
+          if (inputs ? llm-agents && inputs.llm-agents ? outPath && builtins.pathExists pkgPath) then
+            customCallPackage pkgPath
+          else
+            (pkgs.${name} or null)
+        ) effectivePackageNames
+        ++ [
+          (inputs.hister.packages.${sys}.default or inputs.hister.defaultPackage.${sys} or pkgs.hister or null
+          )
+        ]
       );
 
       voxtypeEnabled = elem "voxtype" effectivePackageNames && cfg.enable;

@@ -247,7 +247,7 @@ in
               ssl = true;
             }
           ];
-          root = elementWebPkg;
+          root = lib.mkForce elementWebPkg;
         };
         "searx.local".listen = lib.mkForce [
           {

@@ -69,6 +69,8 @@
       virtualization.enable = true;
       sessionResilience.enable = true;
     };
+    layer-75.mcp.lxconnect.enable = true;
+    layer-79.skills.nix-skills.enable = true;
   };
 
   services = {

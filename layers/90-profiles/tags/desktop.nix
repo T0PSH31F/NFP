@@ -52,6 +52,7 @@
         vlc.enable = lib.mkDefault true;
         wl_shimeji.enable = false;
         lmms.enable = lib.mkDefault true;
+        browsers.thunderbird.enable = lib.mkDefault true;
       };
     };
   };

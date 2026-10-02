@@ -131,8 +131,28 @@
         "extremerouter_api_key"
       ];
 
-      llmPkgs = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system} or { };
-      hermesDesktopPkg = llmPkgs.hermes-desktop or pkgs.hermes-desktop;
+      hermesDesktopPkg =
+        if (inputs ? llm-agents && inputs.llm-agents ? outPath) then
+          let
+            pkgPath = "${inputs.llm-agents}/packages/hermes-desktop/package.nix";
+          in
+          if builtins.pathExists pkgPath then
+            let
+              fn = import pkgPath;
+              fnArgs = builtins.functionArgs fn;
+              args = pkgs // {
+                flake = inputs.llm-agents;
+                hermes-agent =
+                  inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.hermes-agent
+                    or inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system}.default or pkgs.hermes-agent
+                      or null;
+              };
+            in
+            fn (builtins.intersectAttrs fnArgs args)
+          else
+            pkgs.hermes-desktop or null
+        else
+          pkgs.hermes-desktop or null;
     in
     lib.mkIf cfg.enable {
       # NixOS-level sops secrets for the hermes-env template.
@@ -152,6 +172,31 @@
             sopsFile = vicinaeSopsFile;
           };
         };
+
+      nfp.services.hermes = {
+        enable = config.layers.layer-76.hermes.enable;
+        host = config.networking.hostName;
+        bind = "127.0.0.1";
+        port = 9119;
+        tailnetName = "hermes";
+        tls = "headscale";
+        healthcheck = {
+          enable = true;
+          path = "/";
+          expectedStatus = [ 200 ];
+        };
+        homepage = {
+          enable = true;
+          category = "agents";
+          order = 5;
+          title = "Hermes Dashboard";
+          subtitle = "Autonomous Agent Control Plane";
+          icon = "hermes";
+          metric = {
+            mode = "health-only";
+          };
+        };
+      };
 
       services.hermes-agent = {
         enable = true;
@@ -386,7 +431,7 @@
         lib.optional cfg.enableDesktop hermesDesktopPkg
         ++ lib.filter (p: p != null) [
           pkgs.uni-pet
-          (llmPkgs.agentburn or pkgs.agentburn or null)
+          (pkgs.agentburn or null)
           # GLaDOS TTS alert voice (~/.local/bin/glados-tts-cli shells out to piper).
           # Kept here independent of layers.layer-72.voice (which drags in the whisper server).
           pkgs.piper-tts

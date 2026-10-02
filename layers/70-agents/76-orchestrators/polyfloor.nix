@@ -18,6 +18,8 @@ with lib;
 let
   polyfloorFlake = inputs.polyfloor;
   polyfloorPkg = polyfloorFlake.packages.${pkgs.stdenv.hostPlatform.system}.default;
+  polyfloorFullPkg =
+    polyfloorFlake.packages.${pkgs.stdenv.hostPlatform.system}.polyfloor-full or polyfloorPkg;
 in
 {
   # ── Import the upstream Polyfloor flake module ────────────────────
@@ -39,6 +41,19 @@ in
   # follows. Do not set `services.ai-services.polyfloor.*` directly on hosts.
   # Authoritative port is services.polyfloor.port (mkDefault 7777 below), NOT a
   # duplicate constant — legacy shim mirrors that authoritative value.
+  options.layers.layer-76.orchestrators.polyfloor = {
+    enable = mkOption {
+      type = types.bool;
+      default = false;
+      description = "Enable Polyfloor multi-agent orchestrator engine";
+    };
+    port = mkOption {
+      type = types.port;
+      default = 7777;
+      description = "Polyfloor HTTP service port";
+    };
+  };
+
   options.services.ai-services.polyfloor = {
     enable = mkOption {
       type = types.bool;
@@ -54,7 +69,8 @@ in
 
   config = mkMerge [
     {
-      services.polyfloor.port = mkDefault 7777;
+      services.polyfloor.enable = config.layers.layer-76.orchestrators.polyfloor.enable;
+      services.polyfloor.port = config.layers.layer-76.orchestrators.polyfloor.port;
 
       # Fleet-global contract: always declared so dashboard host sees it.
       # enable tracks actual service state on the evaluating host.
@@ -83,8 +99,8 @@ in
     (mkIf config.services.polyfloor.enable {
       # ── NFP defaults for the upstream module ────────────────────────
       services.polyfloor = {
-        # Backend daemon built from the flake input.
-        package = polyfloorPkg;
+        # Full daemon (backend + bundled static SPA frontend) built from flake input.
+        package = polyfloorFullPkg;
         host = lib.mkForce "0.0.0.0"; # Tailnet-reachable (firewall restricts to tailscale0/loopback via trustedInterfaces) — healthcheck probes nami.nfp.nix:7777
         dataDir = "/var/lib/polyfloor";
 
@@ -142,6 +158,23 @@ in
               }
             ];
           };
+
+      # Fix systemd StateDirectory collision with impermanence bind mounts
+      systemd.services.polyfloor.serviceConfig = {
+        StateDirectory = lib.mkForce "";
+        StateDirectoryMode = lib.mkForce "";
+        DynamicUser = lib.mkForce false;
+        User = "polyfloor";
+        Group = "polyfloor";
+      };
+
+      users.users.polyfloor = {
+        isSystemUser = true;
+        group = "polyfloor";
+        home = config.services.polyfloor.dataDir;
+        createHome = true;
+      };
+      users.groups.polyfloor = { };
 
     })
   ];

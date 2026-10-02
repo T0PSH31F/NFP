@@ -62,7 +62,7 @@ with lib;
           environment = {
             OLLAMA_API_BASE_URL = "http://localhost:11434";
             WEBUI_AUTH = "true";
-            OPENAI_API_BASE_URLS = "http://127.0.0.1:8642";
+            OPENAI_API_BASE_URLS = "http://127.0.0.1:20128/v1;http://127.0.0.1:8090/v1;http://127.0.0.1:8642";
           };
         };
       })

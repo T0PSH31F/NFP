@@ -55,6 +55,7 @@ in
       nb = "nom build";
       ndev = "nom develop";
       # Nix helpers
+      nwc = "nix-weather --cache cache.nixos.org .#nixosConfigurations.$(hostname).config.system.build.toplevel";
       ndiff = "nvd diff /run/current-system result";
       ntree = "nix-tree";
       mvi = "mpv --config-dir=$HOME/.config/mvi";

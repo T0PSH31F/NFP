@@ -63,8 +63,50 @@ in
       inherit (cfg) dataDir;
       configDir = "${cfg.dataDir}/.config/syncthing";
       inherit (cfg) guiAddress;
-      overrideDevices = false; # Allow dynamic pairing via web UI
-      overrideFolders = false;
+      overrideDevices = true;
+      overrideFolders = true;
+      settings = {
+        devices = {
+          z0r0 = {
+            id = "CNKR6GT-LSK37DB-H7YITY3-6OAKL4M-G47BYXJ-XXGFFPA-AGBVURA-EYD3LQK";
+            addresses = [
+              "tcp://127.0.0.1:22000"
+              "tcp://z0r0.nfp.nix:22000"
+              "dynamic"
+            ];
+          };
+          luffy = {
+            id = "CT4EUD2-FDYRUL4-REEEGPF-NK7VXO5-PWBWKXJ-7KBUVHD-GM4GG2Q-G7DK5AZ";
+            addresses = [
+              "tcp://luffy.nfp.nix:22000"
+              "tcp://192.168.1.54:22000"
+              "dynamic"
+            ];
+          };
+        };
+        folders = {
+          "clan-vault" = {
+            path = "${cfg.dataDir}/Clan";
+            devices = [
+              "z0r0"
+              "luffy"
+            ];
+            label = "Clan Vault";
+            ignorePerms = false;
+            rescanIntervalS = 60;
+          };
+          "projects-vault" = {
+            path = "${cfg.dataDir}/Projects";
+            devices = [
+              "z0r0"
+              "luffy"
+            ];
+            label = "Projects Vault";
+            ignorePerms = false;
+            rescanIntervalS = 60;
+          };
+        };
+      };
     };
 
     # Firewall - open Syncthing listening ports for Tailscale mesh

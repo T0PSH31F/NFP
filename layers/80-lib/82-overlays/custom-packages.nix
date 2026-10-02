@@ -52,6 +52,15 @@ final: prev: {
     ];
   });
 
+  # Antigravity Agent Control Protocol (ACP) server package
+  antigravity-acp =
+    prev.antigravity-acp or (if builtins.pathExists (prev.path + "/pkgs/by-name/an/antigravity-acp/package.nix") then
+      final.callPackage (prev.path + "/pkgs/by-name/an/antigravity-acp/package.nix") { }
+    else
+      final.writeShellScriptBin "antigravity-acp" ''
+        exec ${final.antigravity-cli}/bin/agy acp "$@"
+      '');
+
   # Fix for noto-fonts-subset build failure (cp fails when glob matches no files)
   noto-fonts-subset = final.runCommand "noto-fonts-subset" { } ''
     mkdir -p "$out/share/fonts/noto/"

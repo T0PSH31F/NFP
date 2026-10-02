@@ -2,6 +2,7 @@
 {
   imports = [
     ./base.nix
+    ./builders.nix
     ./caches.nix
     ./clan-lib.nix
     ./fonts.nix

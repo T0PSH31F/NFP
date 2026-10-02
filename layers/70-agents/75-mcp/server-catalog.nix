@@ -213,7 +213,13 @@ in
         (
           if s.transport == "stdio" then
             {
-              command = if s.command != null then s.command else lib.getExe s.package;
+              command =
+                if s.command != null then
+                  s.command
+                else if s.package != null && lib.isDerivation s.package then
+                  lib.getExe s.package
+                else
+                  "";
               inherit (s) args;
             }
           else

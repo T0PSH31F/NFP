@@ -140,6 +140,7 @@ in
             imports = [
               inputs.nixarr.nixosModules.default
               inputs.nixos-telemetry.nixosModules.default
+              inputs.nixos-passthru-cache.nixosModules.nixos-passthru-cache
             ];
           }
         )
@@ -157,6 +158,7 @@ in
             imports = [
               inputs.nixarr.nixosModules.default
               inputs.nixos-telemetry.nixosModules.default
+              inputs.nixos-passthru-cache.nixosModules.nixos-passthru-cache
             ];
           }
         )
@@ -174,6 +176,7 @@ in
             imports = [
               inputs.nixarr.nixosModules.default
               inputs.nixos-telemetry.nixosModules.default
+              inputs.nixos-passthru-cache.nixosModules.nixos-passthru-cache
             ];
           }
         )

@@ -28,6 +28,7 @@
       ];
 
       config = lib.mkIf osConfig.layers.layer-60.gui.spicetify.enable {
+        home.packages = lib.optional (spicePkgs ? spicetify-cli) spicePkgs.spicetify-cli;
 
         programs.spicetify = {
           enable = true;

@@ -54,8 +54,9 @@
     lib.mkIf cfg.enable {
       environment.systemPackages = [
         pkgs.antigravity-cli
+        pkgs.antigravity-acp
       ]
-      ++ lib.optional cfg.enableIde pkgs.antigravity-ide;
+      ++ lib.optional cfg.enableIde pkgs.antigravity-ide-fhs;
 
       environment.sessionVariables = {
         OPENAI_BASE_URL_KONG_ER = "http://nami:8090/v1";
@@ -71,6 +72,17 @@
       cfg = config.layers.layer-71.harness.antigravity;
     in
     lib.mkIf cfg.enable {
+      # Use nixpkgs Home Manager modules for antigravity-cli and antigravity (IDE)
+      programs.antigravity-cli = {
+        enable = true;
+        package = pkgs.antigravity-cli;
+      };
+
+      programs.antigravity = lib.mkIf cfg.enableIde {
+        enable = true;
+        package = pkgs.antigravity-ide-fhs;
+      };
+
       # Antigravity MCP & A2A Inter-Agent Gateway Configuration
       xdg.configFile."antigravity/mcp_config.json".text = builtins.toJSON {
         mcpServers = lib.optionalAttrs cfg.enableA2A {

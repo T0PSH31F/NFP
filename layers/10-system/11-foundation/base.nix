@@ -55,6 +55,7 @@
     "nodejs-slim-20.20.2"
     "webull-desktop-9.3.0"
     "electron-40.10.5"
+    "electron-41.10.3"
     "electron-41.10.6"
     "pnpm-10.29.2"
   ];

@@ -14,6 +14,7 @@
       crush.enable = lib.mkDefault true;
       herdr.enable = lib.mkDefault true;
       pi-coding-agent.enable = lib.mkDefault true;
+      omp.enable = lib.mkDefault true;
       aider-chat.enable = lib.mkDefault true;
       gitlab.enable = lib.mkDefault true;
     };
@@ -21,6 +22,7 @@
     layers.layer-72.voice.voice.enable = lib.mkDefault false;
 
     layers.layer-75.mcp.enable = lib.mkDefault true;
+    layers.layer-75.mcp.lxconnect.enable = lib.mkDefault true;
     layers.layer-76.hermes.enable = lib.mkDefault true;
     layers.layer-76.hermes.enableDesktop = lib.mkDefault (
       builtins.elem "desktop" config.machine.tags || (config.layers.layer-60.gui.enable or false)
@@ -29,6 +31,7 @@
     layers.layer-76.hermes-dashboard.enable = lib.mkDefault true;
     layers.layer-76.hermes-live-voice.enable = lib.mkDefault true;
     layers.layer-76.open-skills.enable = lib.mkDefault true;
+    layers.layer-79.skills.nix-skills.enable = lib.mkDefault true;
 
     # LLM Routers
     layers.layer-78.llm-routers.extreme-router.enable = lib.mkDefault true;
@@ -37,8 +40,9 @@
     layers.layer-79.skills.llm-agents-catalog.enable = lib.mkDefault true;
     layers.layer-76.orchestrators.executor.enable = lib.mkDefault true;
     layers.layer-76.orchestrators.mission-control.enable = lib.mkDefault true;
-    layers.layer-76.orchestrators.aionui.enable = lib.mkDefault true;
+    layers.layer-76.orchestrators.aionui.enable = lib.mkDefault false; # disabled: upstream better-sqlite3 compilation fails under Node 24
     layers.layer-76.orchestrators.paperclip.enable = lib.mkDefault true;
+    layers.layer-76.orchestrators.polyfloor.enable = lib.mkDefault true;
 
     # Memory chassis & gateway services
     layers.layer-73.memory.memory-vault.enable = lib.mkDefault true;

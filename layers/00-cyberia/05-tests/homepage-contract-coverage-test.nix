@@ -151,6 +151,14 @@ let
       name = "extreme-router";
       host = "z0r0";
     }
+    {
+      name = "hermes";
+      host = "z0r0";
+    }
+    {
+      name = "langfuse";
+      host = "luffy";
+    }
   ];
 
   # Get the right config for a host

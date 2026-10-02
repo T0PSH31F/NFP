@@ -16,7 +16,6 @@
     fileinfo # file info tool
     file
     xorg-cf-files # Fixes for mime type resolution
-    inputs.nixai.packages.${pkgs.stdenv.hostPlatform.system}.default
   ];
 
   xdg.mimeApps = {

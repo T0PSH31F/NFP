@@ -71,6 +71,9 @@ with lib;
       statix
       vulnix
     ];
+    environment.shellAliases = {
+      nwc = "nix-weather .#nixosConfigurations.$(hostname).config.system.build.toplevel";
+    };
     # Enable core system tools
     programs = {
       command-not-found.enable = false;
