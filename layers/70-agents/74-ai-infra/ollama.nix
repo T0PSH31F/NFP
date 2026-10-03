@@ -50,7 +50,7 @@ with lib;
       {
         nfp.services.ollama = {
           inherit (cfg) enable;
-          host = config.networking.hostName;
+          host = "nami";
           port = 11434;
           homepage = {
             enable = false; # Backend API — accessed through Open WebUI or oterm

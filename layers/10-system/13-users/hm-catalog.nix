@@ -21,7 +21,6 @@
       # references it inside mkIf cfg.enable). On headless hosts cfg.enable
       # is always false, so vicinae never activates.
       inputs.vicinae.homeManagerModules.default
-      inputs.nix-skills.homeManagerModules.default
     ];
   };
 }

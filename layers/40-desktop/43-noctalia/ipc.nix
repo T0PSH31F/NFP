@@ -11,6 +11,10 @@ let
 in
 {
   config = lib.mkIf cfg.enable {
+    # Global env for all compositors + systemd user session (fixes missing NOCTALIA_SOCKET with Niri/UWSM)
+    home.sessionVariables.NOCTALIA_SOCKET = "${config.home.homeDirectory}/.cache/noctalia/noctalia.sock";
+    systemd.user.sessionVariables.NOCTALIA_SOCKET = "${config.home.homeDirectory}/.cache/noctalia/noctalia.sock";
+
     home.packages = [
       cfg.package
       (pkgs.writeShellApplication {
@@ -41,7 +45,7 @@ in
     wayland.windowManager.hyprland.settings.env =
       lib.mkIf (cfg.backend == "hyprland" || cfg.backend == "both")
         [
-          "NOCTALIA_SOCKET,~/.cache/noctalia/noctalia.sock"
+          "NOCTALIA_SOCKET,$HOME/.cache/noctalia/noctalia.sock"
         ];
   };
 }

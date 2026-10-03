@@ -119,7 +119,7 @@ with lib;
       {
         nfp.services.omniroute = {
           enable = config.services.ai-services.omniroute.enable;
-          host = config.networking.hostName;
+          host = "nami";
           port = 20129;
           homepage = {
             enable = true;
