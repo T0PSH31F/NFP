@@ -19,6 +19,7 @@ in
       pkgs.deluge
       pkgs.ffmpeg
       pkgs.jellyfin-desktop
+      pkgs.orca
       pkgs.pirate-get
       pkgs.spotdl
       pkgs.transmission_4

@@ -176,6 +176,10 @@ in
       };
       users.groups.polyfloor = { };
 
+      systemd.tmpfiles.rules = [
+        "d ${config.services.polyfloor.dataDir} 0750 polyfloor polyfloor -"
+      ];
+
     })
   ];
 }

@@ -49,6 +49,7 @@
         librewolf.enable = lib.mkDefault true;
         mopidy.enable = lib.mkDefault true;
         spicetify.enable = lib.mkDefault true;
+        media-packages.enable = lib.mkDefault true;
         vlc.enable = lib.mkDefault true;
         wl_shimeji.enable = false;
         lmms.enable = lib.mkDefault true;
