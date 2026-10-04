@@ -161,8 +161,8 @@ in
 
       # Fix systemd StateDirectory collision with impermanence bind mounts
       systemd.services.polyfloor.serviceConfig = {
-        StateDirectory = lib.mkForce "";
-        StateDirectoryMode = lib.mkForce "";
+        StateDirectory = lib.mkForce "polyfloor";
+        StateDirectoryMode = lib.mkForce "0750";
         DynamicUser = lib.mkForce false;
         User = "polyfloor";
         Group = "polyfloor";
