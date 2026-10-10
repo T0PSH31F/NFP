@@ -172,11 +172,54 @@ Append one entry per session, newest at the bottom. Never edit past entries.
 - **Work done:** Integrated `herdr` terminal workspace manager harness on `z0r0` via `inputs.llm-agents` (`herdr.nix`, `ai-agent.nix`). Removed `codingRouter` XOR logic in `kong-gateway.nix` allowing `extremerouter-llm` (`http://z0r0:20128`) and `omniroute-llm` (`http://127.0.0.1:20129`) to run simultaneously on `nami:8090`. Bound `extreme-router.nix` to loopback and tailnet interface (`tailscale0`) with firewall isolation. Updated `omniroute.nix` default port to `20129`. Updated homepage dashboard and documentation.
 - **Verification:** `./init.sh` green; `nix eval` confirmed `z0r0.herdr.enable = true`, `z0r0.systemPackages` contains `herdr-0.8.2`, `z0r0.extreme-router.enable = true`, `nami.kong-gateway.enable = true`, `nami.omniroute.enable = true`; `z0r0`, `luffy`, `nami` system toplevel drvPaths evaluated cleanly.
 - **State change:** passing (evidence recorded in feature_list.json)
-- **Next action:** Deploy changes to `z0r0` (`clan machines update z0r0`) and `nami` (`clan machines update nami`).
+- **Date / Agent:** 2026-10-10 / antigravity
+- **Feature:** homepage-dashboard-widget-metrics
+- **Work done:** Reconciled Homepage Dashboard operational state, restored per-widget metric fields on cards, aligned Vegapunk constellation layout with original Lovable design, and hardened error handling:
+  1. Configured service contracts (`nfp.services.*`) with `mode = "native-api"`, adapter hooks, and `fields`: `filebrowser` (files, size), `glances` (cpu, ram, net), `romm` (roms, platforms), `calibre-web` (books, authors), `komga` (books, series), `audiobookshelf` (items, authors), `lidarr` (artists, albums), `bazarr` (subtitles).
+  2. Created 4 missing local SVG icons (`filebrowser.svg`, `glances.svg`, `lidarr.svg`, `bazarr.svg`) to avoid fallback glyphs.
+  3. Upgraded `homepage-dashboard.nix`: wired `vegapunk` category into `categoryKeys` & `categoryMeta`; passed services list into `constellationData`; implemented live metric transformers in `fetch_adapter_metrics` returning flat metrics + `fields` mapping; ensured unreachable services return explicit `status: "offline"`, `error: "Metrics unavailable"`, and `bountyStat: "Metrics unavailable"` (no silent fallback).
+  4. Redesigned `homepage-theme.js` & `homepage-theme.css`: implemented 420x420 orbital constellation stage with Stella center and satellite nodes mapped to circular coordinates with SVG connection spokes; added `.card-metrics-grid` rendering declared contract `${svc.metric.fields}`; updated `pollWidgetMetrics` to display `METRICS UNAVAILABLE` badge on failure; cleaned up broken responsive classes.
+  5. Extended VM acceptance test (`layers/00-cyberia/05-tests/homepage-dashboard.nix`): added `mock-sensors.service` testing `/api/widget/<id>` JSON response, mapped metric fields for online services, safe `Metrics unavailable` for offline nodes, deterministic ordering, non-cache-inflating cache hits within TTL, and clean browser render without URL leaks.
+- **Verification:**
+  - `nix build .#checks.x86_64-linux.homepage-dashboard-test` PASSED in 47.68s.
+  - `nix eval .#nixosConfigurations.luffy.config.layers.layer-20.services.config.homepage-dashboard.enable` returned `true`.
+  - `nix fmt` passed cleanly.
+  - `./init.sh --worktree` passed completely across z0r0, luffy, and nami.
+- **State change:** passing (evidence recorded in feature_list.json)
+- **Date / Agent:** 2026-10-10 / antigravity
+- **Feature:** beeper-mcp-and-mautrix-bridges
+- **Work done:**
+  1. Configured Beeper Desktop module (`layers/60-gui-programs/68-communication/beeper.nix`) providing `pkgs.beeper` and `pkgs.beeper-bridge-manager` (`bbctl`), MCP server integration, optional autostart service, and option alias `layers.layer-60.gui.beeper`.
+  2. Registered Beeper Desktop MCP tool suite (`http://127.0.0.1:23373/v0/mcp`) in `layers/70-agents/75-mcp/server-catalog.nix` and `layers/70-agents/71-harness/antigravity.nix`, auto-populating `~/.config/mcp/config.json` and `~/.config/Claude/claude_desktop_config.json` for AI agents (Antigravity, Claude, Hermes, OpenCode).
+  3. Reconciled Synapse Matrix homeserver domain to `matrix.lovelain.duckdns.org` in `machines/luffy/default.nix` and `layers/90-profiles/tags/homelab.nix`.
+  4. Hardened native Mautrix bridges (`mautrix.nix`) with admin permissions, PostgreSQL dependencies, and added declarative container bridges for `gvoice` (29337) and `linkedin` (29338).
+  5. Documented port 23373 in `layers/00-cyberia/01-docs/ports.md`.
+- **Verification:**
+  - `nix eval .#nixosConfigurations.z0r0.config.layers.layer-60.gui.communication.beeper.enable` returned `true`.
+  - `nix eval --json .#nixosConfigurations.z0r0.config.layers.layer-75.mcp.clientConfigs.beeper` returned valid URL `http://127.0.0.1:23373/v0/mcp`.
+  - `nix eval .#nixosConfigurations.luffy.config.networking.hostName` returned `"luffy"`.
+- **State change:** passing
+- **Date / Agent:** 2026-10-10 / antigravity
+- **Feature:** homepage-dashboard-widget-metrics
+- **Work done:** Deployed NFP Homepage dashboard to `luffy` via `clan machines update luffy`. Resolved build lock contention and source transfer bottleneck. Verified live Python daemon (PID 2910115), typed API widget metrics (`adguard`, `sonarr`, `radarr`, `prowlarr`, `qbittorrent`), and HTTP 200 SVG assets.
+- **Verification:** `clan machines update luffy` passed; `systemctl status homepage-dashboard.service` active; `curl http://127.0.0.1:3007/api/widget/<id>` verified live metrics; `curl -o /dev/null -w "%{http_code}" /assets/icons/*.svg` returned 200.
+- **State change:** passing (evidence recorded in feature_list.json)
 
-
-
-
-
-
-
+- **Date / Agent:** 2026-10-10 / antigravity
+- **Feature:** homepage-launch-urls-fleet-services-constellation
+- **Work done:**
+  1. Diagnosed broken Board Ship URLs: MagicDNS only registers host nodes (`luffy.nfp.nix`, etc.) returning NXDOMAIN for arbitrary subdomains, and ACME fails on private `.nfp.nix`.
+  2. Extended `mkServiceContract.nix` with explicit `homepage.dashboardUrl` option, separating backend upstream, metrics, health, and client dashboard URLs.
+  3. Upgraded `homepage-dashboard.nix` to use recursion-safe fleet aggregation across all `nixosConfigurations`, distinguishing multiple instances via `${id}@${remoteName}` with provenance labels.
+  4. Restored missing fleet services: Netdata enabled across all 3 hosts on port 19999 bound to `0.0.0.0`; Headplane default port moved from colliding 3000 to 3050 with config path fix; OmniRoute port bound to all interfaces; Paperclip default port fixed to 3101 with no localhost leak; AionUI added contract and firewall; Loki split into dedicated "Loki Logs" entry opening Grafana Explore; FileBrowser audited as active server-side file UI on `nami:8085`.
+  5. Created local SVG assets: `headplane.svg`, `aionui.svg`, `loki.svg`.
+  6. Repaired constellation layout and telemetry: added `min-width: 0` to prevent grid overflow, added keyboard navigation (`role="button" tabindex="0"` with Enter/Space support) to Stella and satellites, replaced fake `99.9%` uptime with "Not measured", and dynamically updated reachable counts.
+  7. Updated VM test suite (`homepage-dashboard.nix`, `homepage-contract-coverage-test.nix`) and verified 100% test pass.
+- **Verification:**
+  - `./init.sh --worktree` passed cleanly (5/5 checks).
+  - `nix build .#checks.x86_64-linux.homepage-contract-coverage` passed.
+  - `nix build .#checks.x86_64-linux.tailnet-dns-guard` passed.
+  - `nix build .#checks.x86_64-linux.luffy-service-scope` passed.
+  - `nix build .#checks.x86_64-linux.homepage-dashboard-test.driver` passed.
+- **State change:** passing
+- **Next action:** Present review packet to Erik; await explicit approval before deployment.

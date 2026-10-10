@@ -388,8 +388,13 @@ html, body {
 /* Service Grid Layout */
 .services-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
   gap: 1.5rem;
+  min-width: 0;
+}
+
+.services-grid > * {
+  min-width: 0;
 }
 
 /* --------------------------------------------------------------------------
@@ -397,6 +402,7 @@ html, body {
    -------------------------------------------------------------------------- */
 .wanted-card {
   position: relative;
+  min-width: 0;
   background: var(--card-bg);
   border: 1px solid var(--card-border);
   border-radius: var(--radius-lg);
@@ -513,6 +519,82 @@ html, body {
   50% { transform: scale(1.08); }
 }
 
+/* Card Metric Fields Grid */
+.card-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+  padding: 8px 10px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-sm);
+  min-height: 44px;
+}
+
+.card-metrics-grid:empty {
+  display: none;
+}
+
+.metric-field-item {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.metric-field-key {
+  font-family: var(--font-header);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.metric-field-val {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.85rem;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.metric-unavailable-pill {
+  grid-column: 1 / -1;
+  font-family: var(--font-header);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #fca5a5;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: 4px;
+  padding: 4px 8px;
+  text-align: center;
+  letter-spacing: 0.02em;
+}
+
+.metric-unavailable-pill.error-state {
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.18);
+  border-color: rgba(239, 68, 68, 0.35);
+}
+
+.metric-health-pill {
+  grid-column: 1 / -1;
+  font-family: var(--font-header);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #86efac;
+  background: rgba(34, 197, 94, 0.12);
+  border: 1px solid rgba(34, 197, 94, 0.25);
+  border-radius: 4px;
+  padding: 4px 8px;
+  text-align: center;
+  letter-spacing: 0.02em;
+}
+
 /* Bounty Metric Display */
 .card-bounty-box {
   padding: 8px 12px;
@@ -593,27 +675,26 @@ html, body {
 /* --------------------------------------------------------------------------
    8. Category 5: Vegapunk Records Satellite Constellation
    -------------------------------------------------------------------------- */
-.constellation-container {
-  position: relative;
-  background: rgba(15, 23, 42, 0.6);
-  border: 1px solid rgba(191, 0, 255, 0.3);
-  border-radius: var(--radius-lg);
-  padding: 2rem;
+.constellation-stage-wrapper {
   display: flex;
-  flex-direction: column;
-  gap: 2rem;
-  box-shadow: inset 0 0 30px rgba(191, 0, 255, 0.1);
-}
-
-.constellation-layout {
-  position: relative;
-  min-height: 480px;
-  display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
+  padding: 1.5rem 0 2rem;
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
 }
 
-.constellation-lines-svg {
+.constellation-orbit-stage {
+  position: relative;
+  width: 420px;
+  height: 420px;
+  max-width: 100%;
+  flex-shrink: 0;
+}
+
+.constellation-orbit-svg {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -621,55 +702,104 @@ html, body {
   pointer-events: none;
 }
 
-.constellation-stella-center {
-  position: relative;
-  z-index: 10;
-  width: 140px;
-  height: 140px;
+.constellation-stella-node {
+  position: absolute;
+  left: 165px;
+  top: 165px;
+  width: 90px;
+  height: 90px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(191, 0, 255, 0.4), rgba(10, 10, 31, 0.9));
+  background: radial-gradient(circle, rgba(191, 0, 255, 0.4), rgba(10, 10, 31, 0.95));
   border: 2px solid var(--c-vegapunk);
-  box-shadow: 0 0 30px var(--c-vegapunk);
+  box-shadow: 0 0 25px rgba(191, 0, 255, 0.6);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  text-align: center;
-  padding: 10px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  z-index: 10;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.constellation-stella-center:hover {
+.constellation-stella-node:hover {
   transform: scale(1.08);
-  box-shadow: 0 0 50px var(--c-vegapunk);
+  box-shadow: 0 0 40px rgba(191, 0, 255, 0.9);
 }
 
-.satellite-grid {
+.stella-node-icon {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  margin-bottom: 2px;
+}
+
+.stella-node-title {
+  font-family: var(--font-header);
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 0.05em;
+  line-height: 1;
+}
+
+.stella-node-sub {
+  font-size: 0.62rem;
+  color: var(--c-vegapunk);
+  line-height: 1.2;
+}
+
+.satellite-orbit-node {
   position: absolute;
-  inset: 0;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1.5rem;
-  align-content: space-between;
-}
-
-.satellite-card {
-  position: relative;
-  z-index: 5;
-  background: rgba(15, 23, 42, 0.85);
-  border: 1px solid rgba(191, 0, 255, 0.25);
-  border-radius: var(--radius-md);
-  padding: 1rem;
+  transform: translate(-50%, -50%);
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  transition: all 0.3s ease;
+  align-items: center;
+  cursor: pointer;
+  z-index: 8;
+  transition: transform 0.25s ease, opacity 0.3s ease;
 }
 
-.satellite-card:hover {
+.satellite-orbit-node:hover {
+  transform: translate(-50%, -50%) scale(1.15);
+}
+
+.satellite-node-bubble {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.9);
+  border: 1.5px solid rgba(191, 0, 255, 0.5);
+  box-shadow: 0 0 12px rgba(191, 0, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  transition: all 0.2s ease;
+}
+
+.satellite-bubble-img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.satellite-orbit-node:hover .satellite-node-bubble {
   border-color: var(--c-vegapunk);
-  box-shadow: 0 0 20px rgba(191, 0, 255, 0.3);
+  box-shadow: 0 0 20px var(--c-vegapunk);
+}
+
+.satellite-node-label {
+  margin-top: 4px;
+  font-family: var(--font-header);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #cbd5e1;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: rgba(15, 23, 42, 0.7);
+  padding: 2px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
 }
 
 /* Brook 💀🎵 Soul King Easter Egg */
@@ -785,17 +915,14 @@ html, body {
    -------------------------------------------------------------------------- */
 @media (max-width: 1024px) {
   .services-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
-  .satellite-grid { grid-template-columns: repeat(2, 1fr); }
-  .constellation-layout { min-height: auto; flex-direction: column; gap: 2rem; }
-  .satellite-grid { position: relative; }
 }
 
 @media (max-width: 768px) {
   .command-bar { padding: 0 1rem; }
   .search-container { width: 180px; }
   .nav-stats-bar { display: none; }
+  .constellation-stage-wrapper { display: none; }
   .services-grid { grid-template-columns: 1fr; }
-  .satellite-grid { grid-template-columns: 1fr; }
 }
 
 @media (prefers-reduced-motion: reduce) {
