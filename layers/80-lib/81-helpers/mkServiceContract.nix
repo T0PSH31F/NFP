@@ -126,6 +126,12 @@ let
             description = "Optional Vegapunk satellite tag.";
           };
 
+          dashboardUrl = mkOption {
+            type = types.nullOr types.str;
+            default = null;
+            description = "Explicit client dashboard URL override (e.g. public FQDN, Grafana explore route, or external service). When null, derived via fleet resolver.";
+          };
+
           logs = {
             enable = mkOption {
               type = types.bool;

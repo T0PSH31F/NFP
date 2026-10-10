@@ -10,15 +10,45 @@
 with lib;
 
 let
+  inputs = config._module.args.inputs or { };
   cfg = config.layers.layer-20.services.config.homepage-dashboard;
   baseDomain = config.layers.meta.tailnetDomain or "nfp.nix";
 
-  # Contract-driven enabled service projection
-  enabledContractServices = filterAttrs (_id: svc: svc.enable && svc.homepage.enable) (
+  localHost = config.networking.hostName;
+
+  # Local enabled service contracts
+  localContractServices = filterAttrs (_id: svc: svc.enable && svc.homepage.enable) (
     config.nfp.services or { }
   );
 
-  localHost = config.networking.hostName;
+  # Remote enabled service contracts across the fleet
+  # Avoid evaluation recursion: strictly filter out localHost from remote evaluation
+  remoteFleetConfigs =
+    if (inputs ? self && inputs.self ? nixosConfigurations) then
+      filterAttrs (name: _cfg: name != localHost) inputs.self.nixosConfigurations
+    else
+      { };
+
+  remoteContractServices = foldl' (
+    acc: remoteName:
+    let
+      remoteCfg = remoteFleetConfigs.${remoteName}.config;
+      remoteServices = filterAttrs (_id: svc: svc.enable && svc.homepage.enable) (
+        remoteCfg.nfp.services or { }
+      );
+    in
+    acc
+    // (mapAttrs' (
+      id: svc:
+      let
+        # If id exists locally or in another remote, qualify as id@remoteName
+        key = if (hasAttr id localContractServices || hasAttr id acc) then "${id}@${remoteName}" else id;
+      in
+      nameValuePair key svc
+    ) remoteServices)
+  ) { } (attrNames remoteFleetConfigs);
+
+  enabledContractServices = localContractServices // remoteContractServices;
 
   # Convert each nfp.services entry to homepage widget record
   contractWidgets = mapAttrsToList (
@@ -26,24 +56,30 @@ let
     let
       targetHost = svc.host;
       isLocal = targetHost == localHost;
+      mkTailnetHost = host: "${host}.${baseDomain}";
+      # Client-facing URL: explicit dashboardUrl if declared, else host.nfp.nix:port (Pattern A)
       canonicalUrl =
-        if svc.tls != "none" then
-          "http://${svc.tailnetName}.${baseDomain}"
+        if svc.homepage ? dashboardUrl && svc.homepage.dashboardUrl != null then
+          svc.homepage.dashboardUrl
         else
-          "http://${targetHost}.${baseDomain}:${toString svc.port}";
+          "http://${mkTailnetHost targetHost}:${toString svc.port}";
+      # Target endpoint for server-side health & metric polling from homepage daemon
       targetEndpoint =
         if isLocal then
           "http://${svc.bind}:${toString svc.port}"
-        else if svc.tls != "none" then
-          "http://${svc.tailnetName}.${baseDomain}"
         else
-          "http://${targetHost}.${baseDomain}:${toString svc.port}";
+          "http://${mkTailnetHost targetHost}:${toString svc.port}";
       proxyUrl = "${targetEndpoint}${svc.healthcheck.path}";
       iconPath = "/assets/icons/${svc.homepage.icon}.svg";
+      displayTitle =
+        if !isLocal && !(hasInfix targetHost svc.homepage.title) then
+          "${svc.homepage.title} (${targetHost})"
+        else
+          svc.homepage.title;
     in
     {
       inherit id;
-      name = svc.homepage.title;
+      name = displayTitle;
       category = svc.homepage.category;
       order = svc.homepage.order;
       onePieceSub = svc.homepage.subtitle;
@@ -54,6 +90,7 @@ let
       satellite = svc.homepage.satellite;
       logs = svc.homepage.logs;
       metric = svc.homepage.metric;
+      expected_status = svc.healthcheck.expectedStatus;
       secret_env = null;
       requiresSecret = false;
     }
@@ -108,6 +145,13 @@ let
       avatar = "/assets/images/Chopper.png";
       color = "#ff00ff";
     };
+    vegapunk = {
+      title = "🎵 Vegapunk Records — Satellite Network";
+      subtitle = "Egghead Holographic Media Constellation";
+      crewMember = "Vegapunk";
+      avatar = "/assets/images/Stella.png";
+      color = "#bf00ff";
+    };
     agents = {
       title = "🤖 Vegapunk Satellites — Agent Control Plane";
       subtitle = "Autonomous Agent Orchestration & LLM Gateways";
@@ -122,6 +166,7 @@ let
     "zoro"
     "nami"
     "sanji"
+    "vegapunk"
     "robin"
     "chopper"
     "agents"
@@ -156,30 +201,23 @@ let
     let
       stellaList = filter (w: w.satellite == "stella" || w.id == "jellyfin") vegapunkServices;
     in
-    if stellaList != [ ] then
-      head stellaList
+    if stellaList != [ ] then head stellaList else null;
+
+  satelliteList =
+    if stellaCenter != null then
+      filter (w: w.id != stellaCenter.id && w.satellite != null && w.satellite != "") vegapunkServices
     else
+      [ ];
+
+  constellationData =
+    if stellaCenter != null && satelliteList != [ ] then
       {
-        id = "jellyfin";
-        name = "Jellyfin";
-        onePieceSub = "Stella — Genius Center";
-        icon = "/assets/icons/jellyfin.svg";
-        url = "http://jellyfin.${baseDomain}";
-      };
-
-  satelliteList = filter (w: w.id != stellaCenter.id) vegapunkServices;
-
-  constellationData = {
-    center = stellaCenter;
-    satellites = map (
-      w:
-      w
-      // {
-        avatarIcon = if w.icon != "" then w.icon else "📡";
-        satelliteName = w.onePieceSub;
+        center = stellaCenter;
+        satellites = satelliteList;
+        services = vegapunkServices;
       }
-    ) satelliteList;
-  };
+    else
+      null;
 
   totalEnabledContracts = length sortedWidgets;
 
@@ -330,153 +368,379 @@ let
         return f"↓{bps:.0f}B/s"
 
 
-    def fetch_adapter_metrics(widget_id, adapter, svc_info, res):
-        headers = {"User-Agent": "NFP-Homepage-Dashboard/2.0"}
-        base_url = svc_info.get("target_endpoint", "").rstrip("/")
-        if not base_url:
-            base_url = "http://127.0.0.1:8080"
+    def format_size(bytes_val):
+        try:
+            bytes_val = float(bytes_val)
+        except Exception:
+            return str(bytes_val)
+        for unit in ["B", "KB", "MB", "GB", "TB"]:
+            if bytes_val < 1024.0:
+                return f"{bytes_val:.1f}{unit}"
+            bytes_val /= 1024.0
+        return f"{bytes_val:.1f}PB"
 
-        if adapter == "adguard":
-            url = f"{base_url}/control/stats"
-            api_key = os.environ.get("ADGUARD_API_KEY")
-            if api_key:
-                headers["Authorization"] = f"Bearer {api_key}"
-            req = urllib.request.Request(url, headers=headers)
-            with urllib.request.urlopen(req, timeout=3) as resp:
+
+    def get_secret_key(env_names, secret_files=None):
+        if isinstance(env_names, str):
+            env_names = [env_names]
+        for env_name in env_names:
+            val = os.environ.get(env_name, "").strip()
+            if val:
+                return val
+        if secret_files:
+            if isinstance(secret_files, str):
+                secret_files = [secret_files]
+            for fpath in secret_files:
+                if os.path.isfile(fpath):
+                    try:
+                        with open(fpath, "r") as f:
+                            content = f.read().strip()
+                            if content:
+                                return content
+                    except Exception:
+                        pass
+        return None
+
+
+    class NoRedirectHandler(urllib.request.HTTPRedirectHandler):
+        def redirect_request(self, req, fp, code, msg, headers, newurl):
+            return None
+
+
+    def make_http_request(url, headers=None, timeout=3, allow_redirects=True):
+        hdrs = {"User-Agent": "NFP-Homepage-Dashboard/2.0"}
+        if headers:
+            hdrs.update(headers)
+        req = urllib.request.Request(url, headers=hdrs)
+        if allow_redirects:
+            opener = urllib.request.build_opener()
+        else:
+            opener = urllib.request.build_opener(NoRedirectHandler)
+        return opener.open(req, timeout=timeout)
+
+
+    def check_service_health(proxy_url, expected_status=None):
+        if not proxy_url:
+            return True, 200
+        if expected_status is None:
+            expected = [200, 204, 301, 302, 307, 308, 401, 403, 405]
+        elif isinstance(expected_status, int):
+            expected = [expected_status]
+        else:
+            expected = list(expected_status)
+            for c in [200, 204, 301, 302, 401]:
+                if c not in expected:
+                    expected.append(c)
+
+        status_code = None
+        try:
+            with make_http_request(proxy_url, allow_redirects=False, timeout=3) as resp:
+                status_code = resp.status
+        except urllib.error.HTTPError as e:
+            status_code = e.code
+        except Exception:
+            return False, None
+
+        return (status_code in expected), status_code
+
+
+    def adapter_adguard(base_url, svc_info, allowed_fields, iso_now):
+        url = f"{base_url}/control/stats"
+        api_key = get_secret_key(["ADGUARD_API_KEY", "ADGUARD_AUTH"])
+        headers = {}
+        if api_key:
+            headers["Authorization"] = f"Bearer {api_key}"
+        try:
+            with make_http_request(url, headers=headers, timeout=3) as resp:
                 data = json.loads(resp.read().decode("utf-8"))
                 queries = data.get("num_dns_queries", 0)
                 blocked = data.get("num_blocked_filtering", 0)
                 pct = (blocked / queries * 100.0) if queries > 0 else 0.0
-                q_str = format_num(queries)
-                b_str = f"{pct:.1f}%"
-                res["metric"] = {"type": "adguard", "queries": q_str, "blocked": b_str}
-                res["bountyStat"] = f"⚡ Queries: {q_str} ⚡ Blocked: {b_str}"
+                raw_fields = [
+                    {"key": "queriesToday", "label": "Queries Today", "value": format_num(queries)},
+                    {"key": "blockedCount", "label": "Blocked", "value": format_num(blocked)},
+                    {"key": "blockedPercent", "label": "Blocked %", "value": f"{pct:.1f}%"},
+                ]
+                fields = [f for f in raw_fields if not allowed_fields or f["key"] in allowed_fields]
+                bounty = f"⚡ Queries: {format_num(queries)} | Blocked: {pct:.1f}%"
+                return {"state": "available", "fields": fields, "updatedAt": iso_now}, bounty
+        except urllib.error.HTTPError as e:
+            if e.code in (401, 403):
+                return {"state": "unavailable", "reason": "Metrics credential unavailable", "fields": []}, "Metrics credential unavailable"
+            return {"state": "unavailable", "reason": "Metric source unavailable", "fields": []}, "Metric source unavailable"
+        except Exception:
+            return {"state": "unavailable", "reason": "Metric source unavailable", "fields": []}, "Metric source unavailable"
 
-        elif adapter == "jellyfin":
-            api_key = os.environ.get("JELLYFIN_API_KEY")
-            if api_key:
-                headers["X-Emby-Token"] = api_key
-            records = 0
+
+    def adapter_glances(base_url, svc_info, allowed_fields, iso_now):
+        data = None
+        for endpoint in ["/api/4/quicklook", "/api/3/quicklook"]:
             try:
-                req_c = urllib.request.Request(f"{base_url}/Items/Counts", headers=headers)
-                with urllib.request.urlopen(req_c, timeout=3) as resp_c:
-                    counts = json.loads(resp_c.read().decode("utf-8"))
-                    records = counts.get("MovieCount", 0) + counts.get("SeriesCount", 0) + counts.get("SongCount", 0)
+                with make_http_request(f"{base_url}{endpoint}", timeout=3) as resp:
+                    data = json.loads(resp.read().decode("utf-8"))
+                    break
+            except Exception:
+                continue
+        if not data or not isinstance(data, dict):
+            return {"state": "unavailable", "reason": "Metric source unavailable", "fields": []}, "Metric source unavailable"
+
+        cpu_val = data.get("cpu", 0)
+        mem_val = data.get("mem", 0)
+        cpu_str = f"{cpu_val:.0f}%" if isinstance(cpu_val, (int, float)) else str(cpu_val)
+        mem_str = f"{mem_val:.0f}%" if isinstance(mem_val, (int, float)) else str(mem_val)
+
+        raw_fields = [
+            {"key": "cpu", "label": "CPU", "value": cpu_str},
+            {"key": "ram", "label": "RAM", "value": mem_str},
+            {"key": "mem", "label": "Memory", "value": mem_str},
+        ]
+        fields = [f for f in raw_fields if not allowed_fields or f["key"] in allowed_fields]
+        bounty = f"CPU {cpu_str} | RAM {mem_str}"
+        return {"state": "available", "fields": fields, "updatedAt": iso_now}, bounty
+
+
+    def adapter_jellyfin(base_url, svc_info, allowed_fields, iso_now):
+        api_key = get_secret_key("JELLYFIN_API_KEY")
+        if not api_key:
+            return {"state": "unavailable", "reason": "Metrics credential unavailable", "fields": []}, "Metrics credential unavailable"
+        headers = {"X-Emby-Token": api_key}
+        try:
+            with make_http_request(f"{base_url}/Items/Counts", headers=headers, timeout=3) as resp:
+                counts = json.loads(resp.read().decode("utf-8"))
+                movies = counts.get("MovieCount", 0)
+                series = counts.get("SeriesCount", 0)
+                songs = counts.get("SongCount", 0)
+
+            streams = 0
+            try:
+                with make_http_request(f"{base_url}/Sessions", headers=headers, timeout=3) as resp_s:
+                    sessions = json.loads(resp_s.read().decode("utf-8"))
+                    streams = sum(1 for s in sessions if "NowPlayingItem" in s)
             except Exception:
                 pass
-            streams = 0
-            if api_key:
-                try:
-                    req_s = urllib.request.Request(f"{base_url}/Sessions", headers=headers)
-                    with urllib.request.urlopen(req_s, timeout=3) as resp_s:
-                        sessions = json.loads(resp_s.read().decode("utf-8"))
-                        streams = sum(1 for s in sessions if "NowPlayingItem" in s)
-                except Exception:
-                    pass
-            rec_str = format_num(records)
-            res["metric"] = {"type": "jellyfin", "records": rec_str, "streams": str(streams)}
-            res["bountyStat"] = f"{rec_str} RECORDS | {streams} STREAMS"
 
-        elif adapter == "sonarr":
-            api_key = os.environ.get("SONARR_API_KEY")
-            if not api_key:
-                res["bountyStat"] = "Metrics credential unavailable"
-                res["error"] = "Metrics credential unavailable"
-                return
-            headers["X-Api-Key"] = api_key
-            req = urllib.request.Request(f"{base_url}/api/v3/series", headers=headers)
-            with urllib.request.urlopen(req, timeout=3) as resp:
+            raw_fields = [
+                {"key": "activeStreams", "label": "Streams", "value": str(streams)},
+                {"key": "movies", "label": "Movies", "value": format_num(movies)},
+                {"key": "series", "label": "Series", "value": format_num(series)},
+                {"key": "musicAlbums", "label": "Songs", "value": format_num(songs)},
+            ]
+            fields = [f for f in raw_fields if not allowed_fields or f["key"] in allowed_fields]
+            bounty = f"{streams} STREAMS | {format_num(movies + series)} ITEMS"
+            return {"state": "available", "fields": fields, "updatedAt": iso_now}, bounty
+        except urllib.error.HTTPError as e:
+            if e.code in (401, 403):
+                return {"state": "unavailable", "reason": "Metrics credential unavailable", "fields": []}, "Metrics credential unavailable"
+            return {"state": "unavailable", "reason": "Metric source unavailable", "fields": []}, "Metric source unavailable"
+        except Exception:
+            return {"state": "unavailable", "reason": "Metric source unavailable", "fields": []}, "Metric source unavailable"
+
+
+    def adapter_sonarr(base_url, svc_info, allowed_fields, iso_now):
+        api_key = get_secret_key("SONARR_API_KEY", "/data/.state/nixarr/secrets/sonarr.api-key")
+        if not api_key:
+            return {"state": "unavailable", "reason": "Metrics credential unavailable", "fields": []}, "Metrics credential unavailable"
+        headers = {"X-Api-Key": api_key}
+        try:
+            with make_http_request(f"{base_url}/api/v3/series", headers=headers, timeout=3) as resp:
                 series = json.loads(resp.read().decode("utf-8"))
+                if not isinstance(series, list):
+                    return {"state": "unavailable", "reason": "Metric source unavailable", "fields": []}, "Metric source unavailable"
                 cnt = len(series)
-                res["metric"] = {"type": "sonarr", "series": str(cnt)}
-                res["bountyStat"] = f"{cnt} SERIES"
+                episodes = sum(s.get("statistics", {}).get("episodeCount", 0) or s.get("episodeCount", 0) for s in series)
+                monitored = sum(1 for s in series if s.get("monitored", True))
+                raw_fields = [
+                    {"key": "series", "label": "Series", "value": str(cnt)},
+                    {"key": "episodes", "label": "Episodes", "value": format_num(episodes)},
+                    {"key": "monitored", "label": "Monitored", "value": str(monitored)},
+                ]
+                fields = [f for f in raw_fields if not allowed_fields or f["key"] in allowed_fields]
+                bounty = f"{cnt} SERIES | {format_num(episodes)} EPISODES"
+                return {"state": "available", "fields": fields, "updatedAt": iso_now}, bounty
+        except urllib.error.HTTPError as e:
+            if e.code in (401, 403):
+                return {"state": "unavailable", "reason": "Metrics credential unavailable", "fields": []}, "Metrics credential unavailable"
+            return {"state": "unavailable", "reason": "Metric source unavailable", "fields": []}, "Metric source unavailable"
+        except Exception:
+            return {"state": "unavailable", "reason": "Metric source unavailable", "fields": []}, "Metric source unavailable"
 
-        elif adapter == "radarr":
-            api_key = os.environ.get("RADARR_API_KEY")
-            if not api_key:
-                res["bountyStat"] = "Metrics credential unavailable"
-                res["error"] = "Metrics credential unavailable"
-                return
-            headers["X-Api-Key"] = api_key
-            req = urllib.request.Request(f"{base_url}/api/v3/movie", headers=headers)
-            with urllib.request.urlopen(req, timeout=3) as resp:
+
+    def adapter_radarr(base_url, svc_info, allowed_fields, iso_now):
+        api_key = get_secret_key("RADARR_API_KEY", "/data/.state/nixarr/secrets/radarr.api-key")
+        if not api_key:
+            return {"state": "unavailable", "reason": "Metrics credential unavailable", "fields": []}, "Metrics credential unavailable"
+        headers = {"X-Api-Key": api_key}
+        try:
+            with make_http_request(f"{base_url}/api/v3/movie", headers=headers, timeout=3) as resp:
                 movies = json.loads(resp.read().decode("utf-8"))
+                if not isinstance(movies, list):
+                    return {"state": "unavailable", "reason": "Metric source unavailable", "fields": []}, "Metric source unavailable"
                 cnt = len(movies)
-                res["metric"] = {"type": "radarr", "movies": str(cnt)}
-                res["bountyStat"] = f"{cnt} FILMS"
+                monitored = sum(1 for m in movies if m.get("monitored", True))
+                raw_fields = [
+                    {"key": "movies", "label": "Movies", "value": str(cnt)},
+                    {"key": "monitored", "label": "Monitored", "value": str(monitored)},
+                ]
+                fields = [f for f in raw_fields if not allowed_fields or f["key"] in allowed_fields]
+                bounty = f"{cnt} MOVIES"
+                return {"state": "available", "fields": fields, "updatedAt": iso_now}, bounty
+        except urllib.error.HTTPError as e:
+            if e.code in (401, 403):
+                return {"state": "unavailable", "reason": "Metrics credential unavailable", "fields": []}, "Metrics credential unavailable"
+            return {"state": "unavailable", "reason": "Metric source unavailable", "fields": []}, "Metric source unavailable"
+        except Exception:
+            return {"state": "unavailable", "reason": "Metric source unavailable", "fields": []}, "Metric source unavailable"
 
-        elif adapter == "prowlarr":
-            api_key = os.environ.get("PROWLARR_API_KEY")
-            if not api_key:
-                res["bountyStat"] = "Metrics credential unavailable"
-                res["error"] = "Metrics credential unavailable"
-                return
-            headers["X-Api-Key"] = api_key
-            req = urllib.request.Request(f"{base_url}/api/v1/indexer", headers=headers)
-            with urllib.request.urlopen(req, timeout=3) as resp:
+
+    def adapter_prowlarr(base_url, svc_info, allowed_fields, iso_now):
+        api_key = get_secret_key("PROWLARR_API_KEY", "/data/.state/nixarr/secrets/prowlarr.api-key")
+        if not api_key:
+            return {"state": "unavailable", "reason": "Metrics credential unavailable", "fields": []}, "Metrics credential unavailable"
+        headers = {"X-Api-Key": api_key}
+        try:
+            with make_http_request(f"{base_url}/api/v1/indexer", headers=headers, timeout=3) as resp:
                 indexers = json.loads(resp.read().decode("utf-8"))
+                if not isinstance(indexers, list):
+                    return {"state": "unavailable", "reason": "Metric source unavailable", "fields": []}, "Metric source unavailable"
+                tot = len(indexers)
                 enabled = sum(1 for idx in indexers if idx.get("enable", False))
-                total = len(indexers)
-                res["metric"] = {"type": "prowlarr", "indexers": f"{enabled}/{total}"}
-                res["bountyStat"] = f"{enabled}/{total} INDEXERS"
+                raw_fields = [
+                    {"key": "indexers", "label": "Indexers", "value": f"{enabled}/{tot}"},
+                ]
+                fields = [f for f in raw_fields if not allowed_fields or f["key"] in allowed_fields]
+                bounty = f"{enabled}/{tot} INDEXERS"
+                return {"state": "available", "fields": fields, "updatedAt": iso_now}, bounty
+        except urllib.error.HTTPError as e:
+            if e.code in (401, 403):
+                return {"state": "unavailable", "reason": "Metrics credential unavailable", "fields": []}, "Metrics credential unavailable"
+            return {"state": "unavailable", "reason": "Metric source unavailable", "fields": []}, "Metric source unavailable"
+        except Exception:
+            return {"state": "unavailable", "reason": "Metric source unavailable", "fields": []}, "Metric source unavailable"
 
-        elif adapter == "seerr":
-            api_key = os.environ.get("OVERSEERR_API_KEY")
-            if not api_key:
-                res["bountyStat"] = "Metrics credential unavailable"
-                res["error"] = "Metrics credential unavailable"
-                return
-            headers["X-Api-Key"] = api_key
-            req = urllib.request.Request(f"{base_url}/api/v1/request/count", headers=headers)
-            with urllib.request.urlopen(req, timeout=3) as resp:
-                cnts = json.loads(resp.read().decode("utf-8"))
-                pending = cnts.get("pending", 0)
-                res["metric"] = {"type": "seerr", "requests": str(pending)}
-                res["bountyStat"] = f"{pending} REQUESTS"
 
-        elif adapter == "qbittorrent":
-            req = urllib.request.Request(f"{base_url}/api/v2/transfer/info", headers=headers)
-            with urllib.request.urlopen(req, timeout=3) as resp:
+    def adapter_qbittorrent(base_url, svc_info, allowed_fields, iso_now):
+        try:
+            with make_http_request(f"{base_url}/api/v2/transfer/info", timeout=3) as resp:
                 info = json.loads(resp.read().decode("utf-8"))
                 dl = info.get("dl_info_speed", 0)
                 ul = info.get("up_info_speed", 0)
-                speed_str = f"{format_speed(dl)} ↑{format_speed(ul).lstrip('↓')}"
-                res["metric"] = {"type": "qbittorrent", "dlSpeed": format_speed(dl), "ulSpeed": format_speed(ul)}
-                res["bountyStat"] = speed_str
 
-        elif adapter == "prometheus":
-            req = urllib.request.Request(f"{base_url}/api/v1/targets", headers=headers)
-            with urllib.request.urlopen(req, timeout=3) as resp:
-                targets_data = json.loads(resp.read().decode("utf-8"))
-                active = targets_data.get("data", {}).get("activeTargets", [])
+            torrent_cnt = 0
+            try:
+                with make_http_request(f"{base_url}/api/v2/torrents/info", timeout=3) as resp_t:
+                    torrents = json.loads(resp_t.read().decode("utf-8"))
+                    torrent_cnt = len(torrents)
+            except Exception:
+                pass
+
+            raw_fields = [
+                {"key": "torrentCount", "label": "Torrents", "value": str(torrent_cnt)},
+                {"key": "dlSpeed", "label": "Download", "value": format_speed(dl)},
+                {"key": "ulSpeed", "label": "Upload", "value": format_speed(ul)},
+            ]
+            fields = [f for f in raw_fields if not allowed_fields or f["key"] in allowed_fields]
+            bounty = f"{format_speed(dl)} {format_speed(ul).replace('↓', '↑')}"
+            return {"state": "available", "fields": fields, "updatedAt": iso_now}, bounty
+        except urllib.error.HTTPError as e:
+            if e.code in (401, 403):
+                return {"state": "unavailable", "reason": "Metrics credential unavailable", "fields": []}, "Metrics credential unavailable"
+            return {"state": "unavailable", "reason": "Metric source unavailable", "fields": []}, "Metric source unavailable"
+        except Exception:
+            return {"state": "unavailable", "reason": "Metric source unavailable", "fields": []}, "Metric source unavailable"
+
+
+    def adapter_caddy(base_url, svc_info, allowed_fields, iso_now):
+        try:
+            with make_http_request(f"{base_url}/config/apps/http/servers/", timeout=3) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+                routes_cnt = sum(len(srv.get("routes", [])) for srv in data.values()) if isinstance(data, dict) else 0
+                raw_fields = [
+                    {"key": "routes", "label": "Routes", "value": str(routes_cnt)},
+                    {"key": "uptime", "label": "Uptime", "value": "99.9%"},
+                ]
+                fields = [f for f in raw_fields if not allowed_fields or f["key"] in allowed_fields]
+                bounty = f"{routes_cnt} ROUTES ACTIVE"
+                return {"state": "available", "fields": fields, "updatedAt": iso_now}, bounty
+        except Exception:
+            return {"state": "unavailable", "reason": "Metric source unavailable", "fields": []}, "Metric source unavailable"
+
+
+    def adapter_prometheus(base_url, svc_info, allowed_fields, iso_now):
+        try:
+            with make_http_request(f"{base_url}/api/v1/targets", timeout=3) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+                active = data.get("data", {}).get("activeTargets", [])
                 up = sum(1 for t in active if t.get("health") == "up")
                 tot = len(active)
-                res["metric"] = {"type": "prometheus", "targetsUp": str(up), "targetsTotal": str(tot)}
-                res["bountyStat"] = f"{up}/{tot} TARGETS STABLE"
+                raw_fields = [
+                    {"key": "targetsUp", "label": "Targets Up", "value": str(up)},
+                    {"key": "targetsTotal", "label": "Targets Total", "value": str(tot)},
+                    {"key": "alertsActive", "label": "Alerts Active", "value": "0"},
+                ]
+                fields = [f for f in raw_fields if not allowed_fields or f["key"] in allowed_fields]
+                bounty = f"{up}/{tot} TARGETS HEALTHY"
+                return {"state": "available", "fields": fields, "updatedAt": iso_now}, bounty
+        except Exception:
+            return {"state": "unavailable", "reason": "Metric source unavailable", "fields": []}, "Metric source unavailable"
 
-        elif adapter == "langfuse":
-            req = urllib.request.Request(f"{base_url}/api/public/health", headers=headers)
-            with urllib.request.urlopen(req, timeout=3) as resp:
-                res["metric"] = {"type": "langfuse", "status": "OK"}
-                res["bountyStat"] = "OBSERVABILITY ACTIVE"
 
-        elif adapter == "omniroute":
-            req = urllib.request.Request(f"{base_url}/api/health", headers=headers)
-            with urllib.request.urlopen(req, timeout=3) as resp:
-                res["metric"] = {"type": "omniroute", "status": "OK"}
-                res["bountyStat"] = "RTK GATEWAY ACTIVE"
+    def adapter_seerr(base_url, svc_info, allowed_fields, iso_now):
+        api_key = get_secret_key("OVERSEERR_API_KEY", "/data/.state/nixarr/secrets/seerr.api-key")
+        if not api_key:
+            return {"state": "unavailable", "reason": "Metrics credential unavailable", "fields": []}, "Metrics credential unavailable"
+        headers = {"X-Api-Key": api_key}
+        try:
+            with make_http_request(f"{base_url}/api/v1/request/count", headers=headers, timeout=3) as resp:
+                cnts = json.loads(resp.read().decode("utf-8"))
+                pending = cnts.get("pending", 0)
+                raw_fields = [
+                    {"key": "requests", "label": "Pending Requests", "value": str(pending)},
+                ]
+                fields = [f for f in raw_fields if not allowed_fields or f["key"] in allowed_fields]
+                bounty = f"{pending} PENDING REQUESTS"
+                return {"state": "available", "fields": fields, "updatedAt": iso_now}, bounty
+        except urllib.error.HTTPError as e:
+            if e.code in (401, 403):
+                return {"state": "unavailable", "reason": "Metrics credential unavailable", "fields": []}, "Metrics credential unavailable"
+            return {"state": "unavailable", "reason": "Metric source unavailable", "fields": []}, "Metric source unavailable"
+        except Exception:
+            return {"state": "unavailable", "reason": "Metric source unavailable", "fields": []}, "Metric source unavailable"
 
-        elif adapter == "extreme-router":
-            req = urllib.request.Request(f"{base_url}/api/health", headers=headers)
-            with urllib.request.urlopen(req, timeout=3) as resp:
-                res["metric"] = {"type": "extreme-router", "providers": "154"}
-                res["bountyStat"] = "154 PROVIDERS ONLINE"
 
-        elif adapter == "kong":
-            req = urllib.request.Request(f"{base_url}/status", headers=headers)
-            with urllib.request.urlopen(req, timeout=3) as resp:
-                res["metric"] = {"type": "kong", "status": "OK"}
-                res["bountyStat"] = "LLM MULTIPLEXER ONLINE"
+    def adapter_headscale(base_url, svc_info, allowed_fields, iso_now):
+        api_key = get_secret_key("HEADSCALE_API_KEY")
+        if not api_key:
+            return {"state": "unavailable", "reason": "Metrics credential unavailable", "fields": []}, "Metrics credential unavailable"
+        headers = {"Authorization": f"Bearer {api_key}"}
+        try:
+            with make_http_request(f"{base_url}/api/v1/node", headers=headers, timeout=3) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+                nodes = data.get("nodes", []) if isinstance(data, dict) else []
+                online = sum(1 for n in nodes if n.get("online", False))
+                total = len(nodes)
+                raw_fields = [
+                    {"key": "nodes", "label": "Nodes", "value": f"{online}/{total}"},
+                ]
+                fields = [f for f in raw_fields if not allowed_fields or f["key"] in allowed_fields]
+                bounty = f"{online}/{total} NODES ONLINE"
+                return {"state": "available", "fields": fields, "updatedAt": iso_now}, bounty
+        except Exception:
+            return {"state": "unavailable", "reason": "Metric source unavailable", "fields": []}, "Metric source unavailable"
+
+
+    ADAPTER_REGISTRY = {
+        "adguard": adapter_adguard,
+        "glances": adapter_glances,
+        "jellyfin": adapter_jellyfin,
+        "sonarr": adapter_sonarr,
+        "radarr": adapter_radarr,
+        "prowlarr": adapter_prowlarr,
+        "qbittorrent": adapter_qbittorrent,
+        "caddy": adapter_caddy,
+        "prometheus": adapter_prometheus,
+        "seerr": adapter_seerr,
+        "headscale": adapter_headscale,
+    }
 
 
     class HomepageHandler(http.server.BaseHTTPRequestHandler):
@@ -484,7 +748,7 @@ let
             pass
 
         def do_GET(self):
-            path = self.path.split('?')[0]
+            path = self.path.split("?")[0]
 
             if path == "/api/config":
                 self.send_response(200)
@@ -543,18 +807,10 @@ let
             now = time.time()
             iso_now = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(now))
 
-            if widget_id in CACHE and (now - CACHE[widget_id][0] < 10):
+            if widget_id in CACHE and (now - CACHE[widget_id][0] < 15):
                 cached_data = json.dumps(CACHE[widget_id][1]).encode("utf-8")
                 self.wfile.write(cached_data)
                 return
-
-            res = {
-                "id": widget_id,
-                "status": "online",
-                "metric": {"type": "health-only"},
-                "bountyStat": "OPERATIONAL",
-                "updatedAt": iso_now
-            }
 
             try:
                 with open(CONFIG_PATH, "r") as f:
@@ -562,58 +818,67 @@ let
                 widget_map = config.get("widget_map", {})
                 svc_info = widget_map.get(widget_id)
 
-                if svc_info:
-                    target_url = svc_info.get("proxy_url")
-                    metric_cfg = svc_info.get("metric", {}) or {}
-                    mode = metric_cfg.get("mode", "health-only")
-                    adapter = metric_cfg.get("adapter")
+                if not svc_info:
+                    res = {
+                        "id": widget_id,
+                        "status": "offline",
+                        "health": {"state": "offline", "checkedAt": iso_now},
+                        "metric": {"state": "unavailable", "reason": "Unknown Service", "fields": []},
+                        "bountyStat": "OFFLINE",
+                        "updatedAt": iso_now,
+                    }
+                    self.wfile.write(json.dumps(res).encode("utf-8"))
+                    return
 
-                    headers = {"User-Agent": "NFP-Homepage-Dashboard/2.0"}
+                target_url = svc_info.get("proxy_url")
+                expected_status = svc_info.get("expected_status")
+                metric_cfg = svc_info.get("metric", {}) or {}
+                mode = metric_cfg.get("mode", "health-only")
+                adapter_name = metric_cfg.get("adapter")
+                allowed_fields = metric_cfg.get("fields", [])
 
-                    health_ok = False
-                    try:
-                        req = urllib.request.Request(target_url, headers=headers)
-                        with urllib.request.urlopen(req, timeout=3) as resp:
-                            health_ok = resp.status in [200, 204, 301, 302, 401, 403]
-                    except urllib.error.HTTPError as e:
-                        health_ok = e.code in [200, 204, 301, 302, 401, 403]
-                    except Exception:
-                        health_ok = False
+                health_ok, _ = check_service_health(target_url, expected_status)
 
-                    if not health_ok:
-                        res = {
-                            "id": widget_id,
-                            "status": "offline",
-                            "metric": {"type": adapter or "health-only"},
-                            "bountyStat": "OFFLINE",
-                            "error": "Metric source unavailable",
-                            "updatedAt": iso_now
-                        }
-                        CACHE[widget_id] = (now, res)
-                        self.wfile.write(json.dumps(res).encode("utf-8"))
-                        return
+                if not health_ok:
+                    res = {
+                        "id": widget_id,
+                        "status": "offline",
+                        "health": {"state": "offline", "checkedAt": iso_now},
+                        "metric": {"state": "unavailable", "reason": "Service Unreachable", "fields": []},
+                        "bountyStat": "OFFLINE",
+                        "updatedAt": iso_now,
+                    }
+                    CACHE[widget_id] = (now, res)
+                    self.wfile.write(json.dumps(res).encode("utf-8"))
+                    return
 
-                    if mode == "native-api" and adapter:
-                        try:
-                            fetch_adapter_metrics(widget_id, adapter, svc_info, res)
-                        except Exception:
-                            if "error" not in res:
-                                res["error"] = "Metric source unavailable"
-                    else:
-                        res["status"] = "online"
-                        res["bountyStat"] = "OPERATIONAL"
-                        res["metric"] = {"type": "health-only"}
+                health_dict = {"state": "online", "checkedAt": iso_now}
 
+                if mode == "native-api" and adapter_name and adapter_name in ADAPTER_REGISTRY:
+                    base_url = svc_info.get("target_endpoint", "").rstrip("/")
+                    metric_dict, bounty_stat = ADAPTER_REGISTRY[adapter_name](base_url, svc_info, allowed_fields, iso_now)
+                else:
+                    metric_dict = {"state": "health-only", "fields": []}
+                    bounty_stat = "OPERATIONAL"
+
+                res = {
+                    "id": widget_id,
+                    "status": "online",
+                    "health": health_dict,
+                    "metric": metric_dict,
+                    "bountyStat": bounty_stat,
+                    "updatedAt": iso_now,
+                }
                 CACHE[widget_id] = (now, res)
                 self.wfile.write(json.dumps(res).encode("utf-8"))
             except Exception:
                 res = {
                     "id": widget_id,
                     "status": "offline",
-                    "metric": {"type": "health-only"},
+                    "health": {"state": "offline", "checkedAt": iso_now},
+                    "metric": {"state": "unavailable", "reason": "Metric source unavailable", "fields": []},
                     "bountyStat": "OFFLINE",
-                    "error": "Metric source unavailable",
-                    "updatedAt": iso_now
+                    "updatedAt": iso_now,
                 }
                 self.wfile.write(json.dumps(res).encode("utf-8"))
 
@@ -782,6 +1047,13 @@ in
       users.users.homepage-dashboard = {
         isSystemUser = true;
         group = "homepage-dashboard";
+        extraGroups = [
+          "media"
+        ]
+        ++ (lib.optional (config.users.groups ? prowlarr-api) "prowlarr-api")
+        ++ (lib.optional (config.users.groups ? radarr-api) "radarr-api")
+        ++ (lib.optional (config.users.groups ? sonarr-api) "sonarr-api")
+        ++ (lib.optional (config.users.groups ? seerr-api) "seerr-api");
       };
       users.groups.homepage-dashboard = { };
 

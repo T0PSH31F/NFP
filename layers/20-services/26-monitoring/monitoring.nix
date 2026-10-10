@@ -122,10 +122,10 @@ with lib;
         nfp.services.grafana = {
           enable = true;
           host = config.networking.hostName;
-          bind = "127.0.0.1";
+          bind = "0.0.0.0";
           port = config.layers.layer-20.services.config.monitoring.grafana.port;
           tailnetName = "grafana";
-          tls = "headscale";
+          tls = "none";
           healthcheck = {
             enable = true;
             path = "/api/health";
@@ -135,9 +135,37 @@ with lib;
             enable = true;
             category = "chopper";
             order = 20;
-            title = "Grafana + Loki";
-            subtitle = "Medical Records";
+            title = "Grafana";
+            subtitle = "Observability Dashboards";
             icon = "grafana";
+            metric = {
+              mode = "health-only";
+            };
+          };
+        };
+
+        nfp.services.loki = {
+          enable = true;
+          host = config.networking.hostName;
+          bind = "127.0.0.1";
+          port = config.layers.layer-20.services.config.monitoring.loki.port;
+          tailnetName = "loki";
+          tls = "none";
+          healthcheck = {
+            enable = true;
+            path = "/ready";
+            expectedStatus = [ 200 ];
+          };
+          homepage = {
+            enable = true;
+            category = "chopper";
+            order = 22;
+            title = "Loki Logs";
+            subtitle = "Grafana Explore Log Viewer";
+            icon = "loki";
+            dashboardUrl = "http://${config.networking.hostName}.${
+              config.layers.meta.tailnetDomain or "nfp.nix"
+            }:${toString config.layers.layer-20.services.config.monitoring.grafana.port}/explore";
             metric = {
               mode = "health-only";
             };
@@ -602,6 +630,7 @@ with lib;
           enable = true;
           settings = {
             server = {
+              http_addr = "0.0.0.0";
               http_port = config.layers.layer-20.services.config.monitoring.grafana.port;
               domain = config.layers.layer-20.services.config.monitoring.domain;
               root_url = "http://%(domain)s:%(http_port)s/";

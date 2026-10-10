@@ -62,6 +62,32 @@ in
         nixosModule =
           { config, pkgs, ... }:
           {
+            nfp.services.matrix-synapse = {
+              enable = true;
+              host = config.networking.hostName;
+              bind = "127.0.0.1";
+              port = 8008;
+              tailnetName = "matrix";
+              tls = "headscale";
+              healthcheck = {
+                enable = true;
+                path = "/_matrix/client/versions";
+                expectedStatus = [ 200 ];
+              };
+              homepage = {
+                enable = true;
+                category = "chopper";
+                order = 25;
+                title = "Matrix Synapse";
+                subtitle = "Transponder Snail Comms";
+                icon = "matrix";
+                dashboardUrl = "https://${settings.app_domain}";
+                metric = {
+                  mode = "health-only";
+                };
+              };
+            };
+
             services.matrix-synapse = {
               enable = true;
               settings = {
@@ -74,6 +100,19 @@ in
                     database = "matrix-synapse";
                   };
                 };
+              };
+            };
+
+            # Matrix Synapse homeserver reverse proxy — matrix.lovelain.duckdns.org
+            services.nginx.virtualHosts.${settings.server_tld} = {
+              enableACME = true;
+              forceSSL = true;
+              locations."/" = {
+                proxyPass = "http://127.0.0.1:8008";
+                proxyWebsockets = true;
+                extraConfig = ''
+                  client_max_body_size 100M;
+                '';
               };
             };
 
