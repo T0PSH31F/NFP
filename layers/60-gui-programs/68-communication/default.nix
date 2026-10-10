@@ -9,6 +9,10 @@ let
   cfg = config.layers.layer-60.gui.communication;
 in
 {
+  imports = [
+    ./beeper.nix
+  ];
+
   options.layers.layer-60.gui.communication = {
     enable = lib.mkOption {
       type = lib.types.bool;

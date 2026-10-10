@@ -70,6 +70,7 @@
       sessionResilience.enable = true;
     };
     layer-60.gui.media-packages.enable = true;
+    layer-60.gui.qutebrowser.enable = true;
     layer-75.mcp.lxconnect.enable = true;
     layer-79.skills.nix-skills.enable = true;
   };
@@ -104,6 +105,9 @@
 
   # Netdata real-time monitoring
   layers.layer-20.services.config.netdata.enable = true;
+
+  # Isolated second Tailscale daemon for friend tailnet (userspace proxy)
+  layers.layer-20.services.config.tailscale-sidecar.enable = true;
 
   systemd.services.rclone-gdrive-mount.enable = false;
 

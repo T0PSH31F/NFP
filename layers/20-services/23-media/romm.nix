@@ -58,7 +58,12 @@ in
         icon = "romm";
         satellite = "atlas";
         metric = {
-          mode = "health-only";
+          mode = "native-api";
+          adapter = "romm";
+          fields = [
+            "roms"
+            "platforms"
+          ];
         };
       };
     };

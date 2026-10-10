@@ -1,3 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" style="color: #ff9500;">
-  <circle cx="32" cy="32" r="24" fill="none" stroke="currentColor" stroke-width="4"/><circle cx="28" cy="28" r="10" fill="none" stroke="currentColor" stroke-width="3"/><line x1="35" y1="35" x2="45" y2="45" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 265 265"><g transform="translate(-40.921 -17.417)"><circle cx="142.2" cy="122.9" r="85" style="fill:none;stroke:#3050ff;stroke-width:28.3465;stroke-miterlimit:11.3386"/><path d="M118.4 77.6c19.8-10.2 44-6.4 59.7 9.4s19.3 40 8.9 59.7" style="fill:none;stroke:#3050ff;stroke-width:14.1732;stroke-miterlimit:11.3386"/><path d="m184.2 202 37-38.6 81.8 78.3-37 38.6z" style="fill:#3050ff"/></g></svg>

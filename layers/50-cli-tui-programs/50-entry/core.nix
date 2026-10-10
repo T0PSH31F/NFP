@@ -85,13 +85,13 @@
       "application/x-cbz" = "org.pwmt.zathura.desktop";
       "application/x-cbr" = "org.pwmt.zathura.desktop";
       "application/x-fictionbook+xml" = "org.pwmt.zathura.desktop";
-      "text/plain" = "org.gnome.TextEditor.desktop";
-      "text/markdown" = "org.gnome.TextEditor.desktop";
+      "text/plain" = "org.gnome.gedit.desktop";
+      "text/markdown" = "org.gnome.gedit.desktop";
       "text/html" = "brave-browser.desktop";
       "application/xhtml+xml" = "brave-browser.desktop";
       "x-scheme-handler/http" = "brave-browser.desktop";
       "x-scheme-handler/https" = "brave-browser.desktop";
-      "inode/directory" = "nemo.desktop";
+      "inode/directory" = "org.kde.dolphin.desktop";
     };
     associations.added = {
       "audio/mpeg" = [ "mpv.desktop" ];
@@ -126,51 +126,51 @@
       "application/vnd.android.package-archive" = [ "waydroid.desktop" ];
       "application/pdf" = [
         "org.pwmt.zathura.desktop"
-        "koreader.desktop"
+        "rocks.koreader.koreader.desktop"
       ];
       "application/epub+zip" = [
         "org.pwmt.zathura.desktop"
-        "koreader.desktop"
+        "rocks.koreader.koreader.desktop"
       ];
       "application/x-mobipocket-ebook" = [
         "org.pwmt.zathura.desktop"
-        "koreader.desktop"
+        "rocks.koreader.koreader.desktop"
       ];
       "application/x-mobi8-ebook" = [
         "org.pwmt.zathura.desktop"
-        "koreader.desktop"
+        "rocks.koreader.koreader.desktop"
       ];
       "application/vnd.amazon.mobi8-ebook" = [
         "org.pwmt.zathura.desktop"
-        "koreader.desktop"
+        "rocks.koreader.koreader.desktop"
       ];
       "application/x-azw" = [
         "org.pwmt.zathura.desktop"
-        "koreader.desktop"
+        "rocks.koreader.koreader.desktop"
       ];
       "application/x-azw3" = [
         "org.pwmt.zathura.desktop"
-        "koreader.desktop"
+        "rocks.koreader.koreader.desktop"
       ];
       "application/x-cbz" = [
         "org.pwmt.zathura.desktop"
-        "koreader.desktop"
+        "rocks.koreader.koreader.desktop"
       ];
       "application/x-cbr" = [
         "org.pwmt.zathura.desktop"
-        "koreader.desktop"
+        "rocks.koreader.koreader.desktop"
       ];
       "application/x-fictionbook+xml" = [
         "org.pwmt.zathura.desktop"
-        "koreader.desktop"
+        "rocks.koreader.koreader.desktop"
       ];
-      "text/plain" = [ "org.gnome.TextEditor.desktop" ];
-      "text/markdown" = [ "org.gnome.TextEditor.desktop" ];
+      "text/plain" = [ "org.gnome.gedit.desktop" ];
+      "text/markdown" = [ "org.gnome.gedit.desktop" ];
       "text/html" = [
         "brave-browser.desktop"
         "librewolf.desktop"
       ];
-      "inode/directory" = [ "nemo.desktop" ];
+      "inode/directory" = [ "org.kde.dolphin.desktop" ];
     };
   };
 

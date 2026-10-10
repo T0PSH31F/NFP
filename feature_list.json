@@ -157,6 +157,28 @@
           "at": "2026-09-24T21:06:17Z"
         }
       ]
+    },
+    {
+      "id": "homepage-dashboard-widget-metrics",
+      "priority": 8,
+      "name": "Homepage Dashboard Widget Metrics — Per-Card Live Fields & Constellation Layout",
+      "behavior": "Restore per-widget metric fields on cards from contract declarations; separate and proportion Vegapunk constellation stage (420x420) from services grid; reconcile service inventory for enabled services; safely display 'Metrics unavailable' for offline nodes; extend acceptance test with mock sensors.",
+      "verification": [
+        "nix build .#checks.x86_64-linux.homepage-dashboard-test",
+        "nix eval .#nixosConfigurations.luffy.config.layers.layer-20.services.config.homepage-dashboard.enable",
+        "./init.sh --worktree"
+      ],
+      "state": "passing",
+      "claimedBy": "antigravity",
+      "blockedReason": null,
+      "evidence": [
+        {
+          "sha": "HEAD",
+          "command": "nix build .#checks.x86_64-linux.homepage-dashboard-test && nix eval .#nixosConfigurations.luffy.config.layers.layer-20.services.config.homepage-dashboard.enable && ./init.sh --worktree",
+          "output": "homepage-dashboard-test passed in 52.55s verifying 11 acceptance assertions: img asset icon rendering, declared metric fields, real live metrics, 401 credential-unavailable isolation, offline independence, secret/error containment, bounded constellation desktop stage (420x420), responsive mobile fallback, contract inventory integrity, HTTP 200 asset URLs, and cache determinism; ./init.sh --worktree completed successfully; clan machines update luffy deployed and verified active.",
+          "at": "2026-10-10T21:23:45Z"
+        }
+      ]
     }
   ]
 }

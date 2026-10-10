@@ -190,6 +190,17 @@ in
           cacheTtlSeconds = 0;
           description = "Headroom Context Token Compression Engine";
         };
+        beeper = {
+          enable = true;
+          transport = "streamable-http";
+          url = "http://127.0.0.1:23373/v0/mcp";
+          domain = "communication";
+          risk = "write";
+          approval = "write";
+          maxResultBytes = 1048576;
+          cacheTtlSeconds = 0;
+          description = "Beeper Desktop universal chat MCP tool suite (WhatsApp, Signal, Telegram, Discord, Google Messages, Voice, LinkedIn)";
+        };
       };
       description = "Declarative registry of typed MCP server definitions.";
     };
@@ -248,6 +259,9 @@ in
 
       home-manager.users.${user} = {
         xdg.configFile."mcp/config.json".text = builtins.toJSON {
+          mcpServers = clientConfigs;
+        };
+        xdg.configFile."Claude/claude_desktop_config.json".text = builtins.toJSON {
           mcpServers = clientConfigs;
         };
       };

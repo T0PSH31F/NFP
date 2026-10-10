@@ -17,6 +17,39 @@ in
   };
 
   config = mkIf cfg.enable {
+    nfp.services.filebrowser = {
+      enable = true;
+      host = config.networking.hostName;
+      bind = "127.0.0.1";
+      inherit (cfg) port;
+      tailnetName = "filebrowser";
+      tls = "headscale";
+      healthcheck = {
+        enable = true;
+        path = "/health";
+        expectedStatus = [
+          200
+          302
+        ];
+      };
+      homepage = {
+        enable = true;
+        category = "luffy";
+        order = 35;
+        title = "FileBrowser";
+        subtitle = "Ship's Log Navigator";
+        icon = "filebrowser";
+        metric = {
+          mode = "native-api";
+          adapter = "filebrowser";
+          fields = [
+            "files"
+            "size"
+          ];
+        };
+      };
+    };
+
     services.filebrowser = {
       enable = true;
       openFirewall = true;

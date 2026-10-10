@@ -16,7 +16,11 @@ with lib;
 
     homeserverDomain = mkOption {
       type = types.str;
-      default = "matrix.local";
+      default =
+        if (config.services.matrix-synapse.enable or false) then
+          (config.services.matrix-synapse.settings.server_name or "matrix.lovelain.duckdns.org")
+        else
+          "matrix.lovelain.duckdns.org";
       description = "Domain of the Matrix homeserver";
     };
 
@@ -110,9 +114,41 @@ with lib;
         description = "Port for Google Messages bridge";
       };
     };
+
+    gvoice = {
+      enable = mkEnableOption "Mautrix-Google Voice bridge";
+      port = mkOption {
+        type = types.int;
+        default = 29337;
+        description = "Port for Google Voice bridge";
+      };
+    };
+
+    linkedin = {
+      enable = mkEnableOption "Mautrix-LinkedIn bridge";
+      port = mkOption {
+        type = types.int;
+        default = 29338;
+        description = "Port for LinkedIn bridge";
+      };
+    };
   };
 
   config = mkIf config.services.mautrix-bridges.enable {
+    # Order Synapse after bridges to guarantee registration YAML files exist before Synapse reads them
+    systemd.services.matrix-synapse = mkIf (config.services.matrix-synapse.enable or false) {
+      after =
+        (optional config.services.mautrix-bridges.whatsapp.enable "mautrix-whatsapp.service")
+        ++ (optional config.services.mautrix-bridges.signal.enable "mautrix-signal.service")
+        ++ (optional config.services.mautrix-bridges.telegram.enable "mautrix-telegram.service")
+        ++ (optional config.services.mautrix-bridges.discord.enable "mautrix-discord.service");
+      wants =
+        (optional config.services.mautrix-bridges.whatsapp.enable "mautrix-whatsapp.service")
+        ++ (optional config.services.mautrix-bridges.signal.enable "mautrix-signal.service")
+        ++ (optional config.services.mautrix-bridges.telegram.enable "mautrix-telegram.service")
+        ++ (optional config.services.mautrix-bridges.discord.enable "mautrix-discord.service");
+    };
+
     # ============================================================================
     # NATIVE NIXOS SERVICES
     # ============================================================================
@@ -120,6 +156,7 @@ with lib;
     # Mautrix-Telegram (Native)
     services.mautrix-telegram = mkIf config.services.mautrix-bridges.telegram.enable {
       enable = true;
+      serviceDependencies = [ "postgresql.service" ];
       settings = {
         homeserver = {
           address = config.services.mautrix-bridges.homeserverUrl;
@@ -134,6 +171,7 @@ with lib;
           permissions = {
             "*" = "relay";
             ${config.services.mautrix-bridges.homeserverDomain} = "user";
+            "@t0psh31f:${config.services.mautrix-bridges.homeserverDomain}" = "admin";
           };
         };
       };
@@ -142,6 +180,7 @@ with lib;
     # Mautrix-WhatsApp (Native)
     services.mautrix-whatsapp = mkIf config.services.mautrix-bridges.whatsapp.enable {
       enable = true;
+      serviceDependencies = [ "postgresql.service" ];
       settings = {
         homeserver = {
           address = config.services.mautrix-bridges.homeserverUrl;
@@ -159,6 +198,7 @@ with lib;
           permissions = {
             "*" = "relay";
             ${config.services.mautrix-bridges.homeserverDomain} = "user";
+            "@t0psh31f:${config.services.mautrix-bridges.homeserverDomain}" = "admin";
           };
         };
       };
@@ -167,6 +207,7 @@ with lib;
     # Mautrix-Signal (Native)
     services.mautrix-signal = mkIf config.services.mautrix-bridges.signal.enable {
       enable = true;
+      serviceDependencies = [ "postgresql.service" ];
       settings = {
         homeserver = {
           address = config.services.mautrix-bridges.homeserverUrl;
@@ -184,6 +225,7 @@ with lib;
           permissions = {
             "*" = "relay";
             ${config.services.mautrix-bridges.homeserverDomain} = "user";
+            "@t0psh31f:${config.services.mautrix-bridges.homeserverDomain}" = "admin";
           };
         };
       };
@@ -209,6 +251,7 @@ with lib;
           permissions = {
             "*" = "relay";
             ${config.services.mautrix-bridges.homeserverDomain} = "user";
+            "@t0psh31f:${config.services.mautrix-bridges.homeserverDomain}" = "admin";
           };
         };
       };
@@ -320,6 +363,32 @@ with lib;
           };
         };
       })
+
+      (mkIf config.services.mautrix-bridges.gvoice.enable {
+        mautrix-gvoice = {
+          image = "dock.mau.dev/mautrix/gvoice:latest";
+          ports = [ "${toString config.services.mautrix-bridges.gvoice.port}:29337" ];
+          volumes = [
+            "/var/lib/mautrix-gvoice:/data"
+          ];
+          environment = {
+            TZ = "America/Los_Angeles";
+          };
+        };
+      })
+
+      (mkIf config.services.mautrix-bridges.linkedin.enable {
+        mautrix-linkedin = {
+          image = "dock.mau.dev/mautrix/linkedin:latest";
+          ports = [ "${toString config.services.mautrix-bridges.linkedin.port}:29338" ];
+          volumes = [
+            "/var/lib/mautrix-linkedin:/data"
+          ];
+          environment = {
+            TZ = "America/Los_Angeles";
+          };
+        };
+      })
     ];
 
     # ============================================================================
@@ -368,7 +437,9 @@ with lib;
       (optional config.services.mautrix-bridges.slack.enable "d /var/lib/mautrix-slack 0755 root root -")
       ++ (optional config.services.mautrix-bridges.googlechat.enable "d /var/lib/mautrix-googlechat 0755 root root -")
       ++ (optional config.services.mautrix-bridges.twitter.enable "d /var/lib/mautrix-twitter 0755 root root -")
-      ++ (optional config.services.mautrix-bridges.gmessages.enable "d /var/lib/mautrix-gmessages 0755 root root -");
+      ++ (optional config.services.mautrix-bridges.gmessages.enable "d /var/lib/mautrix-gmessages 0755 root root -")
+      ++ (optional config.services.mautrix-bridges.gvoice.enable "d /var/lib/mautrix-gvoice 0755 root root -")
+      ++ (optional config.services.mautrix-bridges.linkedin.enable "d /var/lib/mautrix-linkedin 0755 root root -");
 
     # Enable Podman only for container-based bridges
     virtualisation.podman.enable = mkIf (
@@ -376,6 +447,8 @@ with lib;
       || config.services.mautrix-bridges.googlechat.enable
       || config.services.mautrix-bridges.twitter.enable
       || config.services.mautrix-bridges.gmessages.enable
+      || config.services.mautrix-bridges.gvoice.enable
+      || config.services.mautrix-bridges.linkedin.enable
     ) true;
 
     virtualisation.oci-containers.backend = mkIf (
@@ -383,6 +456,8 @@ with lib;
       || config.services.mautrix-bridges.googlechat.enable
       || config.services.mautrix-bridges.twitter.enable
       || config.services.mautrix-bridges.gmessages.enable
+      || config.services.mautrix-bridges.gvoice.enable
+      || config.services.mautrix-bridges.linkedin.enable
     ) "podman";
 
     # Ensure Matrix bridges data is persisted
@@ -404,7 +479,9 @@ with lib;
           ++ (optional config.services.mautrix-bridges.slack.enable "/var/lib/mautrix-slack")
           ++ (optional config.services.mautrix-bridges.googlechat.enable "/var/lib/mautrix-googlechat")
           ++ (optional config.services.mautrix-bridges.twitter.enable "/var/lib/mautrix-twitter")
-          ++ (optional config.services.mautrix-bridges.gmessages.enable "/var/lib/mautrix-gmessages");
+          ++ (optional config.services.mautrix-bridges.gmessages.enable "/var/lib/mautrix-gmessages")
+          ++ (optional config.services.mautrix-bridges.gvoice.enable "/var/lib/mautrix-gvoice")
+          ++ (optional config.services.mautrix-bridges.linkedin.enable "/var/lib/mautrix-linkedin");
         };
   };
 }

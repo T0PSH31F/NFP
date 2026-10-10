@@ -59,6 +59,18 @@ in
         "$mod, F, fullscreen, 1"
         "$mod ALT, F, fullscreen, 1"
 
+        # ── Window Floating & Pinning Controls ─────────────────────────
+        "$mod, V, togglefloating"
+        "$mod SHIFT, V, exec, hypr-window-pin"
+
+        # ── Fractional Window Sizing Presets ───────────────────────────
+        "$mod SHIFT, Minus, exec, hypr-fractional-resize 1/3"
+        "$mod SHIFT, Equal, exec, hypr-fractional-resize 2/3"
+        "$mod CTRL, Minus, exec, hypr-fractional-resize 1/2"
+
+        # ── Runtime Workspace Layout Cycle ────────────────────────────
+        "$mod CTRL, L, exec, hypr-layout-cycle"
+
         # ── Scrolling Layout Resizing ──
         "$mod, Equal, resizeactive, 40 0"
         "$mod, Minus, resizeactive, -40 0"

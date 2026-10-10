@@ -3,6 +3,7 @@
 { config, lib, ... }:
 {
   config = lib.mkIf (builtins.elem "desktop" config.machine.tags) {
+    hardware.audio.pipewire.enable = lib.mkDefault true;
     layers = {
       layer-10.system = {
         flatpak.enable = lib.mkDefault true;

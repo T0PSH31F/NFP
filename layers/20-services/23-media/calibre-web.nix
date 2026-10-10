@@ -51,7 +51,12 @@ with lib;
         subtitle = "Ancient Poneglyphs Library";
         icon = "calibre-web";
         metric = {
-          mode = "health-only";
+          mode = "native-api";
+          adapter = "calibre-web";
+          fields = [
+            "books"
+            "authors"
+          ];
         };
       };
     };

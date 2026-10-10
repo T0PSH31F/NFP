@@ -117,6 +117,10 @@
             command = "${lib.getExe pkgs.github-mcp-server}";
             args = [ ];
           };
+          beeper = {
+            url = "http://127.0.0.1:23373/v0/mcp";
+            description = "Beeper Desktop Universal Chat MCP Tool Suite (WhatsApp, Signal, Telegram, Discord, Google Messages, Voice, LinkedIn)";
+          };
         };
       };
 

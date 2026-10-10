@@ -156,6 +156,13 @@ in
           category = "desktop";
           cmd = "hypr-screenshot region";
         })
+        (mkAction {
+          chord = "Q";
+          action = "browser-qutebrowser";
+          desc = "qutebrowser (Keyboard Web Browser)";
+          category = "desktop";
+          cmd = "uwsm app -- qutebrowser";
+        })
       ];
     };
 

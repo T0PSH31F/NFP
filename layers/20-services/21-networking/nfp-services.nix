@@ -14,13 +14,17 @@ let
     _name: svc:
     let
       hostDomain = "${svc.tailnetName}.${config.layers.meta.tailnetDomain}";
+      tlsDirective = if svc.tls == "headscale" || svc.tls == "internal-ca" then "tls internal" else "";
+      siteAddress = if svc.tls == "none" then "http://${hostDomain}" else hostDomain;
+      extraConfigLines = filter (x: x != "") [
+        tlsDirective
+        "reverse_proxy ${svc.bind}:${toString svc.port}"
+      ];
     in
-    nameValuePair "${hostDomain}" {
-      extraConfig = ''
-        reverse_proxy ${svc.bind}:${toString svc.port}
-      '';
+    nameValuePair siteAddress {
+      extraConfig = concatStringsSep "\n" extraConfigLines;
     }
-  ) (filterAttrs (_: s: s.tls != "none") localServices);
+  ) localServices;
 
   # Prometheus scrape configs
   metricsServices = filterAttrs (_: s: s.metrics.enable && s.metrics.port > 0) enabledServices;

@@ -289,9 +289,16 @@ in
     mautrix-bridges = {
       enable = true;
       homeserverUrl = "http://localhost:8008";
-      homeserverDomain = "matrix.local";
+      homeserverDomain = "matrix.lovelain.duckdns.org";
       whatsapp.enable = true;
       signal.enable = true;
+      telegram.enable = true;
+      discord.enable = true;
+      instagram.enable = true;
+      facebook.enable = true;
+      gmessages.enable = true;
+      gvoice.enable = true;
+      linkedin.enable = true;
     };
 
     # Bind SearXNG to LAN so dashboard search works from z0r0
@@ -627,7 +634,7 @@ in
     wantedBy = [ "multi-user.target" ];
     serviceConfig = {
       Type = "simple";
-      ExecStart = "${pkgs.openssh}/bin/ssh -N -o ServerAliveInterval=30 -o ServerAliveCountMax=3 -o ExitOnForwardFailure=yes -o StrictHostKeyChecking=no -R 8087:127.0.0.1:8086 root@47.254.90.69";
+      ExecStart = "${pkgs.openssh}/bin/ssh -N -i /root/.ssh/id_ed25519 -o ServerAliveInterval=30 -o ServerAliveCountMax=3 -o ExitOnForwardFailure=yes -o StrictHostKeyChecking=no -R 8087:127.0.0.1:8086 root@47.254.90.69";
       Restart = "always";
       RestartSec = 5;
     };

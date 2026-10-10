@@ -6,5 +6,6 @@
     (mkDendriticModule "firefox" ./firefox.nix)
     (mkDendriticModule "google-chrome" ./google-chrome.nix)
     (mkDendriticModule "thunderbird" ./thunderbird.nix)
+    (mkDendriticModule "qutebrowser" ./qutebrowser.nix)
   ];
 }

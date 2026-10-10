@@ -127,7 +127,7 @@ in
         ];
 
         xdg.configFile."menus/applications.menu".source =
-          "${pkgs.kdePackages.kde-cli-tools}/etc/xdg/menus/applications.menu";
+          "${pkgs.kdePackages.plasma-workspace}/etc/xdg/menus/plasma-applications.menu";
 
         # Swappy screenshot tool config → save to ~/Pictures/Screenshots
         xdg.configFile."swappy/config".text = ''

@@ -119,6 +119,7 @@ let
         ⚡ Carapace
         🛠️ CLI Tools
         🏷️ Tag Groups
+        🌐 qutebrowser
     CHOICES
           )
           [ -z "$SELECTED" ] && break
@@ -148,6 +149,7 @@ let
             "⚡ Carapace")          ${carapace_cheatsheet}/bin/carapace-cheatsheet ;;
             "🛠️ CLI Tools")       ${cli_tools_cheatsheet}/bin/cli-tools-cheatsheet ;;
             "🏷️ Tag Groups")      ${tag_groups_cheatsheet}/bin/tag-groups-cheatsheet ;;
+            "🌐 qutebrowser")     ${qutebrowser_cheatsheet}/bin/qutebrowser-cheatsheet ;;
           esac
         done
   '';
@@ -1218,6 +1220,95 @@ let
         echo "$CARAPACE" | rofi_with_theme -dmenu -p "Carapace Guide" -filter ""
   '';
 
+  qutebrowser_cheatsheet = pkgs.writeShellScriptBin "qutebrowser-cheatsheet" ''
+        ${rofiTheme}
+        QUTEBROWSER="
+    🌐 QUTEBROWSER — KEYBOARD-DRIVEN BROWSER
+    ═══════════════════════════════════════════
+
+    🔗 LINK HINTS & OPENING
+    ─────────────────────────────────────────
+    f                           Show link hints (open in current tab)
+    F                           Show link hints (open in new tab)
+    ;b                          Show link hints (open in background tab)
+    ;w                          Show link hints (open in new window)
+    ;y                          Show link hints (copy URL to clipboard)
+    o                           Open URL / search prompt
+    O                           Open URL in new tab
+    go                          Open URL (pre-filled with current URL)
+    gO                          Open URL in new tab (pre-filled with current)
+
+    📜 PAGE NAVIGATION & SCROLLING
+    ─────────────────────────────────────────
+    j / k                       Scroll down / up
+    h / l                       Scroll left / right
+    d / u                       Scroll half-page down / up
+    gg / G                      Scroll to top / bottom of page
+    H / L                       Back / Forward in browser history
+    r / R                       Reload page / Reload without cache
+    stop / Ctrl+s               Stop loading page
+
+    📑 TAB MANAGEMENT
+    ─────────────────────────────────────────
+    J / K                       Switch to previous / next tab
+    gt / gT                     Switch to next / previous tab
+    gN                          Open new blank tab
+    d / x                       Close current tab
+    u                           Undo closed tab (restore tab)
+    b                           Buffer picker (search/select active tabs)
+    co                          Pin / unpin current tab
+    gm                          Move tab to position
+
+    🔍 IN-PAGE SEARCH & COPYING
+    ─────────────────────────────────────────
+    /                           Search forward in page
+    ?                           Search backward in page
+    n / N                       Next / Previous search match
+    yy                          Copy current page URL
+    yY                          Copy current page title and URL
+    yt                          Copy current tab URL
+    pp                          Open URL from primary selection
+    pP                          Open URL from clipboard in new tab
+
+    ⌨️ MODES & KEYS
+    ─────────────────────────────────────────
+    :                           Enter command mode
+    i                           Enter insert mode (typing into text inputs)
+    I                           Enter passthrough mode (bypass qutebrowser keys)
+    v                           Enter caret / selection mode
+    V                           Select line in caret mode
+    Escape / Ctrl+[             Exit insert / caret / command mode back to Normal
+
+    ⭐ BOOKMARKS & QUICKMARKS
+    ─────────────────────────────────────────
+    M                           Quickmark add (prompt for shortcut name)
+    b                           Open quickmark / buffer
+    :bookmark-add               Bookmark current page
+    :quickmark-load <name>      Load quickmark in current tab
+    qutebrowser-import-brave-bookmarks  Import 460+ Brave bookmarks to qutebrowser
+
+    📥 DOWNLOADS & PRIVACY
+    ─────────────────────────────────────────
+    :download                   Download target URL
+    :download-clear             Clear completed downloads list
+    ,p                          Open new private window
+    ,b                          Update adblock hosts / filter rules
+
+    🚀 CUSTOM NFP BINDINGS
+    ─────────────────────────────────────────
+    F1 / ,?                     Open built-in keybindings page (bind)
+    ,h                          Open qutebrowser help docs
+    ,r                          Reload configuration (config-source)
+    ,d                          Open Fleet Dashboard in current tab
+    ,D                          Open Fleet Dashboard in new tab
+    Ctrl+t                      Open new tab (url.default_page)
+    ,p                          Open private window
+    ,b                          Update adblock lists
+    Ctrl+[                      Escape / Exit mode mapping
+    "
+        echo "$QUTEBROWSER" | rofi_with_theme -dmenu -p "qutebrowser Guide" -filter ""
+  '';
+
 in
 {
   environment.systemPackages = [
@@ -1241,5 +1332,6 @@ in
     carapace_cheatsheet
     cli_tools_cheatsheet
     tag_groups_cheatsheet
+    qutebrowser_cheatsheet
   ];
 }

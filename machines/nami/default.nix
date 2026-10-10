@@ -110,6 +110,10 @@
     };
   };
 
+  users.users.root.openssh.authorizedKeys.keys = [
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJxCZSHtsjhrP4LqoteoVKwohyMwy9WQ/9o0BgvGQydj luffy-to-nami"
+  ];
+
   # === Firewall: SSH + gno + headscale + HTTPS ===
   networking.firewall.allowedTCPPorts = [
     22

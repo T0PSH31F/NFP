@@ -26,7 +26,7 @@ with lib;
       # Audio control
       pavucontrol
       pulsemixer
-      alsamixer
+      alsa-utils
 
       # Audio tools
       audacity

@@ -18,7 +18,6 @@ in
 
     # Session-wide environment variables for portal/Wayland integration
     environment.sessionVariables = {
-      GTK_USE_PORTAL = "1";
       NIXOS_OZONE_WL = "1";
     };
 
@@ -41,6 +40,8 @@ in
         with pkgs;
         [
           xdg-desktop-portal-gtk
+          xdg-desktop-portal-gnome
+          kdePackages.xdg-desktop-portal-kde
         ]
         ++ cfg.extraPortals;
 
@@ -53,18 +54,16 @@ in
           "org.freedesktop.impl.portal.AppChooser" = [ "gtk" ];
           "org.freedesktop.impl.portal.FileChooser" = [ "gtk" ];
           "org.freedesktop.impl.portal.OpenURI" = [ "gtk" ];
+          "org.freedesktop.impl.portal.Secret" = [ "gnome" ];
         };
 
         # Matches XDG_CURRENT_DESKTOP=Hyprland
         hyprland = {
           default = [ "gtk" ];
-          "org.freedesktop.impl.portal.AppChooser" = [ "gtk" ];
-          "org.freedesktop.impl.portal.FileChooser" = [ "gtk" ];
-          "org.freedesktop.impl.portal.OpenURI" = [ "gtk" ];
-          "org.freedesktop.impl.portal.Print" = [ "gtk" ];
+          "org.freedesktop.impl.portal.FileChooser" = [ "kde" ];
           "org.freedesktop.impl.portal.ScreenCast" = [ "hyprland" ];
-          "org.freedesktop.impl.portal.Screenshot" = [ "hyprland" ];
           "org.freedesktop.impl.portal.GlobalShortcuts" = [ "hyprland" ];
+          "org.freedesktop.impl.portal.Secret" = [ "gnome" ];
         };
 
         # Matches XDG_CURRENT_DESKTOP=niri
@@ -74,6 +73,7 @@ in
           "org.freedesktop.impl.portal.FileChooser" = [ "gtk" ];
           "org.freedesktop.impl.portal.OpenURI" = [ "gtk" ];
           "org.freedesktop.impl.portal.Print" = [ "gtk" ];
+          "org.freedesktop.impl.portal.Secret" = [ "gnome" ];
         };
       };
     };

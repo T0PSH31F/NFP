@@ -40,7 +40,7 @@
     layers.layer-79.skills.llm-agents-catalog.enable = lib.mkDefault true;
     layers.layer-76.orchestrators.executor.enable = lib.mkDefault true;
     layers.layer-76.orchestrators.mission-control.enable = lib.mkDefault true;
-    layers.layer-76.orchestrators.aionui.enable = lib.mkDefault false; # disabled: upstream better-sqlite3 compilation fails under Node 24
+    layers.layer-76.orchestrators.aionui.enable = lib.mkDefault false; # Disabled: better-sqlite3 build failure against electron 43 headers
     layers.layer-76.orchestrators.paperclip.enable = lib.mkDefault true;
     layers.layer-76.orchestrators.polyfloor.enable = lib.mkDefault true;
 

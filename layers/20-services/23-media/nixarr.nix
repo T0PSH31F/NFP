@@ -112,7 +112,12 @@ in
           subtitle = "Manga Scrolls Archive";
           icon = "komga";
           metric = {
-            mode = "health-only";
+            mode = "native-api";
+            adapter = "komga";
+            fields = [
+              "books"
+              "series"
+            ];
           };
         };
       };
@@ -133,7 +138,12 @@ in
           subtitle = "Ancient Audio Archives";
           icon = "audiobookshelf";
           metric = {
-            mode = "health-only";
+            mode = "native-api";
+            adapter = "audiobookshelf";
+            fields = [
+              "items"
+              "authors"
+            ];
           };
         };
         healthcheck = {
@@ -278,6 +288,75 @@ in
               "ulSpeed"
             ];
           };
+        };
+      };
+
+      lidarr = {
+        enable = true;
+        host = "luffy";
+        bind = "127.0.0.1";
+        port = 8686;
+        tailnetName = "lidarr";
+        tls = "headscale";
+        backup.paths = [ "${cfg.stateDir}/lidarr" ];
+        homepage = {
+          enable = true;
+          category = "vegapunk";
+          order = 35;
+          title = "Lidarr";
+          subtitle = "Brook — Soul King 💀🎵";
+          icon = "lidarr";
+          satellite = "brook";
+          metric = {
+            mode = "native-api";
+            adapter = "lidarr";
+            fields = [
+              "artists"
+              "albums"
+            ];
+          };
+        };
+        healthcheck = {
+          enable = true;
+          path = "/";
+          expectedStatus = [
+            200
+            401
+          ];
+        };
+      };
+
+      bazarr = {
+        enable = true;
+        host = "luffy";
+        bind = "127.0.0.1";
+        port = 6767;
+        tailnetName = "bazarr";
+        tls = "headscale";
+        backup.paths = [ "${cfg.stateDir}/bazarr" ];
+        homepage = {
+          enable = true;
+          category = "vegapunk";
+          order = 45;
+          title = "Bazarr";
+          subtitle = "Pythagoras — Wisdom";
+          icon = "bazarr";
+          satellite = "pythagoras";
+          metric = {
+            mode = "native-api";
+            adapter = "bazarr";
+            fields = [
+              "subtitles"
+            ];
+          };
+        };
+        healthcheck = {
+          enable = true;
+          path = "/";
+          expectedStatus = [
+            200
+            401
+          ];
         };
       };
     };

@@ -222,8 +222,14 @@ let
     🪟 WINDOW MANAGEMENT
     ─────────────────────────────────────────
     Super + Q                  Kill Active Window
+    Super + V                  Toggle Floating Window
+    Super + Shift + V          Toggle Window Pin & Float
     Super + F                  Fullscreen
     Super + Shift + F          Maximize
+    Super + Shift + -          1/3 Width Preset
+    Super + Shift + =          2/3 Width Preset
+    Super + Ctrl + -           1/2 Width Preset
+    Super + Ctrl + L           Cycle Workspace Layout
     Super + Arrows             Move Focus
     Super + Shift + Arrows     Move Window
     Super + Mouse (Left)       Move Window
@@ -348,6 +354,193 @@ let
   #  # Apply resize
   #  hyprctl dispatch resizewindowpixel exact "$NEW_WIDTH" 100%,activewindow
   #'';
+
+  # ── Window Pinning / Floating Toggle ──────────────────────────────
+  hypr-window-pin = pkgs.writeShellScriptBin "hypr-window-pin" ''
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    WIN_JSON=$(hyprctl activewindow -j 2>/dev/null || echo "{}")
+    if [ "$WIN_JSON" = "{}" ] || [ -z "$WIN_JSON" ]; then
+      exit 0
+    fi
+
+    ADDR=$(echo "$WIN_JSON" | ${pkgs.jq}/bin/jq -r '.address // empty')
+    if [ -z "$ADDR" ] || [ "$ADDR" = "null" ]; then
+      exit 0
+    fi
+
+    FLOATING=$(echo "$WIN_JSON" | ${pkgs.jq}/bin/jq -r '.floating')
+    PINNED=$(echo "$WIN_JSON" | ${pkgs.jq}/bin/jq -r '.pinned')
+
+    if [ "$FLOATING" = "false" ]; then
+      hyprctl dispatch togglefloating "address:$ADDR"
+      hyprctl dispatch pin "address:$ADDR"
+      ${pkgs.libnotify}/bin/notify-send -t 1500 -u low -i pin "Window Pinning" "Window floated & pinned"
+    elif [ "$FLOATING" = "true" ] && [ "$PINNED" = "false" ]; then
+      hyprctl dispatch pin "address:$ADDR"
+      ${pkgs.libnotify}/bin/notify-send -t 1500 -u low -i pin "Window Pinning" "Window pinned"
+    elif [ "$PINNED" = "true" ]; then
+      hyprctl dispatch pin "address:$ADDR"
+      ${pkgs.libnotify}/bin/notify-send -t 1500 -u low -i pin "Window Pinning" "Window unpinned (remains floating)"
+    fi
+  '';
+
+  # ── Layout-Aware Fractional Sizing Presets ───────────────────────
+  hypr-fractional-resize = pkgs.writeShellScriptBin "hypr-fractional-resize" ''
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    PRESET="''${1:-}"
+    case "$PRESET" in
+      1/3) RATIO="0.333333" ;;
+      2/3) RATIO="0.666667" ;;
+      1/2) RATIO="0.5" ;;
+      *)
+        echo "Usage: hypr-fractional-resize {1/3|2/3|1/2}" >&2
+        exit 1
+        ;;
+    esac
+
+    WIN_JSON=$(hyprctl activewindow -j 2>/dev/null || echo "{}")
+    if [ "$WIN_JSON" = "{}" ] || [ -z "$WIN_JSON" ]; then
+      exit 0
+    fi
+
+    ADDR=$(echo "$WIN_JSON" | ${pkgs.jq}/bin/jq -r '.address // empty')
+    if [ -z "$ADDR" ] || [ "$ADDR" = "null" ]; then
+      exit 0
+    fi
+
+    FLOATING=$(echo "$WIN_JSON" | ${pkgs.jq}/bin/jq -r '.floating')
+    MONITOR_ID=$(echo "$WIN_JSON" | ${pkgs.jq}/bin/jq -r '.monitor')
+    WIN_X=$(echo "$WIN_JSON" | ${pkgs.jq}/bin/jq -r '.at[0]')
+    WIN_Y=$(echo "$WIN_JSON" | ${pkgs.jq}/bin/jq -r '.at[1]')
+    WIN_H=$(echo "$WIN_JSON" | ${pkgs.jq}/bin/jq -r '.size[1]')
+
+    WS_JSON=$(hyprctl activeworkspace -j 2>/dev/null || echo "{}")
+    TILED_LAYOUT=$(echo "$WS_JSON" | ${pkgs.jq}/bin/jq -r '.tiledLayout // "dwindle"')
+
+    MON_JSON=$(hyprctl monitors -j 2>/dev/null | ${pkgs.jq}/bin/jq -c ".[] | select(.id == $MONITOR_ID)" 2>/dev/null || echo "")
+    if [ -z "$MON_JSON" ]; then
+      MON_JSON=$(hyprctl monitors -j 2>/dev/null | ${pkgs.jq}/bin/jq -c '.[] | select(.focused == true)' 2>/dev/null || echo "")
+    fi
+
+    if [ -z "$MON_JSON" ]; then
+      echo "hypr-fractional-resize: could not determine monitor properties" >&2
+      exit 1
+    fi
+
+    MON_CALC=$(echo "$MON_JSON" | ${pkgs.jq}/bin/jq -r \
+      '(.scale // 1.0) as $scale |
+       (.width / $scale) as $lw |
+       (.height / $scale) as $lh |
+       ((.reserved[0] // 0) / $scale) as $rl |
+       ((.reserved[1] // 0) / $scale) as $rt |
+       ((.reserved[2] // 0) / $scale) as $rr |
+       ((.reserved[3] // 0) / $scale) as $rb |
+       ($lw - $rl - $rr | round) as $uw |
+       ($lh - $rt - $rb | round) as $uh |
+       (((.x // 0) + $rl) | round) as $xmin |
+       (((.y // 0) + $rt) | round) as $ymin |
+       "\($uw) \($uh) \($xmin) \($ymin)"')
+
+    read -r USABLE_W USABLE_H USABLE_XMIN USABLE_YMIN <<< "$MON_CALC"
+
+    if [ "$FLOATING" = "true" ]; then
+      TARGET_W=$(echo "$USABLE_W $RATIO" | ${pkgs.jq}/bin/jq -r '(.[0] * .[1]) | round')
+      USABLE_XMAX=$(( USABLE_XMIN + USABLE_W ))
+      TARGET_XMAX=$(( WIN_X + TARGET_W ))
+
+      NEW_X=$WIN_X
+      if [ "$TARGET_XMAX" -gt "$USABLE_XMAX" ]; then
+        NEW_X=$(( USABLE_XMAX - TARGET_W ))
+      fi
+      if [ "$NEW_X" -lt "$USABLE_XMIN" ]; then
+        NEW_X=$USABLE_XMIN
+      fi
+
+      hyprctl dispatch resizewindowpixel exact "''${TARGET_W}" "''${WIN_H}",address:"''${ADDR}"
+      hyprctl dispatch movewindowpixel exact "''${NEW_X}" "''${WIN_Y}",address:"''${ADDR}"
+      ${pkgs.libnotify}/bin/notify-send -t 1500 -u low -i preferences-desktop-display "Window Sizing" "Floating window width set to $PRESET (''${TARGET_W}px)"
+    else
+      case "$TILED_LAYOUT" in
+        master)
+          hyprctl keyword master:mfact "$RATIO"
+          ${pkgs.libnotify}/bin/notify-send -t 1500 -u low -i preferences-desktop-display "Master Layout Preset" "Master area fraction set to $PRESET"
+          ;;
+        dwindle)
+          TARGET_W=$(echo "$USABLE_W $RATIO" | ${pkgs.jq}/bin/jq -r '(.[0] * .[1]) | round')
+          hyprctl dispatch resizeactive exact "''${TARGET_W}" "''${WIN_H}"
+          ${pkgs.libnotify}/bin/notify-send -t 1500 -u low -i preferences-desktop-display "Dwindle Layout Preset" "Split container width set to $PRESET (''${TARGET_W}px)"
+          ;;
+        monocle)
+          ${pkgs.libnotify}/bin/notify-send -t 1500 -u low -i dialog-information "Monocle Layout" "Fractional sizing is not applicable to tiled windows"
+          ;;
+        scrolling)
+          TARGET_W=$(echo "$USABLE_W $RATIO" | ${pkgs.jq}/bin/jq -r '(.[0] * .[1]) | round')
+          hyprctl dispatch resizeactive exact "''${TARGET_W}" "''${WIN_H}"
+          ${pkgs.libnotify}/bin/notify-send -t 1500 -u low -i preferences-desktop-display "Scrolling Layout Preset" "Column width set to $PRESET (''${TARGET_W}px)"
+          ;;
+        *)
+          TARGET_W=$(echo "$USABLE_W $RATIO" | ${pkgs.jq}/bin/jq -r '(.[0] * .[1]) | round')
+          hyprctl dispatch resizeactive exact "''${TARGET_W}" "''${WIN_H}"
+          ;;
+      esac
+    fi
+  '';
+
+  # ── Runtime Active Workspace Layout Switcher ──────────────────────
+  hypr-layout-cycle = pkgs.writeShellScriptBin "hypr-layout-cycle" ''
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    FOCUSED_MON=$(hyprctl monitors -j 2>/dev/null | ${pkgs.jq}/bin/jq -c '.[] | select(.focused == true)' || echo "")
+    SPECIAL_NAME=$(echo "$FOCUSED_MON" | ${pkgs.jq}/bin/jq -r '.specialWorkspace.name // empty')
+
+    if [ -n "$SPECIAL_NAME" ] && [ "$SPECIAL_NAME" != "" ]; then
+      WS_TARGET="$SPECIAL_NAME"
+    else
+      WS_TARGET=$(hyprctl activeworkspace -j 2>/dev/null | ${pkgs.jq}/bin/jq -r '.name // "1"')
+    fi
+
+    CURRENT_LAYOUT=$(hyprctl activeworkspace -j 2>/dev/null | ${pkgs.jq}/bin/jq -r '.tiledLayout // "dwindle"')
+
+    SEQUENCE=("dwindle" "master" "monocle" "scrolling")
+    NUM_SEQ=''${#SEQUENCE[@]}
+
+    CURRENT_IDX=-1
+    for i in "''${!SEQUENCE[@]}"; do
+      if [ "''${SEQUENCE[$i]}" = "$CURRENT_LAYOUT" ]; then
+        CURRENT_IDX=$i
+        break
+      fi
+    done
+
+    if [ "$CURRENT_IDX" -eq -1 ]; then
+      CURRENT_IDX=0
+    fi
+
+    NEXT_LAYOUT=""
+    for step in $(seq 1 $NUM_SEQ); do
+      CAND_IDX=$(( (CURRENT_IDX + step) % NUM_SEQ ))
+      CAND_LAYOUT="''${SEQUENCE[$CAND_IDX]}"
+
+      hyprctl keyword workspace "''${WS_TARGET},layout:''${CAND_LAYOUT}" >/dev/null 2>&1 || true
+      CHECK_LAYOUT=$(hyprctl activeworkspace -j 2>/dev/null | ${pkgs.jq}/bin/jq -r '.tiledLayout // ""')
+
+      if [ "$CHECK_LAYOUT" = "$CAND_LAYOUT" ]; then
+        NEXT_LAYOUT="$CAND_LAYOUT"
+        break
+      fi
+    done
+
+    if [ -n "$NEXT_LAYOUT" ]; then
+      ${pkgs.libnotify}/bin/notify-send -t 2000 -u low -i preferences-desktop-workspaces "Workspace Layout" "Workspace $WS_TARGET: $NEXT_LAYOUT"
+    else
+      ${pkgs.libnotify}/bin/notify-send -t 2000 -u low -i dialog-warning "Workspace Layout" "Could not switch layout for workspace $WS_TARGET"
+    fi
+  '';
 in
 {
   config = lib.mkIf cfg.enable {
@@ -356,6 +549,9 @@ in
       hypr-sfx-toggle
       theme-switch
       hypr-keybind-cheatsheet
+      hypr-window-pin
+      hypr-fractional-resize
+      hypr-layout-cycle
       #  hypr-scrolling-resize
     ];
   };
