@@ -106,6 +106,13 @@ in
       peripherals.razer.enable = lib.mkForce false; # Disabled: openrazer driver incompatible with linux 7.0.10
     };
   };
+  services.ai-services = {
+    ollama.enable = lib.mkForce false;
+    open-webui.enable = lib.mkForce false;
+    kong-gateway.enable = lib.mkForce false;
+  };
+  services.sillytavern-app.enable = lib.mkForce false;
+
   layers.layer-20.services.config.your-spotify.enable = true;
   services.searxng.enable = true;
   services.calibre-web-app.enable = true;

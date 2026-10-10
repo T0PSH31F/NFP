@@ -129,6 +129,7 @@
         "xiaomi_mimo_api_key_wright"
         "kong_key_hermes"
         "extremerouter_api_key"
+        "mistral_api_key"
       ];
 
       hermesDesktopPkg =
@@ -686,7 +687,7 @@
               provider: gemini
               model: gemini-3.1-flash-lite-preview
               base_url: ""
-              api_key: ""
+              api_key: "''${GEMINI_API_KEY}"
               timeout: 120
               extra_body: {}
 
@@ -737,7 +738,7 @@
                 - -y
                 - mistral-mcp
               env:
-                MISTRAL_API_KEY: ""
+                MISTRAL_API_KEY: "''${MISTRAL_API_KEY}"
             codegraph:
               command: codegraph
               args:
@@ -787,6 +788,7 @@
           GOOGLE_AI_API_KEY=${config.sops.placeholder.gemini_api_key_we77}
           OLLAMA_API_KEY=${config.sops.placeholder.ollama_api_key}
           ANTHROPIC_API_KEY=${config.sops.placeholder.anthropic_api_key}
+          MISTRAL_API_KEY=${config.sops.placeholder.mistral_api_key}
           # ExtremeRouter integration
           OPENAI_API_KEY=${config.sops.placeholder.extremerouter_api_key}
           EXTREMEROUTER_API_KEY=${config.sops.placeholder.extremerouter_api_key}
