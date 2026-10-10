@@ -20,7 +20,6 @@ let
 
   # Intentional omissions (backend-only services that don't need cards)
   intentionalOmissions = {
-    netdata = "Backend telemetry agent — visible through Grafana dashboards";
     ollama = "Backend LLM runtime — accessed through Open WebUI or oterm";
   };
 
@@ -39,6 +38,10 @@ let
     {
       name = "headscale";
       host = "luffy";
+    }
+    {
+      name = "headplane";
+      host = "nami";
     }
     # Media
     {
@@ -99,18 +102,34 @@ let
       name = "syncthing";
       host = "luffy";
     }
+    {
+      name = "filebrowser";
+      host = "nami";
+    }
     # Monitoring
     {
       name = "ntfy";
       host = "luffy";
     }
     {
-      name = "prometheus";
+      name = "netdata";
       host = "luffy";
     }
     {
-      name = "grafana";
+      name = "glances";
       host = "luffy";
+    }
+    {
+      name = "prometheus";
+      host = "nami";
+    }
+    {
+      name = "grafana";
+      host = "nami";
+    }
+    {
+      name = "loki";
+      host = "nami";
     }
     # Search
     {
@@ -124,6 +143,10 @@ let
     }
     {
       name = "omniroute";
+      host = "nami";
+    }
+    {
+      name = "paperclip";
       host = "nami";
     }
     {

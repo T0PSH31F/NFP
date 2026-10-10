@@ -36,7 +36,7 @@ in
     enable = mkEnableOption "Headplane Headscale management web UI";
     port = mkOption {
       type = types.port;
-      default = 3000;
+      default = 3050;
       description = "Listen port for Headplane web UI";
     };
     headscaleUrl = mkOption {
@@ -68,6 +68,8 @@ in
     };
     users.groups.headplane = { };
 
+    environment.etc."headplane/config.yaml".source = headplaneConfig;
+
     # Systemd service for Headplane
     systemd.services.headplane = {
       description = "Headplane Headscale Management Console";
@@ -76,6 +78,7 @@ in
       wants = [ "network-online.target" ];
       environment = {
         HEADPLANE_CONFIG_FILE = "${headplaneConfig}";
+        HEADPLANE_CONFIG_PATH = "${headplaneConfig}";
         PORT = toString cfg.port;
         HOST = "0.0.0.0";
       };
@@ -89,6 +92,8 @@ in
         WorkingDirectory = "/var/lib/headplane";
       };
     };
+
+    networking.firewall.allowedTCPPorts = [ cfg.port ];
 
     # Data contract & homepage integration
     nfp.services.headplane = {
@@ -110,9 +115,12 @@ in
       homepage = {
         enable = true;
         category = "nami";
-        widget = {
-          type = "customapi";
-          url = "http://127.0.0.1:${toString cfg.port}";
+        order = 15;
+        title = "Headplane";
+        subtitle = "Tailnet Web Console";
+        icon = "headplane";
+        metric = {
+          mode = "health-only";
         };
       };
     };

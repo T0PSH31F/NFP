@@ -99,8 +99,8 @@ with lib;
           Environment = [
             "HOME=/home/${primaryUser}"
             "PATH=/etc/profiles/per-user/${primaryUser}/bin:/home/${primaryUser}/.nix-profile/bin:/home/${primaryUser}/.local/bin:/run/current-system/sw/bin:/usr/bin:/bin"
-            "AIONUI_HOST=127.0.0.1"
-            "HOST=127.0.0.1"
+            "AIONUI_HOST=0.0.0.0"
+            "HOST=0.0.0.0"
             "AIONUI_PORT=${toString cfg.port}"
             "PORT=${toString cfg.port}"
             "NODE_ENV=production"
@@ -119,7 +119,32 @@ with lib;
         };
       };
 
-      networking.firewall.allowedTCPPorts = mkIf cfg.openFirewall [ cfg.port ];
+      networking.firewall.allowedTCPPorts = [ cfg.port ];
+
+      nfp.services.aionui = {
+        enable = true;
+        host = config.networking.hostName;
+        bind = "0.0.0.0";
+        inherit (cfg) port;
+        tailnetName = "aionui";
+        tls = "headscale";
+        healthcheck = {
+          enable = true;
+          path = "/";
+          expectedStatus = [ 200 ];
+        };
+        homepage = {
+          enable = true;
+          category = "agents";
+          order = 20;
+          title = "AionUI";
+          subtitle = "AI Cowork Web Interface";
+          icon = "aionui";
+          metric = {
+            mode = "health-only";
+          };
+        };
+      };
 
       environment.persistence."/persist" =
         mkIf (config.layers.layer-10.system.config.impermanence.enable or false)

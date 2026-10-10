@@ -254,8 +254,8 @@
             throw "luffy service scope error: Netdata must be enabled on nami"
           else if !z0r0Config.layers.layer-20.services.config.netdata.enable then
             throw "luffy service scope error: Netdata must be enabled on z0r0"
-          else if luffyConfig.nfp.services.netdata.homepage.enable then
-            throw "luffy service scope error: Netdata homepage card must be false by default"
+          else if !luffyConfig.nfp.services.netdata.homepage.enable then
+            throw "luffy service scope error: Netdata homepage card must be enabled per policy update"
           else
             pkgs.runCommand "check-luffy-service-scope" { } ''
               touch $out

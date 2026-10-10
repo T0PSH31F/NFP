@@ -22,6 +22,8 @@
 | **389**  | Vaultwarden LDAP       | luffy  | `layers/20-services/25-data/vaultwarden.nix`      | Internal LDAP auth              |
 | **465**  | Himalaya SMTPS         | z0r0   | `layers/50-cli-tui-programs/53-tools/`             | Email client SMTP               |
 | **993**  | Himalaya IMAPS         | z0r0   | `layers/50-cli-tui-programs/53-tools/`             | Email client IMAP               |
+| **1055** | Tailscale Sidecar SOCKS5| z0r0   | `layers/20-services/21-networking/tailscale-sidecar.nix` | Isolated SOCKS5 proxy listener (`127.0.0.1:1055`) |
+| **1056** | Tailscale Sidecar HTTP  | z0r0   | `layers/20-services/21-networking/tailscale-sidecar.nix` | Isolated HTTP proxy listener (`127.0.0.1:1056`) |
 | **1337** | Jan AI                 | z0r0   | `layers/74-ai-infra/jan.nix`                       | Local AI Desktop API            |
 | **3000** | Hermes Workspace       | z0r0   | `layers/70-agents/71-harness/hermes/`              | Hermes Agent Web GUI            |
 | **3001** | HedgeDoc               | z0r0   | `machines/z0r0/default.nix`                        | Collaborative Markdown Editor   |
@@ -95,6 +97,7 @@
 | **21027**| Syncthing Discovery    | Both   | `layers/20-services/25-data/syncthing.nix`         | Syncthing UDP Discovery         |
 | **21116**| RustDesk Signal        | z0r0   | `layers/20-services/24-communication/`             | Remote Desktop Signaling        |
 | **22000**| Syncthing Sync         | Both   | `layers/20-services/25-data/syncthing.nix`         | Syncthing Peer Transfer Port    |
+| **23373**| Beeper Desktop API/MCP | z0r0   | `layers/60-gui-programs/68-communication/beeper.nix`| Beeper local REST API & MCP Server (Streamable HTTP) |
 | **25600**| Komga                  | luffy  | `layers/20-services/26-monitoring/`                | Comic & Manga Server            |
 | **29317**| Mautrix WhatsApp       | luffy  | `layers/20-services/24-communication/`             | WhatsApp Matrix Bridge          |
 | **29318**| Mautrix Signal         | luffy  | `layers/20-services/24-communication/`             | Signal Matrix Bridge            |

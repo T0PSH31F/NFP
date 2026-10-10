@@ -662,7 +662,7 @@ in
         nfp.services.kong-gateway = {
           enable = config.services.ai-services.kong-gateway.enable;
           host = "nami";
-          port = 8091;
+          port = 8090;
           homepage = {
             enable = true;
             category = "agents";
@@ -677,7 +677,7 @@ in
           healthcheck = {
             enable = true;
             path = "/status";
-            expectedStatus = 200;
+            expectedStatus = [ 200 ];
           };
         };
       }

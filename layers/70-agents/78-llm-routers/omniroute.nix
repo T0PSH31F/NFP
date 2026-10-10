@@ -45,7 +45,7 @@ with lib;
           omniroute:
             image: ghcr.io/diegosouzapw/omniroute:latest
             ports:
-              - "127.0.0.1:${toString cfg.port}:20128"
+              - "${toString cfg.port}:20128"
             environment:
               - NODE_ENV=production
               - PORT=20128
@@ -119,8 +119,9 @@ with lib;
       {
         nfp.services.omniroute = {
           enable = config.services.ai-services.omniroute.enable;
-          host = "nami";
-          port = 20129;
+          host = config.networking.hostName;
+          bind = "0.0.0.0";
+          inherit (cfg) port;
           homepage = {
             enable = true;
             category = "agents";
@@ -135,11 +136,13 @@ with lib;
           healthcheck = {
             enable = true;
             path = "/api/health";
-            expectedStatus = 200;
+            expectedStatus = [ 200 ];
           };
         };
       }
       (mkIf cfg.enable {
+        networking.firewall.allowedTCPPorts = [ cfg.port ];
+
         environment.systemPackages = [
           pkgs.podman-compose
           helperPkg

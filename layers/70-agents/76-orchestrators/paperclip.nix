@@ -37,7 +37,7 @@ with lib;
 
     port = mkOption {
       type = types.port;
-      default = 3100;
+      default = 3101;
       description = "Port for Paperclip web UI";
     };
 
@@ -77,16 +77,41 @@ with lib;
             else
               pkgs.paperclip or (pkgs.writeShellScriptBin "paperclip" ''
                 echo "Starting fallback Paperclip daemon..."
-                exec ${pkgs.python3}/bin/python3 -m http.server "3100" --bind "127.0.0.1"
+                exec ${pkgs.python3}/bin/python3 -m http.server "${toString cfg.port}" --bind "0.0.0.0"
               '')
           else
             pkgs.paperclip or (pkgs.writeShellScriptBin "paperclip" ''
               echo "Starting fallback Paperclip daemon..."
-              exec ${pkgs.python3}/bin/python3 -m http.server "3100" --bind "127.0.0.1"
+              exec ${pkgs.python3}/bin/python3 -m http.server "${toString cfg.port}" --bind "0.0.0.0"
             '')
         );
     in
     mkIf cfg.enable {
+      nfp.services.paperclip = {
+        enable = true;
+        host = config.networking.hostName;
+        bind = "0.0.0.0";
+        inherit (cfg) port;
+        tailnetName = "paperclip";
+        tls = "headscale";
+        healthcheck = {
+          enable = true;
+          path = "/";
+          expectedStatus = [ 200 ];
+        };
+        homepage = {
+          enable = true;
+          category = "chopper";
+          order = 26;
+          title = "Paperclip";
+          subtitle = "Swarm Control Plane";
+          icon = "paperclip";
+          metric = {
+            mode = "health-only";
+          };
+        };
+      };
+
       systemd.tmpfiles.rules = [
         "d ${cfg.dataDir} 0755 root root -"
       ];
@@ -126,7 +151,7 @@ with lib;
             "BETTER_AUTH_SECRET=${cfg.authSecret}"
             "PAPERCLIP_DEPLOYMENT_MODE=authenticated"
             "PAPERCLIP_DEPLOYMENT_EXPOSURE=private"
-            "PAPERCLIP_PUBLIC_URL=http://localhost:${toString cfg.port}"
+            "PAPERCLIP_PUBLIC_URL=http://${config.networking.hostName}.nfp.nix:${toString cfg.port}"
           ];
         };
       };

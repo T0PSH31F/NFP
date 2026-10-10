@@ -26,15 +26,17 @@ in
       config = {
         global = {
           "default port" = toString cfg.port;
-          "bind socket to IP" = "127.0.0.1";
+          "bind socket to IP" = "0.0.0.0";
         };
       };
     };
 
+    networking.firewall.allowedTCPPorts = [ cfg.port ];
+
     nfp.services.netdata = {
       enable = true;
       host = config.networking.hostName;
-      bind = "127.0.0.1";
+      bind = "0.0.0.0";
       inherit (cfg) port;
       tailnetName = "netdata";
       tls = "headscale";
@@ -44,10 +46,10 @@ in
         expectedStatus = [ 200 ];
       };
       homepage = {
-        enable = false;
+        enable = true;
         category = "chopper";
         order = 40;
-        title = "Netdata";
+        title = "Netdata (${config.networking.hostName})";
         subtitle = "Real-Time Telemetry";
         icon = "netdata";
         metric = {
