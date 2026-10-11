@@ -69,49 +69,39 @@ with lib;
           ".config"
           ".local"
 
-          # SSH & GPG
+          # SSH (GPG moved to XDG: .local/share/gnupg, covered by ".local")
           ".ssh"
-          ".gnupg"
 
           # Development caches
           ".cache"
-
-          # Browser profiles
-          ".mozilla"
 
           # Shell history & state
           ".local/share/fish"
           ".local/share/zsh"
 
           # Legacy/Custom User Data
+          # (XDG migration 2026-10-10: .gnupg/.mozilla/.icons/.themes/.pki/
+          #  .claude/.codex/.kodi/.zsh_history moved under .config/ or
+          #  .local/share/, which are persisted wholesale above.)
           "Agents"
           "Templates"
           "Games"
           "Appimages"
           "Notes"
-          ".icons"
-          ".themes"
           ".cursors"
-          ".pki"
           ".thunderbird"
           ".background"
           ".antigravity"
           ".gemini"
-          ".claude" # Claude Code transcripts + skills
-          ".codex" # Codex CLI state
           ".opencode" # OpenCode local plugin data
           ".zeroclaw" # ZeroClaw logs + skills
           ".openclaw" # OpenClaw logs + skills
           ".kilocode" # KiloCode CLI state
-          ".kodi"
           ".var/app"
           ".authsome"
         ];
 
         files = [
-          # Shell history
-          ".zsh_history"
-
           # facter.json
           "facter.json"
         ];
@@ -127,7 +117,7 @@ with lib;
       # User home persistence
       "d ${config.layers.layer-10.system.config.impermanence.persistPath}/home/t0psh31f 0700 t0psh31f users -"
       "d ${config.layers.layer-10.system.config.impermanence.persistPath}/home/t0psh31f/.ssh 0700 t0psh31f users -"
-      "d ${config.layers.layer-10.system.config.impermanence.persistPath}/home/t0psh31f/.gnupg 0700 t0psh31f users -"
+      "d ${config.layers.layer-10.system.config.impermanence.persistPath}/home/t0psh31f/.local/share/gnupg 0700 t0psh31f users -"
 
       # OpenCode local plugin data
       "d ${config.layers.layer-10.system.config.impermanence.persistPath}/home/t0psh31f/.opencode 0700 t0psh31f users -"

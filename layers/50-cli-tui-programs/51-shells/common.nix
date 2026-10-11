@@ -1,6 +1,13 @@
 { config, lib, ... }:
 let
   cfg = config.layers.layer-50.cli;
+  # This module is evaluated against the NixOS-level config (dendritic),
+  # so xdg.* home paths are built from the primary user's home directory.
+  homeDir = config.users.users.${config.layers.meta.primaryUser}.home;
+  xdgConfig = "${homeDir}/.config";
+  xdgData = "${homeDir}/.local/share";
+  xdgState = "${homeDir}/.local/state";
+  xdgCache = "${homeDir}/.cache";
 in
 {
   home = lib.mkIf cfg.enable {
@@ -10,6 +17,24 @@ in
       PAGER = "bat";
       MANPAGER = "sh -c 'col -bx | bat -l man -p'";
       STARSHIP_CONFIG = lib.mkForce "$HOME/.cache/starship/starship.toml";
+
+      # ── XDG Base Directory migration (xdg-ninja) ──────────────────────
+      HISTFILE = "${xdgState}/bash/history";
+      GOPATH = "${xdgData}/go";
+      CODEX_HOME = "${xdgConfig}/codex";
+      CLAUDE_CONFIG_DIR = "${xdgConfig}/claude";
+      DOTNET_CLI_HOME = "${xdgData}/dotnet";
+      ANDROID_USER_HOME = "${xdgData}/android";
+      ANDROID_AVD_HOME = "${xdgData}/android/avd";
+      KODI_DATA = "${xdgData}/kodi";
+      PI_CODING_AGENT_DIR = "${xdgConfig}/pi/agent";
+      WINEPREFIX = "${xdgData}/wine";
+      GNUPGHOME = lib.mkForce "${xdgData}/gnupg";
+      NPM_CONFIG_CACHE = "${xdgCache}/npm";
+      NPM_CONFIG_USERCONFIG = "${xdgConfig}/npm/npmrc";
+      NPM_CONFIG_INIT_MODULE = "${xdgConfig}/npm/config/npm-init.js";
+      # Ensure X cursor themes remain resolvable after leaving ~/.icons
+      XCURSOR_PATH = "/run/current-system/sw/share/icons:${xdgData}/icons";
     };
 
     home.shellAliases = {
@@ -59,6 +84,13 @@ in
       ndiff = "nvd diff /run/current-system result";
       ntree = "nix-tree";
       mvi = "mpv --config-dir=$HOME/.config/mvi";
+      # XDG-compliant config locations for tools that hardcode $HOME
+      mitmproxy = "mitmproxy --set confdir=${xdgConfig}/mitmproxy";
+      mitmdump = "mitmdump --set confdir=${xdgConfig}/mitmproxy";
+      mitmweb = "mitmweb --set confdir=${xdgConfig}/mitmproxy";
+      svn = "svn --config-dir ${xdgConfig}/subversion";
+      lmms = "lmms -c ${xdgConfig}/lmms/lmmsrc.xml";
+      adb = "HOME=${xdgData}/android adb";
       ports = "ss -tulanp";
       ps = "procs";
       serve = "miniserve";

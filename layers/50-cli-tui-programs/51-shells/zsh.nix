@@ -53,6 +53,12 @@ in
         esac
         export PATH="$HOME/.local/bin:$PATH"
 
+        # XDG: npm tmp dir inside the user runtime dir
+        export NPM_CONFIG_TMP="''${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/npm"
+
+        # Kiro CLI shell integration (was in stale ~/.zshrc)
+        [[ "$TERM_PROGRAM" == "kiro" ]] && . "$(kiro --locate-shell-integration-path zsh)"
+
         any-nix-shell zsh --info-right | source /dev/stdin
         bindkey '^Y' autosuggest-accept
         bindkey '^E' autosuggest-clear

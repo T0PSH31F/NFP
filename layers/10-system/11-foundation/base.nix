@@ -21,6 +21,11 @@
     "flakes"
   ];
 
+  # XDG Base Directory support for the Nix CLI (nix-env etc.).
+  # With this, nix uses $XDG_STATE_HOME/nix/{profile,defexpr} instead of
+  # $HOME/.nix-profile and $HOME/.nix-defexpr.
+  nix.settings.use-xdg-base-directories = true;
+
   imports = [
     inputs.home-manager.nixosModules.home-manager
     inputs.sops-nix.nixosModules.sops
