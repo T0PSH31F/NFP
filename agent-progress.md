@@ -223,3 +223,10 @@ Append one entry per session, newest at the bottom. Never edit past entries.
   - `nix build .#checks.x86_64-linux.homepage-dashboard-test.driver` passed.
 - **State change:** passing
 - **Next action:** Present review packet to Erik; await explicit approval before deployment.
+
+## 2026-10-10 — XDG home-directory migration (z0r0)
+- **Scope:** Operational migration following xdg-ninja suggestions (not a feature_list item).
+- **Changes:** commit `ff267ac7` — `feat(xdg): migrate home dotfiles to XDG base directories` (common.nix sessionVariables + aliases, zsh.nix NPM tmp + kiro port, base.nix use-xdg-base-directories, impermanence.nix entry cleanup).
+- **Deployed:** `clan machines update z0r0` ×2; data moved via /persist btrfs renames (impermanence-aware).
+- **Verified:** `nix run nixpkgs#xdg-ninja` — remaining flags are unsupported-upstream only (bun/vscode/steam/thunderbird/aws/flatpak/librewolf/ollama/.claude.json/.ssh) plus HM-managed bootstrap symlinks (.zshenv/.Xresources/.gtkrc-2.0) and mounted .pki stub pending sudo umount.
+- **Known issues:** codex (auth/sessions, ~68M) and pki nss-db lost to a cleanup race; gpg public keybox lost (secret key file preserved at `~/.local/state/xdg-migration/gpg-secret-key-backup.key` + `~/.local/share/gnupg/private-keys-v1.d/`); claude transcripts salvaged (12 files) into `~/.config/claude/transcripts`. Re-login required for new session vars.
