@@ -14,10 +14,9 @@
 2. Data moved on z0r0: npm→`.cache/npm` (12G), go→`.local/share/go` (2.6G), themes (1.6G), firefox→`.config/mozilla` (1.5G), icons (491M), wine (529M), codex/claude/dotnet/android/pi/pki/gnupg/mitmproxy/subversion/lmms configs; bash history→`.local/state/bash`; stale `.zshrc`/`.zprofile`/`.zsh_history` archived to `~/.local/state/xdg-migration/`; `~/.nix-{profile,defexpr}` → `~/.local/state/nix/{profile,defexpr}`.
 
 ## Follow-ups (user action needed)
-1. **sudo one-liner:** `sudo umount ~/.pki && rmdir ~/.pki` (last impermanence stub; or reboot — mount unit removed from config).
-2. **Re-login** (new terminal session) so all apps see new env vars; until then old sessions may recreate `~/.npm`/`~/.pi`.
-3. **GPG:** public keybox (pubring.kbx) was lost; secret key file intact at `~/.local/share/gnupg/private-keys-v1.d/E3372E3C….key` (backup: `~/.local/state/xdg-migration/gpg-secret-key-backup.key`). Restore by importing the public key (keys.openpgp.org / another machine) — private key matches by keygrip automatically. If pubkey unobtainable, professional key-recovery from the .key file is possible but non-trivial.
-4. **Codex:** run `codex login` (old auth/state lost in migration race). Claude: 12 transcripts salvaged to `~/.config/claude/transcripts`; settings.json will return with next HM activation.
-5. `~/.claude.json` (top-level), `.bun`, `.vscode`, `.steam`, `.thunderbird`, `.aws/sso`, `.var`, `.librewolf`, `.ollama` are unsupported upstream — kept in place.
-6. Repo nit: pre-commit hook store path is stale (`git commit` needs `--no-verify` until hooks reinstalled).
-7. Optional: `~/.config/claude/settings.json` (HM symlink) missing after cleanup — next `clan machines update` activation should restore.
+1. **Re-login** (new terminal session) so all apps see new env vars; until then old sessions may recreate `~/.npm`/`~/.pi`.
+2. **GPG:** public keybox (pubring.kbx) was lost; secret key file intact at `~/.local/share/gnupg/private-keys-v1.d/E3372E3C….key` (backup: `~/.local/state/xdg-migration/gpg-secret-key-backup.key`). Restore by importing the public key (keys.openpgp.org / another machine) — private key matches by keygrip automatically. If pubkey unobtainable, professional key-recovery from the .key file is possible but non-trivial.
+3. **Codex:** run `codex login` (old auth/state lost in migration race). Claude: 12 transcripts salvaged to `~/.config/claude/transcripts`; settings.json restored manually to HM store target (`m1v3xcbr…`).
+4. `~/.claude.json` (top-level), `.bun`, `.vscode`, `.steam`, `.thunderbird`, `.aws/sso`, `.var`, `.librewolf`, `.ollama` are unsupported upstream — kept in place.
+5. Repo nit: pre-commit hook store path is stale (`git commit` needs `--no-verify` until hooks reinstalled).
+6. **`.pki` resolved (99f1099c):** NSS hardcodes `~/.pki/nssdb` (spotify holds cert9.db open); restored to impermanence as documented exception — no umount needed, mount stays.
