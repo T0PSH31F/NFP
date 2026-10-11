@@ -72,6 +72,11 @@ with lib;
           # SSH (GPG moved to XDG: .local/share/gnupg, covered by ".local")
           ".ssh"
 
+          # NSS exception: libnss3 hardcodes ~/.pki/nssdb (no XDG override
+          # exists); spotify/brave keep cert9.db/key4.db open here. XDG
+          # migration 2026-10-10 deliberately keeps this path persisted.
+          ".pki"
+
           # Development caches
           ".cache"
 
@@ -80,9 +85,10 @@ with lib;
           ".local/share/zsh"
 
           # Legacy/Custom User Data
-          # (XDG migration 2026-10-10: .gnupg/.mozilla/.icons/.themes/.pki/
+          # (XDG migration 2026-10-10: .gnupg/.mozilla/.icons/.themes/
           #  .claude/.codex/.kodi/.zsh_history moved under .config/ or
-          #  .local/share/, which are persisted wholesale above.)
+          #  .local/share/, which are persisted wholesale above. .pki is
+          #  the documented NSS exception above.)
           "Agents"
           "Templates"
           "Games"
