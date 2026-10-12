@@ -40,6 +40,9 @@ in
       (pkgs.writeShellScriptBin "noctalia-color-scheme" ''
         noctalia msg color-scheme-set "$@"
       '')
+      (pkgs.writeShellScriptBin "noctalia-lock" ''
+        noctalia msg session lock || loginctl lock-session
+      '')
     ];
 
     wayland.windowManager.hyprland.settings.env =

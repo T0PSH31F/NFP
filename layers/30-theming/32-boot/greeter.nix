@@ -31,7 +31,7 @@ with lib;
     greetd = {
       background = lib.mkOption {
         type = lib.types.path;
-        default = ../../00-cyberia/02-assets/sddm_background/fallback1.jpg;
+        default = ../../00-cyberia/02-assets/sddm_background/thousand-sunny-poster.png;
         description = "Path to the background image for ReGreet (greetd only)";
       };
     };
@@ -62,7 +62,7 @@ with lib;
         environment.systemPackages = [
           (pkgs.sddm-astronaut.override {
             themeConfig = {
-              Background = "../../00-cyberia/02-assets/sddm_background/fallback1.jpg";
+              Background = "${../../00-cyberia/02-assets/sddm_background/thousand-sunny.mp4}";
             };
           })
         ];
@@ -130,6 +130,10 @@ with lib;
             };
             appearance = {
               password_style = "random";
+              wallpaper = "${../../00-cyberia/02-assets/sddm_background/thousand-sunny-poster.png}";
+            };
+            wallpaper = {
+              path = "${../../00-cyberia/02-assets/sddm_background/thousand-sunny-poster.png}";
             };
           };
         };

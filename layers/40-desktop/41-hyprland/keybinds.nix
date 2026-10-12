@@ -55,6 +55,7 @@ in
 
         # ── System / Session ───────────────────────────────────────────
         "$mod, Q, killactive"
+        "$mod SHIFT, L, exec, loginctl lock-session"
         "$mod CTRL SHIFT, M, exec, hypr-sfx-toggle"
         "$mod, F, fullscreen, 1"
         "$mod ALT, F, fullscreen, 1"

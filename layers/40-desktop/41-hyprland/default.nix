@@ -65,15 +65,18 @@ in
   };
 
   nixos = lib.mkIf cfg.enable {
-    programs.hyprland.enable = true;
+    programs = {
+      hyprland.enable = true;
+      hyprlock.enable = true;
 
-    programs.uwsm = {
-      enable = true;
-      waylandCompositors = {
-        hyprland = {
-          prettyName = "Hyprland";
-          comment = "Hyprland compositor managed by UWSM";
-          binPath = "/run/current-system/sw/bin/Hyprland";
+      uwsm = {
+        enable = true;
+        waylandCompositors = {
+          hyprland = {
+            prettyName = "Hyprland";
+            comment = "Hyprland compositor managed by UWSM";
+            binPath = "/run/current-system/sw/bin/Hyprland";
+          };
         };
       };
     };
@@ -90,6 +93,7 @@ in
         ./keybinds.nix
         ./rules.nix
         ./uwsm.nix
+        ./hyprlock.nix
       ];
 
       config = lib.mkIf cfg.enable {
