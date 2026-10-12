@@ -100,8 +100,27 @@ html, body {
 }
 
 /* --------------------------------------------------------------------------
-   4. Background & Atmosphere — Egghead Island
+   4. Background & Atmosphere — Straw Hat MP4 Video + Egghead Island
    -------------------------------------------------------------------------- */
+.dashboard-bg-video {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.dashboard-bg-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(8, 12, 22, 0.55), rgba(4, 8, 16, 0.75)),
+              radial-gradient(circle at 50% 15%, rgba(220, 140, 40, 0.12), transparent 70%);
+}
+
 .atmosphere-container {
   position: fixed;
   inset: 0;
@@ -1167,5 +1186,14 @@ html, body {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+  .dashboard-bg-video {
+    display: none;
+  }
+  body, .dashboard-shell {
+    background-image: url("/assets/one-piece-skull-poster.png");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
   }
 }

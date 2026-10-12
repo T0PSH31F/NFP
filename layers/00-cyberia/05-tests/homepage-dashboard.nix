@@ -373,12 +373,16 @@
     machine.wait_for_unit("homepage-dashboard.service")
     machine.wait_for_open_port(3007)
 
-    # 1. HTML serves NIX FLAKE PIRATES brand title and local theme assets; no raw icon paths as visible text
+    # 1. HTML serves NIX FLAKE PIRATES brand title, video background, and local theme assets; no raw icon paths as visible text
     html = machine.succeed("curl -fsS http://localhost:3007")
     assert "NIX FLAKE PIRATES" in html, "HTML missing NIX FLAKE PIRATES brand title"
     assert "GRANDLIX" not in html, "HTML still contains obsolete GRANDLIX brand title"
     assert "/assets/css/theme.css" in html, "HTML missing theme CSS link"
     assert "/assets/js/app.js" in html, "HTML missing app JS link"
+    assert 'class="dashboard-bg-video"' in html, "HTML missing dashboard-bg-video element"
+    assert 'src="/assets/one-piece-skull.mp4"' in html, "HTML missing one-piece-skull.mp4 source"
+    assert 'poster="/assets/one-piece-skull-poster.png"' in html, "HTML missing one-piece-skull-poster.png poster"
+    assert 'class="dashboard-bg-overlay"' in html, "HTML missing dashboard-bg-overlay"
     assert "http://" not in html and "https://" not in html, "HTML contains external URL references"
 
     app_js = machine.succeed("curl -fsS http://localhost:3007/assets/js/app.js")
@@ -499,6 +503,12 @@
     js_status = machine.succeed("curl -s -o /dev/null -w '%{http_code}' http://localhost:3007/assets/js/app.js")
     assert js_status.strip() == "200", f"app.js returned {js_status}"
 
+    video_status = machine.succeed("curl -s -o /dev/null -w '%{http_code}' http://localhost:3007/assets/one-piece-skull.mp4")
+    assert video_status.strip() == "200", f"one-piece-skull.mp4 returned {video_status}"
+
+    poster_status = machine.succeed("curl -s -o /dev/null -w '%{http_code}' http://localhost:3007/assets/one-piece-skull-poster.png")
+    assert poster_status.strip() == "200", f"one-piece-skull-poster.png returned {poster_status}"
+
     for wid, winfo in wmap.items():
         icon_path = winfo.get("icon")
         if icon_path and icon_path.startswith("/assets/"):
@@ -529,7 +539,9 @@
     assert "glances" not in html.lower(), "Glances found in index.html"
     assert "glances" not in app_js.lower(), "Glances found in app.js"
 
-    # 13. Wanted poster elements and Grand Line Fleet Vitals present in assets
+    # 13. Wanted poster elements, video background, and Grand Line Fleet Vitals present in assets
+    assert "dashboard-bg-video" in theme_css, "theme.css missing dashboard-bg-video"
+    assert "dashboard-bg-overlay" in theme_css, "theme.css missing dashboard-bg-overlay"
     assert "wanted-poster-frame" in theme_css, "theme.css missing wanted-poster-frame"
     assert "wanted-poster-masthead" in theme_css, "theme.css missing wanted-poster-masthead"
     assert "bounty-plaque" in theme_css, "theme.css missing bounty-plaque"

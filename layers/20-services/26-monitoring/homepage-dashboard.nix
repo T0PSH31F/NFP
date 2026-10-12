@@ -272,6 +272,20 @@ let
       <link rel="stylesheet" href="/assets/css/custom.css">
     </head>
     <body>
+      <video
+        class="dashboard-bg-video"
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="metadata"
+        poster="/assets/one-piece-skull-poster.png"
+        aria-hidden="true"
+      >
+        <source src="/assets/one-piece-skull.mp4" type="video/mp4">
+      </video>
+      <div class="dashboard-bg-overlay" aria-hidden="true"></div>
+
       <div class="atmosphere-container" aria-hidden="true">
         <div class="holographic-grid"></div>
         <div class="fog-layer fog-1"></div>
@@ -338,6 +352,10 @@ let
     cp ${../../../layers/00-cyberia/02-assets/png-ico/Franck.png} $out/public/assets/images/Franck.png
     cp ${../../../layers/00-cyberia/02-assets/png-ico/Usopp.png} $out/public/assets/images/Usopp.png
     cp ${../../../layers/00-cyberia/02-assets/png-ico/TransponderSnail.png} $out/public/assets/images/TransponderSnail.png
+
+    # Copy Background Media
+    cp ${../../../layers/00-cyberia/02-assets/sddm_background/one-piece-skull.1920x1080.mp4} $out/public/assets/one-piece-skull.mp4
+    cp ${../../../layers/00-cyberia/02-assets/homepage/one-piece-skull-poster.png} $out/public/assets/one-piece-skull-poster.png
   '';
 
   # Python HTTP Daemon Server Script
