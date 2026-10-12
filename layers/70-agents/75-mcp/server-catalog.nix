@@ -201,6 +201,18 @@ in
           cacheTtlSeconds = 0;
           description = "Beeper Desktop universal chat MCP tool suite (WhatsApp, Signal, Telegram, Discord, Google Messages, Voice, LinkedIn)";
         };
+        nfp-dashboard = {
+          enable = true;
+          transport = "stdio";
+          command = "${pkgs.python3}/bin/python3";
+          args = [ "${./nfp-dashboard-mcp.py}" ];
+          domain = "monitoring";
+          risk = "read";
+          approval = "never";
+          maxResultBytes = 1048576;
+          cacheTtlSeconds = 15;
+          description = "NFP Homepage Command Center read-only contract & telemetry projection MCP server";
+        };
       };
       description = "Declarative registry of typed MCP server definitions.";
     };
