@@ -1,0 +1,30 @@
+{
+  "state": "Title: Building Agentic Workflows\nAuthor: Andrew Ng\nExtracted_TOC: 1. Tool Use 2. System-1 Models 3. Memory Architectures...",
+  "questions": [
+    {
+      "id": "is_ai_or_passive_income",
+      "type": "boolean"
+    },
+    {
+      "id": "primary_domain",
+      "type": "enum",
+      "options": [
+        "ai_agent_architecture",
+        "machine_learning_llm",
+        "passive_income_business",
+        "technical_programming",
+        "general_fiction",
+        "general_nonfiction"
+      ]
+    },
+    {
+      "id": "brain_service_ingest_priority",
+      "type": "enum",
+      "options": [
+        "p0_immediate_rag_ingest",
+        "p1_standard_rag_ingest",
+        "skip_general_library_only"
+      ]
+    }
+  ]
+}

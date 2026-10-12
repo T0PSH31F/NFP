@@ -13,10 +13,41 @@ in
   };
 
   config = mkIf cfg.enable {
-    # Glances contract removed — Netdata is primary source for fleet vitals
+    nfp.services.glances = {
+      enable = false;
+      host = config.networking.hostName;
+      bind = "127.0.0.1";
+      inherit (cfg) port;
+      tailnetName = "glances";
+      tls = "headscale";
+      healthcheck = {
+        enable = true;
+        path = "/api/3/quicklook";
+        expectedStatus = [
+          200
+        ];
+      };
+      homepage = {
+        enable = false;
+        category = "luffy";
+        order = 50;
+        title = "Glances";
+        subtitle = "Ship Status Monitor";
+        icon = "glances";
+        metric = {
+          mode = "native-api";
+          adapter = "glances";
+          fields = [
+            "cpu"
+            "ram"
+            "net"
+          ];
+        };
+      };
+    };
 
     services.glances = {
-      enable = true;
+      enable = false;
       openFirewall = true;
       extraArgs = [
         "-w"

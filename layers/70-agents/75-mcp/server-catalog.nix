@@ -12,127 +12,124 @@
 }:
 with lib;
 let
-  serverSubmodule = types.submodule (
-    { name, config, ... }:
-    {
-      options = {
-        enable = mkOption {
-          type = types.bool;
-          default = true;
-          description = "Whether to enable this MCP server entry.";
-        };
-
-        transport = mkOption {
-          type = types.enum [
-            "stdio"
-            "streamable-http"
-            "sse"
-            "openapi"
-            "graphql"
-          ];
-          default = "stdio";
-          description = "MCP transport protocol type.";
-        };
-
-        package = mkOption {
-          type = types.nullOr types.package;
-          default = null;
-          description = "Package providing the executable.";
-        };
-
-        command = mkOption {
-          type = types.nullOr types.str;
-          default = null;
-          description = "Command string or executable path for stdio transport.";
-        };
-
-        url = mkOption {
-          type = types.nullOr types.str;
-          default = null;
-          description = "Endpoint URL for HTTP/SSE/OpenAPI/GraphQL transport.";
-        };
-
-        args = mkOption {
-          type = types.listOf types.str;
-          default = [ ];
-          description = "Command-line arguments for stdio transport.";
-        };
-
-        environmentFile = mkOption {
-          type = types.nullOr types.path;
-          default = null;
-          description = "Path to environment file containing runtime secrets.";
-        };
-
-        scope = mkOption {
-          type = types.enum [
-            "fleet"
-            "host"
-            "project"
-          ];
-          default = "host";
-          description = "Deployment scope for this server definition.";
-        };
-
-        domain = mkOption {
-          type = types.str;
-          default = "general";
-          description = "Functional domain (e.g. nix, git, home-automation, memory).";
-        };
-
-        tags = mkOption {
-          type = types.listOf types.str;
-          default = [ ];
-          description = "Capability tags.";
-        };
-
-        risk = mkOption {
-          type = types.enum [
-            "read"
-            "write"
-            "destructive"
-            "credentialed"
-          ];
-          default = "read";
-          description = "Risk level classification.";
-        };
-
-        approval = mkOption {
-          type = types.enum [
-            "never"
-            "write"
-            "always"
-          ];
-          default = "never";
-          description = "User approval requirement class.";
-        };
-
-        dataClasses = mkOption {
-          type = types.listOf types.str;
-          default = [ ];
-          description = "Data classifications (e.g. public, internal, sensitive).";
-        };
-
-        maxResultBytes = mkOption {
-          type = types.int;
-          default = 1048576; # 1MB default
-          description = "Maximum allowed response size in bytes.";
-        };
-
-        cacheTtlSeconds = mkOption {
-          type = types.int;
-          default = 0;
-          description = "Cache TTL in seconds (only applicable for read operations).";
-        };
-
-        description = mkOption {
-          type = types.str;
-          default = "";
-          description = "Concise description of the server for discovery.";
-        };
+  serverSubmodule = types.submodule (_: {
+    options = {
+      enable = mkOption {
+        type = types.bool;
+        default = true;
+        description = "Whether to enable this MCP server entry.";
       };
-    }
-  );
+
+      transport = mkOption {
+        type = types.enum [
+          "stdio"
+          "streamable-http"
+          "sse"
+          "openapi"
+          "graphql"
+        ];
+        default = "stdio";
+        description = "MCP transport protocol type.";
+      };
+
+      package = mkOption {
+        type = types.nullOr types.package;
+        default = null;
+        description = "Package providing the executable.";
+      };
+
+      command = mkOption {
+        type = types.nullOr types.str;
+        default = null;
+        description = "Command string or executable path for stdio transport.";
+      };
+
+      url = mkOption {
+        type = types.nullOr types.str;
+        default = null;
+        description = "Endpoint URL for HTTP/SSE/OpenAPI/GraphQL transport.";
+      };
+
+      args = mkOption {
+        type = types.listOf types.str;
+        default = [ ];
+        description = "Command-line arguments for stdio transport.";
+      };
+
+      environmentFile = mkOption {
+        type = types.nullOr types.path;
+        default = null;
+        description = "Path to environment file containing runtime secrets.";
+      };
+
+      scope = mkOption {
+        type = types.enum [
+          "fleet"
+          "host"
+          "project"
+        ];
+        default = "host";
+        description = "Deployment scope for this server definition.";
+      };
+
+      domain = mkOption {
+        type = types.str;
+        default = "general";
+        description = "Functional domain (e.g. nix, git, home-automation, memory).";
+      };
+
+      tags = mkOption {
+        type = types.listOf types.str;
+        default = [ ];
+        description = "Capability tags.";
+      };
+
+      risk = mkOption {
+        type = types.enum [
+          "read"
+          "write"
+          "destructive"
+          "credentialed"
+        ];
+        default = "read";
+        description = "Risk level classification.";
+      };
+
+      approval = mkOption {
+        type = types.enum [
+          "never"
+          "write"
+          "always"
+        ];
+        default = "never";
+        description = "User approval requirement class.";
+      };
+
+      dataClasses = mkOption {
+        type = types.listOf types.str;
+        default = [ ];
+        description = "Data classifications (e.g. public, internal, sensitive).";
+      };
+
+      maxResultBytes = mkOption {
+        type = types.int;
+        default = 1048576; # 1MB default
+        description = "Maximum allowed response size in bytes.";
+      };
+
+      cacheTtlSeconds = mkOption {
+        type = types.int;
+        default = 0;
+        description = "Cache TTL in seconds (only applicable for read operations).";
+      };
+
+      description = mkOption {
+        type = types.str;
+        default = "";
+        description = "Concise description of the server for discovery.";
+      };
+    };
+  });
 in
 {
   options.layers.layer-75.mcp = {
@@ -212,6 +209,18 @@ in
           maxResultBytes = 1048576;
           cacheTtlSeconds = 15;
           description = "NFP Homepage Command Center read-only contract & telemetry projection MCP server";
+        };
+        jev-decision = {
+          enable = true;
+          transport = "stdio";
+          command = "${pkgs.python3}/bin/python3";
+          args = [ "${./jev-mcp.py}" ];
+          domain = "decision";
+          risk = "read";
+          approval = "never";
+          maxResultBytes = 1048576;
+          cacheTtlSeconds = 0;
+          description = "High-speed System-1 Jev decision, email triage & filesystem routing engine";
         };
       };
       description = "Declarative registry of typed MCP server definitions.";

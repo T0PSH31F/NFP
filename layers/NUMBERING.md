@@ -48,6 +48,7 @@
 
 ### 20-services
 - `21-networking`: Tailscale, Headscale, DNS, proxy
+- `22-ai`: Lead triage webhook, ad hook miner, market intelligence pipelines
 - `23-media`: Jellyfin, Sonarr, Radarr, Audio
 - `24-communication`: Matrix, Signal, Element
 - `25-data`: PostgreSQL, Vector DBs (ChromaDB, LokB, Qdrant), Restic backups, Redis
@@ -106,6 +107,7 @@
 - `77-dash-desk-ui`: Web frontends & desktop UIs (Ollama-UI, Open-WebUI, SillyTavern, Cherry-Studio)
 - `78-llm-routers`: API routing & gateways (ExtremeRouter, FreeLLMAPI, FreeLLMPool, Kong, LiteLLM, Manifest, OmniRoute)
 - `79-skills`: Agent skills, catalog, master switches, productivity stubs (ai-packages, ai-services, Aider, Fabric AI, Jan, LM Studio, llm-agents, todo-system)
+- `jev`: Jev System-1 decision engine, router hooks, daemon pipelines, and CLI/TUI suites
 
 ### 80-lib
 - `81-helpers`: mkDendriticModule & functional lib

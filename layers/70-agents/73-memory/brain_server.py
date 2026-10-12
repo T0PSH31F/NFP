@@ -338,11 +338,22 @@ async def ingest_upload(file: UploadFile = File(...), request: Request = None):
 
 
 @app.post("/ingest/path")
-async def ingest_from_path(path: str, request: Request = None):
+@app.post("/ingest/file")
+async def ingest_from_path(request: Request, path: Optional[str] = None):
     _require_write(request)
-    if not os.path.exists(path):
-        raise HTTPException(status_code=404, detail=f"File not found: {path}")
-    result = ingest_file(path)
+    target_path = path
+    if not target_path:
+        try:
+            body = await request.json()
+            if isinstance(body, dict):
+                target_path = body.get("path") or body.get("file")
+        except Exception:
+            pass
+    if not target_path:
+        raise HTTPException(status_code=400, detail="Missing 'path' parameter or JSON body")
+    if not os.path.exists(target_path):
+        raise HTTPException(status_code=404, detail=f"File not found: {target_path}")
+    result = ingest_file(target_path)
     if "error" in result:
         raise HTTPException(status_code=400, detail=result["error"])
     return {"status": "success", **result}

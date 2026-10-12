@@ -1,0 +1,63 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "LeadScoringDecision",
+  "description": "System-1 Jev decision schema for autonomous inbound lead qualification, deal sizing, technical fit, and urgency timeline.",
+  "type": "object",
+  "properties": {
+    "state": {
+      "type": "string",
+      "description": "Lead context: name, email, company, inquiry message, source, and budget"
+    },
+    "questions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "type": { "type": "string", "enum": ["enum", "boolean"] },
+          "options": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "required": ["id", "type"]
+      }
+    }
+  },
+  "required": ["state", "questions"],
+  "default_questions": [
+    {
+      "id": "qualification_tier",
+      "type": "enum",
+      "options": [
+        "tier_1_enterprise_hot",
+        "tier_2_smb_warm",
+        "tier_3_low_budget_cold",
+        "spam_or_jobseeker"
+      ]
+    },
+    {
+      "id": "estimated_deal_size",
+      "type": "enum",
+      "options": [
+        "under_5k",
+        "5k_to_20k",
+        "20k_to_100k",
+        "enterprise_100k_plus"
+      ]
+    },
+    {
+      "id": "technical_fit",
+      "type": "boolean"
+    },
+    {
+      "id": "urgency_timeline",
+      "type": "enum",
+      "options": [
+        "immediate_under_2_weeks",
+        "quarterly_1_3_months",
+        "exploratory"
+      ]
+    }
+  ]
+}

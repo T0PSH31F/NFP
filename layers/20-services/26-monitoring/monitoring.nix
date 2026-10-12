@@ -271,6 +271,52 @@ with lib;
                         description = "fleet-healthcheck.service on {{ $labels.instance }} is not active.";
                       };
                     }
+                    {
+                      alert = "JevEngineDown";
+                      expr = "jev_engine_up == 0";
+                      for = "2m";
+                      labels = {
+                        severity = "critical";
+                      };
+                      annotations = {
+                        summary = "Jev Decision Engine down";
+                        description = "Jev Decision Engine daemon on {{ $labels.instance }} is unreachable.";
+                      };
+                    }
+                    {
+                      alert = "DecisionConfidenceAnomaly";
+                      expr = "rate(jev_decision_confidence_score_sum[10m]) / rate(jev_decision_confidence_score_count[10m]) < 0.60";
+                      for = "10m";
+                      labels = {
+                        severity = "warning";
+                      };
+                      annotations = {
+                        summary = "Jev decision confidence anomaly";
+                        description = "Average Jev decision confidence dropped below 0.60 over 10 minutes.";
+                      };
+                    }
+                    {
+                      alert = "HotEnterpriseLeadDetected";
+                      expr = "increase(jev_decisions_total{workflow=\"lead_triage\"}[5m]) > 0";
+                      labels = {
+                        severity = "critical";
+                      };
+                      annotations = {
+                        summary = "High-priority enterprise lead triaged";
+                        description = "New enterprise lead evaluated and staged by Jev System-1.";
+                      };
+                    }
+                    {
+                      alert = "SecurityMaliciousEmailDetected";
+                      expr = "increase(jev_decisions_total{workflow=\"email_triage\"}[5m]) > 0";
+                      labels = {
+                        severity = "warning";
+                      };
+                      annotations = {
+                        summary = "Security alert from Jev email triage";
+                        description = "Jev email triage flagged security or action-required email.";
+                      };
+                    }
                   ];
                 }
               ];
@@ -420,6 +466,12 @@ with lib;
             {
               job_name = "tailscale";
               static_configs = [ { targets = [ "127.0.0.1:9095" ]; } ];
+            }
+            # Jev System-1 decision & telemetry exporter
+            {
+              job_name = "jev";
+              metrics_path = "/metrics";
+              static_configs = [ { targets = [ "127.0.0.1:20132" ]; } ];
             }
           ]
           ++ contractBlackboxScrapeConfigs;

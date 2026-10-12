@@ -109,6 +109,9 @@ in
   layers.layer-20.services.config.your-spotify.enable = true;
   services.searxng.enable = true;
   services.calibre-web-app.enable = true;
+  services.jev-engine.enable = true;
+  services.lead-triage-webhook.enable = true;
+  services.ad-hook-miner.enable = true;
   layers.layer-20.services.config.nixarr-stack.enable = true;
   layers.layer-20.services.config.jackett.enable = true;
   layers.layer-20.services.config.netdata.enable = true;

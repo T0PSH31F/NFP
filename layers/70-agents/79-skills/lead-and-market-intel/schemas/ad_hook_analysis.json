@@ -1,0 +1,71 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AdHookAnalysisDecision",
+  "description": "System-1 Jev decision schema for competitor ad mining, hook categorization, objection handling, target persona, and CTA urgency.",
+  "type": "object",
+  "properties": {
+    "state": {
+      "type": "string",
+      "description": "Raw ad copy, headline, body text, or competitor review dump"
+    },
+    "questions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "type": { "type": "string", "enum": ["enum", "boolean"] },
+          "options": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "required": ["id", "type"]
+      }
+    }
+  },
+  "required": ["state", "questions"],
+  "default_questions": [
+    {
+      "id": "hook_category",
+      "type": "enum",
+      "options": [
+        "pain_point_frustration",
+        "fear_of_loss",
+        "social_proof",
+        "curiosity_novelty",
+        "direct_savings_roi"
+      ]
+    },
+    {
+      "id": "primary_objection_handled",
+      "type": "enum",
+      "options": [
+        "setup_complexity",
+        "pricing_cost",
+        "security_compliance",
+        "performance_speed"
+      ]
+    },
+    {
+      "id": "target_persona",
+      "type": "enum",
+      "options": [
+        "devops_infrastructure_lead",
+        "founder_cto",
+        "individual_contributor",
+        "finance_buyer"
+      ]
+    },
+    {
+      "id": "call_to_action_urgency",
+      "type": "enum",
+      "options": [
+        "free_trial",
+        "book_demo",
+        "limited_offer",
+        "content_download"
+      ]
+    }
+  ]
+}

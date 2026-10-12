@@ -1,0 +1,57 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "FilesystemOrganizerDecision",
+  "description": "System-1 Jev decision schema for file categorization, vault destination, and rename pattern.",
+  "type": "object",
+  "properties": {
+    "state": {
+      "type": "string",
+      "description": "File path, MIME type, size, and header/text snippet."
+    },
+    "questions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["enum", "boolean"]
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["id", "type"]
+      }
+    }
+  },
+  "required": ["state", "questions"],
+  "default_questions": [
+    {
+      "id": "target_vault",
+      "type": "enum",
+      "options": [
+        "financial_records",
+        "code_projects",
+        "media_audiobooks",
+        "personal_documents",
+        "ephemeral_trash"
+      ]
+    },
+    {
+      "id": "suggested_filename_pattern",
+      "type": "enum",
+      "options": [
+        "YYYY-MM-DD_vendor_receipt",
+        "project_artifact",
+        "keep_original"
+      ]
+    }
+  ]
+}

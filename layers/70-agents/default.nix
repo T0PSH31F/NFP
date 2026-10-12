@@ -11,5 +11,6 @@
     ./77-dash-desk-ui
     ./78-llm-routers
     ./79-skills
+    ./jev
   ];
 }
