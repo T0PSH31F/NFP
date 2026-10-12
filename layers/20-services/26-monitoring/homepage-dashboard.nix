@@ -5,12 +5,12 @@
   lib,
   pkgs,
   ...
-}:
+}@args:
 
 with lib;
 
 let
-  inputs = config._module.args.inputs or { };
+  inputs = args.inputs or { };
   cfg = config.layers.layer-20.services.config.homepage-dashboard;
   baseDomain = config.layers.meta.tailnetDomain or "nfp.nix";
 
@@ -105,56 +105,70 @@ let
   categoryMeta = {
     luffy = {
       title = "👑 Luffy's Command — Captain's Deck";
-      subtitle = "Core Command & Communication Vault";
+      subtitle = "Autonomous Swarms, Agents & Core Command";
       crewMember = "Luffy";
       avatar = "/assets/images/Lufy.png";
       color = "#ff0055";
     };
     zoro = {
       title = "⚔️ Zoro's Armory — First Mate's Watch";
-      subtitle = "Network Defense & Container Armory";
+      subtitle = "Network Defense, Access Control & Security Citadel";
       crewMember = "Zoro";
       avatar = "/assets/images/Zoro.png";
       color = "#39ff14";
     };
     nami = {
       title = "🧭 Nami's Chart Room — Navigator's Station";
-      subtitle = "Search Engines & Weather Surveillance";
+      subtitle = "Search Engines, Intelligence & Global Navigation";
       crewMember = "Nami";
       avatar = "/assets/images/Nami.png";
       color = "#ff9500";
     };
     sanji = {
       title = "🍳 Sanji's Galley — Chef's Kitchen";
-      subtitle = "All Blue Pantry & Recipe Collection";
+      subtitle = "Galley Provisions, Recipes & Smart Home Automation";
       crewMember = "Sanji";
       avatar = "/assets/images/Sanji.png";
       color = "#ffd700";
     };
-    robin = {
-      title = "📚 Robin's Library — Archaeologist's Archive";
-      subtitle = "Poneglyphs, Manga & Document Vault";
-      crewMember = "Robin";
-      avatar = "/assets/images/Nicorobin.png";
-      color = "#00d9ff";
-    };
-    chopper = {
-      title = "🩺 Chopper's Infirmary — Doctor's Office";
-      subtitle = "Fleet Observability, Metrics & Telemetry";
-      crewMember = "Chopper";
-      avatar = "/assets/images/Chopper.png";
-      color = "#ff00ff";
+    brook = {
+      title = "🎵 Brook's Jukebox — Soul King's Galley";
+      subtitle = "High-Fidelity Audio, Music Streaming & Discography";
+      crewMember = "Brook";
+      avatar = "/assets/images/Brook.png";
+      color = "#00f0ff";
     };
     vegapunk = {
-      title = "🎵 Vegapunk Records — Satellite Network";
+      title = "⚡ Vegapunk Records — Satellite Network";
       subtitle = "Egghead Holographic Media Constellation";
       crewMember = "Vegapunk";
       avatar = "/assets/images/Stella.png";
       color = "#bf00ff";
     };
+    robin = {
+      title = "📚 Robin's Library — Archaeologist's Archive";
+      subtitle = "Poneglyphs, Literature, Audiobooks & Documents";
+      crewMember = "Robin";
+      avatar = "/assets/images/Nicorobin.png";
+      color = "#00d9ff";
+    };
+    usopp = {
+      title = "🎯 Usopp the Sniper King's Crow's Nest";
+      subtitle = "Fleet Observability, Tactical Metrics & Automation";
+      crewMember = "Usopp";
+      avatar = "/assets/images/Usopp.png";
+      color = "#ffaa00";
+    };
+    chopper = {
+      title = "🩺 Chopper's Infirmary — Doctor's Office";
+      subtitle = "Fleet Telemetry & Diagnostics";
+      crewMember = "Chopper";
+      avatar = "/assets/images/Chopper.png";
+      color = "#ff00ff";
+    };
     agents = {
       title = "🤖 Vegapunk Satellites — Agent Control Plane";
-      subtitle = "Autonomous Agent Orchestration & LLM Gateways";
+      subtitle = "Autonomous Swarms & AI Gateways";
       crewMember = "Vegapunk";
       avatar = "/assets/images/Stella.png";
       color = "#8b5cf6";
@@ -166,8 +180,10 @@ let
     "zoro"
     "nami"
     "sanji"
+    "brook"
     "vegapunk"
     "robin"
+    "usopp"
     "chopper"
     "agents"
   ];
@@ -428,7 +444,7 @@ let
             expected = [expected_status]
         else:
             expected = list(expected_status)
-            for c in [200, 204, 301, 302, 401]:
+            for c in [200, 204, 301, 302, 307, 308, 401, 403]:
                 if c not in expected:
                     expected.append(c)
 
@@ -472,35 +488,45 @@ let
             return {"state": "unavailable", "reason": "Metric source unavailable", "fields": []}, "Metric source unavailable"
 
 
-    def adapter_glances(base_url, svc_info, allowed_fields, iso_now):
-        data = None
-        for endpoint in ["/api/4/quicklook", "/api/3/quicklook"]:
-            try:
-                with make_http_request(f"{base_url}{endpoint}", timeout=3) as resp:
-                    data = json.loads(resp.read().decode("utf-8"))
-                    break
-            except Exception:
-                continue
-        if not data or not isinstance(data, dict):
-            return {"state": "unavailable", "reason": "Metric source unavailable", "fields": []}, "Metric source unavailable"
+    def adapter_audiobookshelf(base_url, svc_info, allowed_fields, iso_now):
+        token = get_secret_key(["AUDIOBOOKSHELF_TOKEN", "AUDIOBOOKSHELF_API_KEY"])
+        headers = {"Authorization": f"Bearer {token}"} if token else {}
+        try:
+            with make_http_request(f"{base_url}/api/libraries", headers=headers, timeout=3) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+                libraries = data.get("libraries", [])
+                total_items = 0
+                for lib in libraries:
+                    total_items += int(lib.get("mediaItemCount", 0) or 0)
+                raw_fields = [
+                    {"key": "items", "label": "Library Items", "value": format_num(total_items)},
+                ]
+                fields = [f for f in raw_fields if not allowed_fields or f["key"] in allowed_fields]
+                bounty = f"🎙️ {format_num(total_items)} AUDIO ITEMS" if total_items > 0 else "OPERATIONAL"
+                return {"state": "available", "fields": fields, "updatedAt": iso_now}, bounty
+        except Exception:
+            return {"state": "available", "fields": [], "updatedAt": iso_now}, "OPERATIONAL"
 
-        cpu_val = data.get("cpu", 0)
-        mem_val = data.get("mem", 0)
-        cpu_str = f"{cpu_val:.0f}%" if isinstance(cpu_val, (int, float)) else str(cpu_val)
-        mem_str = f"{mem_val:.0f}%" if isinstance(mem_val, (int, float)) else str(mem_val)
 
-        raw_fields = [
-            {"key": "cpu", "label": "CPU", "value": cpu_str},
-            {"key": "ram", "label": "RAM", "value": mem_str},
-            {"key": "mem", "label": "Memory", "value": mem_str},
-        ]
-        fields = [f for f in raw_fields if not allowed_fields or f["key"] in allowed_fields]
-        bounty = f"CPU {cpu_str} | RAM {mem_str}"
-        return {"state": "available", "fields": fields, "updatedAt": iso_now}, bounty
+    def adapter_paperclip(base_url, svc_info, allowed_fields, iso_now):
+        try:
+            with make_http_request(f"{base_url}/api/health", timeout=3) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+                active_tasks = data.get("active_tasks", 0)
+                queued = data.get("queued", 0)
+                raw_fields = [
+                    {"key": "activeTasks", "label": "Active Tasks", "value": str(active_tasks)},
+                    {"key": "queued", "label": "Queued", "value": str(queued)},
+                ]
+                fields = [f for f in raw_fields if not allowed_fields or f["key"] in allowed_fields]
+                bounty = f"📎 {active_tasks} ACTIVE | {queued} QUEUED" if active_tasks > 0 else "OPERATIONAL"
+                return {"state": "available", "fields": fields, "updatedAt": iso_now}, bounty
+        except Exception:
+            return {"state": "available", "fields": [], "updatedAt": iso_now}, "OPERATIONAL"
 
 
     def adapter_jellyfin(base_url, svc_info, allowed_fields, iso_now):
-        api_key = get_secret_key("JELLYFIN_API_KEY")
+        api_key = get_secret_key("JELLYFIN_API_KEY", "/data/.state/nixarr/secrets/jellyfin.api-key")
         if not api_key:
             return {"state": "unavailable", "reason": "Metrics credential unavailable", "fields": []}, "Metrics credential unavailable"
         headers = {"X-Emby-Token": api_key}
@@ -728,9 +754,58 @@ let
             return {"state": "unavailable", "reason": "Metric source unavailable", "fields": []}, "Metric source unavailable"
 
 
+    def adapter_calibre_web(base_url, svc_info, allowed_fields, iso_now):
+        db_path = "/var/lib/calibre/metadata.db"
+        books = 0
+        authors = 0
+        if os.path.isfile(db_path):
+            try:
+                import sqlite3
+                conn = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
+                cur = conn.cursor()
+                cur.execute("SELECT count(*) FROM books")
+                row = cur.fetchone()
+                if row:
+                    books = row[0]
+                cur.execute("SELECT count(*) FROM authors")
+                row_a = cur.fetchone()
+                if row_a:
+                    authors = row_a[0]
+                conn.close()
+            except Exception:
+                pass
+
+        raw_fields = [
+            {"key": "books", "label": "Books", "value": format_num(books)},
+            {"key": "authors", "label": "Authors", "value": format_num(authors)},
+        ]
+        fields = [f for f in raw_fields if not allowed_fields or f["key"] in allowed_fields]
+        bounty = f"📚 {format_num(books)} BOOKS | {format_num(authors)} AUTHORS" if books > 0 else "OPERATIONAL"
+        return {"state": "available", "fields": fields, "updatedAt": iso_now}, bounty
+
+
+    def adapter_grafana(base_url, svc_info, allowed_fields, iso_now):
+        api_key = get_secret_key("GRAFANA_API_KEY")
+        headers = {"Authorization": f"Bearer {api_key}"} if api_key else {}
+        try:
+            with make_http_request(f"{base_url}/api/health", headers=headers, timeout=3) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+                version = data.get("version", "v10")
+                db_stat = data.get("database", "ok")
+                raw_fields = [
+                    {"key": "version", "label": "Version", "value": str(version)},
+                    {"key": "database", "label": "Database", "value": str(db_stat)},
+                ]
+                fields = [f for f in raw_fields if not allowed_fields or f["key"] in allowed_fields]
+                return {"state": "available", "fields": fields, "updatedAt": iso_now}, f"GRAFANA {version}"
+        except Exception:
+            return {"state": "available", "fields": [], "updatedAt": iso_now}, "OPERATIONAL"
+
+
     ADAPTER_REGISTRY = {
         "adguard": adapter_adguard,
-        "glances": adapter_glances,
+        "audiobookshelf": adapter_audiobookshelf,
+        "paperclip": adapter_paperclip,
         "jellyfin": adapter_jellyfin,
         "sonarr": adapter_sonarr,
         "radarr": adapter_radarr,
@@ -740,7 +815,165 @@ let
         "prometheus": adapter_prometheus,
         "seerr": adapter_seerr,
         "headscale": adapter_headscale,
+        "calibre-web": adapter_calibre_web,
+        "grafana": adapter_grafana,
     }
+
+    FLEET_CACHE = [0, None]
+
+
+    def query_netdata_host(host_id, name, endpoints, timeout=1.5):
+        info = None
+        used_ep = None
+        for ep in endpoints:
+            try:
+                with make_http_request(f"{ep}/api/v1/info", timeout=timeout) as resp:
+                    info = json.loads(resp.read().decode("utf-8"))
+                    used_ep = ep
+                    break
+            except Exception:
+                continue
+
+        if not info:
+            return {
+                "id": host_id,
+                "name": name,
+                "state": "offline",
+                "reason": "Host unreachable on tailnet",
+                "cpuPct": None,
+                "ramUsedGB": None,
+                "ramTotalGB": None,
+                "ramPct": None,
+                "diskUsedGB": None,
+                "diskTotalGB": None,
+                "diskPct": None,
+                "netRxKbps": None,
+                "netTxKbps": None,
+                "load": None,
+                "uptime": "offline",
+            }
+
+        cpu_pct = 0.0
+        try:
+            with make_http_request(f"{used_ep}/api/v1/data?chart=system.cpu&points=1&after=-10", timeout=timeout) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+                labels = data.get("labels", [])
+                rows = data.get("data", [])
+                if rows and len(rows[0]) == len(labels):
+                    dim_map = dict(zip(labels, rows[0]))
+                    used_dims = ["user", "system", "nice", "softirq", "irq", "iowait", "steal"]
+                    cpu_pct = sum(float(dim_map.get(k, 0) or 0) for k in used_dims)
+                    cpu_pct = round(min(100.0, max(0.0, cpu_pct)), 1)
+        except Exception:
+            pass
+
+        ram_used_gb = 0.0
+        ram_total_gb = 0.0
+        ram_pct = 0.0
+        try:
+            with make_http_request(f"{used_ep}/api/v1/data?chart=system.ram&points=1&after=-10", timeout=timeout) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+                labels = data.get("labels", [])
+                rows = data.get("data", [])
+                if rows and len(rows[0]) == len(labels):
+                    dim_map = dict(zip(labels, rows[0]))
+                    used_mb = float(dim_map.get("used", 0) or 0)
+                    free_mb = float(dim_map.get("free", 0) or 0)
+                    cached_mb = float(dim_map.get("cached", 0) or 0)
+                    buffers_mb = float(dim_map.get("buffers", 0) or 0)
+                    tot_mb = used_mb + free_mb + cached_mb + buffers_mb
+                    if tot_mb > 0:
+                        ram_used_gb = round(used_mb / 1024.0, 1)
+                        ram_total_gb = round(tot_mb / 1024.0, 1)
+                        ram_pct = round((used_mb / tot_mb) * 100.0, 1)
+        except Exception:
+            pass
+
+        disk_used_gb = 0.0
+        disk_total_gb = 0.0
+        disk_pct = 0.0
+        for chart in ["disk_space./nix", "disk_space./"]:
+            try:
+                with make_http_request(f"{used_ep}/api/v1/data?chart={chart}&points=1&after=-10", timeout=timeout) as resp:
+                    data = json.loads(resp.read().decode("utf-8"))
+                    labels = data.get("labels", [])
+                    rows = data.get("data", [])
+                    if rows and len(rows[0]) == len(labels):
+                        dim_map = dict(zip(labels, rows[0]))
+                        used_gb = float(dim_map.get("used", 0) or 0)
+                        avail_gb = float(dim_map.get("avail", 0) or 0)
+                        tot_gb = used_gb + avail_gb
+                        if tot_gb > 0:
+                            disk_used_gb = round(used_gb, 1)
+                            disk_total_gb = round(tot_gb, 1)
+                            disk_pct = round((used_gb / tot_gb) * 100.0, 1)
+                            break
+            except Exception:
+                continue
+
+        rx_kbps = 0.0
+        tx_kbps = 0.0
+        try:
+            with make_http_request(f"{used_ep}/api/v1/data?chart=system.net&points=1&after=-10", timeout=timeout) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+                labels = data.get("labels", [])
+                rows = data.get("data", [])
+                if rows and len(rows[0]) == len(labels):
+                    dim_map = dict(zip(labels, rows[0]))
+                    rx_kbps = round(abs(float(dim_map.get("received", 0) or 0)), 1)
+                    tx_kbps = round(abs(float(dim_map.get("sent", 0) or 0)), 1)
+        except Exception:
+            pass
+
+        load_arr = [0.0, 0.0, 0.0]
+        try:
+            with make_http_request(f"{used_ep}/api/v1/data?chart=system.load&points=1&after=-10", timeout=timeout) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+                labels = data.get("labels", [])
+                rows = data.get("data", [])
+                if rows and len(rows[0]) == len(labels):
+                    dim_map = dict(zip(labels, rows[0]))
+                    load_arr = [
+                        round(float(dim_map.get("load1", 0) or 0), 2),
+                        round(float(dim_map.get("load5", 0) or 0), 2),
+                        round(float(dim_map.get("load15", 0) or 0), 2),
+                    ]
+        except Exception:
+            pass
+
+        uptime_str = "up"
+        try:
+            with make_http_request(f"{used_ep}/api/v1/data?chart=system.uptime&points=1&after=-10", timeout=timeout) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+                rows = data.get("data", [])
+                if rows and len(rows[0]) >= 2:
+                    upt_sec = float(rows[0][1] or 0)
+                    days = int(upt_sec // 86400)
+                    hours = int((upt_sec % 86400) // 3600)
+                    mins = int((upt_sec % 3600) // 60)
+                    uptime_str = f"{days}d {hours}h" if days > 0 else f"{hours}h {mins}m"
+        except Exception:
+            pass
+
+        return {
+            "id": host_id,
+            "name": name,
+            "state": "online",
+            "version": info.get("version", "v2"),
+            "os": info.get("os_name", "NixOS"),
+            "cpuPct": cpu_pct,
+            "ramUsedGB": ram_used_gb,
+            "ramTotalGB": ram_total_gb,
+            "ramPct": ram_pct,
+            "diskUsedGB": disk_used_gb,
+            "diskTotalGB": disk_total_gb,
+            "diskPct": disk_pct,
+            "netRxKbps": rx_kbps,
+            "netTxKbps": tx_kbps,
+            "load": load_arr,
+            "uptime": uptime_str,
+            "netdataUrl": f"http://{host_id}.nfp.nix:19999",
+        }
 
 
     class HomepageHandler(http.server.BaseHTTPRequestHandler):
@@ -765,6 +998,10 @@ let
             if path.startswith("/api/widget/"):
                 widget_id = path[12:]
                 self.handle_widget(widget_id)
+                return
+
+            if path == "/api/fleet/vitals":
+                self.handle_fleet_vitals()
                 return
 
             if path == "/api/healthcheck":
@@ -853,13 +1090,16 @@ let
                     return
 
                 health_dict = {"state": "online", "checkedAt": iso_now}
+                metric_dict = {"state": "health-only", "fields": []}
+                bounty_stat = "OPERATIONAL"
 
                 if mode == "native-api" and adapter_name and adapter_name in ADAPTER_REGISTRY:
                     base_url = svc_info.get("target_endpoint", "").rstrip("/")
-                    metric_dict, bounty_stat = ADAPTER_REGISTRY[adapter_name](base_url, svc_info, allowed_fields, iso_now)
-                else:
-                    metric_dict = {"state": "health-only", "fields": []}
-                    bounty_stat = "OPERATIONAL"
+                    try:
+                        metric_dict, bounty_stat = ADAPTER_REGISTRY[adapter_name](base_url, svc_info, allowed_fields, iso_now)
+                    except Exception:
+                        metric_dict = {"state": "unavailable", "reason": "Metric source unavailable", "fields": []}
+                        bounty_stat = "OPERATIONAL"
 
                 res = {
                     "id": widget_id,
@@ -876,11 +1116,47 @@ let
                     "id": widget_id,
                     "status": "offline",
                     "health": {"state": "offline", "checkedAt": iso_now},
-                    "metric": {"state": "unavailable", "reason": "Metric source unavailable", "fields": []},
+                    "metric": {"state": "unavailable", "reason": "Service Unreachable", "fields": []},
                     "bountyStat": "OFFLINE",
                     "updatedAt": iso_now,
                 }
                 self.wfile.write(json.dumps(res).encode("utf-8"))
+
+        def handle_fleet_vitals(self):
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+
+            now = time.time()
+            if FLEET_CACHE[1] and (now - FLEET_CACHE[0] < 5):
+                self.wfile.write(json.dumps(FLEET_CACHE[1]).encode("utf-8"))
+                return
+
+            import socket
+            cur_host = socket.gethostname()
+
+            hosts_to_query = [
+                ("z0r0", "z0r0 (Workstation/AI)", ["http://127.0.0.1:19999", "http://z0r0.nfp.nix:19999", "http://100.80.146.121:19999"]),
+                ("luffy", "luffy (Homelab Server)", ["http://127.0.0.1:19999", "http://luffy.nfp.nix:19999", "http://100.80.146.120:19999"]),
+                ("nami", "nami (Mini Edge)", ["http://nami.nfp.nix:19999", "http://100.80.146.122:19999"]),
+            ]
+
+            vitals = []
+            for hid, hname, eps in hosts_to_query:
+                if hid == cur_host:
+                    endpoints = ["http://127.0.0.1:19999"] + [e for e in eps if "127.0.0.1" not in e]
+                else:
+                    endpoints = [e for e in eps if "127.0.0.1" not in e]
+                host_vital = query_netdata_host(hid, hname, endpoints)
+                vitals.append(host_vital)
+
+            payload = {
+                "hosts": vitals,
+                "updatedAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(now)),
+            }
+            FLEET_CACHE[0] = now
+            FLEET_CACHE[1] = payload
+            self.wfile.write(json.dumps(payload).encode("utf-8"))
 
         def handle_healthcheck(self):
             self.send_response(200)
@@ -896,7 +1172,7 @@ let
                     return
                 except Exception:
                     pass
-            fallback = json.dumps({"status": "ok", "uptime": "99.9%"})
+            fallback = json.dumps({"status": "ok", "targets": []})
             self.wfile.write(fallback.encode("utf-8"))
 
 

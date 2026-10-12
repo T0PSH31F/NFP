@@ -102,10 +102,10 @@ with lib;
           };
           homepage = {
             enable = true;
-            category = "chopper";
+            category = "usopp";
             order = 10;
             title = "Prometheus";
-            subtitle = "Medical Scanner";
+            subtitle = "Tactical Metric Radar";
             icon = "prometheus";
             metric = {
               mode = "native-api";
@@ -133,10 +133,10 @@ with lib;
           };
           homepage = {
             enable = true;
-            category = "chopper";
+            category = "usopp";
             order = 20;
             title = "Grafana";
-            subtitle = "Observability Dashboards";
+            subtitle = "Tactical Command Views";
             icon = "grafana";
             metric = {
               mode = "health-only";
@@ -158,7 +158,7 @@ with lib;
           };
           homepage = {
             enable = true;
-            category = "chopper";
+            category = "usopp";
             order = 22;
             title = "Loki Logs";
             subtitle = "Grafana Explore Log Viewer";

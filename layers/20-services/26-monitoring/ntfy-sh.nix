@@ -51,10 +51,10 @@ in
       };
       homepage = {
         enable = true;
-        category = "chopper";
+        category = "usopp";
         order = 30;
         title = "ntfy";
-        subtitle = "Transponder Snail Signal";
+        subtitle = "Tactical Alert Relay";
         icon = "ntfy";
         metric = {
           mode = "health-only";

@@ -47,10 +47,10 @@ in
       };
       homepage = {
         enable = true;
-        category = "chopper";
+        category = "usopp";
         order = 40;
         title = "Netdata (${config.networking.hostName})";
-        subtitle = "Real-Time Telemetry";
+        subtitle = "Real-Time Host Telemetry";
         icon = "netdata";
         metric = {
           mode = "health-only";

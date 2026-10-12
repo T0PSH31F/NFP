@@ -304,8 +304,8 @@ in
     # Bind SearXNG to LAN so dashboard search works from z0r0
     searx.settings.server.bind_address = lib.mkForce "0.0.0.0";
 
-    # Glances — re-enabled for homepage-dashboard cross-machine system stats
-    glances-server.enable = lib.mkForce true;
+    # Glances — disabled, replaced by Netdata for fleet vitals
+    glances-server.enable = lib.mkForce false;
 
     # Caddy Reverse Proxy
     caddy = {

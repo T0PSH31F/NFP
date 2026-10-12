@@ -100,8 +100,8 @@
     server.enable = false;
   };
 
-  # Glances server for cross-machine system metrics
-  services.glances-server.enable = true;
+  # Glances server disabled — Netdata is primary source
+  services.glances-server.enable = false;
 
   # Netdata real-time monitoring
   layers.layer-20.services.config.netdata.enable = true;
