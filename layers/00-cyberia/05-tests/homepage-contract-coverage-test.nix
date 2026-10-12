@@ -116,10 +116,6 @@ let
       host = "luffy";
     }
     {
-      name = "glances";
-      host = "luffy";
-    }
-    {
       name = "prometheus";
       host = "nami";
     }

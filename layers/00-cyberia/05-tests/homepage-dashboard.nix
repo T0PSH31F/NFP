@@ -26,6 +26,7 @@
       };
 
       config = {
+        _module.args.inputs = { };
         layers.layer-20.services.config.homepage-dashboard = {
           enable = true;
           port = 3007;
@@ -514,5 +515,26 @@
     second_cached = json.loads(machine.succeed("curl -fsS http://localhost:3007/api/widget/adguard"))
     assert initial_cached["updatedAt"] == second_cached["updatedAt"], "Cache miss: updatedAt timestamp changed within TTL window"
     assert sorted(initial_cached.keys()) == sorted(second_cached.keys()), "Cache inflated response keys"
+
+    # 12. Fleet Vitals endpoint provides hosts and Glances is absent everywhere
+    fleet_raw = machine.succeed("curl -fsS http://localhost:3007/api/fleet/vitals")
+    fleet_data = json.loads(fleet_raw)
+    assert "hosts" in fleet_data, "Fleet vitals response missing 'hosts'"
+    fleet_host_ids = [h["id"] for h in fleet_data["hosts"]]
+    for expected_host in ["z0r0", "luffy", "nami"]:
+        assert expected_host in fleet_host_ids, f"Host '{expected_host}' missing from fleet vitals response"
+
+    # Glances must be absent everywhere
+    assert "glances" not in config_raw.lower(), "Glances found in /api/config"
+    assert "glances" not in html.lower(), "Glances found in index.html"
+    assert "glances" not in app_js.lower(), "Glances found in app.js"
+
+    # 13. Wanted poster elements and Grand Line Fleet Vitals present in assets
+    assert "wanted-poster-frame" in theme_css, "theme.css missing wanted-poster-frame"
+    assert "wanted-poster-masthead" in theme_css, "theme.css missing wanted-poster-masthead"
+    assert "bounty-plaque" in theme_css, "theme.css missing bounty-plaque"
+    assert "fleet-vitals-section" in theme_css, "theme.css missing fleet-vitals-section"
+    assert "wanted-poster-card" in app_js, "app.js missing wanted-poster-card class"
+    assert "GRAND LINE FLEET VITALS" in app_js, "app.js missing GRAND LINE FLEET VITALS title"
   '';
 }
