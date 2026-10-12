@@ -135,13 +135,8 @@ with lib;
   };
 
   config = mkIf config.services.mautrix-bridges.enable {
-    # Order Synapse after bridges to guarantee registration YAML files exist before Synapse reads them
+    # Ensure bridges are started with Synapse without creating cyclic dependencies
     systemd.services.matrix-synapse = mkIf (config.services.matrix-synapse.enable or false) {
-      after =
-        (optional config.services.mautrix-bridges.whatsapp.enable "mautrix-whatsapp.service")
-        ++ (optional config.services.mautrix-bridges.signal.enable "mautrix-signal.service")
-        ++ (optional config.services.mautrix-bridges.telegram.enable "mautrix-telegram.service")
-        ++ (optional config.services.mautrix-bridges.discord.enable "mautrix-discord.service");
       wants =
         (optional config.services.mautrix-bridges.whatsapp.enable "mautrix-whatsapp.service")
         ++ (optional config.services.mautrix-bridges.signal.enable "mautrix-signal.service")

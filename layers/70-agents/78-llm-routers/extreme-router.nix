@@ -79,7 +79,7 @@ with lib;
           port = 20128;
           homepage = {
             enable = true;
-            category = "agents";
+            category = "luffy";
             order = 20;
             title = "ExtremeRouter";
             subtitle = "154-Provider AI Gateway";

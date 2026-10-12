@@ -176,7 +176,7 @@
       nfp.services.hermes = {
         enable = config.layers.layer-76.hermes.enable;
         host = config.networking.hostName;
-        bind = "127.0.0.1";
+        bind = "0.0.0.0";
         port = 9119;
         tailnetName = "hermes";
         tls = "headscale";
@@ -187,7 +187,7 @@
         };
         homepage = {
           enable = true;
-          category = "agents";
+          category = "luffy";
           order = 5;
           title = "Hermes Dashboard";
           subtitle = "Autonomous Agent Control Plane";
@@ -197,6 +197,8 @@
           };
         };
       };
+
+      networking.firewall.allowedTCPPorts = [ 9119 ];
 
       services.hermes-agent = {
         enable = true;

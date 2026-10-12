@@ -72,10 +72,10 @@ in
       };
       homepage = {
         enable = true;
-        category = "sanji";
+        category = "brook";
         order = 30;
         title = "Your Spotify";
-        subtitle = "Galley Music History";
+        subtitle = "Listening Habits & Logs";
         icon = "your-spotify";
         metric = {
           mode = "health-only";

@@ -1,6 +1,7 @@
 {
   config,
   lib,
+  pkgs,
   ...
 }:
 with lib;
@@ -80,6 +81,15 @@ with lib;
       "d ${config.services.calibre-web-app.dataDir} 0755 calibre-web calibre-web -"
       "d ${config.services.calibre-web-app.libraryPath} 0755 calibre-web calibre-web -"
     ];
+
+    # Auto-initialize empty metadata.db if missing so service does not crash on pre-start check
+    systemd.services.calibre-web.preStart = lib.mkBefore ''
+      if [ -n "${toString config.services.calibre-web-app.libraryPath}" ] && [ ! -f "${config.services.calibre-web-app.libraryPath}/metadata.db" ]; then
+        mkdir -p "${config.services.calibre-web-app.libraryPath}"
+        ${pkgs.calibre}/bin/calibredb list --library-path "${config.services.calibre-web-app.libraryPath}" >/dev/null 2>&1 || true
+        chown -R calibre-web:calibre-web "${config.services.calibre-web-app.libraryPath}" || true
+      fi
+    '';
 
     # Firewall
     networking.firewall.allowedTCPPorts = [ config.services.calibre-web-app.port ];

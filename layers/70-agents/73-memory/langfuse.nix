@@ -36,7 +36,7 @@
         nfp.services.langfuse = {
           enable = config.services.infrastructure.langfuse.enable;
           host = config.networking.hostName;
-          bind = "127.0.0.1";
+          bind = "0.0.0.0";
           port = 3005;
           tailnetName = "langfuse";
           tls = "headscale";
@@ -47,7 +47,7 @@
           };
           homepage = {
             enable = true;
-            category = "chopper";
+            category = "usopp";
             order = 35;
             title = "Langfuse";
             subtitle = "LLM Observability & Traces";
@@ -90,9 +90,11 @@
           ];
           environment = {
             PORT = toString cfg.port;
-            HOSTNAME = "127.0.0.1";
+            HOSTNAME = "0.0.0.0";
             NODE_ENV = "production";
-            NEXTAUTH_URL = "http://127.0.0.1:${toString cfg.port}";
+            NEXTAUTH_URL = "http://${config.networking.hostName}.${
+              config.layers.meta.tailnetDomain or "nfp.nix"
+            }:${toString cfg.port}";
             NEXT_PUBLIC_SIGN_UP_DISABLED = "false";
             NEXT_PUBLIC_LANGFUSE_CLOUD_EDITION = "local";
             TELEMETRY_ENABLED = "false";

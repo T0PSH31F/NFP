@@ -124,7 +124,7 @@ with lib;
           inherit (cfg) port;
           homepage = {
             enable = true;
-            category = "agents";
+            category = "luffy";
             order = 30;
             title = "OmniRoute";
             subtitle = "RTK Compression Gateway";

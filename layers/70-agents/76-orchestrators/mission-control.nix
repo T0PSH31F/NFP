@@ -80,6 +80,34 @@ with lib;
 
       networking.firewall.allowedTCPPorts = [ cfg.port ];
 
+      nfp.services.mission-control = {
+        enable = true;
+        host = config.networking.hostName;
+        bind = "0.0.0.0";
+        inherit (cfg) port;
+        tailnetName = "mission-control";
+        tls = "headscale";
+        healthcheck = {
+          enable = true;
+          path = "/";
+          expectedStatus = [
+            200
+            307
+          ];
+        };
+        homepage = {
+          enable = true;
+          category = "luffy";
+          order = 28;
+          title = "Mission Control";
+          subtitle = "Autonomous Swarm Deck";
+          icon = "mission-control";
+          metric = {
+            mode = "health-only";
+          };
+        };
+      };
+
       systemd.tmpfiles.rules = [
         "d ${cfg.dataDir} 0777 root root -"
         "d /home/t0psh31f/.gemini/config/skills 0755 t0psh31f users -"

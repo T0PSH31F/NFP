@@ -74,6 +74,31 @@ in
       };
     };
 
+    nfp.services.n8n = {
+      enable = true;
+      host = config.networking.hostName;
+      bind = "0.0.0.0";
+      inherit (cfg) port;
+      tailnetName = "n8n";
+      tls = "headscale";
+      healthcheck = {
+        enable = true;
+        path = "/healthz";
+        expectedStatus = [ 200 ];
+      };
+      homepage = {
+        enable = true;
+        category = "usopp";
+        order = 50;
+        title = "n8n";
+        subtitle = "Automated Tactical Workflows";
+        icon = "n8n";
+        metric = {
+          mode = "health-only";
+        };
+      };
+    };
+
     # Ensure data is persisted
     environment.persistence."/persist" = mkIf config.layers.layer-10.system.config.impermanence.enable {
       directories = [

@@ -36,6 +36,32 @@ in
 
     networking.firewall.allowedTCPPorts = [ 8222 ];
 
+    nfp.services.vaultwarden = {
+      enable = true;
+      host = config.networking.hostName;
+      bind = "0.0.0.0";
+      port = 8222;
+      tailnetName = "vaultwarden";
+      tls = "headscale";
+      healthcheck = {
+        enable = true;
+        path = "/alive";
+        expectedStatus = [ 200 ];
+      };
+      homepage = {
+        enable = true;
+        category = "zoro";
+        order = 45;
+        title = "Vaultwarden";
+        subtitle = "Encrypted Armory Vault";
+        icon = "vaultwarden";
+        dashboardUrl = "https://vault.lovelain.duckdns.org";
+        metric = {
+          mode = "health-only";
+        };
+      };
+    };
+
     # Persistence
     environment.persistence."/persist" = mkIf config.layers.layer-10.system.config.impermanence.enable {
       directories = [

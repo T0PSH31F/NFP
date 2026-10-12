@@ -85,7 +85,7 @@ in
         };
         homepage = {
           enable = true;
-          category = "agents";
+          category = "luffy";
           order = 10;
           title = "Polyfloor";
           subtitle = "Multi-Agent Orchestrator";

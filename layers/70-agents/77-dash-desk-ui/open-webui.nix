@@ -37,7 +37,7 @@ with lib;
           port = 8088;
           homepage = {
             enable = true;
-            category = "agents";
+            category = "luffy";
             order = 60;
             title = "Open WebUI";
             subtitle = "LLM Chat Interface";

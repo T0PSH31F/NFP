@@ -87,9 +87,11 @@ let
               "zoro"
               "nami"
               "sanji"
-              "robin"
-              "chopper"
+              "brook"
               "vegapunk"
+              "robin"
+              "usopp"
+              "chopper"
               "agents"
             ];
             default = "luffy";

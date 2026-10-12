@@ -76,7 +76,7 @@ in
               };
               homepage = {
                 enable = true;
-                category = "chopper";
+                category = "luffy";
                 order = 25;
                 title = "Matrix Synapse";
                 subtitle = "Transponder Snail Comms";

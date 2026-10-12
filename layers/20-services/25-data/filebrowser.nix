@@ -8,7 +8,7 @@ in
     enable = mkEnableOption "FileBrowser web interface";
     port = mkOption {
       type = types.port;
-      default = 8085;
+      default = 8089;
     };
     rootDir = mkOption {
       type = types.str;

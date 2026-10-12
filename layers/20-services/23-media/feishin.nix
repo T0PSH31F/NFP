@@ -105,10 +105,10 @@ in
         port = 9180;
         homepage = {
           enable = true;
-          category = "sanji";
+          category = "brook";
           order = 20;
           title = "Feishin";
-          subtitle = "Galley Jukebox";
+          subtitle = "Soul King Audio Streamer";
           icon = "feishin";
           metric = {
             mode = "health-only";

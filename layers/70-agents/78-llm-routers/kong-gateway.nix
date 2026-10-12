@@ -665,7 +665,7 @@ in
           port = 8090;
           homepage = {
             enable = true;
-            category = "agents";
+            category = "luffy";
             order = 40;
             title = "Kong Gateway";
             subtitle = "Unified LLM Multiplexer";

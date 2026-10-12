@@ -67,7 +67,19 @@
       dashboardConfig = await res.json();
 
       renderNavbarStats(dashboardConfig.stats);
+
+      const main = document.getElementById('dashboard-main');
+      if (main) main.innerHTML = '';
+
+      // 1. Grand Line Fleet Vitals — ALWAYS FIRST
+      renderFleetVitalsSkeleton();
+      pollFleetVitals();
+      setInterval(pollFleetVitals, 5000);
+
+      // 2. Render crew categories
       renderCategories(dashboardConfig.categories, dashboardConfig.constellation);
+
+      // 3. Render speeddial bookmarks
       renderSpeeddial(dashboardConfig.bookmarks);
 
       setupSearch();
@@ -95,9 +107,124 @@
         <span>📡</span>
         <span class="stat-pill-val">${stats.satellites || 7} SATELLITES</span>
       </div>
-      <div class="stat-pill" aria-label="Fleet Uptime">
-        <span>⛵</span>
-        <span class="stat-pill-val">${stats.uptime ? stats.uptime + '%' : 'Not measured'}</span>
+      <div class="stat-pill" aria-label="Observability Status">
+        <span>🎯</span>
+        <span class="stat-pill-val">NETDATA ACTIVE</span>
+      </div>
+    `;
+  }
+
+  function renderFleetVitalsSkeleton() {
+    const main = document.getElementById('dashboard-main');
+    if (!main) return;
+
+    const sec = document.createElement('section');
+    sec.className = 'fleet-vitals-section';
+    sec.id = 'fleet-vitals-section';
+    sec.innerHTML = `
+      <header class="fleet-vitals-header">
+        <div class="fleet-vitals-title-group">
+          <div class="fleet-vitals-flag">🏴‍☠️</div>
+          <div>
+            <h2>GRAND LINE FLEET VITALS</h2>
+            <span class="fleet-vitals-subtitle">High-Definition Telemetry via Netdata Engine (z0r0 · luffy · nami)</span>
+          </div>
+        </div>
+        <div class="fleet-vitals-meta" id="fleet-vitals-meta">COLLECTING VITALS...</div>
+      </header>
+      <div class="fleet-vitals-grid" id="fleet-vitals-grid">
+        <div class="fleet-loading-card">Connecting to fleet Netdata engines...</div>
+      </div>
+    `;
+    main.appendChild(sec);
+  }
+
+  async function pollFleetVitals() {
+    const grid = document.getElementById('fleet-vitals-grid');
+    const meta = document.getElementById('fleet-vitals-meta');
+    if (!grid) return;
+
+    try {
+      const res = await fetch('/api/fleet/vitals');
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      const hosts = data.hosts || [];
+
+      if (meta && data.updatedAt) {
+        meta.textContent = `LAST HARVEST: ${new Date(data.updatedAt).toLocaleTimeString()} UTC`;
+      }
+
+      grid.innerHTML = hosts.map(h => createHostVitalCardHtml(h)).join('');
+    } catch (err) {
+      if (meta) meta.textContent = 'TELEMETRY DEGRADED';
+    }
+  }
+
+  function createHostVitalCardHtml(host) {
+    const isOnline = host.state === 'online';
+    const cpuPct = host.cpuPct !== null ? host.cpuPct : 0;
+    const ramPct = host.ramPct !== null ? host.ramPct : 0;
+    const diskPct = host.diskPct !== null ? host.diskPct : 0;
+    const loadStr = Array.isArray(host.load) ? host.load.join(', ') : (host.load || '—');
+
+    return `
+      <div class="host-vital-card ${isOnline ? 'host-online' : 'host-offline'}" id="host-card-${host.id}">
+        <div class="host-vital-top">
+          <div class="host-identity">
+            <span class="host-status-indicator ${isOnline ? 'indicator-online' : 'indicator-offline'}"></span>
+            <div class="host-name-box">
+              <span class="host-name">${host.name}</span>
+              <span class="host-subinfo">${host.os || 'NixOS'} · ${host.version || 'v2'}</span>
+            </div>
+          </div>
+          <div class="host-badges">
+            <span class="host-uptime-badge">⏱ ${host.uptime || 'offline'}</span>
+            ${host.netdataUrl ? `<a href="${host.netdataUrl}" target="_blank" rel="noopener noreferrer" class="netdata-link" aria-label="Open Netdata on ${host.id}">Netdata — ${host.id} ↗</a>` : ''}
+          </div>
+        </div>
+
+        ${isOnline ? `
+        <div class="host-metrics-bars">
+          <div class="vital-bar-group">
+            <div class="vital-bar-label">
+              <span>CPU UTILIZATION</span>
+              <span class="vital-val">${cpuPct}%</span>
+            </div>
+            <div class="vital-progress-track">
+              <div class="vital-progress-fill ${cpuPct > 80 ? 'fill-warn' : ''}" style="width: ${Math.min(100, cpuPct)}%"></div>
+            </div>
+          </div>
+
+          <div class="vital-bar-group">
+            <div class="vital-bar-label">
+              <span>RAM USAGE</span>
+              <span class="vital-val">${host.ramUsedGB} / ${host.ramTotalGB} GB (${ramPct}%)</span>
+            </div>
+            <div class="vital-progress-track">
+              <div class="vital-progress-fill ${ramPct > 85 ? 'fill-warn' : ''}" style="width: ${Math.min(100, ramPct)}%"></div>
+            </div>
+          </div>
+
+          <div class="vital-bar-group">
+            <div class="vital-bar-label">
+              <span>DATA DISK</span>
+              <span class="vital-val">${host.diskUsedGB} / ${host.diskTotalGB} GB (${diskPct}%)</span>
+            </div>
+            <div class="vital-progress-track">
+              <div class="vital-progress-fill ${diskPct > 90 ? 'fill-warn' : ''}" style="width: ${Math.min(100, diskPct)}%"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="host-vital-footer">
+          <span class="vital-stat-sub">NET: ↓ ${host.netRxKbps || 0} KB/s  ↑ ${host.netTxKbps || 0} KB/s</span>
+          <span class="vital-stat-sub">LOAD: ${loadStr}</span>
+        </div>
+        ` : `
+        <div class="host-offline-box">
+          <span>⚠️ Tailnet unreachable or Netdata probe inactive</span>
+        </div>
+        `}
       </div>
     `;
   }
@@ -131,7 +258,7 @@
             <div class="constellation-orbit-stage" id="constellation-stage">
               <svg class="constellation-orbit-svg" id="constellation-svg" viewBox="0 0 420 420"></svg>
               
-              <div class="constellation-stella-node" id="stella-node" role="button" tabindex="0" aria-label="Vegapunk Stella Center" onclick="document.querySelector('[data-service-id=\\'${constellation.center.id}\\']')?.scrollIntoView({behavior: 'smooth'})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();document.querySelector('[data-service-id=\\'${constellation.center.id}\\']')?.scrollIntoView({behavior: 'smooth'})}">
+              <div class="constellation-stella-node" id="stella-node" role="button" tabindex="0" aria-label="Vegapunk Stella Center" onclick="focusCanonicalCard('${constellation.center.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();focusCanonicalCard('${constellation.center.id}')}">
                 <img src="${constellation.center.icon}" alt="Stella" class="stella-node-icon" onerror="this.src='/assets/icons/fallback.svg'">
                 <span class="stella-node-title">STELLA</span>
                 <span class="stella-node-sub">${constellation.center.name}</span>
@@ -142,7 +269,7 @@
           </div>
 
           <div class="services-grid">
-            ${cat.services.map(svc => createServiceCardHtml(svc, cat.color)).join('')}
+            ${cat.services.map(svc => createWantedPosterCardHtml(svc, cat.color)).join('')}
           </div>
         `;
       } else {
@@ -158,7 +285,7 @@
             <div class="vivre-card-summary" id="cat-summary-${cat.id}">${cat.services.length} SERVICES (PROBING...)</div>
           </header>
           <div class="services-grid">
-            ${cat.services.map(svc => createServiceCardHtml(svc, cat.color)).join('')}
+            ${cat.services.map(svc => createWantedPosterCardHtml(svc, cat.color)).join('')}
           </div>
         `;
       }
@@ -170,6 +297,15 @@
       window.addEventListener('resize', drawConstellationLines);
     }
   }
+
+  window.focusCanonicalCard = function (svcId) {
+    const card = document.querySelector(`[data-service-id='${svcId}']`);
+    if (card) {
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      card.classList.add('card-highlight-pulse');
+      setTimeout(() => card.classList.remove('card-highlight-pulse'), 2500);
+    }
+  };
 
   function renderOrbitalSatellites(satellites) {
     if (!satellites || satellites.length === 0) return '';
@@ -195,8 +331,8 @@
              role="button" tabindex="0"
              style="left: ${x}px; top: ${y}px;"
              title="${sat.name}: ${sat.satelliteName || ''}"
-             onclick="document.querySelector('[data-service-id=\\'${sat.id}\\']')?.scrollIntoView({behavior: 'smooth'})"
-             onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();document.querySelector('[data-service-id=\\'${sat.id}\\']')?.scrollIntoView({behavior: 'smooth'})}">
+             onclick="focusCanonicalCard('${sat.id}')"
+             onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();focusCanonicalCard('${sat.id}')}">
           <div class="satellite-node-bubble">${bubbleContent}</div>
           <span class="satellite-node-label">${label}</span>
         </div>
@@ -230,7 +366,7 @@
     svg.innerHTML = svgContent;
   }
 
-  function createServiceCardHtml(svc, catColor) {
+  function createWantedPosterCardHtml(svc, catColor) {
     const hasLogs = svc.logs && svc.logs.enable && svc.logs.url;
     const isBrook = svc.satellite === 'brook' || svc.id === 'lidarr';
     const declaredFields = (svc.metric && svc.metric.fields) || [];
@@ -239,12 +375,12 @@
     const hasImg = svc.icon && (svc.icon.startsWith('/') || svc.icon.endsWith('.svg') || svc.icon.endsWith('.png'));
     const iconHtml = hasImg
       ? `<img src="${svc.icon}" alt="${svc.name}" class="service-card-icon" onerror="this.src='/assets/icons/fallback.svg'">`
-      : `<span class="service-icon-text">${svc.icon || '⚓'}</span>`;
+      : `<span class="wanted-portrait-emoji">${svc.icon || '⚓'}</span>`;
 
     const initialFieldsHtml = isHealthOnly
       ? `<div class="metric-health-pill">HEALTH CHECKED</div>`
       : declaredFields.map(f => {
-          const label = f.replace(/([A-Z])/g, ' $1').toLowerCase();
+          const label = f.replace(/([A-Z])/g, ' $1').toUpperCase();
           return `
             <div class="metric-field-item">
               <span class="metric-field-key">${label}</span>
@@ -254,34 +390,42 @@
         }).join('');
 
     return `
-      <article class="wanted-card ${isBrook ? 'brook-card' : ''}" data-service-id="${svc.id}" data-search-terms="${svc.name.toLowerCase()} ${(svc.onePieceSub || '').toLowerCase()}" style="--accent-color: ${catColor}">
-        <div class="card-top">
-          <div class="card-icon-container">
-            ${iconHtml}
+      <article class="wanted-poster-card ${isBrook ? 'brook-card' : ''}" data-service-id="${svc.id}" data-search-terms="${svc.name.toLowerCase()} ${(svc.onePieceSub || '').toLowerCase()}" style="--accent-color: ${catColor}">
+        <div class="wanted-poster-frame">
+          <div class="wanted-poster-masthead">
+            <span class="wanted-text">WANTED</span>
+            <span class="dead-or-alive-text">DEAD OR ALIVE</span>
           </div>
-          <div class="card-identity">
-            <h3 class="card-title">${svc.name}</h3>
-            <span class="card-onepiece-sub">${svc.onePieceSub || ''}</span>
+
+          <div class="wanted-portrait-box">
+            <div class="wanted-portrait-inner">
+              ${iconHtml}
+            </div>
+            <div class="den-den-mushi-container" id="snail-${svc.id}">
+              ${DEN_DEN_MUSHI_SVGS.checking}
+            </div>
           </div>
-          <div class="den-den-mushi-container" id="snail-${svc.id}">
-            ${DEN_DEN_MUSHI_SVGS.checking}
+
+          <div class="wanted-identity">
+            <h3 class="wanted-name">${svc.name}</h3>
+            <span class="wanted-role">${svc.onePieceSub || 'CYBERIA SHIPMATE'}</span>
           </div>
-        </div>
 
-        <div class="card-metrics-grid" id="metrics-${svc.id}">
-          ${initialFieldsHtml}
-        </div>
+          <div class="bounty-plaque" id="bounty-plaque-${svc.id}">
+            <span class="bounty-currency">฿</span>
+            <span class="bounty-figure" id="bounty-${svc.id}">FETCHING...</span>
+          </div>
 
-        <div class="card-bounty-box">
-          <span class="bounty-label" id="bounty-label-${svc.id}">${isHealthOnly ? 'SERVICE STATUS' : 'LIVE METRICS'}</span>
-          <span class="bounty-value" id="bounty-${svc.id}">FETCHING...</span>
-        </div>
+          <div class="card-metrics-grid" id="metrics-${svc.id}">
+            ${initialFieldsHtml}
+          </div>
 
-        <div class="widget-error-container" id="error-${svc.id}" style="display: none;"></div>
+          <div class="widget-error-container" id="error-${svc.id}" style="display: none;"></div>
 
-        <div class="card-actions">
-          <a href="${svc.url}" target="_blank" rel="noopener noreferrer" class="action-btn action-btn-primary" aria-label="Board ${svc.name}">BOARD SHIP</a>
-          ${hasLogs ? `<a href="${svc.logs.url}" target="_blank" rel="noopener noreferrer" class="action-btn action-btn-secondary" aria-label="View logs for ${svc.name}">LOGS</a>` : ''}
+          <div class="wanted-actions">
+            <a href="${svc.url}" target="_blank" rel="noopener noreferrer" class="action-btn action-btn-primary" aria-label="Board ${svc.name}">BOARD SHIP</a>
+            ${hasLogs ? `<a href="${svc.logs.url}" target="_blank" rel="noopener noreferrer" class="action-btn action-btn-secondary" aria-label="View logs for ${svc.name}">LOGS</a>` : ''}
+          </div>
         </div>
       </article>
     `;
@@ -340,7 +484,7 @@
 
         const snailEl = document.getElementById(`snail-${svc.id}`);
         const bountyEl = document.getElementById(`bounty-${svc.id}`);
-        const bountyLabelEl = document.getElementById(`bounty-label-${svc.id}`);
+        const bountyPlaqueEl = document.getElementById(`bounty-plaque-${svc.id}`);
         const errorEl = document.getElementById(`error-${svc.id}`);
         const metricsEl = document.getElementById(`metrics-${svc.id}`);
         const orbitNode = document.getElementById(`orbit-${svc.id}`);
@@ -371,27 +515,31 @@
           if (!isOnline) {
             metricsEl.innerHTML = `<div class="metric-unavailable-pill error-state">Service Unreachable</div>`;
           } else if (metricState === 'unavailable') {
-            const reason = (data.metric && data.metric.reason) || data.error || 'Metrics credential unavailable';
+            const reason = (data.metric && data.metric.reason) || data.error || 'Metrics unavailable';
             metricsEl.innerHTML = `<div class="metric-unavailable-pill">${reason}</div>`;
           } else if (metricState === 'health-only' || fieldsList.length === 0) {
             metricsEl.innerHTML = `<div class="metric-health-pill">HEALTH CHECKED</div>`;
           } else {
             metricsEl.innerHTML = fieldsList.map(f => `
               <div class="metric-field-item">
-                <span class="metric-field-key">${f.label || f.key}</span>
+                <span class="metric-field-key">${(f.label || f.key).toUpperCase()}</span>
                 <span class="metric-field-val">${f.value}</span>
               </div>
             `).join('');
           }
         }
 
-        if (bountyLabelEl) {
-          bountyLabelEl.textContent = (isOnline && metricState === 'available') ? 'LIVE METRICS' : 'SERVICE STATUS';
-        }
-
         if (bountyEl) {
           let statText = data.bountyStat || (isOnline ? 'OPERATIONAL' : 'OFFLINE');
           bountyEl.textContent = statText;
+        }
+
+        if (bountyPlaqueEl) {
+          if (!isOnline) {
+            bountyPlaqueEl.classList.add('bounty-offline');
+          } else {
+            bountyPlaqueEl.classList.remove('bounty-offline');
+          }
         }
 
         if (errorEl) {
@@ -405,12 +553,12 @@
       } catch (err) {
         const snailEl = document.getElementById(`snail-${svc.id}`);
         const bountyEl = document.getElementById(`bounty-${svc.id}`);
-        const bountyLabelEl = document.getElementById(`bounty-label-${svc.id}`);
+        const bountyPlaqueEl = document.getElementById(`bounty-plaque-${svc.id}`);
         const metricsEl = document.getElementById(`metrics-${svc.id}`);
         const orbitNode = document.getElementById(`orbit-${svc.id}`);
         if (snailEl) snailEl.innerHTML = DEN_DEN_MUSHI_SVGS.offline;
-        if (bountyLabelEl) bountyLabelEl.textContent = 'SERVICE STATUS';
         if (bountyEl) bountyEl.textContent = 'OFFLINE';
+        if (bountyPlaqueEl) bountyPlaqueEl.classList.add('bounty-offline');
         if (metricsEl) {
           metricsEl.innerHTML = '<div class="metric-unavailable-pill error-state">Service Unreachable</div>';
         }
@@ -433,7 +581,7 @@
 
     input.addEventListener('input', (e) => {
       const q = e.target.value.toLowerCase().trim();
-      const cards = document.querySelectorAll('.wanted-card, .speeddial-tile');
+      const cards = document.querySelectorAll('.wanted-poster-card, .speeddial-tile');
 
       cards.forEach(card => {
         const terms = card.getAttribute('data-search-terms') || card.textContent.toLowerCase();

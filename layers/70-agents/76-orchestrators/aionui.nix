@@ -135,7 +135,7 @@ with lib;
         };
         homepage = {
           enable = true;
-          category = "agents";
+          category = "luffy";
           order = 20;
           title = "AionUI";
           subtitle = "AI Cowork Web Interface";

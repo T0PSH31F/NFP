@@ -65,6 +65,11 @@ in
     # Override upstream nixarr setting deprecated services.sabnzbd.configFile
     services.sabnzbd.configFile = mkForce null;
 
+    services.audiobookshelf = {
+      host = lib.mkForce "0.0.0.0";
+      openFirewall = true;
+    };
+
     # Declarative nfp.services contracts for nixarr media services
     nfp.services = {
       jellyfin = {
@@ -75,6 +80,14 @@ in
         tailnetName = "jellyfin";
         tls = "headscale";
         backup.paths = [ "${cfg.stateDir}/jellyfin" ];
+        healthcheck = {
+          enable = true;
+          path = "/";
+          expectedStatus = [
+            200
+            302
+          ];
+        };
         homepage = {
           enable = true;
           category = "vegapunk";
@@ -125,7 +138,7 @@ in
       audiobookshelf = {
         enable = true;
         host = "luffy";
-        bind = "127.0.0.1";
+        bind = "0.0.0.0";
         port = 9292;
         tailnetName = "audiobookshelf";
         tls = "headscale";
@@ -247,6 +260,14 @@ in
         tailnetName = "seerr";
         tls = "headscale";
         backup.paths = [ "${cfg.stateDir}/seerr" ];
+        healthcheck = {
+          enable = true;
+          path = "/";
+          expectedStatus = [
+            200
+            307
+          ];
+        };
         homepage = {
           enable = true;
           category = "vegapunk";
@@ -276,9 +297,9 @@ in
           category = "vegapunk";
           order = 60;
           title = "qBittorrent";
-          subtitle = "Pythagoras — Wisdom";
+          subtitle = "Torrent Seedbox";
           icon = "qbittorrent";
-          satellite = "pythagoras";
+          satellite = null;
           metric = {
             mode = "native-api";
             adapter = "qbittorrent";
@@ -301,12 +322,12 @@ in
         backup.paths = [ "${cfg.stateDir}/lidarr" ];
         homepage = {
           enable = true;
-          category = "vegapunk";
+          category = "brook";
           order = 35;
           title = "Lidarr";
-          subtitle = "Brook — Soul King 💀🎵";
+          subtitle = "Soul King Discography 💀🎵";
           icon = "lidarr";
-          satellite = "brook";
+          satellite = null;
           metric = {
             mode = "native-api";
             adapter = "lidarr";

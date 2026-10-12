@@ -46,9 +46,9 @@ in
         category = "vegapunk";
         order = 45;
         title = "Jackett";
-        subtitle = "Edison — Tracker Gateway";
+        subtitle = "Tracker Gateway";
         icon = "jackett";
-        satellite = "edison";
+        satellite = null;
         metric = {
           mode = "health-only";
         };

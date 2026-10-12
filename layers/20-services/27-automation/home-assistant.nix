@@ -78,6 +78,34 @@ with lib;
       config.services.home-assistant-server.port
     ];
 
+    nfp.services.home-assistant = {
+      enable = true;
+      host = config.networking.hostName;
+      bind = "0.0.0.0";
+      port = config.services.home-assistant-server.port;
+      tailnetName = "home-assistant";
+      tls = "headscale";
+      healthcheck = {
+        enable = true;
+        path = "/";
+        expectedStatus = [
+          200
+          302
+        ];
+      };
+      homepage = {
+        enable = true;
+        category = "sanji";
+        order = 30;
+        title = "Home Assistant";
+        subtitle = "Galley & Quarters Automation";
+        icon = "home-assistant";
+        metric = {
+          mode = "health-only";
+        };
+      };
+    };
+
     # Ensure data is persisted
 
     environment.persistence."/persist" = mkIf config.layers.layer-10.system.config.impermanence.enable {

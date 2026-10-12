@@ -83,7 +83,7 @@ with lib;
           port = 8080;
           homepage = {
             enable = true;
-            category = "agents";
+            category = "luffy";
             order = 46;
             title = "FreeLLMPool";
             subtitle = "Provider Socket Pool";

@@ -101,7 +101,7 @@ with lib;
         };
         homepage = {
           enable = true;
-          category = "chopper";
+          category = "luffy";
           order = 26;
           title = "Paperclip";
           subtitle = "Swarm Control Plane";
@@ -131,10 +131,10 @@ with lib;
               "$meta": {
                 "version": 1,
                 "updatedAt": "2026-01-01T00:00:00.000Z",
-                "source": "nixos"
+                "source": "configure"
               },
               "database": { "url": "${cfg.databaseUrl}" },
-              "logging": { "level": "info", "mode": "pretty" },
+              "logging": { "level": "info", "mode": "file" },
               "server": { "port": ${toString cfg.port} }
             }
             EOF

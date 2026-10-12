@@ -125,7 +125,7 @@
           port = 3001;
           homepage = {
             enable = true;
-            category = "agents";
+            category = "luffy";
             order = 45;
             title = "FreeLLMAPI";
             subtitle = "Free Provider Aggregator";

@@ -39,7 +39,7 @@ with lib;
         port = 8000;
         homepage = {
           enable = true;
-          category = "agents";
+          category = "luffy";
           order = 70;
           title = "SillyTavern";
           subtitle = "Roleplay & Chat Engine";

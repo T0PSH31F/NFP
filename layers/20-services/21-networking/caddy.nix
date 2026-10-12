@@ -71,7 +71,12 @@ with lib;
           subtitle = "Santoryu Navigation Routes";
           icon = "caddy";
           metric = {
-            mode = "health-only";
+            mode = "native-api";
+            adapter = "caddy";
+            fields = [
+              "routes"
+              "uptime"
+            ];
           };
         };
       };
