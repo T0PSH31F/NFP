@@ -15,7 +15,7 @@
 
 ## Follow-ups (user action needed)
 1. **Re-login** (new terminal session) so all apps see new env vars; until then old sessions may recreate `~/.npm`/`~/.pi`.
-2. **GPG:** public keybox (pubring.kbx) was lost; secret key file intact at `~/.local/share/gnupg/private-keys-v1.d/E3372E3C….key` (backup: `~/.local/state/xdg-migration/gpg-secret-key-backup.key`). Restore by importing the public key (keys.openpgp.org / another machine) — private key matches by keygrip automatically. If pubkey unobtainable, professional key-recovery from the .key file is possible but non-trivial.
+2. ~~**GPG:** public keybox lost~~ **RESOLVED (2026-10-11):** reconstructed the uid-less pubkey packet from the preserved sexp (q-point + protected-at ctime), imported via pre-keyboxd GnuPG 2.4.0 in a sandbox, re-added uid `t0psh31f <t0psh31f@grandlix.gang>` (user-approved pinentry), exported, imported into live keyring with ultimate trust. Fingerprint: `97C2D3F4993CD05BDB54AD7284468D2EA90AA84F` (keyid `284468D2EA90AA84F`, keygrip `E3372E3C…` unchanged — old gpg-signed artifacts pair automatically). Sandbox + plaintext exports shredded. Backup sexp kept at `~/.local/state/xdg-migration/gpg-secret-key-backup.key`.
 3. **Codex:** run `codex login` (old auth/state lost in migration race). Claude: 12 transcripts salvaged to `~/.config/claude/transcripts`; settings.json restored manually to HM store target (`m1v3xcbr…`).
 4. `~/.claude.json` (top-level), `.bun`, `.vscode`, `.steam`, `.thunderbird`, `.aws/sso`, `.var`, `.librewolf`, `.ollama` are unsupported upstream — kept in place.
 5. Repo nit: pre-commit hook store path is stale (`git commit` needs `--no-verify` until hooks reinstalled).
