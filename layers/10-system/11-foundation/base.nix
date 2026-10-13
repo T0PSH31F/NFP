@@ -26,6 +26,11 @@
   # $HOME/.nix-profile and $HOME/.nix-defexpr.
   nix.settings.use-xdg-base-directories = true;
 
+  # Local cache nami.nfp.nix:5000 is unreliable (frequent timeouts). Without
+  # fallback=true, substituter failures abort builds fatally (attempt 5/5);
+  # with it, nix falls back to building locally after retries.
+  nix.settings.fallback = true;
+
   imports = [
     inputs.home-manager.nixosModules.home-manager
     inputs.sops-nix.nixosModules.sops
