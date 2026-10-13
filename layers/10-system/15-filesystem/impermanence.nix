@@ -238,5 +238,12 @@ with lib;
       fileSystems = [ "/persist" "/data" ];
     };
 
+    # ============================================================================
+    # ADDITIONAL CONFIGURATION
+    # ============================================================================
+    # Mark persistent storage as needed for boot (required for impermanence bind mounts)
+    fileSystems."/persist".neededForBoot = true;
+    fileSystems."/home".neededForBoot = true;
+
   };
 }

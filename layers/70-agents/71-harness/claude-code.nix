@@ -35,10 +35,10 @@
     lib.mkIf cfg.enable {
       environment.systemPackages = lib.optional (pkgs ? claude-code) pkgs.claude-code;
       environment.sessionVariables = {
-        ANTHROPIC_BASE_URL_KONG_ER = "http://nami:8090/v1";
-        ANTHROPIC_BASE_URL_KONG_OMNI = "http://nami:8090/omni/v1";
-        ANTHROPIC_BASE_URL_KONG_FREE = "http://nami:8090/llm/free/v1";
-        ANTHROPIC_BASE_URL_KONG_FRONTIER = "http://nami:8090/llm/frontier/v1";
+        ANTHROPIC_BASE_URL_KONG_ER = "http://nami.nfp.nix:8090/v1";
+        ANTHROPIC_BASE_URL_KONG_OMNI = "http://nami.nfp.nix:8090/omni/v1";
+        ANTHROPIC_BASE_URL_KONG_FREE = "http://nami.nfp.nix:8090/llm/free/v1";
+        ANTHROPIC_BASE_URL_KONG_FRONTIER = "http://nami.nfp.nix:8090/llm/frontier/v1";
         ANTHROPIC_BASE_URL_EXTREME_DIRECT = "http://127.0.0.1:20128/v1";
       };
     };
@@ -55,7 +55,7 @@
       xdg.configFile."claude/settings.json".text = builtins.toJSON {
         hasCompletedOnboarding = true;
         env = {
-          ANTHROPIC_BASE_URL = "http://nami:8090/v1";
+          ANTHROPIC_BASE_URL = "http://nami.nfp.nix:8090/v1";
         };
       };
     };

@@ -48,10 +48,10 @@ with lib;
       ];
 
       environment.sessionVariables = {
-        OPENAI_BASE_URL_KONG_ER = "http://nami:8090/v1";
-        OPENAI_BASE_URL_KONG_OMNI = "http://nami:8090/omni/v1";
-        OPENAI_BASE_URL_KONG_FREE = "http://nami:8090/llm/free/v1";
-        OPENAI_BASE_URL_KONG_FRONTIER = "http://nami:8090/llm/frontier/v1";
+        OPENAI_BASE_URL_KONG_ER = "http://nami.nfp.nix:8090/v1";
+        OPENAI_BASE_URL_KONG_OMNI = "http://nami.nfp.nix:8090/omni/v1";
+        OPENAI_BASE_URL_KONG_FREE = "http://nami.nfp.nix:8090/llm/free/v1";
+        OPENAI_BASE_URL_KONG_FRONTIER = "http://nami.nfp.nix:8090/llm/frontier/v1";
         OPENAI_BASE_URL_EXTREME_DIRECT = "http://127.0.0.1:20128/v1";
       };
 

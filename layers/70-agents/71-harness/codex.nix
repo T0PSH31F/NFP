@@ -35,10 +35,10 @@
     lib.mkIf cfg.enable {
       environment.systemPackages = lib.optional (pkgs ? codex) pkgs.codex;
       environment.sessionVariables = {
-        OPENAI_BASE_URL_KONG_ER = "http://nami:8090/v1";
-        OPENAI_BASE_URL_KONG_OMNI = "http://nami:8090/omni/v1";
-        OPENAI_BASE_URL_KONG_FREE = "http://nami:8090/llm/free/v1";
-        OPENAI_BASE_URL_KONG_FRONTIER = "http://nami:8090/llm/frontier/v1";
+        OPENAI_BASE_URL_KONG_ER = "http://nami.nfp.nix:8090/v1";
+        OPENAI_BASE_URL_KONG_OMNI = "http://nami.nfp.nix:8090/omni/v1";
+        OPENAI_BASE_URL_KONG_FREE = "http://nami.nfp.nix:8090/llm/free/v1";
+        OPENAI_BASE_URL_KONG_FRONTIER = "http://nami.nfp.nix:8090/llm/frontier/v1";
         OPENAI_BASE_URL_EXTREME_DIRECT = "http://127.0.0.1:20128/v1";
       };
     };
@@ -50,19 +50,19 @@
     lib.mkIf cfg.enable {
       xdg.configFile."deepseek/config.toml".text = ''
         [providers.openai]
-        base_url = "http://nami:8090/v1"
+        base_url = "http://nami.nfp.nix:8090/v1"
 
         [providers.kong-er]
-        base_url = "http://nami:8090/v1"
+        base_url = "http://nami.nfp.nix:8090/v1"
 
         [providers.kong-omni]
-        base_url = "http://nami:8090/omni/v1"
+        base_url = "http://nami.nfp.nix:8090/omni/v1"
 
         [providers.kong-free]
-        base_url = "http://nami:8090/llm/free/v1"
+        base_url = "http://nami.nfp.nix:8090/llm/free/v1"
 
         [providers.kong-frontier]
-        base_url = "http://nami:8090/llm/frontier/v1"
+        base_url = "http://nami.nfp.nix:8090/llm/frontier/v1"
 
         [providers.extreme-direct]
         base_url = "http://127.0.0.1:20128/v1"

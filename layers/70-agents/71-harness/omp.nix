@@ -53,7 +53,7 @@ in
 
     routerEndpoint = mkOption {
       type = types.str;
-      default = "http://nami:8090/v1";
+      default = "http://nami.nfp.nix:8090/v1";
       description = "NFP LLM router OpenAI-compatible gateway endpoint (default: kong-er)";
     };
 
@@ -71,10 +71,10 @@ in
       OMP_MODEL = cfg.defaultModel;
       OMP_ROUTER_ENDPOINT = cfg.routerEndpoint;
       OPENAI_BASE_URL = cfg.routerEndpoint;
-      OPENAI_BASE_URL_KONG_ER = lib.mkDefault "http://nami:8090/v1";
-      OPENAI_BASE_URL_KONG_OMNI = "http://nami:8090/omni/v1";
-      OPENAI_BASE_URL_KONG_FREE = "http://nami:8090/llm/free/v1";
-      OPENAI_BASE_URL_KONG_FRONTIER = "http://nami:8090/llm/frontier/v1";
+      OPENAI_BASE_URL_KONG_ER = lib.mkDefault "http://nami.nfp.nix:8090/v1";
+      OPENAI_BASE_URL_KONG_OMNI = "http://nami.nfp.nix:8090/omni/v1";
+      OPENAI_BASE_URL_KONG_FREE = "http://nami.nfp.nix:8090/llm/free/v1";
+      OPENAI_BASE_URL_KONG_FRONTIER = "http://nami.nfp.nix:8090/llm/frontier/v1";
       OPENAI_BASE_URL_EXTREME_DIRECT = "http://127.0.0.1:20128/v1";
     };
 
@@ -85,16 +85,16 @@ in
           apiBase = cfg.routerEndpoint;
           providers = {
             kong-er = {
-              baseUrl = "http://nami:8090/v1";
+              baseUrl = "http://nami.nfp.nix:8090/v1";
             };
             kong-omni = {
-              baseUrl = "http://nami:8090/omni/v1";
+              baseUrl = "http://nami.nfp.nix:8090/omni/v1";
             };
             kong-free = {
-              baseUrl = "http://nami:8090/llm/free/v1";
+              baseUrl = "http://nami.nfp.nix:8090/llm/free/v1";
             };
             kong-frontier = {
-              baseUrl = "http://nami:8090/llm/frontier/v1";
+              baseUrl = "http://nami.nfp.nix:8090/llm/frontier/v1";
             };
             extreme-direct = {
               baseUrl = "http://127.0.0.1:20128/v1";

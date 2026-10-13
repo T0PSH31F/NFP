@@ -345,6 +345,10 @@
       };
 
       systemd.services.hermes-agent.serviceConfig.UMask = lib.mkForce "0002";
+      # Fix #16: Suppress hermes journal spam — agent emits frequent SSE/health
+      # pings that can flood journald with 100+ lines/sec under active sessions.
+      systemd.services.hermes-agent.serviceConfig.LogRateLimitBurst = 200;
+      systemd.services.hermes-agent.serviceConfig.LogRateLimitIntervalSec = 30;
 
       # Grant hermes user access to the GLaDOS TTS project under /home/t0psh31f/
       users.users.hermes.extraGroups = [ "users" ];
@@ -464,22 +468,22 @@
 
           providers:
             kong-er:
-              base_url: "http://nami:8090/v1"
+              base_url: "http://nami.nfp.nix:8090/v1"
               api_key: "''${KONG_API_KEY}"
               request_timeout_seconds: 180
               fetch_models: true
             kong-omni:
-              base_url: "http://nami:8090/omni/v1"
+              base_url: "http://nami.nfp.nix:8090/omni/v1"
               api_key: "''${KONG_API_KEY}"
               request_timeout_seconds: 180
               fetch_models: true
             kong-free:
-              base_url: "http://nami:8090/llm/free/v1"
+              base_url: "http://nami.nfp.nix:8090/llm/free/v1"
               api_key: "''${KONG_API_KEY}"
               request_timeout_seconds: 180
               fetch_models: true
             kong-frontier:
-              base_url: "http://nami:8090/llm/frontier/v1"
+              base_url: "http://nami.nfp.nix:8090/llm/frontier/v1"
               api_key: "''${KONG_API_KEY}"
               request_timeout_seconds: 180
               fetch_models: true
@@ -489,25 +493,25 @@
               request_timeout_seconds: 180
               fetch_models: true
             kong:
-              base_url: "http://nami:8090/v1"
+              base_url: "http://nami.nfp.nix:8090/v1"
               api_key: "''${KONG_API_KEY}"
               request_timeout_seconds: 180
 
           custom_providers:
             kong-er:
-              base_url: "http://nami:8090/v1"
+              base_url: "http://nami.nfp.nix:8090/v1"
               api_key: "''${KONG_API_KEY}"
               fetch_models: true
             kong-omni:
-              base_url: "http://nami:8090/omni/v1"
+              base_url: "http://nami.nfp.nix:8090/omni/v1"
               api_key: "''${KONG_API_KEY}"
               fetch_models: true
             kong-free:
-              base_url: "http://nami:8090/llm/free/v1"
+              base_url: "http://nami.nfp.nix:8090/llm/free/v1"
               api_key: "''${KONG_API_KEY}"
               fetch_models: true
             kong-frontier:
-              base_url: "http://nami:8090/llm/frontier/v1"
+              base_url: "http://nami.nfp.nix:8090/llm/frontier/v1"
               api_key: "''${KONG_API_KEY}"
               fetch_models: true
             extreme-direct:
