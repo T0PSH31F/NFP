@@ -34,6 +34,10 @@ with lib;
         "/var/lib/nixos"
         "/var/lib/hermes" # Hermes agent session DB + state
 
+        # AI Services State — persisted across impermanence reboots
+        "/var/lib/brain-service" # LlamaIndex + pgvector embeddings, RAG inbox, PKB state
+        "/var/lib/postgresql"    # PostgreSQL vectordb, brain-service DB, honcho DB
+
         # Network configuration
         "/etc/NetworkManager/system-connections"
         "/var/lib/NetworkManager"
@@ -212,7 +216,7 @@ with lib;
 
         # Ensure essential skeleton mount directories exist on /@root for impermanence bind mounts
         echo "ensuring mount skeleton directories on /@root..."
-        ${pkgs.coreutils}/bin/mkdir -p /mnt/@root/{bin,etc/ssh,etc/NetworkManager/system-connections,var/lib/systemd,var/lib/nixos,var/lib/hermes,var/lib/tailscale,var/lib/skyvern,var/log,tmp,usr,home/t0psh31f,root}
+        ${pkgs.coreutils}/bin/mkdir -p /mnt/@root/{bin,etc/ssh,etc/NetworkManager/system-connections,var/lib/systemd,var/lib/nixos,var/lib/hermes,var/lib/tailscale,var/lib/skyvern,var/lib/brain-service,var/lib/postgresql,var/log,tmp,usr,home/t0psh31f,root}
         ${pkgs.coreutils}/bin/touch /mnt/@root/etc/NIXOS
 
         # NOTE: We DO NOT roll back @home. Wiping @home destroys the mount points
@@ -224,11 +228,15 @@ with lib;
     };
 
     # ============================================================================
-    # ADDITIONAL CONFIGURATION
+    # BTRFS INTEGRITY — SCHEDULED SCRUB TIMERS
     # ============================================================================
-    # Mark persistent storage as needed for boot
-    fileSystems."/persist".neededForBoot = true;
-    fileSystems."/home".neededForBoot = true;
+    # Weekly scrubs detect silent bitrot on persist and data pools.
+    # autoScrub.fileSystems must list *mountpoints*, not subvolumes.
+    services.btrfs.autoScrub = {
+      enable = true;
+      interval = "weekly";
+      fileSystems = [ "/persist" "/data" ];
+    };
 
   };
 }

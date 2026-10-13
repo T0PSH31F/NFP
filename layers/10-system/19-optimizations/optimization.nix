@@ -27,7 +27,7 @@
       "--prefer"
       "^(Web Content|chromium|firefox|electron|aionui|brave)$"
       "--avoid"
-      "^(Hyprland|hyprland|noctalia|Noctalia|sshd|systemd|greetd)$"
+      "^(Hyprland|hyprland|noctalia|Noctalia|sshd|systemd|greetd|kong|extreme-router|omniroute|brain-service|caddy|calibre-web)$"
     ];
   };
 

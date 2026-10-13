@@ -28,7 +28,7 @@ in
 
     nfp.services.jackett = {
       enable = true;
-      host = "luffy";
+      host = config.networking.hostName;
       bind = "127.0.0.1";
       inherit (cfg) port;
       tailnetName = "jackett";

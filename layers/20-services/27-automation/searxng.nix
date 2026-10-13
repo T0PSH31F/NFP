@@ -22,7 +22,7 @@ in
   config = lib.mkIf cfg.enable {
     nfp.services.searxng = {
       enable = true;
-      host = "luffy";
+      host = config.networking.hostName;
       bind = "127.0.0.1";
       inherit (cfg) port;
       tailnetName = "searxng";

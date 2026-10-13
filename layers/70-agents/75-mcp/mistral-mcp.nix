@@ -4,12 +4,39 @@
 # Option Path: services.ai-services.mistral-mcp
 # Enabling Host Tags: ai-agent, homelab
 # RAM Footprint: medium (300MB-1GB)
+#
+# Pin policy: mistral-mcp version is pinned via src hash below.
+# To upgrade: update version + sha256 + update npmDepsHash via
+#   nix-prefetch-url https://registry.npmjs.org/mistral-mcp/-/mistral-mcp-<ver>.tgz
 {
   config,
   lib,
   pkgs,
   ...
 }:
+let
+  # Pinned version of mistral-mcp — update hash when bumping.
+  mistral-mcp-pkg = pkgs.buildNpmPackage rec {
+    pname = "mistral-mcp";
+    version = "1.1.0";
+
+    src = pkgs.fetchFromGitHub {
+      owner = "mistralai";
+      repo = "mistral-mcp";
+      rev = "v${version}";
+      sha256 = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="; # update via nix-prefetch
+    };
+
+    npmDepsHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="; # update via prefetchNpmDeps
+    nodejs = pkgs.nodejs_22;
+
+    meta = {
+      description = "Mistral AI MCP server";
+      license = lib.licenses.asl20;
+      maintainers = [ ];
+    };
+  };
+in
 {
   options.services.ai-services.mistral-mcp = {
     enable = lib.mkEnableOption "Mistral MCP server — full Mistral AI surface over MCP";
@@ -64,7 +91,7 @@
         };
 
         serviceConfig = {
-          ExecStart = "${pkgs.nodejs_22}/bin/npx -y mistral-mcp";
+          ExecStart = "${mistral-mcp-pkg}/bin/mistral-mcp";
           Restart = "on-failure";
           RestartSec = 5;
           DynamicUser = true;
@@ -74,9 +101,8 @@
           MemoryDenyWriteExecute = false;
         };
 
-        # npx needs sh and node in PATH for downloaded packages
+        # Node.js available in PATH for any runtime require()
         path = [
-          pkgs.bash
           pkgs.nodejs_22
         ];
       };

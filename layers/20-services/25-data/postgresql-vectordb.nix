@@ -43,9 +43,11 @@ in
 
       authentication = pkgs.lib.mkOverride 10 ''
         # TYPE  DATABASE        USER            ADDRESS                 METHOD
-        local   all             all                                     trust
-        host    all             all             127.0.0.1/32            trust
-        host    all             all             ::1/128                 trust
+        # peer auth for unix-socket connections (postgres OS user only)
+        local   all             all                                     peer
+        # scram-sha-256 for loopback TCP connections (services using a password)
+        host    all             all             127.0.0.1/32            scram-sha-256
+        host    all             all             ::1/128                 scram-sha-256
       '';
 
       ensureDatabases = [

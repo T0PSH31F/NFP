@@ -27,6 +27,9 @@ import hmac
 
 app = FastAPI(title="Brain Service PKB", description="Local Knowledge Base with PDF/EPUB/HTML/MD ingestion")
 
+# Maximum file size for ingest requests (100 MB) — prevent OOM kills on luffy
+MAX_INGEST_BYTES = 100 * 1024 * 1024  # 100 MB
+
 # CORS — allow bookmarklets and browser extensions to call the API
 from fastapi.middleware.cors import CORSMiddleware
 app.add_middleware(
@@ -353,6 +356,14 @@ async def ingest_from_path(request: Request, path: Optional[str] = None):
         raise HTTPException(status_code=400, detail="Missing 'path' parameter or JSON body")
     if not os.path.exists(target_path):
         raise HTTPException(status_code=404, detail=f"File not found: {target_path}")
+    # Guard: reject files exceeding the ingest size cap to prevent OOM on luffy
+    file_size = os.path.getsize(target_path)
+    if file_size > MAX_INGEST_BYTES:
+        raise HTTPException(
+            status_code=413,
+            detail=f"File exceeds maximum ingest limit of 100 MB ({file_size:,} bytes). "
+                   f"Split large documents before ingesting."
+        )
     result = ingest_file(target_path)
     if "error" in result:
         raise HTTPException(status_code=400, detail=result["error"])

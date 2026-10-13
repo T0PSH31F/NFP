@@ -101,7 +101,7 @@ in
     {
       nfp.services.feishin = {
         enable = config.services.feishin.enable;
-        host = "luffy";
+        host = config.networking.hostName;
         port = 9180;
         homepage = {
           enable = true;
@@ -117,7 +117,11 @@ in
         healthcheck = {
           enable = true;
           path = "/";
-          expectedStatus = 200;
+          # Feishin root redirects to /web/index.html (302); accept both
+          expectedStatus = [
+            200
+            302
+          ];
         };
       };
     }

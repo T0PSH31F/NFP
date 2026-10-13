@@ -74,7 +74,7 @@ in
     nfp.services = {
       jellyfin = {
         enable = true;
-        host = "luffy";
+        host = config.networking.hostName;
         bind = "127.0.0.1";
         port = 8096;
         tailnetName = "jellyfin";
@@ -111,7 +111,7 @@ in
 
       komga = {
         enable = true;
-        host = "luffy";
+        host = config.networking.hostName;
         bind = "127.0.0.1";
         port = 25600;
         tailnetName = "komga";
@@ -137,7 +137,7 @@ in
 
       audiobookshelf = {
         enable = true;
-        host = "luffy";
+        host = config.networking.hostName;
         bind = "0.0.0.0";
         port = 9292;
         tailnetName = "audiobookshelf";
@@ -171,7 +171,7 @@ in
 
       sonarr = {
         enable = true;
-        host = "luffy";
+        host = config.networking.hostName;
         bind = "127.0.0.1";
         port = 8989;
         tailnetName = "sonarr";
@@ -206,7 +206,7 @@ in
 
       radarr = {
         enable = true;
-        host = "luffy";
+        host = config.networking.hostName;
         bind = "127.0.0.1";
         port = 7878;
         tailnetName = "radarr";
@@ -230,7 +230,7 @@ in
 
       prowlarr = {
         enable = true;
-        host = "luffy";
+        host = config.networking.hostName;
         bind = "127.0.0.1";
         port = 9696;
         tailnetName = "prowlarr";
@@ -254,7 +254,7 @@ in
 
       seerr = {
         enable = true;
-        host = "luffy";
+        host = config.networking.hostName;
         bind = "127.0.0.1";
         port = 5055;
         tailnetName = "seerr";
@@ -286,7 +286,7 @@ in
 
       qbittorrent = {
         enable = true;
-        host = "luffy";
+        host = config.networking.hostName;
         bind = "127.0.0.1";
         port = 8085;
         tailnetName = "qbittorrent";
@@ -314,7 +314,7 @@ in
 
       lidarr = {
         enable = true;
-        host = "luffy";
+        host = config.networking.hostName;
         bind = "127.0.0.1";
         port = 8686;
         tailnetName = "lidarr";
@@ -349,7 +349,7 @@ in
 
       bazarr = {
         enable = true;
-        host = "luffy";
+        host = config.networking.hostName;
         bind = "127.0.0.1";
         port = 6767;
         tailnetName = "bazarr";

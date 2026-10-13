@@ -109,6 +109,15 @@
   # Isolated second Tailscale daemon for friend tailnet (userspace proxy)
   layers.layer-20.services.config.tailscale-sidecar.enable = true;
 
+  # Jev filesystem organizer — dry-run proposals by default; CLI: jev-fs-organize
+  # dryRun pinned true: never moves/deletes files (incl. ~/GoogleDrive rclone
+  # mount); writes only ~/.local/share/jev/fs-proposals.json. Watch dirs are
+  # ~/Downloads, ~/Inbox, ~/Scans — GoogleDrive is not watched.
+  services.fs-organizer-daemon = {
+    enable = true;
+    dryRun = true;
+  };
+
   systemd.services.rclone-gdrive-mount.enable = false;
 
   clan.core.postgresql.enable = true;

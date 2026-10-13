@@ -31,7 +31,7 @@ with lib;
   config = mkIf config.services.calibre-web-app.enable {
     nfp.services.calibre-web = {
       enable = true;
-      host = "luffy";
+      host = config.networking.hostName;
       bind = "127.0.0.1";
       port = config.services.calibre-web-app.port;
       tailnetName = "calibre-web";

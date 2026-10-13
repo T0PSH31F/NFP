@@ -121,7 +121,9 @@ in
     client.enable = true;
     server.enable = true;
   };
-  services.rustdesk-server.signal.relayHosts = [ "192.168.1.54" ];
+  # RustDesk relay: use Tailnet MagicDNS name so it resolves over Headscale
+  # regardless of luffy's current LAN IP (avoids 192.168.1.54 hardcode).
+  services.rustdesk-server.signal.relayHosts = [ "luffy.nfp.nix" ];
 
   # Desktop experience: owned by tag/profile architecture.
   # luffy is hybrid server+desktop: desktop tag enables base Hyprland/Noctalia

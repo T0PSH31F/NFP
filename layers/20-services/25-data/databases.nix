@@ -51,8 +51,10 @@ with lib;
 
     environment.persistence."/persist" = {
       directories =
-        (optional config.services.databases.postgresql.enable "/var/lib/postgresql")
-        ++ (optional config.services.databases.mysql.enable "/var/lib/mysql")
+        # postgresql: persisted unconditionally in 10-system/15-filesystem/
+        # impermanence.nix (AI-services state consolidation) — keep only here
+        # to avoid environment.persistence duplicate-directory assertion.
+        (optional config.services.databases.mysql.enable "/var/lib/mysql")
         ++ (optional config.services.databases.redis.enable "/var/lib/redis")
         ++ (optional (lib.hasAttr "nextcloud" (
           config.services.redis.servers or { }

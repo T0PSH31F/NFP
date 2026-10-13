@@ -428,9 +428,15 @@
           # Kong AI Gateway — unified LLM provider
           # Routes to ExtremeRouter (coding), FreeLLMAPI (free), etc.
           provider.kong = lib.mkIf (osConfig.services.ai-services.kong-gateway.enable or false) {
-            baseUrl = "http://127.0.0.1:${
-              toString (osConfig.services.ai-services.kong-gateway.proxyPort or 8090)
-            }/v1";
+            # Kong runs on nami, not on z0r0 — use Tailnet MagicDNS endpoint.
+            # If kong-gateway is locally enabled (nami), use loopback; otherwise
+            # route over the Headscale mesh to nami.nfp.nix:8090.
+            baseUrl =
+              if (osConfig.services.ai-services.kong-gateway.enable or false)
+              then "http://127.0.0.1:${
+                toString (osConfig.services.ai-services.kong-gateway.proxyPort or 8090)
+              }/v1"
+              else "http://nami.nfp.nix:8090/v1";
             name = "Kong AI Gateway";
             models = {
               "deepseek-v4-pro" = {
