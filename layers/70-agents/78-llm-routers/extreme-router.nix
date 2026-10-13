@@ -72,9 +72,9 @@ with lib;
       cfg = config.layers.layer-78.llm-routers.extreme-router;
     in
     mkMerge [
-      {
+      (mkIf (cfg.enable && (options ? nfp)) {
         nfp.services.extreme-router = {
-          enable = config.layers.layer-78.llm-routers.extreme-router.enable;
+          enable = cfg.enable;
           host = "z0r0";
           port = 20128;
           homepage = {
@@ -94,7 +94,7 @@ with lib;
             expectedStatus = 200;
           };
         };
-      }
+      })
       (mkIf cfg.enable {
         assertions = [
           {
