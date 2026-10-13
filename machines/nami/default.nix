@@ -114,13 +114,15 @@
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJxCZSHtsjhrP4LqoteoVKwohyMwy9WQ/9o0BgvGQydj luffy-to-nami"
   ];
 
-  # === Firewall: SSH + gno + headscale + HTTPS ===
+  # === Firewall: SSH + Caddy HTTP/HTTPS ===
+  # Omitted intentionally:
+  #   3456 (gno) — service disabled until public image available
+  #   8086 (Headscale) — authoritative plane runs on luffy; disabled here
+  #   8090 (Kong proxy) — loopback-only; Caddy at :443 is the external entry point
   networking.firewall.allowedTCPPorts = [
     22
     80 # Caddy HTTP (ACME challenges)
-    443 # Caddy HTTPS (Headscale, Homepage)
-    3456 # gno
-    8086 # Headscale API
+    443 # Caddy HTTPS (Headscale-plane proxy, Homepage, Kong via Caddy)
   ];
 
   # === Restic backups ===

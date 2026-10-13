@@ -9,10 +9,13 @@
 let
   clanTags = osConfig.machine.tags or [ ];
   hasDesktopTag = builtins.elem "desktop" clanTags;
+  # Removed nixpkgs-unstable 2026-09-17 (EOL Electron) as a throw-alias;
+  # `pkgs ? waveterm` is true for throw-aliases, so force with tryEval.
+  wavetermPkg = builtins.tryEval pkgs.waveterm;
 in
 {
   config = lib.mkIf hasDesktopTag {
-    home.packages = [ pkgs.waveterm ];
+    home.packages = lib.optionals wavetermPkg.success [ wavetermPkg.value ];
 
     xdg.configFile."waveterm/settings.json".text = builtins.toJSON {
       "term:fontfamily" = "JetBrains Mono Nerd Font";

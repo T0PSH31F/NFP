@@ -33,7 +33,7 @@ in
   config = lib.mkIf cfg.enable {
     environment.systemPackages = [
       pkgs.cifs-utils
-      pkgs.smbclient # smbclient -L //host for share discovery/diagnostics
+      pkgs.samba # smbclient -L //host for share discovery/diagnostics (pkgs.smbclient attr was removed; samba ships the binary)
     ];
 
     # Credentials are user-supplied via `clan vars set <machine> nas-credentials smb-credentials`

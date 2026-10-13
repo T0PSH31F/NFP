@@ -35,7 +35,10 @@ with lib;
         "/var/lib/hermes" # Hermes agent session DB + state
 
         # AI Services State — persisted across impermanence reboots
-        "/var/lib/brain-service" # LlamaIndex + pgvector embeddings, RAG inbox, PKB state
+        # NOTE: /var/lib/brain-service is declared by
+        # layers/70-agents/73-memory/brain-service.nix with its postgres:postgres
+        # 0750 ownership. Listing it here too trips the NixOS "specified two or
+        # more times" assertion.
         "/var/lib/postgresql"    # PostgreSQL vectordb, brain-service DB, honcho DB
 
         # Network configuration

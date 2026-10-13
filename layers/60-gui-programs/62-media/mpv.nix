@@ -70,7 +70,7 @@ in
         mpv-handler
         ff2mpv
         anime4k
-        sickgear
+        # sickgear removed from nixpkgs (security concerns, #560697)
         socat
         jq
         radiant-player

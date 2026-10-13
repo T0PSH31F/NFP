@@ -414,6 +414,28 @@
               echo "tailnet-dns-guard: all 8 checks passed"
               touch $out
             '';
+
+        # Regression guard: all agent harnesses must use nami.nfp.nix MagicDNS,
+        # never bare 'nami:PORT' which silently breaks when Tailnet resolves
+        # hostnames (requires MagicDNS suffix for FQDN lookups).
+        bare-nami-hostname-check =
+          pkgs.runCommand "check-bare-nami-hostname"
+            {
+              nativeBuildInputs = [
+                pkgs.gnugrep
+                pkgs.coreutils
+              ];
+            }
+            ''
+              set -euo pipefail
+              if grep -r '"http://nami:' ${../layers/70-agents/71-harness} ${../layers/70-agents/71-harness/hermes} 2>/dev/null | grep -q .; then
+                echo "ERROR: bare 'http://nami:PORT' found in harness — use 'nami.nfp.nix:PORT' MagicDNS instead"
+                grep -r '"http://nami:' ${../layers/70-agents/71-harness} ${../layers/70-agents/71-harness/hermes}
+                exit 1
+              fi
+              echo "bare-nami-hostname-check: OK"
+              touch $out
+            '';
       };
     };
 }

@@ -5,7 +5,7 @@
 }:
 {
   options.layers.layer-60.gui.audio = {
-    enable = lib.mkEnableOption "Audio visualization and management (cava, cavalier, mpd)" // {
+    enable = lib.mkEnableOption "Audio visualization and management (cava, cavasik, mpd)" // {
       default = true;
     };
   };
@@ -51,7 +51,7 @@
       };
 
       home.packages = with pkgs; [
-        cavalier # GUI Visualizer
+        cavasik # GUI Visualizer (cavalier was removed from nixpkgs; cavasik is its successor)
         mpc # CLI control for mpd
         picard # MusicBrainz Picard for metadata tagging & cover art
         mediainfo-gui # GUI media file technical inspector

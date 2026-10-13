@@ -1,4 +1,4 @@
-{ config, ... }: {
+{ config, lib, ... }: {
   services.harmonia.cache.enable = true;
 
   services.nixos-passthru-cache = {
@@ -33,7 +33,11 @@
         "https://cache.nixos.org"
         "http://luffy.nfp.nix:5000"
         "http://z0r0.nfp.nix:5000"
-        "http://nami.nfp.nix:5000"
+        # DISABLED (2026-10-12): nami.nfp.nix (100.64.0.4) is off the tailnet
+        # (100% packet loss). Every miss against it burns connect-timeout x
+        # download-attempts before falling through, which serializes builds and
+        # eventually kills the nix daemon mid-query. Re-add once nami is back:
+        #   "http://nami.nfp.nix:5000"
         "https://nix-community.cachix.org"
         "https://numtide.cachix.org"
         "https://vicinae.cachix.org"
@@ -41,8 +45,19 @@
         "https://niri.cachix.org"
         "https://noctalia.cachix.org"
         "https://cache.numtide.com"
-        "https://yazelix.cachix.org" # disabled: timing out during downloads
+        "https://yazelix.cachix.org"
       ];
+
+      # Substituter timeouts. A dead cache costs connect-timeout x
+      # download-attempts per missed path; with the nix defaults (5 x 5) that
+      # is 25s of dead time per miss before nix falls through to the next
+      # cache, and enough cumulative stalls to make the daemon give up
+      # mid-query. 2 x 2 caps the worst case at 4s per unreachable cache
+      # while still tolerating ordinary tailnet latency.
+      #
+      # mkForce: clanCore/nix-settings.nix also sets connect-timeout = 5.
+      connect-timeout = lib.mkForce 2;
+      download-attempts = lib.mkForce 2;
 
       # Set the trusted public keys for the substituters above
       trusted-public-keys = [
@@ -62,7 +77,6 @@
       trusted-substituters = [
         "http://luffy.nfp.nix:5000"
         "http://z0r0.nfp.nix:5000"
-        "http://nami.nfp.nix:5000"
         "https://nix-community.cachix.org"
         "https://numtide.cachix.org"
         "https://cache.numtide.com"

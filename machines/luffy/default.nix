@@ -639,7 +639,11 @@ in
     wantedBy = [ "multi-user.target" ];
     serviceConfig = {
       Type = "simple";
-      ExecStart = "${pkgs.openssh}/bin/ssh -N -i /root/.ssh/id_ed25519 -o ServerAliveInterval=30 -o ServerAliveCountMax=3 -o ExitOnForwardFailure=yes -o StrictHostKeyChecking=no -R 8087:127.0.0.1:8086 root@47.254.90.69";
+      # ConnectTimeout=15: without it the OS TCP connect timeout (~130s) governs
+      # each attempt, so a recovered nami waits up to ~2m19s before the tunnel
+      # is re-established. 15s detects recovery ~5x faster while still tolerating
+      # normal Alibaba SG latency.
+      ExecStart = "${pkgs.openssh}/bin/ssh -N -i /root/.ssh/id_ed25519 -o ConnectTimeout=15 -o ServerAliveInterval=30 -o ServerAliveCountMax=3 -o ExitOnForwardFailure=yes -o StrictHostKeyChecking=no -R 8087:127.0.0.1:8086 root@47.254.90.69";
       Restart = "always";
       RestartSec = 5;
     };
@@ -676,4 +680,47 @@ in
       echo "Done. No unreferenced-but-needed paths were harmed."
     '')
   ];
+
+  # === LLM gateway stack — migrated off nami (2026-10-13) ===
+  # nami (Alibaba Cloud 47.254.90.69) went permanently unreachable on
+  # 2026-10-12 00:43Z. Kong, OmniRoute, FreeLLMAPI and FreeLLMPool ran only
+  # there. Polyfloor was already running here but was BROKEN: its
+  # routerEndpoint points at Kong on 127.0.0.1:8090, which did not exist on
+  # luffy — so it 502'd on every routed request. Bringing Kong here repairs it.
+  #
+  # Secrets need no migration: kong-secrets.nix reads the shared global sops
+  # file layers/00-cyberia/03-treasure/secrets/external_services.yaml, and
+  # luffy already decrypts it (57 secrets in /run/secrets).
+  services.ai-services = {
+    kong-gateway.enable = true;
+    omniroute.enable = true;
+    freellmapi.enable = true;
+    freellmpool.enable = true;
+  };
+
+  # FreeLLMPool cannot use its 8080 default here — signal-cli already owns
+  # 127.0.0.1:8080 on luffy (java, pid 3621). 8083 is free and is also what
+  # the ports.md registry documents for FreeLLMPool.
+  services.ai-services.freellmpool.port = lib.mkForce 8083;
+
+  # Kong's router defaults assume freellmapi:3003 / freellmpool:8083, but the
+  # services themselves default to 3001 / 8080 — so the upstream defaults point
+  # Kong at the wrong backends. Align the routers with the real listener ports.
+  # (freellmpool's router default is already 8083, matching the move above.)
+  services.ai-services.kong-gateway.routers.freellmapi.port = lib.mkForce 3001;
+  services.ai-services.kong-gateway.routers.freellmpool.port = lib.mkForce 8083;
+
+  # nixarr's autobrr module sets `services.autobrr.secretFile = "/dev/null"` as
+  # a deliberate placeholder (it handles the session secret itself). nixpkgs
+  # removed that option in autobrr >= 1.82.0 via mkRemovedOptionModule, so the
+  # placeholder now trips a hard assertion and the WHOLE luffy config fails to
+  # evaluate. Checked upstream nix-media-server/nixarr on both main and master:
+  # the placeholder is still there, so `nix flake update` does not help, and
+  # the option cannot be overridden back to null because a removed option cannot
+  # be redefined at all.
+  #
+  # Disabling nixarr's autobrr is the only unblocking move without patching a
+  # flake input. Every other *arr service (sonarr/radarr/qbittorrent/etc.) is
+  # unaffected. Re-enable once nixarr drops the placeholder.
+  nixarr.autobrr.enable = lib.mkForce false;
 }

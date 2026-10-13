@@ -3,6 +3,12 @@
 # Purpose: Feishin modern music client & web application service with Caddy reverse proxy & server connection defaults.
 # Option Path: services.feishin (and programs.feishin / layers.layer-20.services.feishin / layers.layer-60.gui.feishin)
 # Enabling Host Tags: media, desktop
+#
+# NOTE (2026-10-13): nixpkgs-unstable now ships its own services.feishin module
+# (static web-app serving via nginx/caddy). We no longer declare enable/package/
+# caddy here — those belong to upstream. Local extras live under distinct names
+# (desktopPackage, reverseProxy, mode/port/serverConnection) to avoid the
+# "option already declared" collision.
 {
   config,
   lib,
@@ -25,12 +31,12 @@ in
   ];
 
   options.services.feishin = {
-    enable = mkEnableOption "Feishin modern music client & web application";
+    # enable: declared by upstream nixpkgs services.feishin module.
 
-    package = mkOption {
+    desktopPackage = mkOption {
       type = types.nullOr types.package;
       default = pkgs.feishin or null;
-      description = "Package to use for Feishin desktop client";
+      description = "Desktop client package to install (upstream `package` is the web build)";
     };
 
     mode = mkOption {
@@ -80,8 +86,10 @@ in
       };
     };
 
-    caddy = {
-      enable = mkEnableOption "Caddy reverse proxy integration for Feishin";
+    # Caddy reverse proxy for the containerized player (NOT upstream's
+    # caddy option, which serves the static web build).
+    reverseProxy = {
+      enable = mkEnableOption "Caddy reverse proxy in front of the Feishin container";
 
       hostName = mkOption {
         type = types.str;
@@ -129,8 +137,8 @@ in
       {
         # Install desktop package if in desktop or both mode
         environment.systemPackages = optional (
-          (cfg.mode == "desktop" || cfg.mode == "both") && cfg.package != null
-        ) cfg.package;
+          (cfg.mode == "desktop" || cfg.mode == "both") && cfg.desktopPackage != null
+        ) cfg.desktopPackage;
 
         # Firewall
         networking.firewall.allowedTCPPorts = optional cfg.openFirewall cfg.port;
@@ -169,11 +177,11 @@ in
         };
       })
 
-      # Caddy reverse proxy integration
-      (mkIf cfg.caddy.enable {
+      # Caddy reverse proxy for the containerized player
+      (mkIf cfg.reverseProxy.enable {
         services.caddy = {
           enable = true;
-          virtualHosts."http://${cfg.caddy.hostName}" = {
+          virtualHosts."http://${cfg.reverseProxy.hostName}" = {
             extraConfig = ''
               reverse_proxy 127.0.0.1:${toString cfg.port}
             '';

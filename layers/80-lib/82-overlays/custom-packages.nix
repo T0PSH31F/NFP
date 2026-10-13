@@ -44,14 +44,6 @@ final: prev: {
   # x86_64-only; this conditional never fires and merely shadows the cached
   # upstream attr. Referenced nowhere in the repo.
 
-  # Disable pipx tests — test_inject parametrize bug on Python 3.14
-  # (collection error: 1 name vs 13 values in parametrize)
-  pipx = prev.pipx.overridePythonAttrs (old: {
-    disabledTestPaths = (old.disabledTestPaths or [ ]) ++ [
-      "tests/test_inject.py"
-    ];
-  });
-
   # Antigravity Agent Control Protocol (ACP) server package
   antigravity-acp =
     prev.antigravity-acp or (if builtins.pathExists (prev.path + "/pkgs/by-name/an/antigravity-acp/package.nix") then
@@ -61,17 +53,15 @@ final: prev: {
         exec ${final.antigravity-cli}/bin/agy acp "$@"
       '');
 
-  # Fix for noto-fonts-subset build failure (cp fails when glob matches no files)
-  noto-fonts-subset = final.runCommand "noto-fonts-subset" { } ''
-    mkdir -p "$out/share/fonts/noto/"
-    for f in "${final.noto-fonts}/share/fonts/noto/"NotoSans*.[ot]tf; do
-      if [ -e "$f" ]; then
-        cp -v "$f" "$out/share/fonts/noto/"
-      fi
-    done
-    # Ensure at least an empty output so downstream doesn't fail
-    touch "$out/share/fonts/noto/.keep"
-  '';
+  # niri-flake (2026-08 rev) callPackages its pinned niri with
+  # libdisplay-info_0_2 and asserts version == "0.2.0". nixpkgs-unstable
+  # removed the 0.2 attr (throw alias). Re-provide it as 0.3 with a version
+  # shim: nixpkgs' own niri 26.04 builds cleanly against 0.3, and the C API
+  # is stable. Drop this overlay when niri-flake adapts to the removal.
+  libdisplay-info_0_2 = prev.libdisplay-info_0_3.overrideAttrs (old: {
+    version = "0.2.0";
+    __intentionallyOverridingVersion = true;
+  });
 
   # Camoufox prebuilt binary from GitHub releases (v150.0.2-beta.25 / alpha.26).
   # Bumped from v135.0.1-beta.24 (2025-03) → v150.0.2-beta.25 (2026-05) because

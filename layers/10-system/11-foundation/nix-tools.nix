@@ -113,26 +113,25 @@ with lib;
           gdk-pixbuf
           glew_1_10
           glib
-          gnome2.GConf
+          # gnome2.GConf removed from nixpkgs (long deprecated) — dropped 2026-10-13
           pango
           gtk2
           gtk3
           icu
           libGL
-          libappindicator-gtk2
+          # libappindicator-gtk2 / libindicator-gtk2 / libdbusmenu-gtk2 removed
+          # from nixpkgs 2026-10 (deprecated GTK2 appindicator stack) — dropped
           libappindicator-gtk3
           libcaca
           libcanberra
           libcanberra-gtk3 # canberra-gtk-play for warcraft-notifications plugin audio (force rebuild 2026-07-09)
           libcap
-          libdbusmenu-gtk2
           libdrm
           libelf
           libgbm
           libgcrypt
           libglvnd
           libidn
-          libindicator-gtk2
           libjpeg
           libmikmod
           libnotify

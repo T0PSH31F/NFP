@@ -58,8 +58,11 @@
   # SYSTEM CORE CONFIGURATION
   # ============================================================================
   nixpkgs.config.allowUnfree = true;
+  # Insecure-but-required pins. Prune entries when the dependent package moves
+  # to a supported version.
   nixpkgs.config.permittedInsecurePackages = [
     "beekeeper-studio-5.5.7"
+    "beekeeper-studio-6.1.4" # current nixpkgs version (insecure-listed)
     "olm-3.2.16"
     "nodejs-20.20.2"
     "nodejs-slim-20.20.2"
@@ -67,6 +70,7 @@
     "electron-40.10.5"
     "electron-41.10.3"
     "electron-41.10.6"
+    "electron-41.10.7" # hermes-desktop / hermes-one / paseo-desktop (electron_41 pin)
     "pnpm-10.29.2"
   ];
 
