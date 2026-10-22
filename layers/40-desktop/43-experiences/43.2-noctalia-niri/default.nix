@@ -43,7 +43,7 @@ in
   };
 
   home =
-    { config, lib, ... }:
+    { lib, ... }:
     {
       config = lib.mkIf isEnabled {
         systemd.user.services.noctalia-experience-dirs = {

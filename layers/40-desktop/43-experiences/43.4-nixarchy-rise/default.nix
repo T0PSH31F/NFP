@@ -77,7 +77,7 @@ in
   };
 
   home =
-    { config, lib, ... }:
+    { lib, ... }:
     {
       config = lib.mkIf isEnabled {
         # $ipc uses Quickshell IPC — NOT noctalia msg

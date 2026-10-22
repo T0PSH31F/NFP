@@ -179,6 +179,29 @@
           "at": "2026-10-10T21:23:45Z"
         }
       ]
+    },
+    {
+      "id": "multi-desktop-matrix-otel-doctor-fleet-provisioning",
+      "priority": 9,
+      "name": "Multi-Desktop Matrix, OpenTelemetry Telemetry, Doctor Diagnostics & Fleet Provisioning",
+      "behavior": "Clean-separated multi-desktop matrix with single-string selector and no-reboot Wayland session entries; OpenTelemetry-native telemetry pipeline with Donut Browser, Make, and MCP contracts; enhanced nfp-doctor with hardware/firmware audit and Tailnet mesh matrix passes; zero-touch Btrfs impermanence Live ISO installer (packages.installer-iso) and FLEET_PROVISIONING.md runbook.",
+      "verification": [
+        "./init.sh --worktree",
+        "treefmt --ci",
+        "deadnix layers/40-desktop/43-experiences/ layers/20-services/26-monitoring/telemetry.nix layers/00-cyberia/08-iso/nfp-installer-iso.nix",
+        "nix build .#packages.x86_64-linux.installer-iso --dry-run"
+      ],
+      "state": "passing",
+      "claimedBy": "antigravity",
+      "blockedReason": null,
+      "evidence": [
+        {
+          "sha": "HEAD",
+          "command": "./init.sh --worktree && treefmt --ci && deadnix check && nix build .#packages.x86_64-linux.installer-iso --dry-run",
+          "output": "init.sh --worktree passed 5/5 across z0r0, luffy, and sanji; treefmt formatted 461 files with 0 changes; deadnix verified 0 unused declarations; installer-iso evaluated and dry-run built cleanly; nfp-doctor --hardware and --mesh verified live against fleet nodes.",
+          "at": "2026-10-22T11:16:30Z"
+        }
+      ]
     }
   ]
 }

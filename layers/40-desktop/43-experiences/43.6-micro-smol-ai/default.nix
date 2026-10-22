@@ -64,7 +64,7 @@ in
   };
 
   home =
-    { config, lib, ... }:
+    { lib, ... }:
     {
       config = lib.mkIf isEnabled {
         services.swayidle = {

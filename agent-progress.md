@@ -236,3 +236,21 @@ Append one entry per session, newest at the bottom. Never edit past entries.
 - **Recovery:** computed pubkey packet (v4/Ed25519, ctime from `protected-at 20260327T211759`, q from sexp) → uid-less import refused by gpg 2.4.9 (keyboxd) → sandboxed pre-keyboxd gpnupg 2.4.0 with legacy `pubring.gpg` → listed/paired by keygrip → `adduid t0psh31f <t0psh31f@grandlix.gang>` (user pinentry-qt) → export/import into live `~/.local/share/gnupg` → ownertrust ultimate.
 - **Verified:** `gpg --list-secret-keys` shows `sec ed25519/0x84468D2EA90AA84F 2026-03-27 [SCA]`, uid `[ultimate]`, fpr `97C2D3F4993CD05BDB54AD7284468D2EA90AA84F`.
 - **Cleanup:** sandbox, exports (shredded), raw packets removed; sexp backup retained.
+
+- **Date / Agent:** 2026-10-22 / antigravity
+- **Feature:** multi-desktop-matrix-otel-doctor-fleet-provisioning
+- **Work done:**
+  1. Multi-Desktop Matrix: Refactored `layers/40-desktop/43-experiences/` with mutually exclusive `layers.desktop.experience` enum selector ("noctalia-hyprland", "noctalia-niri", "noctalia-umbriel", "nixarchy-rise", "custom-vibe-quickshell", "micro-smol-ai", "headless-console", "none") defaulting to "noctalia-hyprland" (and "none" on server profile tag).
+  2. Experience Isolation: De-bled Noctalia variables out of base modules (`zsh.nix`, `34-qt/default.nix`) and encapsulated into `43-noctalia/default.nix`. Registered independent Wayland session `.desktop` files in `/run/current-system/sw/share/wayland-sessions/` via `services.displayManager.sessionPackages` for zero-reboot display manager switching.
+  3. Upstream Ingestions & Greeters: Configured `xdg-desktop-portal-umbriel` in `layers/40-desktop/41-compositors/umbriel/`; created hermetic derivations for Nixarchy Rise and custom Vibe-Lab live QML dev workspace (`~/.config/quickshell/active/`); built ultra-light micro-smol-ai GUI with `cage`/`wlopm`; added `regreet-wayland` and One Piece video loops (`one-piece-skull.mp4`, `zoro-swords.mp4`) to `layers/30-theming/32-boot/greeter.nix`. Registered `41-compositors` in `layers/NUMBERING.md`.
+  4. OpenTelemetry Telemetry: Implemented OTel collector module (`layers/20-services/26-monitoring/telemetry.nix`) referencing `mrVanDalo/nixos-telemetry` with Prometheus, Loki, Grafana Alloy/Langfuse routing; authored Python client (`telemetry_client.py`) and skill; created Donut Browser agent and Make workflow contracts (`input-config.yaml`, `import-config.yaml`, `make-modules.yaml`, `telemetry-mcp.json`, `telemetry-agent.yaml`).
+  5. Enhanced Doctor: Created `nfp-doctor.sh` supporting `--all`, `--hardware`, `--mesh`, `--firmware` auditing governors, microcode, throttling, SSD TRIM, Btrfs health, and ping/port/DNS/WireGuard reachability matrix across fleet nodes (`z0r0`, `luffy`, `sanji`). Added `doctor.md` OpenCode command.
+  6. Zero-Touch Fleet Provisioning: Authored `layers/00-cyberia/08-iso/nfp-installer-iso.nix` exporting `packages.x86_64-linux.installer-iso` with offline store closure, automated `nfp-install-host` Btrfs impermanence disk partitioner, Age/SOPS key generator, Headscale pre-auth enrollment, and fleet config registrar. Documented runbook in `FLEET_PROVISIONING.md`.
+- **Verification:**
+  - `./init.sh --worktree` passed 5/5 across `z0r0`, `luffy`, and `sanji`.
+  - `treefmt --ci` formatted 461 files with 0 changes in 3.36s.
+  - `deadnix` clean on all touched paths.
+  - `nix build .#packages.x86_64-linux.installer-iso --dry-run` evaluated and confirmed clean derivation.
+  - `nfp-doctor --hardware` and `nfp-doctor --mesh` verified live.
+- **State change:** passing (evidence recorded in feature_list.json)
+- **Next action:** Stage and commit clean-up pass; await user confirmation before fleet deployment.

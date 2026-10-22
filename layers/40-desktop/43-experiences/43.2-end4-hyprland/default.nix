@@ -20,7 +20,7 @@ in
 
   # Skeleton adapter for end4-hyprland experience setup
   home =
-    { config, lib, ... }:
+    { lib, ... }:
     {
       config = lib.mkIf isEnabled {
         xdg.configFile."hypr/experiences/end4-hyprland.conf".text = ''

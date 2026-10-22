@@ -14,7 +14,6 @@
   lib,
   pkgs,
   osConfig ? config,
-  inputs,
   ...
 }:
 let
@@ -53,7 +52,7 @@ in
   };
 
   home =
-    { config, lib, ... }:
+    { lib, ... }:
     {
       config = lib.mkIf isEnabled {
         # IPC injection — Umbriel uses the same noctalia msg IPC as Hyprland

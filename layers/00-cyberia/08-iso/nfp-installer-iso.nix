@@ -10,7 +10,6 @@
 {
   pkgs,
   lib,
-  config,
   inputs,
   modulesPath,
   ...
