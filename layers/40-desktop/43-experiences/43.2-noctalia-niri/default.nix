@@ -9,13 +9,13 @@
 }:
 let
   exp = osConfig.layers.desktop.experience or "none";
-  isEnabled = exp == "noctalia-niri";
+  isEnabled = exp == "noctalia" || exp == "noctalia-niri";
 in
 {
   nixos = lib.mkIf isEnabled {
     layers.layer-40.desktop.noctalia = {
       enable = true;
-      backend = "niri";
+      backend = lib.mkDefault (if exp == "noctalia" then "all" else "niri");
     };
 
     layers.layer-40.desktop.niri.enable = true;
@@ -45,21 +45,6 @@ in
   home =
     { lib, ... }:
     {
-      config = lib.mkIf isEnabled {
-        systemd.user.services.noctalia-experience-dirs = {
-          Unit = {
-            Description = "Ensure Noctalia HVE cache and experience directories exist";
-            Before = [ "graphical-session-pre.target" ];
-          };
-          Install = {
-            WantedBy = [ "graphical-session-pre.target" ];
-          };
-          Service = {
-            Type = "oneshot";
-            RemainAfterExit = true;
-            ExecStart = "${pkgs.bash}/bin/bash -c 'mkdir -p %h/.cache/noctalia/HVE'";
-          };
-        };
-      };
+      config = lib.mkIf isEnabled { };
     };
 }

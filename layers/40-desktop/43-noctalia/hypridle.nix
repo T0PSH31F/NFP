@@ -34,55 +34,62 @@ let
       "${pkgs.hyprland}/bin/hyprctl dispatch dpms off";
 in
 {
-  config = lib.mkIf (cfg.enable && cfg.backend == "hyprland" && idleCfg.enable) {
-    home.packages = [ pkgs.hypridle ];
+  config =
+    lib.mkIf
+      (
+        cfg.enable
+        && (cfg.backend == "hyprland" || cfg.backend == "both" || cfg.backend == "all")
+        && idleCfg.enable
+      )
+      {
+        home.packages = [ pkgs.hypridle ];
 
-    xdg.configFile."hypr/hypridle.conf" = {
-      text = ''
-                # hypridle — idle management for Hyprland
-                #
-                # Replaces noctalia's built-in idle handler which caused DPMS-related
-                # Wayland crashes on Intel Iris Xe. See layers/40-desktop/43-noctalia/hypridle.nix.
+        xdg.configFile."hypr/hypridle.conf" = {
+          text = ''
+                    # hypridle — idle management for Hyprland
+                    #
+                    # Replaces noctalia's built-in idle handler which caused DPMS-related
+                    # Wayland crashes on Intel Iris Xe. See layers/40-desktop/43-noctalia/hypridle.nix.
 
-                general {
-                    lock_cmd = pidof hyprlock || hyprlock;  # lock if hyprlock installed
-                    before_sleep_cmd = loginctl lock-session; # lock before system suspend
-                    after_sleep_cmd = hyprctl dispatch dpms on; # wake display after suspend
-                }
-        ${lib.optionalString (idleCfg.dpmsTimeout != null) ''
+                    general {
+                        lock_cmd = pidof hyprlock || hyprlock;  # lock if hyprlock installed
+                        before_sleep_cmd = loginctl lock-session; # lock before system suspend
+                        after_sleep_cmd = hyprctl dispatch dpms on; # wake display after suspend
+                    }
+            ${lib.optionalString (idleCfg.dpmsTimeout != null) ''
 
-          listener {
-              timeout = ${toString idleCfg.dpmsTimeout};
-              on-timeout = ${dpmsOffCmd};
-              on-resume = hyprctl dispatch dpms on;
-          }
-        ''}
-        ${lib.optionalString (idleCfg.lockTimeout != null) ''
+              listener {
+                  timeout = ${toString idleCfg.dpmsTimeout};
+                  on-timeout = ${dpmsOffCmd};
+                  on-resume = hyprctl dispatch dpms on;
+              }
+            ''}
+            ${lib.optionalString (idleCfg.lockTimeout != null) ''
 
-          listener {
-              timeout = ${toString idleCfg.lockTimeout};
-              on-timeout = loginctl lock-session;
-          }
-        ''}
-      '';
-    };
+              listener {
+                  timeout = ${toString idleCfg.lockTimeout};
+                  on-timeout = loginctl lock-session;
+              }
+            ''}
+          '';
+        };
 
-    systemd.user.services.hypridle = {
-      Unit = {
-        Description = "Hyprland idle daemon (DPMS + lock)";
-        Documentation = "https://github.com/hyprwm/hypridle";
-        PartOf = [ "graphical-session.target" ];
-        After = [ "graphical-session.target" ];
+        systemd.user.services.hypridle = {
+          Unit = {
+            Description = "Hyprland idle daemon (DPMS + lock)";
+            Documentation = "https://github.com/hyprwm/hypridle";
+            PartOf = [ "graphical-session.target" ];
+            After = [ "graphical-session.target" ];
+          };
+          Service = {
+            Type = "simple";
+            ExecStart = "${pkgs.hypridle}/bin/hypridle";
+            Restart = "on-failure";
+            RestartSec = "5s";
+          };
+          Install = {
+            WantedBy = [ "graphical-session.target" ];
+          };
+        };
       };
-      Service = {
-        Type = "simple";
-        ExecStart = "${pkgs.hypridle}/bin/hypridle";
-        Restart = "on-failure";
-        RestartSec = "5s";
-      };
-      Install = {
-        WantedBy = [ "graphical-session.target" ];
-      };
-    };
-  };
 }

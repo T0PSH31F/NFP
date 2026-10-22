@@ -14,7 +14,6 @@
       crush.enable = lib.mkDefault true;
       herdr.enable = lib.mkDefault true;
       pi-coding-agent.enable = lib.mkDefault true;
-      omp.enable = lib.mkDefault true;
       aider-chat.enable = lib.mkDefault true;
       gitlab.enable = lib.mkDefault true;
     };

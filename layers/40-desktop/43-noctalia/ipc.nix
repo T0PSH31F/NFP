@@ -3,7 +3,6 @@
   config,
   lib,
   pkgs,
-  inputs,
   ...
 }:
 let
@@ -43,10 +42,37 @@ in
       (pkgs.writeShellScriptBin "noctalia-lock" ''
         noctalia msg session lock || loginctl lock-session
       '')
+      (pkgs.writeShellScriptBin "noctalia-compositor-switch" ''
+        COMPOSITOR="''${1-}"
+        if [ -z "$COMPOSITOR" ]; then
+          if command -v rofi >/dev/null 2>&1; then
+            COMPOSITOR=$(printf "hyprland\nniri\numbriel" | rofi -dmenu -p "Noctalia Compositor")
+          else
+            echo "Usage: noctalia-compositor-switch [hyprland|niri|umbriel]"
+            exit 1
+          fi
+        fi
+
+        case "$COMPOSITOR" in
+          hyprland)
+            exec uwsm start hyprland-uwsm.desktop
+            ;;
+          niri)
+            exec uwsm start niri-uwsm.desktop
+            ;;
+          umbriel)
+            exec uwsm start umbriel-uwsm.desktop
+            ;;
+          *)
+            echo "Unknown compositor: $COMPOSITOR (supported: hyprland, niri, umbriel)" >&2
+            exit 1
+            ;;
+        esac
+      '')
     ];
 
     wayland.windowManager.hyprland.settings.env =
-      lib.mkIf (cfg.backend == "hyprland" || cfg.backend == "both")
+      lib.mkIf (cfg.backend == "hyprland" || cfg.backend == "both" || cfg.backend == "all")
         [
           "NOCTALIA_SOCKET,$HOME/.cache/noctalia/noctalia.sock"
         ];

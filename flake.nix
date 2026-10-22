@@ -154,8 +154,8 @@
       url = "github:numtide/nixos-passthru-cache";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    omp = {
-      url = "github:can1357/oh-my-pi";
+    pi = {
+      url = "github:earendil-works/Pi";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     polyfloor = {

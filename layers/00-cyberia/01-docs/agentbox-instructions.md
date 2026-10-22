@@ -39,10 +39,7 @@ reproducible and easy to customise.
 | `letta-code`     | [Letta Code](https://github.com/letta-ai/letta-code)              | `nix build .#letta-code`     |
 | `mistral-vibe`   | [Mistral Vibe](https://github.com/mistralai/mistral-vibe)         | `nix build .#mistral-vibe`   |
 | `nanocoder`      | [Nanocoder](https://github.com/Mote-Software/nanocoder)           | `nix build .#nanocoder`      |
-| `oh-my-opencode` | [Oh My OpenCode](https://github.com/code-yeongyu/oh-my-openagent) | `nix build .#oh-my-opencode` |
-| `omp`            | [OMP](https://github.com/can1357/oh-my-pi)                        | `nix build .#omp`            |
-| `opencode`       | [OpenCode](https://github.com/anomalyco/opencode)                 | `nix build .#opencode`       |
-| `pi`             | [Pi](https://github.com/badlogic/pi-mono)                         | `nix build .#pi`             |
+| `pi`             | [Pi Durable Agent](https://github.com/earendil-works/Pi)         | `nix build .#pi`             |
 | `qoder-cli`      | [Qoder CLI](https://qoder.com)                                    | `nix build .#qoder-cli`      |
 | `qwen-code`      | [Qwen Code](https://github.com/QwenLM/qwen-code)                  | `nix build .#qwen-code`      |
 

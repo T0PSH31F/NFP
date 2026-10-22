@@ -40,13 +40,11 @@ in
     # ── System packages ────────────────────────────────────────────────
     environment.systemPackages = [
       cfg.package
-      pkgs.xdg-desktop-portal-wlr # XDG portal backend (wlr-compatible)
     ];
 
     # ── XDG portal ─────────────────────────────────────────────────────
     xdg.portal = {
       enable = true;
-      wlr.enable = true;
       extraPortals = [
         pkgs.xdg-desktop-portal-umbriel
         pkgs.xdg-desktop-portal-gtk

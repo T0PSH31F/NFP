@@ -25,13 +25,12 @@ let
   nixarchyPkgs = inputs.nixarchy.packages.${pkgs.stdenv.hostPlatform.system} or { };
   nixarchyPkg = nixarchyPkgs.default or pkgs.hello; # fallback: build will error clearly if missing
 
-  # Launcher for the full Omarchy Hyprland session
+  # Launcher for the Nixarchy Rise Hyprland session
   nixarchy-session = pkgs.writeShellScriptBin "nixarchy-session" ''
     export OMARCHY_PATH="${nixarchyPkg}/share/omarchy"
     export LUA_PATH="${nixarchyPkg}/share/omarchy/config/?.lua;${nixarchyPkg}/share/omarchy/?.lua;;$LUA_PATH"
     exec ${pkgs.uwsm}/bin/uwsm start -N "Nixarchy Rise" -D Hyprland -- \
-      ${pkgs.hyprland}/bin/start-hyprland -- \
-      --config "${nixarchyPkg}/share/omarchy/config/hypr/hyprland.lua"
+      ${pkgs.hyprland}/bin/start-hyprland
   '';
 
   nixarchy-rise-wayland-session =
@@ -62,6 +61,7 @@ in
       nixarchy-session
       nixarchy-rise-wayland-session
       pkgs.quickshell
+      pkgs.xdg-terminal-exec
       pkgs.matugen # Material You color token generator
     ];
   };
@@ -75,6 +75,9 @@ in
 
         # Deploy Rise shell config to ~/.config/quickshell/rise
         xdg.configFile."quickshell/rise".source = "${nixarchyPkg}/share/omarchy/shell";
+
+        # Ensure Ghostty is the default terminal for xdg-terminal-exec
+        xdg.configFile."xdg-terminals.list".text = "ghostty.desktop\ncom.mitchellh.ghostty.desktop\n";
 
         # Active experience configuration for standard Hyprland sessions
         xdg.configFile."hypr/experiences/nixarchy-rise.conf".text = ''
@@ -94,11 +97,16 @@ in
         '';
 
         # Link Omarchy Hyprland Lua configs so both standalone and standard Hyprland sessions work
-        xdg.configFile."hypr/monitors.lua".source = lib.mkDefault "${nixarchyPkg}/share/omarchy/config/hypr/monitors.lua";
-        xdg.configFile."hypr/input.lua".source = lib.mkDefault "${nixarchyPkg}/share/omarchy/config/hypr/input.lua";
-        xdg.configFile."hypr/bindings.lua".source = lib.mkDefault "${nixarchyPkg}/share/omarchy/config/hypr/bindings.lua";
-        xdg.configFile."hypr/looknfeel.lua".source = lib.mkDefault "${nixarchyPkg}/share/omarchy/config/hypr/looknfeel.lua";
-        xdg.configFile."hypr/autostart.lua".source = lib.mkDefault "${nixarchyPkg}/share/omarchy/config/hypr/autostart.lua";
+        xdg.configFile."hypr/monitors.lua".source =
+          lib.mkDefault "${nixarchyPkg}/share/omarchy/config/hypr/monitors.lua";
+        xdg.configFile."hypr/input.lua".source =
+          lib.mkDefault "${nixarchyPkg}/share/omarchy/config/hypr/input.lua";
+        xdg.configFile."hypr/bindings.lua".source =
+          lib.mkDefault "${nixarchyPkg}/share/omarchy/config/hypr/bindings.lua";
+        xdg.configFile."hypr/looknfeel.lua".source =
+          lib.mkDefault "${nixarchyPkg}/share/omarchy/config/hypr/looknfeel.lua";
+        xdg.configFile."hypr/autostart.lua".source =
+          lib.mkDefault "${nixarchyPkg}/share/omarchy/config/hypr/autostart.lua";
 
         # Matugen hook — generate color tokens from current wallpaper on login
         systemd.user.services.nixarchy-matugen-init = {

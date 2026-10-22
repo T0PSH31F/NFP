@@ -1,19 +1,24 @@
 # Tier: 71-harness
 # Module: pi-coding-agent.nix
-# Purpose: Pi Coding Agent terminal AI coding harness wrapper with NFP LLM router & MCP integration.
-# Provider endpoints (Kong path multiplexer + ExtremeRouter backup):
-#   kong-er:       http://luffy:8090/v1 (ExtremeRouter)
-#   kong-omni:     http://luffy:8090/omni/v1 (OmniRoute - TODO: when merged)
-#   kong-free:     http://luffy:8090/llm/free/v1 (FreeLLMPool)
-#   kong-frontier: http://luffy:8090/llm/frontier/v1 (Manifest)
+# Purpose: Pi Durable Coding Agent (earendil-works/Pi) terminal AI harness with
+#          durable execution, NFP LLM router hierarchy & MCP integration.
+#
+# Provider endpoints (Kong path multiplexer + ExtremeRouter + Jev System-1):
+#   kong-er:        http://luffy.nfp.nix:8090/v1 (ExtremeRouter)
+#   kong-omni:      http://luffy.nfp.nix:8090/omni/v1 (OmniRoute)
+#   kong-free:      http://luffy.nfp.nix:8090/llm/free/v1 (FreeLLMPool)
+#   kong-frontier:  http://luffy.nfp.nix:8090/llm/frontier/v1 (Manifest)
+#   jev-preflight:  http://127.0.0.1:20127/v1 (Jev System-1 0-token discriminative pre-flight)
 #   extreme-direct: http://127.0.0.1:20128/v1 (ER direct backup)
-# Option Path: programs.pi-coding-agent (and layers.layer-71.harness.pi-coding-agent)
+#   local-ollama:   http://127.0.0.1:11434/v1 (Ollama local inference)
+#
+# Option Path: layers.layer-71.harness.pi-coding-agent (and programs.pi / programs.pi-durable)
 # Enabling Host Tags: ai-agent, development
-# RAM Footprint: light (<300MB)
 {
   config,
   lib,
   pkgs,
+  inputs ? { },
   osConfig ? config,
   ...
 }:
@@ -23,6 +28,8 @@ with lib;
 let
   cfg = config.layers.layer-71.harness.pi-coding-agent;
   user = osConfig.layers.meta.primaryUser or "t0psh31f";
+  sys = pkgs.stdenv.hostPlatform.system;
+  piPkg = inputs.pi.packages.${sys}.default or (pkgs.pi or null);
 in
 {
   imports = [
@@ -30,19 +37,36 @@ in
       [ "programs" "pi-coding-agent" ]
       [ "layers" "layer-71" "harness" "pi-coding-agent" ]
     )
+    (lib.mkAliasOptionModule [ "programs" "pi" ] [ "layers" "layer-71" "harness" "pi-coding-agent" ])
+    (lib.mkAliasOptionModule
+      [ "programs" "pi-durable" ]
+      [ "layers" "layer-71" "harness" "pi-coding-agent" ]
+    )
     (lib.mkAliasOptionModule
       [ "layers" "layer-70" "agent" "pi-coding-agent" ]
+      [ "layers" "layer-71" "harness" "pi-coding-agent" ]
+    )
+    (lib.mkAliasOptionModule
+      [ "layers" "layer-71" "harness" "pi" ]
+      [ "layers" "layer-71" "harness" "pi-coding-agent" ]
+    )
+    (lib.mkAliasOptionModule
+      [ "layers" "layer-71" "harness" "pi-durable" ]
+      [ "layers" "layer-71" "harness" "pi-coding-agent" ]
+    )
+    (lib.mkAliasOptionModule
+      [ "layers" "layer-71" "harness" "omp" ]
       [ "layers" "layer-71" "harness" "pi-coding-agent" ]
     )
   ];
 
   options.layers.layer-71.harness.pi-coding-agent = {
-    enable = mkEnableOption "Pi coding agent terminal tool";
+    enable = mkEnableOption "Pi durable coding agent (earendil-works/Pi)";
 
     package = mkOption {
       type = types.nullOr types.package;
-      default = pkgs.pi-coding-agent or (pkgs.pi or null);
-      description = "Package to use for Pi coding agent";
+      default = piPkg;
+      description = "Package to use for Pi coding agent (durable agent)";
     };
 
     defaultModel = mkOption {
@@ -53,7 +77,7 @@ in
 
     routerEndpoint = mkOption {
       type = types.str;
-      default = "http://luffy.nfp.nix:8090/v1";
+      default = "http://127.0.0.1:8090/v1";
       description = "NFP LLM router OpenAI-compatible gateway endpoint";
     };
 
@@ -82,34 +106,106 @@ in
     environment.sessionVariables = {
       PI_MODEL = cfg.defaultModel;
       PI_ROUTER_ENDPOINT = cfg.routerEndpoint;
-      OPENAI_BASE_URL_KONG_ER = lib.mkDefault "http://luffy.nfp.nix:8090/v1";
-      OPENAI_BASE_URL_KONG_OMNI = "http://luffy.nfp.nix:8090/omni/v1";
-      OPENAI_BASE_URL_KONG_FREE = "http://luffy.nfp.nix:8090/llm/free/v1";
-      OPENAI_BASE_URL_KONG_FRONTIER = "http://luffy.nfp.nix:8090/llm/frontier/v1";
-      OPENAI_BASE_URL_EXTREME_DIRECT = "http://127.0.0.1:20128/v1";
+      PI_CODING_AGENT_DIR = "$HOME/.pi/agent";
+      OPENAI_BASE_URL = lib.mkDefault cfg.routerEndpoint;
+      OPENAI_BASE_URL_KONG_ER = lib.mkDefault "http://127.0.0.1:8090/v1";
+      OPENAI_BASE_URL_KONG_OMNI = lib.mkDefault "http://127.0.0.1:8090/omni/v1";
+      OPENAI_BASE_URL_KONG_FREE = lib.mkDefault "http://127.0.0.1:8090/llm/free/v1";
+      OPENAI_BASE_URL_KONG_FRONTIER = lib.mkDefault "http://127.0.0.1:8090/llm/frontier/v1";
+      OPENAI_BASE_URL_JEV_PREFLIGHT = lib.mkDefault "http://127.0.0.1:20127/v1";
+      OPENAI_BASE_URL_EXTREME_DIRECT = lib.mkDefault "http://127.0.0.1:20128/v1";
     };
 
     home-manager.users.${user} = { pkgs, ... }: {
       config = {
-        xdg.configFile."pi/config.json".text = builtins.toJSON {
-          model = cfg.defaultModel;
-          apiBase = cfg.routerEndpoint;
+        # Pi User Settings (~/.pi/agent/settings.json)
+        home.file.".pi/agent/settings.json".text = builtins.toJSON {
+          defaultProvider = "kong";
+          inherit (cfg) defaultModel;
           inherit (cfg) autoCommit;
           inherit (cfg) thinkingBudget;
+        };
+
+        # Pi Models Configuration (~/.pi/agent/models.json)
+        # Speaks native OpenAI-compatible completions format supported by Kong, ExtremeRouter & Ollama
+        home.file.".pi/agent/models.json".text = builtins.toJSON {
+          "$schema" = "https://pi.dev/schemas/models.schema.json";
+          providers = {
+            kong = {
+              baseUrl = cfg.routerEndpoint;
+              api = "openai-completions";
+              apiKey = "nfp-router-internal";
+              models = [
+                {
+                  id = "mimo-v2.5-pro";
+                  name = "MiMo Pro 2.5";
+                  input = [ "text" ];
+                }
+                {
+                  id = "claude-3-5-sonnet";
+                  name = "Claude 3.5 Sonnet";
+                  input = [
+                    "text"
+                    "image"
+                  ];
+                }
+                {
+                  id = "gpt-4o";
+                  name = "GPT-4o";
+                  input = [
+                    "text"
+                    "image"
+                  ];
+                }
+              ];
+            };
+            jev-preflight = {
+              baseUrl = "http://127.0.0.1:20127/v1";
+              api = "openai-completions";
+              apiKey = "jev-zero-token";
+              models = [
+                {
+                  id = "mimo-v2.5-pro";
+                  name = "MiMo Pro 2.5 (Jev Pre-Flight Proxy)";
+                  input = [ "text" ];
+                }
+              ];
+            };
+            ollama = {
+              baseUrl = "http://127.0.0.1:11434/v1";
+              api = "openai-completions";
+              apiKey = "ollama";
+              models = [
+                {
+                  id = "qwen2.5-coder:7b";
+                  name = "Qwen 2.5 Coder 7B (Local)";
+                  input = [ "text" ];
+                }
+              ];
+            };
+          };
+        };
+
+        # Pi MCP Servers (~/.pi/agent/mcp.json)
+        home.file.".pi/agent/mcp.json".text = builtins.toJSON {
           mcpServers = optionalAttrs cfg.enableMcp {
             hermes-a2a = {
               url = "http://127.0.0.1:8085/mcp";
               description = "Hermes Autonomous Worker A2A Gateway";
             };
             context-forge = {
-              url = osConfig.layers.layer-20.endpoints.context-forge.baseUrl;
+              url = osConfig.layers.layer-20.endpoints.context-forge.baseUrl or "http://127.0.0.1:8000";
               description = "ContextForge Universal MCP/A2A Gateway";
             };
-            mcp-nixos = {
-              command = "${lib.getExe pkgs.mcp-nixos}";
-              args = [ ];
-            };
           };
+        };
+
+        # Backward compatibility symlink (~/.config/pi/config.json)
+        xdg.configFile."pi/config.json".text = builtins.toJSON {
+          model = cfg.defaultModel;
+          apiBase = cfg.routerEndpoint;
+          inherit (cfg) autoCommit;
+          inherit (cfg) thinkingBudget;
         };
       };
     };

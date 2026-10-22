@@ -12,7 +12,7 @@
     layers.layer-20.services.backups.restic.enable = lib.mkDefault true;
 
     layers.desktop.experience = lib.mkDefault (
-      if (builtins.elem "desktop" config.machine.tags) then "noctalia-hyprland" else "none"
+      if (builtins.elem "desktop" config.machine.tags) then "noctalia" else "none"
     );
   };
 }

@@ -139,7 +139,7 @@ in
   # Noctalia-Hyprland adapter. Do NOT set hyprland.enable / noctalia.enable
   # directly here — they derive from desktop.experience.
   # Explicit machine boundary selection required for hybrid server+desktop.
-  layers.desktop.experience = "noctalia-hyprland";
+  layers.desktop.experience = "noctalia";
 
   # Greeter follows desktop tag default (noctalia-greeter / hyprland-uwsm);
   # keep explicit only if diverging from tag default — currently redundant,

@@ -30,7 +30,7 @@ let
       "mistral-vibe"
       #"nanocoder"
       #"mimo-code"
-      #"omp"
+      #"pi-durable"
       #"openclaw"
       "opencode2"
       "openfang"
@@ -219,7 +219,7 @@ in
         # oh-my-claudecode — Multi-agent orchestration system for Claude Code
         # oh-my-codex — Multi-agent orchestration layer for OpenAI Codex CLI
         # oh-my-opencode [UNFREE] — The Best AI Agent Harness - Multi-Model Orchestration for OpenCode
-        # omp — A terminal-based coding agent with multi-model support
+        # pi-durable — Durable conversation, task, and document coding agent runtime (earendil-works/Pi)
         # open-code-review — AI-powered code review CLI
         # openclaw — Your own personal AI assistant. Any OS. Any Platform. The lobster way
         # opencode2 — OpenCode 2 preview CLI

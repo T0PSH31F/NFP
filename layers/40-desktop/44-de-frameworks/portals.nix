@@ -33,7 +33,7 @@ in
     xdg.portal = {
       enable = true;
       xdgOpenUsePortal = true;
-      wlr.enable = false; # Disable wlr portal (conflicts with hyprland)
+      wlr.enable = lib.mkDefault false; # Disable wlr portal by default (conflicts with hyprland)
 
       # Don't add xdg-desktop-portal-hyprland here - programs.hyprland adds it automatically
       extraPortals =

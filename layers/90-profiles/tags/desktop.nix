@@ -33,10 +33,10 @@
         };
         noctalia = {
           enable = lib.mkDefault true;
-          backend = lib.mkDefault "hyprland";
+          backend = lib.mkDefault "all";
         };
       };
-      desktop.experience = lib.mkDefault "noctalia-hyprland";
+      desktop.experience = lib.mkDefault "noctalia";
       layer-50.cli = {
         terminal-toys.enable = lib.mkDefault true;
         yazelix-nova.enable = lib.mkDefault true;

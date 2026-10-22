@@ -22,8 +22,9 @@ in
         "hyprland"
         "niri"
         "both"
+        "all"
       ];
-      default = "hyprland";
+      default = "all";
       description = "Which compositor backend to use with Noctalia";
     };
 
@@ -980,6 +981,21 @@ in
               "LD_LIBRARY_PATH=${pkgs.libglvnd}/lib:/run/opengl-driver/lib"
               "__EGL_VENDOR_LIBRARY_DIRS=/run/opengl-driver/share/glvnd/egl_vendor.d"
             ];
+          };
+        };
+
+        systemd.user.services.noctalia-experience-dirs = {
+          Unit = {
+            Description = "Ensure Noctalia HVE cache and experience directories exist";
+            Before = [ "graphical-session-pre.target" ];
+          };
+          Install = {
+            WantedBy = [ "graphical-session-pre.target" ];
+          };
+          Service = {
+            Type = "oneshot";
+            RemainAfterExit = true;
+            ExecStart = "${pkgs.bash}/bin/bash -c 'mkdir -p %h/.config/hypr/experiences %h/.cache/noctalia/HVE'";
           };
         };
 

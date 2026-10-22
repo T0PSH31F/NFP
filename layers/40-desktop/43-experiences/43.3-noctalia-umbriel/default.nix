@@ -18,7 +18,7 @@
 }:
 let
   exp = osConfig.layers.desktop.experience or "none";
-  isEnabled = exp == "noctalia-umbriel";
+  isEnabled = exp == "noctalia" || exp == "noctalia-umbriel";
 in
 {
   nixos = lib.mkIf isEnabled {
@@ -64,21 +64,6 @@ in
             #!/usr/bin/env bash
             noctalia msg wallpaper-set "$1" 2>/dev/null || true
           '';
-        };
-
-        systemd.user.services.noctalia-experience-dirs = {
-          Unit = {
-            Description = "Ensure Noctalia HVE cache and experience directories exist";
-            Before = [ "graphical-session-pre.target" ];
-          };
-          Install = {
-            WantedBy = [ "graphical-session-pre.target" ];
-          };
-          Service = {
-            Type = "oneshot";
-            RemainAfterExit = true;
-            ExecStart = "${pkgs.bash}/bin/bash -c 'mkdir -p %h/.cache/noctalia/HVE'";
-          };
         };
       };
     };

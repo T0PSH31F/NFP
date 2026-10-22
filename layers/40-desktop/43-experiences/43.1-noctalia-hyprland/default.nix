@@ -17,7 +17,7 @@
 }:
 let
   exp = osConfig.layers.desktop.experience or "none";
-  isEnabled = exp == "noctalia-hyprland";
+  isEnabled = exp == "noctalia" || exp == "noctalia-hyprland";
 in
 {
   options.layers.desktop.noctalia-hyprland = {
@@ -93,22 +93,6 @@ in
             #!/usr/bin/env bash
             noctalia msg wallpaper-set "$1" 2>/dev/null || true
           '';
-        };
-
-        # ── Boot-time directory scaffold ────────────────────────────────
-        systemd.user.services.noctalia-experience-dirs = {
-          Unit = {
-            Description = "Ensure Noctalia HVE cache and experience directories exist";
-            Before = [ "graphical-session-pre.target" ];
-          };
-          Install = {
-            WantedBy = [ "graphical-session-pre.target" ];
-          };
-          Service = {
-            Type = "oneshot";
-            RemainAfterExit = true;
-            ExecStart = "${pkgs.bash}/bin/bash -c 'mkdir -p %h/.config/hypr/experiences %h/.cache/noctalia/HVE'";
-          };
         };
       };
     };
