@@ -79,7 +79,7 @@ in
               (llmPkgs.claude-code or pkgs.claude-code or null)
               (llmPkgs.goose-cli or null)
               (llmPkgs.opencode or pkgs.opencode or null)
-              (llmPkgs.pi or null)
+              (inputs.pi.packages.${pkgs.stdenv.hostPlatform.system}.default or null)
               (llmPkgs.ccusage or null)
               (llmPkgs.beads or null)
             ]
