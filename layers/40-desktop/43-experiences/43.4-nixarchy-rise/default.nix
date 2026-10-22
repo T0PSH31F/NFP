@@ -113,7 +113,7 @@ in
 
           # Omarchy shortcuts & bindings
           bind = $mod, SPACE, exec, omarchy-menu toggle
-          bind = $mod, D, exec, omarchy-menu toggle apps
+          bind = $mod, A, exec, omarchy-menu toggle apps
           bind = $mod, comma, exec, omarchy-menu toggle setup
 
           # Autostart Quickshell Rise bar
