@@ -8,7 +8,7 @@ Declarative disk partitioning templates for NixOS using [disko](https://github.c
 **Use case:** Basic installations, testing, minimal setups
 
 **Layout:**
-- 1GB FAT32 `/boot`
+- 4GB FAT32 `/boot`
 - ext4 `/` (100% remaining)
 - No encryption
 
@@ -46,7 +46,7 @@ Declarative disk partitioning templates for NixOS using [disko](https://github.c
 **Use case:** Servers, NAS, databases, file sharing
 
 **Layout:**
-- 1GB FAT32 `/boot`
+- 4GB FAT32 `/boot`
 - LUKS encrypted ZFS pool with datasets:
   - `zroot/root` → `/`
   - `zroot/nix` → `/nix` (no snapshots)

@@ -249,6 +249,9 @@ in
             # Sync Zellij colors
             zellij-colors-sync 2>/dev/null || true
 
+            # Sync Spicetify / Spotify colors
+            noctalia-spicetify-sync 2>/dev/null || true
+
             # Sync Rofi theme/colors
             pkill -USR2 rofi 2>/dev/null || true
           '')
@@ -935,6 +938,22 @@ in
             #   wallpaperChange = "noctalia-hypr-reload";
             #   colorGeneration = "noctalia-hypr-reload && zellij-colors-sync";
             # };
+          };
+        };
+
+        # Noctalia v5 is statically linked and dlopen's libEGL.so at runtime.
+        # Two vars are required for eglGetDisplay to succeed:
+        #   1. LD_LIBRARY_PATH — so dlopen("libEGL.so") finds the GLVND dispatcher
+        #      (/run/opengl-driver/lib only has libEGL_mesa.so, not the dispatcher)
+        #   2. __EGL_VENDOR_LIBRARY_DIRS — so GLVND can locate the Mesa ICD
+        #      vendor JSON (50_mesa.json) and back the dispatcher with a real driver.
+        # Without both, eglGetDisplay returns NULL and noctalia crashes on startup.
+        systemd.user.services.noctalia = {
+          Service = {
+            Environment = [
+              "LD_LIBRARY_PATH=${pkgs.libglvnd}/lib:/run/opengl-driver/lib"
+              "__EGL_VENDOR_LIBRARY_DIRS=/run/opengl-driver/share/glvnd/egl_vendor.d"
+            ];
           };
         };
 

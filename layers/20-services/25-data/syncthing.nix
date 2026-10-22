@@ -72,6 +72,7 @@ in
             addresses = [
               "tcp://127.0.0.1:22000"
               "tcp://z0r0.nfp.nix:22000"
+              "tcp://192.168.1.39:22000"
               "dynamic"
             ];
           };
@@ -83,6 +84,14 @@ in
               "dynamic"
             ];
           };
+          sanji = {
+            id = "QFRJHM5-D4VKGXN-KRMUSUB-X7ZWSQW-D2APEGB-XCM2BKK-RYATWYI-ROF2MA3";
+            addresses = [
+              "tcp://sanji.nfp.nix:22000"
+              "tcp://192.168.1.68:22000"
+              "dynamic"
+            ];
+          };
         };
         folders = {
           "clan-vault" = {
@@ -90,6 +99,7 @@ in
             devices = [
               "z0r0"
               "luffy"
+              "sanji"
             ];
             label = "Clan Vault";
             ignorePerms = false;
@@ -100,6 +110,7 @@ in
             devices = [
               "z0r0"
               "luffy"
+              "sanji"
             ];
             label = "Projects Vault";
             ignorePerms = false;

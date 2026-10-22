@@ -2,6 +2,38 @@
 # Custom packages you might want available on all systems.
 
 final: prev: {
+  # ── electron_41 pin: REMOVED (2026-10-15) ──────────────────────────
+  # Tried pinning electron_41 to 41.10.3 to stop paseo-desktop/hermes-* from
+  # re-hashing on nixpkgs bumps. It was wrong on both counts:
+  #   1. No benefit — paseo/hermes-one come from inputs.llm-agents, which does
+  #      NOT follow our nixpkgs (see flake.nix), so this overlay could never
+  #      reach them anyway.
+  #   2. Net harm — it forked electron_41 into a local-only derivation that is
+  #      404 on cache.nixos.org, turning a substitutable electron into a
+  #      multi-hour from-scratch build.
+  # If pinning is ever needed, do it where the package is actually consumed
+  # (llmPkgs.paseo-desktop.override { electron_41 = ...; }), not in our overlay.
+
+  # ── typescript-language-server: stale pnpmDeps pin ─────────────────
+  # nixpkgs (rev 7fd4004d / 2026-10-11) pins pnpmDeps to
+  #   sha256-MUSxDMlbG21KSesGdEvqa2kEpuVfLlXRUX1qV/FGsSo=
+  # but `fetchPnpmDeps` reproducibly produces
+  #   sha256-xR/EF60lVBsITKgH7wCM2wHM46PFQevD51KfCENSUH4=
+  # under our toolchain — verified: that "got" hash is byte-identical to the
+  # already-valid store path 4q1qpv5q...-typescript-language-server-pnpm-deps,
+  # so the build output is correct and the pin is what's wrong. Left alone this
+  # FOD aborts and cascades into tsserver -> helix-languages-config, neovim,
+  # nixvim, home-manager-generation -> the toplevel on BOTH machines.
+  # Drop this override once nixpkgs fixes the pin (nix-update / upstream PR).
+  typescript-language-server = prev.typescript-language-server.overrideAttrs (old: {
+    pnpmDeps = prev.fetchPnpmDeps {
+      inherit (old) pname version src;
+      pnpm = prev.pnpm_12;
+      fetcherVersion = 4;
+      hash = "sha256-xR/EF60lVBsITKgH7wCM2wHM46PFQevD51KfCENSUH4=";
+    };
+  });
+
   # REMOVED (2026-08-06): glibc 2.42+ linuxHeaders overlays for flatpak,
   # seahorse, vte, libadwaita, xdg-desktop-portal, xdg-desktop-portal-gtk,
   # gnome-bluetooth, zenity, libpanel, gedit, gnome-color-manager, rustdesk,
@@ -44,23 +76,55 @@ final: prev: {
   # x86_64-only; this conditional never fires and merely shadows the cached
   # upstream attr. Referenced nowhere in the repo.
 
+  # Upstream nixpkgs has 1.2.16; pin 1.4.4 for Gemini 4 Argon support
+  antigravity-cli = prev.antigravity-cli.overrideAttrs (oldAttrs: rec {
+    version = "1.4.4";
+    wholeVersion = "${version}-4783783166214144";
+    src = prev.fetchurl {
+      url = "https://storage.googleapis.com/antigravity-public/antigravity-cli/${wholeVersion}/linux-x64/cli_linux_x64.tar.gz";
+      hash = "sha256-muT38GZ6KGjhW7mtk4Gf91J8cYfxLRLjtRkRN8cmKHs=";
+    };
+  });
+
   # Antigravity Agent Control Protocol (ACP) server package
   antigravity-acp =
-    prev.antigravity-acp or (if builtins.pathExists (prev.path + "/pkgs/by-name/an/antigravity-acp/package.nix") then
-      final.callPackage (prev.path + "/pkgs/by-name/an/antigravity-acp/package.nix") { }
-    else
-      final.writeShellScriptBin "antigravity-acp" ''
-        exec ${final.antigravity-cli}/bin/agy acp "$@"
-      '');
+    prev.antigravity-acp or (
+      if builtins.pathExists (prev.path + "/pkgs/by-name/an/antigravity-acp/package.nix") then
+        final.callPackage (prev.path + "/pkgs/by-name/an/antigravity-acp/package.nix") { }
+      else
+        final.writeShellScriptBin "antigravity-acp" ''
+          exec ${final.antigravity-cli}/bin/agy acp "$@"
+        ''
+    );
 
   # niri-flake (2026-08 rev) callPackages its pinned niri with
   # libdisplay-info_0_2 and asserts version == "0.2.0". nixpkgs-unstable
   # removed the 0.2 attr (throw alias). Re-provide it as 0.3 with a version
   # shim: nixpkgs' own niri 26.04 builds cleanly against 0.3, and the C API
   # is stable. Drop this overlay when niri-flake adapts to the removal.
+  #
+  # 2026-10-15: overriding `version` alone renames the store path but leaves
+  # libdisplay-info.pc saying "Version: 0.3.0". libdisplay-info-sys v0.2.2
+  # probes pkg-config for `libdisplay-info >= 0.1.0, < 0.3.0` and panics
+  # (build.rs unwrap, exit 101) when the .pc rejects it. Patch the .pc too.
   libdisplay-info_0_2 = prev.libdisplay-info_0_3.overrideAttrs (old: {
     version = "0.2.0";
     __intentionallyOverridingVersion = true;
+    postFixup = (old.postFixup or "") + ''
+      if [ -f "$out/lib/pkgconfig/libdisplay-info.pc" ]; then
+        sed -i 's/^Version:.*/Version: 0.2.0/' "$out/lib/pkgconfig/libdisplay-info.pc"
+      fi
+    '';
+  });
+
+  # pgAdmin 4 9.14's installCheckPhase imports its regression suite, which
+  # trips psycopg 3.3.5's read-only `psycopg._encodings._py_codecs`
+  # (TypeError: 'tuple' object does not support item assignment) and aborts
+  # the build. Upstream packaging mismatch, not a pgAdmin runtime defect —
+  # skip the checks (same treatment as zat).
+  pgadmin4-desktopmode = prev.pgadmin4-desktopmode.overrideAttrs (_old: {
+    doCheck = false;
+    doInstallCheck = false;
   });
 
   # Camoufox prebuilt binary from GitHub releases (v150.0.2-beta.25 / alpha.26).
@@ -284,7 +348,15 @@ final: prev: {
     src = final.fetchFromGitHub {
       owner = "alvinunreal";
       repo = "lazyskills";
-      rev = "main";
+      # PINNED (2026-10-15): was `rev = "main"`, which drifted and broke the
+      # FOD hash mid-build. This is the commit the recorded `hash` above was
+      # captured from (verified: its tarball unpacks to exactly
+      # sha256-uTosunMSnmgV0gr7eYhxbFAPYQu77Ou4Na8wtVEoiP0=), so vendorHash
+      # below is still correct for this rev.
+      # To bump: nix-prefetch-github alvinunreal/lazyskills --rev <new>, update
+      # `rev` + `hash` (+ `vendorHash` via nix build and take the got-hash),
+      # then set `version` to 0.1.0-unstable-<commit-date>.
+      rev = "f22610cdb5b745b439354a13f04c1f42de99c06d";
       hash = "sha256-uTosunMSnmgV0gr7eYhxbFAPYQu77Ou4Na8wtVEoiP0=";
     };
 
@@ -338,13 +410,22 @@ final: prev: {
       format = "pyproject";
 
       # Not on PyPI — distributed via GitHub + uvx. Fetch from GitHub instead.
-      # No version tag exists on the repo — use main branch with current hash.
-      # If hash drifts again, update hash from build error message.
+      #
+      # PINNED TO A COMMIT, NOT A BRANCH. `rev = "main"` made this a moving
+      # target: upstream commits to main, the fixed-output hash stops matching,
+      # and every build fails with `hash mismatch in fixed-output derivation
+      # ...-source.drv` (last: 2026-10-12, blocked hermes-agent -> system-path
+      # -> z0r0 toplevel for ~1h7m before surfacing). Branch refs are not
+      # immutable, so this WILL drift again unless pinned.
+      # Repo now tags releases (v0.14.0 as of 2026-10-12) — prefer a tag over
+      # a raw commit when bumping, and update `version` alongside it.
+      # Bump procedure: curl -s https://api.github.com/repos/Socialpranker/agentburn/commits/main
+      # then set rev=<sha> and hash from the build error's `got:` value.
       src = final.fetchFromGitHub {
         owner = "Socialpranker";
         repo = "agentburn";
-        rev = "main";
-        hash = "sha256-3T7+1n0sBcl3bWaGq0VeUhqhLVZdi2PNakHLnmJUflk=";
+        rev = "8477cc81b2982e3799864c407d4de0069339854f"; # main @ 2026-10-12
+        hash = "sha256-L7rxsJ61ZvFcTQo6vhYGY9ZO/Naa9/0F71tFF3X4bEE=";
       };
 
       # pyproject.toml requires setuptools>=68 as build backend

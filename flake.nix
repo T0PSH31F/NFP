@@ -108,6 +108,19 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # ── Compositors & Desktop Environments ──────────────────────
+    umbriel = {
+      # Independent Wayland compositor with blur, shadows, fluid animations
+      url = "github:noctalia-dev/umbriel";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    nixarchy = {
+      # Omarchy 4.x vendored for NixOS (upstream tree as a derivation)
+      url = "github:olafkfreund/nixarchy";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
+    };
+
     # ── AI & Agents ────────────────────────────────────────────
     camoufox-nix = {
       url = "github:maximoffua/camoufox-nix";
@@ -125,6 +138,14 @@
     };
     llm-agents = {
       url = "github:numtide/llm-agents.nix";
+      # Deliberately does NOT set inputs.nixpkgs.follows (unlike most inputs).
+      # numtide runs daily CI against the nixpkgs pinned inside llm-agents.nix
+      # and pushes the results to https://cache.numtide.com. Output hashes only
+      # match if we build with that same nixpkgs — overriding it to follow ours
+      # re-hashes every package in the catalog and guarantees a local rebuild
+      # with no cache hit (they are 404 on cache.nixos.org too, so "from scratch"
+      # is the only option). Keep this decoupled; see caches.nix for the
+      # substituter + trusted key, which are already configured system-wide.
       inputs.flake-parts.follows = "flake-parts";
       inputs.treefmt-nix.follows = "clan-core/treefmt-nix";
       inputs.systems.follows = "systems";

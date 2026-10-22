@@ -614,6 +614,10 @@ with lib;
             server.http_listen_port = config.layers.layer-20.services.config.monitoring.loki.port;
             auth_enabled = false;
             common = {
+              # Pin instance address so memberlist-kv init does not depend on
+              # live NICs (NetworkManager/tailscaled are down during switch and
+              # no non-loopback address is found → start-limit-hit).
+              instance_addr = "127.0.0.1";
               ring = {
                 instance_interface_names = [
                   "lo"

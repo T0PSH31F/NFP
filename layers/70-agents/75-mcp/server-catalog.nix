@@ -137,7 +137,51 @@ in
 
     servers = mkOption {
       type = types.attrsOf serverSubmodule;
-      default = {
+      default = { };
+      description = "Declarative registry of typed MCP server definitions.";
+    };
+
+    clientConfigs = mkOption {
+      type = types.attrsOf types.anything;
+      readOnly = true;
+      description = "Normalized client connection records generated from enabled server definitions.";
+    };
+  };
+
+  config =
+    let
+      cfg = config.layers.layer-75.mcp;
+      user = config.layers.meta.primaryUser or "t0psh31f";
+
+      enabledServers = filterAttrs (_n: s: s.enable) cfg.servers;
+
+      toClientConfig =
+        s:
+        (
+          if s.transport == "stdio" then
+            {
+              command =
+                if s.command != null then
+                  s.command
+                else if s.package != null && lib.isDerivation s.package then
+                  lib.getExe s.package
+                else
+                  "";
+              inherit (s) args;
+            }
+          else
+            {
+              inherit (s) url;
+            }
+        )
+        // {
+          inherit (s) maxResultBytes cacheTtlSeconds;
+        };
+
+      clientConfigs = mapAttrs (_n: toClientConfig) enabledServers;
+    in
+    mkIf cfg.enable {
+      layers.layer-75.mcp.servers = {
         mcp-nixos = {
           enable = true;
           transport = "stdio";
@@ -223,49 +267,7 @@ in
           description = "High-speed System-1 Jev decision, email triage & filesystem routing engine";
         };
       };
-      description = "Declarative registry of typed MCP server definitions.";
-    };
 
-    clientConfigs = mkOption {
-      type = types.attrsOf types.anything;
-      readOnly = true;
-      description = "Normalized client connection records generated from enabled server definitions.";
-    };
-  };
-
-  config =
-    let
-      cfg = config.layers.layer-75.mcp;
-      user = config.layers.meta.primaryUser or "t0psh31f";
-
-      enabledServers = filterAttrs (_n: s: s.enable) cfg.servers;
-
-      toClientConfig =
-        s:
-        (
-          if s.transport == "stdio" then
-            {
-              command =
-                if s.command != null then
-                  s.command
-                else if s.package != null && lib.isDerivation s.package then
-                  lib.getExe s.package
-                else
-                  "";
-              inherit (s) args;
-            }
-          else
-            {
-              inherit (s) url;
-            }
-        )
-        // {
-          inherit (s) maxResultBytes cacheTtlSeconds;
-        };
-
-      clientConfigs = mapAttrs (_n: toClientConfig) enabledServers;
-    in
-    mkIf cfg.enable {
       layers.layer-75.mcp.clientConfigs = clientConfigs;
 
       environment.systemPackages = with pkgs; [

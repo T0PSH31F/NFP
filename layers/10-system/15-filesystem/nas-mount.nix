@@ -40,7 +40,7 @@ in
     # File format must be:
     #   username=<user>
     #   password=<pass>
-    # Set once per machine; stored encrypted via sops backend.
+    # Buffalo NAS default: guest/guest
     clan.core.vars.generators.nas-credentials = {
       files."smb-credentials" = {
         secret = true;
@@ -62,10 +62,8 @@ in
         "gid=100"
         "file_mode=0775"
         "dir_mode=0775"
-        # SMBv3 with automatic downgrade to 2.1 — SMBv1 is disabled on modern firmware.
-        # Buffalo NAS ≥ LS-series firmware 2.73 supports SMB 3.0.
-        "vers=3.0"
-        "sec=ntlmssp"
+        # Buffalo LinkStation requires SMB 1.0 (NT1)
+        "vers=1.0"
         # Systemd automount — only mount on first access, unmount after idle
         "x-systemd.automount"
         "noauto"

@@ -35,21 +35,20 @@ let
       deploy.targetHost = "root@192.168.1.54"; # Direct LAN target (Tailscale 100.72.46.75 / luffy.nfp.nix fallback)
     };
 
-    # NAMI — Cloud control-plane (always-on AI gateway, agent orchestration, media)
-    # Always-on services: Kong, Omniroute, ExtremeRouter, Mission Control, Paperclip, Homepage, Headscale
-    # Memory services stay on luffy for privacy.
-    nami = {
+    # SANJI — Dell Precision 7680 (desktop workstation, control-plane, local inference, agent orchestrator)
+    # Always-on services: Kong, Omniroute, FreeLLMAPI, FreeLLMPool, Ollama, Polyfloor
+    sanji = {
       tags = [
-        "server"
-        "homelab"
-        "network-router"
+        "desktop"
+        "workstation"
+        "laptop"
+        "development"
         "ai-router"
+        "ai-inference"
         "agent-orchestrator"
-        "media"
       ];
-      deploy.targetHost = "root@47.254.90.69"; # Alibaba VPS (US West-1)
+      deploy.targetHost = "root@192.168.1.68";
     };
-
   };
 in
 {
@@ -153,23 +152,54 @@ in
         ./machines/luffy/default.nix
         ./all-layers.nix
         (
-          { inputs, ... }:
+          {
+            inputs,
+            pkgs,
+            lib,
+            ...
+          }:
           {
             imports = [
               inputs.nixarr.nixosModules.default
               inputs.nixos-telemetry.nixosModules.default
               inputs.nixos-passthru-cache.nixosModules.nixos-passthru-cache
             ];
+
+            # nixarr-py rebuild: nixarr/lib/nixarr-py/python-deps.nix keys a
+            # Jellyfin OpenAPI-spec hash table that stops at 10.11.11, but
+            # current nixpkgs ships jellyfin 12.2. Every nixarr settings-sync
+            # unit (prowlarr, radarr, sonarr, …) forces nixarr-py, so luffy
+            # fails to evaluate with `attribute '"12.2"' missing`.
+            #
+            # jellyfin-py is only a generated API client for Jellyfin<->radarr
+            # app-config mapping, so building it against the newest spec nixarr
+            # actually hashes (10.11.11) is safe. The real Jellyfin *server*
+            # stays at 12.2 — only the API-client input spec is pinned back.
+            nixarr.nixarr-py.package = lib.mkForce (
+              pkgs.python3Packages.buildPythonPackage {
+                pname = "nixarr-py";
+                version = "0.1.0";
+                pyproject = true;
+                src = inputs.nixarr.outPath + "/nixarr/lib/nixarr-py";
+                build-system = [ pkgs.python3Packages.setuptools ];
+                dependencies = pkgs.callPackage (inputs.nixarr.outPath + "/nixarr/lib/nixarr-py/python-deps.nix") {
+                  jellyfin = pkgs.jellyfin.overrideAttrs (_old: {
+                    version = "10.11.11";
+                    __intentionallyOverridingVersion = true;
+                  });
+                };
+              }
+            );
           }
         )
       ];
     };
 
-    nami = {
-      machine.tags = machinesInventory.nami.tags;
+    sanji = {
+      machine.tags = machinesInventory.sanji.tags;
       imports = [
-        ./machines/nami/default.nix
-        ./server-layers.nix # headless: all layers EXCEPT 13-users (no HM profile)
+        ./machines/sanji/default.nix
+        ./all-layers.nix
         (
           { inputs, ... }:
           {

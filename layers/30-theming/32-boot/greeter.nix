@@ -6,25 +6,44 @@
   ...
 }:
 with lib;
+let
+  cfg = config.layers.layer-30.theming.themes.greeter;
+
+  # Experience-coupled greeter auto-derivation:
+  #   - noctalia-*         → noctalia-greeter   (native Noctalia login screen)
+  #   - nixarchy-rise      → nixarchy-greeter   (Omarchy's own DM)
+  #   - headless-console   → tuigreet
+  #   - none               → tuigreet
+  #   - everything else    → sddm-astronaut     (eye-candy Qt6 fallback)
+  derivedType = config.layers.desktop.derivedGreeter or "sddm-astronaut";
+in
 {
   imports = [
     inputs.noctalia-greeter.nixosModules.default
   ];
 
   options.layers.layer-30.theming.themes.greeter = {
-    # Greeter selection — mutually exclusive. Only one can be active.
+    # Greeter selection — mutually exclusive. Defaults to experience-derived value.
     type = lib.mkOption {
       type = lib.types.enum [
-        "sddm"
-        "greetd"
         "noctalia-greeter"
+        "nixarchy-greeter"
+        "sddm-astronaut"
+        "sddm" # legacy alias for plain SDDM without astronaut theme
+        "greetd" # regreet-in-cage
+        "tuigreet"
       ];
-      default = "noctalia-greeter";
+      default = derivedType;
       description = ''
-        Which login greeter to use:
-        - "sddm": SDDM with Astronaut theme (Qt-based, X11/Wayland)
-        - "greetd": Greetd with ReGreet in cage (minimal, Wayland-native)
-        - "noctalia-greeter": Noctalia Greeter (native Wayland, recommended)
+        Which login greeter to use. Defaults to the value auto-derived from
+        layers.desktop.experience so each desktop environment gets its own
+        native login screen:
+          noctalia-*       → noctalia-greeter
+          nixarchy-rise    → nixarchy-greeter
+          micro-smol-ai    → tuigreet
+          headless-console → tuigreet
+          everything else  → sddm-astronaut
+        Override here only to decouple from the experience default.
       '';
     };
 
@@ -40,7 +59,23 @@ with lib;
       session = lib.mkOption {
         type = lib.types.str;
         default = "hyprland-uwsm";
-        description = "Default session to launch (hyprland-uwsm, niri-uwsm, etc.)";
+        description = "Default session to launch (hyprland-uwsm, niri-uwsm, umbriel-uwsm, etc.)";
+      };
+    };
+
+    sddm-astronaut = {
+      videoBackground = lib.mkOption {
+        type = lib.types.nullOr lib.types.path;
+        default = ../../00-cyberia/02-assets/sddm_background/thousand-sunny.mp4;
+        description = ''
+          Path to a video file for the SDDM Astronaut background loop.
+          Supports .mp4 / .webm. Set to null for a static image fallback.
+        '';
+      };
+      staticBackground = lib.mkOption {
+        type = lib.types.path;
+        default = ../../00-cyberia/02-assets/sddm_background/thousand-sunny-poster.png;
+        description = "Static image fallback when videoBackground is null.";
       };
     };
   };
@@ -50,57 +85,17 @@ with lib;
       cfg = config.layers.layer-30.theming.themes.greeter;
     in
     lib.mkMerge [
-      # SDDM Implementation
-      (mkIf (cfg.type == "sddm") {
-        services.xserver.enable = true;
-        services.displayManager.sddm = {
-          enable = true;
-          wayland.enable = true;
-          theme = "sddm-astronaut-theme";
-        };
-
-        environment.systemPackages = [
-          (pkgs.sddm-astronaut.override {
-            themeConfig = {
-              Background = "${../../00-cyberia/02-assets/sddm_background/thousand-sunny.mp4}";
-            };
-          })
-        ];
-      })
-
-      # Greetd Implementation (cage + regreet per best practice)
-      (mkIf (cfg.type == "greetd") {
-        services.greetd = {
-          enable = true;
-          settings = {
-            default_session = {
-              # Minimal, stable Wayland greeter host (cage kiosk)
-              command = "${pkgs.cage}/bin/cage -s -- ${pkgs.regreet}/bin/regreet";
-              user = "greeter";
-            };
-          };
-        };
-
-        programs.regreet = {
-          enable = true;
-          settings = {
-            background = {
-              path = toString cfg.greetd.background;
-              fit = "Cover";
-            };
-            GTK = lib.mkDefault {
-              icon_theme_name = "candy-icons";
-              theme_name = "adw-gtk3-dark";
-            };
-          };
-        };
-      })
-
-      # Noctalia Greeter Implementation
+      # ── Noctalia Greeter ──────────────────────────────────────────────
       (mkIf (cfg.type == "noctalia-greeter") {
         users.users.greeter = {
           isSystemUser = true;
           group = "greeter";
+          extraGroups = [
+            "video"
+            "render"
+            "input"
+            "tty"
+          ];
         };
         users.groups.greeter = { };
 
@@ -141,6 +136,107 @@ with lib;
         environment.systemPackages = [
           pkgs.bibata-cursors
         ];
+      })
+
+      # ── Nixarchy Greeter ──────────────────────────────────────────────
+      # Omarchy 4.x ships its own greetd wrapper; we invoke it via tuigreet
+      # on the Omarchy session path as a fallback until nixarchy exposes its
+      # own NixOS greeter module.
+      (mkIf (cfg.type == "nixarchy-greeter") {
+        services.greetd = {
+          enable = true;
+          settings = {
+            default_session = {
+              command = "${pkgs.tuigreet}/bin/tuigreet -u t0psh31f --time --remember --remember-session --asterisks --sessions /run/current-system/sw/share/wayland-sessions --session-wrapper 'uwsm start'";
+              user = "greeter";
+            };
+          };
+        };
+        users.users.greeter = {
+          isSystemUser = true;
+          group = "greeter";
+          extraGroups = [
+            "video"
+            "render"
+            "input"
+            "tty"
+          ];
+        };
+        users.groups.greeter = { };
+      })
+
+      # ── SDDM Astronaut (Eye-Candy Qt6 — default for non-native DEs) ───
+      (mkIf (cfg.type == "sddm-astronaut") {
+        services.displayManager.sddm = {
+          enable = true;
+          wayland.enable = true;
+          package = pkgs.kdePackages.sddm;
+          extraPackages = [ pkgs.kdePackages.qtmultimedia ];
+          theme = "sddm-astronaut-theme";
+        };
+
+        environment.systemPackages = [
+          (pkgs.sddm-astronaut.override {
+            themeConfig = lib.optionalAttrs (cfg.sddm-astronaut.videoBackground != null) {
+              Background = toString cfg.sddm-astronaut.videoBackground;
+            }
+            // lib.optionalAttrs (cfg.sddm-astronaut.videoBackground == null) {
+              Background = toString cfg.sddm-astronaut.staticBackground;
+            };
+          })
+        ];
+      })
+
+      # ── SDDM (legacy plain, no astronaut theme) ───────────────────────
+      (mkIf (cfg.type == "sddm") {
+        services.xserver.enable = true;
+        services.displayManager.sddm = {
+          enable = true;
+          wayland.enable = true;
+        };
+      })
+
+      # ── Greetd + ReGreet in cage ──────────────────────────────────────
+      (mkIf (cfg.type == "greetd") {
+        users.users.greeter = {
+          isSystemUser = true;
+          group = "greeter";
+          extraGroups = [
+            "video"
+            "render"
+            "input"
+            "tty"
+          ];
+        };
+        users.groups.greeter = { };
+
+        services.displayManager.regreet = {
+          enable = true;
+          cageArgs = [ "-s" ];
+          settings = {
+            background = {
+              path = toString cfg.greetd.background;
+              fit = "Cover";
+            };
+            GTK = lib.mkDefault {
+              icon_theme_name = "candy-icons";
+              theme_name = "adw-gtk3-dark";
+            };
+          };
+        };
+      })
+
+      # ── Tuigreet (TTY console — micro-host / headless) ────────────────
+      (mkIf (cfg.type == "tuigreet") {
+        services.greetd = {
+          enable = true;
+          settings = {
+            default_session = {
+              command = "${pkgs.tuigreet}/bin/tuigreet -u t0psh31f --time --remember --remember-session --asterisks --sessions /run/current-system/sw/share/wayland-sessions";
+              user = "greeter";
+            };
+          };
+        };
       })
     ];
 }

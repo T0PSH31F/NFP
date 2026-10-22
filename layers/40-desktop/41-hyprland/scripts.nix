@@ -172,7 +172,9 @@ let
     fi
 
     # Spicetify — apply without restart
-    if command -v spicetify >/dev/null 2>&1; then
+    if command -v noctalia-spicetify-sync >/dev/null 2>&1; then
+      noctalia-spicetify-sync 2>/dev/null &
+    elif command -v spicetify >/dev/null 2>&1; then
       spicetify apply -n 2>/dev/null &
     fi
 

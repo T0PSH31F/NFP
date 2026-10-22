@@ -629,6 +629,11 @@ in
   # Reverse tunnel: expose luffy's headscale on nami as localhost:8087 so nami's
   # tailscale client can reach the (migrated) control server over SSH.
   # Requires luffy's root SSH key on nami (installed 2026-09-15).
+  #
+  # DISABLED 2026-10-13: nami (47.254.90.69) is permanently unreachable —
+  # `ssh: connect to host ... port 22: Connection timed out` on every attempt,
+  # 803 restarts and climbing. Nothing to tunnel to. Re-enable if it returns.
+  systemd.services.headscale-tunnel-nami.enable = lib.mkForce false;
   systemd.services.headscale-tunnel-nami = {
     description = "Reverse tunnel: expose luffy headscale on nami:8087";
     after = [
@@ -681,46 +686,32 @@ in
     '')
   ];
 
-  # === LLM gateway stack — migrated off nami (2026-10-13) ===
-  # nami (Alibaba Cloud 47.254.90.69) went permanently unreachable on
-  # 2026-10-12 00:43Z. Kong, OmniRoute, FreeLLMAPI and FreeLLMPool ran only
-  # there. Polyfloor was already running here but was BROKEN: its
-  # routerEndpoint points at Kong on 127.0.0.1:8090, which did not exist on
-  # luffy — so it 502'd on every routed request. Bringing Kong here repairs it.
+  # nixarr's autobrr wrapper is incompatible with current nixpkgs and must be
+  # bypassed, not disabled-and-forgotten:
   #
-  # Secrets need no migration: kong-secrets.nix reads the shared global sops
-  # file layers/00-cyberia/03-treasure/secrets/external_services.yaml, and
-  # luffy already decrypts it (57 secrets in /run/secrets).
-  services.ai-services = {
-    kong-gateway.enable = true;
-    omniroute.enable = true;
-    freellmapi.enable = true;
-    freellmpool.enable = true;
-  };
-
-  # FreeLLMPool cannot use its 8080 default here — signal-cli already owns
-  # 127.0.0.1:8080 on luffy (java, pid 3621). 8083 is free and is also what
-  # the ports.md registry documents for FreeLLMPool.
-  services.ai-services.freellmpool.port = lib.mkForce 8083;
-
-  # Kong's router defaults assume freellmapi:3003 / freellmpool:8083, but the
-  # services themselves default to 3001 / 8080 — so the upstream defaults point
-  # Kong at the wrong backends. Align the routers with the real listener ports.
-  # (freellmpool's router default is already 8083, matching the move above.)
-  services.ai-services.kong-gateway.routers.freellmapi.port = lib.mkForce 3001;
-  services.ai-services.kong-gateway.routers.freellmpool.port = lib.mkForce 8083;
-
-  # nixarr's autobrr module sets `services.autobrr.secretFile = "/dev/null"` as
-  # a deliberate placeholder (it handles the session secret itself). nixpkgs
-  # removed that option in autobrr >= 1.82.0 via mkRemovedOptionModule, so the
-  # placeholder now trips a hard assertion and the WHOLE luffy config fails to
-  # evaluate. Checked upstream nix-media-server/nixarr on both main and master:
-  # the placeholder is still there, so `nix flake update` does not help, and
-  # the option cannot be overridden back to null because a removed option cannot
-  # be redefined at all.
+  #   nixarr/autobrr/default.nix:182 sets `services.autobrr.secretFile =
+  #   "/dev/null"` as a deliberate placeholder (it manages the session secret
+  #   itself). nixpkgs removed that option in autobrr >= 1.82.0 via
+  #   mkRemovedOptionModule, whose assertion is `!opt.isDefined` — it fires if
+  #   ANY file defines the option, so it cannot be overridden back to null or
+  #   any other value. Confirmed still present on nix-media-server/nixarr main
+  #   and master, so `nix flake update nixarr` does not help.
   #
-  # Disabling nixarr's autobrr is the only unblocking move without patching a
-  # flake input. Every other *arr service (sonarr/radarr/qbittorrent/etc.) is
-  # unaffected. Re-enable once nixarr drops the placeholder.
+  # Because nixarr.nixosModules.default.imports the whole ./nixarr tree as one
+  # merged module, the offending submodule cannot be excluded from it. So we
+  # turn off nixarr's autobrr and run nixpkgs' native module in its place.
+  # Lossless: the repo configures no autobrr settings and the live
+  # /data/.state/nixarr/autobrr/config.toml is defaults only
+  # (checkForUpdates=false, host 0.0.0.0, port 7474 — no filters), so nothing
+  # is lost by moving to the native module's StateDirectory.
   nixarr.autobrr.enable = lib.mkForce false;
+  services.autobrr = {
+    enable = true;
+    openFirewall = true; # nixarr had host = 0.0.0.0; native module defaults to loopback
+    settings = {
+      host = "0.0.0.0";
+      port = 7474;
+      checkForUpdates = false;
+    };
+  };
 }

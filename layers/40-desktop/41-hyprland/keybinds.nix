@@ -14,7 +14,12 @@ in
       "$terminal" = "ghostty";
       "$fileManager" = "dolphin";
       "$browser" = "brave";
-      "$ipc" = "noctalia msg";
+      # $ipc is intentionally NOT set here.
+      # Each experience adapter (43-experiences/43.N-*/default.nix) injects
+      # the correct IPC command for its shell via settings."$ipc".
+      # Non-Noctalia experiences that don't set $ipc will see no-op fallback.
+      "$ipc" = lib.mkDefault "true";
+
 
       bind = [
         # ── Core App Launchers ─────────────────────────────────────────

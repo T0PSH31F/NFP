@@ -1,5 +1,5 @@
 # Simple Disko Template
-# 1GB FAT32 boot + ext4 root (100%)
+# 4GB FAT32 boot + ext4 root (100%)
 # No encryption - for simple/testing setups
 _: {
   disko.devices = {
@@ -10,7 +10,7 @@ _: {
         type = "gpt";
         partitions = {
           boot = {
-            size = "1G";
+            size = "4G";
             type = "EF00"; # EFI System Partition
             content = {
               type = "filesystem";

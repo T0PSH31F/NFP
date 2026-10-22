@@ -39,7 +39,7 @@ with lib;
         # layers/70-agents/73-memory/brain-service.nix with its postgres:postgres
         # 0750 ownership. Listing it here too trips the NixOS "specified two or
         # more times" assertion.
-        "/var/lib/postgresql"    # PostgreSQL vectordb, brain-service DB, honcho DB
+        "/var/lib/postgresql" # PostgreSQL vectordb, brain-service DB, honcho DB
 
         # Network configuration
         "/etc/NetworkManager/system-connections"
@@ -195,6 +195,12 @@ with lib;
         # Use the explicit device mapper path for the unlocked LUKS container
         ${pkgs.util-linuxMinimal}/bin/mount -o subvol=/ /dev/mapper/crypted /mnt
 
+        # Ensure blank snapshot template exists on first boot
+        if [ ! -e /mnt/@root-blank ]; then
+          echo "Initial boot detected: creating /@root-blank snapshot template..."
+          ${pkgs.btrfs-progs}/bin/btrfs subvolume create /mnt/@root-blank
+        fi
+
         # Delete nested subvolumes inside @root first to avoid "Directory not empty"
         # We sort by depth (descending) to ensure nested subvolumes are deleted first
         if [ -d /mnt/@root ]; then
@@ -238,7 +244,10 @@ with lib;
     services.btrfs.autoScrub = {
       enable = true;
       interval = "weekly";
-      fileSystems = [ "/persist" "/data" ];
+      fileSystems = [
+        "/persist"
+        "/data"
+      ];
     };
 
     # ============================================================================

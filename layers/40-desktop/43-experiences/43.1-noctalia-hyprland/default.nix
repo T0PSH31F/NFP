@@ -1,4 +1,13 @@
 # Noctalia Hyprland Desktop Experience Adapter
+# Activates when: layers.desktop.experience = "noctalia-hyprland"
+#
+# Responsibilities:
+#   - Enable the Noctalia shell subsystem (layers.layer-40.desktop.noctalia)
+#   - Inject $ipc = "noctalia msg" into Hyprland (mkForce overrides keybinds default)
+#   - Register noctalia layer rules + keybinds specific to the noctalia shell
+#   - Ensure cache/experience directories exist at graphical-session-pre
+#
+# Nothing here bleeds into other experiences (no-op when exp != "noctalia-hyprland").
 {
   config,
   lib,
@@ -27,6 +36,12 @@ in
     { config, lib, ... }:
     {
       config = lib.mkIf isEnabled {
+        # ── IPC injection ────────────────────────────────────────────────
+        # Override the neutral default from keybinds.nix so that all $ipc
+        # bindings in keybinds.nix use "noctalia msg".
+        wayland.windowManager.hyprland.settings."$ipc" = lib.mkForce "noctalia msg";
+
+        # ── Noctalia layer rules & keybindings ───────────────────────────
         xdg.configFile."hypr/experiences/noctalia.conf".text = ''
           # Noctalia Hyprland Experience Configuration
           $ipc = noctalia msg
@@ -37,7 +52,7 @@ in
           layerrule = no_anim 1, match:namespace ^noctalia-(bar-.+|notification|dock|panel|attached-panel|osd)$
           layerrule = ignore_alpha 0.1, match:namespace ^noctalia-(notification|dock|osd)$
 
-          # Keybindings
+          # Keybindings — Noctalia shell actions
           bind = $mod, comma, exec, $ipc settings-toggle
           bind = $mod, A, exec, $ipc panel-toggle launcher
           bind = $mod, X, exec, $ipc panel-toggle control-center
@@ -59,6 +74,7 @@ in
           '';
         };
 
+        # ── Boot-time directory scaffold ────────────────────────────────
         systemd.user.services.noctalia-experience-dirs = {
           Unit = {
             Description = "Ensure Noctalia HVE cache and experience directories exist";
@@ -71,7 +87,6 @@ in
             Type = "oneshot";
             RemainAfterExit = true;
             ExecStart = "${pkgs.bash}/bin/bash -c 'mkdir -p %h/.config/hypr/experiences %h/.cache/noctalia/HVE'";
-
           };
         };
       };

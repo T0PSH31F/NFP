@@ -6,7 +6,6 @@
 }:
 let
   luffyConfig = nixosConfigurations.luffy.config or { };
-  namiConfig = nixosConfigurations.nami.config or { };
   z0r0Config = nixosConfigurations.z0r0.config or { };
 in
 {
@@ -31,9 +30,6 @@ in
     assert "${
       toString (luffyConfig.layers.layer-20.services.config.netdata.enable or false)
     }" == "true", "Luffy Netdata must be enabled"
-    assert "${
-      toString (namiConfig.layers.layer-20.services.config.netdata.enable or false)
-    }" == "true", "Nami Netdata must be enabled"
     assert "${
       toString (z0r0Config.layers.layer-20.services.config.netdata.enable or false)
     }" == "true", "Z0r0 Netdata must be enabled"

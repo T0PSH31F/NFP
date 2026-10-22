@@ -19,7 +19,7 @@ in
 
   home = lib.mkIf cfg.enable {
     home.packages = with pkgs; [
-      libreoffice-fresh
+      libreoffice
       pandoc
       pdfmm
       texliveFull
@@ -27,7 +27,6 @@ in
       sigil
       obsidian
       z-library-desktop
-      tutanota-desktop
       webull-desktop
       hicolor-icon-theme
     ];
