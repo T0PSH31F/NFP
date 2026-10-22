@@ -61,9 +61,14 @@ in
       nixarchy-session
       nixarchy-rise-wayland-session
       pkgs.quickshell
+      pkgs.inotify-tools
       pkgs.xdg-terminal-exec
       pkgs.matugen # Material You color token generator
     ];
+
+    environment.sessionVariables = {
+      OMARCHY_PATH = "${nixarchyPkg}/share/omarchy";
+    };
   };
 
   home =
@@ -84,12 +89,30 @@ in
           # Nixarchy Rise Hyprland Experience Configuration
           $ipc = qs ipc
 
+          # Environment variables for Omarchy runtime
+          env = OMARCHY_PATH,${nixarchyPkg}/share/omarchy
+          env = LUA_PATH,${nixarchyPkg}/share/omarchy/config/?.lua;${nixarchyPkg}/share/omarchy/?.lua;;
+
+          # Theme color definitions for Hyprland borders and lightsaber aura
+          $primary = rgb(89b4fa)
+          $surface = rgb(1e1e2e)
+          $secondary = rgb(b4befe)
+          $surfaceContainer = rgb(313244)
+          $error = rgb(f38ba8)
+          $tertiary = rgb(f5c2e7)
+          $surface_lowest = rgb(11111b)
+
+          general {
+            col.active_border = $primary
+            col.inactive_border = $surface
+          }
+
           # Quickshell Rise layer rules
           layerrule = blur 1, match:namespace ^omarchy-(bar|menu|notifications|dock|osd)$
           layerrule = no_anim 1, match:namespace ^omarchy-(bar|menu|notifications|dock|osd)$
 
           # Autostart Quickshell Rise bar
-          exec-once = quickshell -p ~/.config/quickshell/rise
+          exec-once = OMARCHY_PATH=${nixarchyPkg}/share/omarchy quickshell -p ~/.config/quickshell/rise
         '';
 
         xdg.configFile."hypr/experiences/active-experience.conf".text = ''
@@ -107,6 +130,23 @@ in
           lib.mkDefault "${nixarchyPkg}/share/omarchy/config/hypr/looknfeel.lua";
         xdg.configFile."hypr/autostart.lua".source =
           lib.mkDefault "${nixarchyPkg}/share/omarchy/config/hypr/autostart.lua";
+
+        # Ensure default Omarchy theme and background state exist on login
+        systemd.user.services.nixarchy-state-init = {
+          Unit = {
+            Description = "Initialize default theme and wallpaper state for Nixarchy Rise";
+            After = [ "graphical-session-pre.target" ];
+            PartOf = [ "graphical-session.target" ];
+          };
+          Install = {
+            WantedBy = [ "graphical-session.target" ];
+          };
+          Service = {
+            Type = "oneshot";
+            RemainAfterExit = true;
+            ExecStart = "${pkgs.bash}/bin/bash -c 'mkdir -p %h/.local/state/omarchy/current && if [ ! -e %h/.local/state/omarchy/current/theme ]; then ln -sfn ${nixarchyPkg}/share/omarchy/themes/catppuccin %h/.local/state/omarchy/current/theme && ln -sfn ${nixarchyPkg}/share/omarchy/themes/catppuccin/backgrounds/2-waves.webp %h/.local/state/omarchy/current/background && echo Catppuccin > %h/.local/state/omarchy/current/theme.name && echo 1 > %h/.local/state/omarchy/current/theme.generation; fi'";
+          };
+        };
 
         # Matugen hook — generate color tokens from current wallpaper on login
         systemd.user.services.nixarchy-matugen-init = {

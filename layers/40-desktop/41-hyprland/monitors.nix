@@ -15,10 +15,12 @@ in
       # Sourced from nwg-displays (managed manually via GUI)
       # This sources ~/.config/hypr/monitors.conf
 
-      # Safety override for NVIDIA legacy drivers (prevents GBM format mismatch crashes)
-      # Forces 8-bit depth (XRGB8888) as default for any monitor not explicitly matched.
-      monitor = lib.mkIf cfg.isNvidia [
-        ",preferred,auto,1,bitdepth,8"
+      # Monitor configuration defaults:
+      # Explicit 1:1 scale on eDP-1 prevents Hyprland from guessing 1.5 fractional scaling
+      # which clips the viewport to 1280x800 on a 1920x1200 panel.
+      monitor = lib.mkDefault [
+        "eDP-1,1920x1200@60,0x0,1"
+        ",preferred,auto,1"
       ];
 
       # We leave 'monitor' and 'workspace' assignments empty here to allow

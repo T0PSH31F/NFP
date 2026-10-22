@@ -19,10 +19,6 @@
         gtk.enable = lib.mkDefault true;
         qt.enable = lib.mkDefault true;
         sfx.enable = lib.mkDefault true;
-        themes.greeter = {
-          type = lib.mkDefault "noctalia-greeter";
-          noctalia-greeter.session = lib.mkDefault "hyprland-uwsm";
-        };
       };
       layer-40.desktop = {
         hyprland.enable = lib.mkDefault true;
@@ -30,10 +26,6 @@
           portals.enable = lib.mkDefault true;
           which-key.enable = lib.mkDefault true;
           vicinae.enable = lib.mkDefault true;
-        };
-        noctalia = {
-          enable = lib.mkDefault true;
-          backend = lib.mkDefault "all";
         };
       };
       desktop.experience = lib.mkDefault "noctalia";

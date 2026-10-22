@@ -163,9 +163,16 @@ in
               "${config.home.homeDirectory}/.config/hypr/hyprviz.conf"
             ];
 
-            # Color variables ($primary, $secondary, $surfaceContainer) are
-            # provided by active experience templates via the source above.
-            # Do NOT hardcode them here.
+            # Color variables ($primary, $secondary, $surfaceContainer, etc.)
+            # can be overridden by active experience templates via the source above.
+            # Safe defaults ensure Hyprland never crashes on missing gradient colors.
+            "$primary" = lib.mkDefault "rgb(89b4fa)";
+            "$surface" = lib.mkDefault "rgb(1e1e2e)";
+            "$secondary" = lib.mkDefault "rgb(b4befe)";
+            "$surfaceContainer" = lib.mkDefault "rgb(313244)";
+            "$error" = lib.mkDefault "rgb(f38ba8)";
+            "$tertiary" = lib.mkDefault "rgb(f5c2e7)";
+            "$surface_lowest" = lib.mkDefault "rgb(11111b)";
 
             plugin = {
               "dynamic-cursors" = {
