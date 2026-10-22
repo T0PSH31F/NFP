@@ -65,7 +65,7 @@
     layer-40.desktop.noctalia.idle = {
       dpmsIgnoreAc = true; # Never shut screen off while plugged in to AC power
     };
-    desktop.experience = "noctalia-hyprland";
+    desktop.experience = "nixarchy-rise";
   };
 
   # Prevent display power-off / blanking when plugged in
