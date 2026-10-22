@@ -106,6 +106,12 @@ in
   config = {
     layers.desktop.compositor = lib.mkDefault derivedCompositor;
     layers.desktop.derivedGreeter = lib.mkDefault derivedGreeter;
+
+    # Dynamically enable the derived compositor substrate
+    layers.layer-40.desktop.hyprland.enable = lib.mkDefault (derivedCompositor == "hyprland");
+    layers.layer-40.desktop.niri.enable = lib.mkDefault (derivedCompositor == "niri");
+    layers.desktop.compositors.umbriel.enable = lib.mkDefault (derivedCompositor == "umbriel");
+
     services.displayManager.defaultSession =
       lib.mkIf (exp == "noctalia" || lib.hasPrefix "noctalia-" exp)
         (if exp == "noctalia" then "noctalia-${config.layers.desktop.noctalia.defaultCompositor}" else exp);

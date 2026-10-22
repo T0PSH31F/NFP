@@ -21,7 +21,6 @@
         sfx.enable = lib.mkDefault true;
       };
       layer-40.desktop = {
-        hyprland.enable = lib.mkDefault true;
         frameworks = {
           portals.enable = lib.mkDefault true;
           which-key.enable = lib.mkDefault true;
@@ -44,7 +43,7 @@
         spicetify.enable = lib.mkDefault true;
         media-packages.enable = lib.mkDefault true;
         vlc.enable = lib.mkDefault true;
-        wl_shimeji.enable = false;
+        wl_shimeji.enable = lib.mkDefault false;
         lmms.enable = lib.mkDefault true;
         browsers.thunderbird.enable = lib.mkDefault true;
       };
