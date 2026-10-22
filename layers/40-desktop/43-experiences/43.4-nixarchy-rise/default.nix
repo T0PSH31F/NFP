@@ -62,6 +62,7 @@ in
       nixarchy-rise-wayland-session
       pkgs.quickshell
       pkgs.inotify-tools
+      pkgs.qt6.qtimageformats
       pkgs.xdg-terminal-exec
       pkgs.matugen # Material You color token generator
     ];

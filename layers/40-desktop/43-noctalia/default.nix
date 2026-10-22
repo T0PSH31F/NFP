@@ -72,6 +72,12 @@ in
         default = false;
         description = "If true, do not shut off display via DPMS when connected to AC power";
       };
+
+      lockIgnoreAc = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = "If true, do not lock session when connected to AC power";
+      };
     };
   };
 

@@ -20,9 +20,10 @@ let
       dpmsTimeout = 600;
       lockTimeout = 660;
       dpmsIgnoreAc = false;
+      lockIgnoreAc = false;
     };
   dpmsOffCmd =
-    if idleCfg.dpmsIgnoreAc then
+    if idleCfg.dpmsIgnoreAc or false then
       "${pkgs.writeShellScript "hypridle-dpms-off" ''
         # If AC power supply is online, do not shut display off
         if [ -d /sys/class/power_supply ] && ${pkgs.gnugrep}/bin/grep -q 1 /sys/class/power_supply/*/online 2>/dev/null; then
@@ -32,6 +33,17 @@ let
       ''}"
     else
       "${pkgs.hyprland}/bin/hyprctl dispatch dpms off";
+  lockCmd =
+    if idleCfg.lockIgnoreAc or false then
+      "${pkgs.writeShellScript "hypridle-lock" ''
+        # If AC power supply is online, do not lock session
+        if [ -d /sys/class/power_supply ] && ${pkgs.gnugrep}/bin/grep -q 1 /sys/class/power_supply/*/online 2>/dev/null; then
+          exit 0
+        fi
+        loginctl lock-session
+      ''}"
+    else
+      "loginctl lock-session";
 in
 {
   config =
@@ -68,7 +80,7 @@ in
 
               listener {
                   timeout = ${toString idleCfg.lockTimeout};
-                  on-timeout = loginctl lock-session;
+                  on-timeout = ${lockCmd};
               }
             ''}
           '';
