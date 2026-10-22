@@ -21,70 +21,84 @@ let
   exp = osConfig.layers.desktop.experience or "none";
   isEnabled = exp == "nixarchy-rise";
 
-  # Nixarchy package from flake input
+  # Nixarchy package from flake input (omarchy 4.5.x)
   nixarchyPkgs = inputs.nixarchy.packages.${pkgs.stdenv.hostPlatform.system} or { };
   nixarchyPkg = nixarchyPkgs.default or pkgs.hello; # fallback: build will error clearly if missing
 
-  # HANCORE Quickshell Rise — hermetic derivation wrapping the quickshell config
-  hancore-quickshell-rise = pkgs.stdenv.mkDerivation {
-    pname = "hancore-quickshell-rise";
-    version = "0.1.0";
-    # The Rise bar lives inside the nixarchy source tree
-    src = inputs.nixarchy;
-    installPhase = ''
-      mkdir -p $out/share/quickshell
-      # Copy the Rise QML config if present; otherwise create a placeholder
-      if [ -d quickshell ]; then
-        cp -r quickshell/. $out/share/quickshell/
-      elif [ -d rise ]; then
-        cp -r rise/. $out/share/quickshell/
-      else
-        echo "// HANCORE Quickshell Rise placeholder" > $out/share/quickshell/shell.qml
-      fi
-    '';
-  };
+  # Launcher for the full Omarchy Hyprland session
+  nixarchy-session = pkgs.writeShellScriptBin "nixarchy-session" ''
+    export OMARCHY_PATH="${nixarchyPkg}/share/omarchy"
+    export LUA_PATH="${nixarchyPkg}/share/omarchy/config/?.lua;${nixarchyPkg}/share/omarchy/?.lua;;$LUA_PATH"
+    exec ${pkgs.uwsm}/bin/uwsm start -N "Nixarchy Rise" -D Hyprland -- \
+      ${pkgs.hyprland}/bin/start-hyprland -- \
+      --config "${nixarchyPkg}/share/omarchy/config/hypr/hyprland.lua"
+  '';
+
+  nixarchy-rise-wayland-session =
+    (pkgs.writeTextFile {
+      name = "nixarchy-rise-wayland-session";
+      destination = "/share/wayland-sessions/nixarchy-rise.desktop";
+      passthru.providedSessions = [ "nixarchy-rise" ];
+      text = ''
+        [Desktop Entry]
+        Name=Nixarchy Rise
+        Comment=Omarchy 4.x with HANCORE Quickshell Rise
+        Exec=${nixarchy-session}/bin/nixarchy-session
+        Type=Application
+        DesktopNames=Hyprland
+      '';
+    })
+    // {
+      providedSessions = [ "nixarchy-rise" ];
+    };
 in
 {
   nixos = lib.mkIf isEnabled {
     # Register Wayland session for DM session picker (no-reboot switching)
-    services.displayManager.sessionPackages = [
-      (
-        (pkgs.writeTextFile {
-          name = "nixarchy-rise-wayland-session";
-          destination = "/share/wayland-sessions/nixarchy-rise.desktop";
-          passthru.providedSessions = [ "nixarchy-rise" ];
-          text = ''
-            [Desktop Entry]
-            Name=Nixarchy Rise
-            Comment=Omarchy 4.x with HANCORE Quickshell Rise
-            Exec=nixarchy-session
-            Type=Application
-            DesktopNames=Hyprland
-          '';
-        })
-        // {
-          providedSessions = [ "nixarchy-rise" ];
-        }
-      )
-    ];
+    services.displayManager.sessionPackages = [ nixarchy-rise-wayland-session ];
 
     environment.systemPackages = [
       nixarchyPkg
-      hancore-quickshell-rise
+      nixarchy-session
+      nixarchy-rise-wayland-session
       pkgs.quickshell
       pkgs.matugen # Material You color token generator
     ];
   };
 
   home =
-    { lib, ... }:
+    { config, lib, ... }:
     {
       config = lib.mkIf isEnabled {
         # $ipc uses Quickshell IPC — NOT noctalia msg
         wayland.windowManager.hyprland.settings."$ipc" = lib.mkForce "qs ipc";
 
-        # Deploy Rise config to ~/.config/quickshell/rise
-        xdg.configFile."quickshell/rise".source = "${hancore-quickshell-rise}/share/quickshell";
+        # Deploy Rise shell config to ~/.config/quickshell/rise
+        xdg.configFile."quickshell/rise".source = "${nixarchyPkg}/share/omarchy/shell";
+
+        # Active experience configuration for standard Hyprland sessions
+        xdg.configFile."hypr/experiences/nixarchy-rise.conf".text = ''
+          # Nixarchy Rise Hyprland Experience Configuration
+          $ipc = qs ipc
+
+          # Quickshell Rise layer rules
+          layerrule = blur 1, match:namespace ^omarchy-(bar|menu|notifications|dock|osd)$
+          layerrule = no_anim 1, match:namespace ^omarchy-(bar|menu|notifications|dock|osd)$
+
+          # Autostart Quickshell Rise bar
+          exec-once = quickshell -p ~/.config/quickshell/rise
+        '';
+
+        xdg.configFile."hypr/experiences/active-experience.conf".text = ''
+          source = ${config.home.homeDirectory}/.config/hypr/experiences/nixarchy-rise.conf
+        '';
+
+        # Link Omarchy Hyprland Lua configs so both standalone and standard Hyprland sessions work
+        xdg.configFile."hypr/monitors.lua".source = lib.mkDefault "${nixarchyPkg}/share/omarchy/config/hypr/monitors.lua";
+        xdg.configFile."hypr/input.lua".source = lib.mkDefault "${nixarchyPkg}/share/omarchy/config/hypr/input.lua";
+        xdg.configFile."hypr/bindings.lua".source = lib.mkDefault "${nixarchyPkg}/share/omarchy/config/hypr/bindings.lua";
+        xdg.configFile."hypr/looknfeel.lua".source = lib.mkDefault "${nixarchyPkg}/share/omarchy/config/hypr/looknfeel.lua";
+        xdg.configFile."hypr/autostart.lua".source = lib.mkDefault "${nixarchyPkg}/share/omarchy/config/hypr/autostart.lua";
 
         # Matugen hook — generate color tokens from current wallpaper on login
         systemd.user.services.nixarchy-matugen-init = {
