@@ -1,0 +1,33 @@
+# OpenTelemetry Profile Import Specifications
+# Maps Fleet Nodes & Donut Agents to Telemetry Export Pipelines
+schema_version: "2.0.0"
+
+profiles:
+  fleet_workstation:
+    match_tags: ["desktop", "workstation"]
+    target_collector: "http://luffy.nfp.nix:4318"
+    batch_timeout_ms: 1000
+    export_signals: ["metrics", "logs", "spans"]
+    compression: "gzip"
+    retry:
+      max_attempts: 3
+      initial_backoff_ms: 100
+
+  fleet_server:
+    match_tags: ["server", "homelab"]
+    target_collector: "http://127.0.0.1:4318"
+    batch_timeout_ms: 500
+    export_signals: ["metrics", "logs", "spans"]
+    sinks:
+      prometheus: "http://127.0.0.1:9090/api/v1/write"
+      loki: "http://127.0.0.1:3100/loki/api/v1/push"
+      traces: "http://127.0.0.1:3000/api/public/otel/v1/traces"
+
+  ai_agent_harness:
+    match_types: ["antigravity", "hermes", "opencode", "donut-browser"]
+    target_collector: "http://127.0.0.1:4318"
+    sampling_ratio: 1.0
+    attributes:
+      system: "nfp-ai-mesh"
+      telemetry.sdk.language: "python"
+      telemetry.sdk.name: "nfp-otel-client"

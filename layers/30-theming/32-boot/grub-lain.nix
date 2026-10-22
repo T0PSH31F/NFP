@@ -30,10 +30,15 @@
         version = "1.0";
 
         # Use fetchFromGitHub for reproducibility
+        # PINNED (2026-10-15): was `rev = "main"`, a moving ref that would
+        # silently change the boot theme on every upstream push and eventually
+        # break this FOD's hash (same failure mode as lazyskills/agentburn).
+        # This commit's tarball unpacks to exactly the sha256 recorded below.
+        # To bump: nix-prefetch-github uiriansan/LainGrubTheme --rev <new>.
         src = pkgs.fetchFromGitHub {
           owner = "uiriansan";
           repo = "LainGrubTheme";
-          rev = "main"; # Use main branch as default
+          rev = "1cf38e3b46e26cfd9166613bb49669f27efab12c";
           sha256 = "117872vbaj19ynnjf4j49zs7cf5z3d6xk1jdiha49wbnaai0sg40";
         };
 

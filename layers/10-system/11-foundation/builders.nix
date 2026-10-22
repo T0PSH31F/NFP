@@ -44,15 +44,19 @@ let
       ];
       sshUser = "root";
     }
-    {
-      hostName = "nami.${baseDomain}";
-      machineId = "nami";
-      system = "x86_64-linux";
-      maxJobs = 2;
-      speedFactor = 1;
-      supportedFeatures = [ ];
-      sshUser = "root";
-    }
+    # RETIRED 2026-10-13: nami removed as a distributed builder. The instance
+    # (47.254.90.69) went permanently unreachable on 2026-10-12, so every build
+    # paid a full SSH connect-timeout before falling through to a real builder.
+    # Re-add the block below if nami ever returns:
+    #   {
+    #     hostName = "nami.${baseDomain}";
+    #     machineId = "nami";
+    #     system = "x86_64-linux";
+    #     maxJobs = 2;
+    #     speedFactor = 1;
+    #     supportedFeatures = [ ];
+    #     sshUser = "root";
+    #   }
     {
       hostName = "phone.${baseDomain}";
       machineId = "phone";

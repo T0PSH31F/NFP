@@ -291,6 +291,61 @@
                 };
               };
             };
+            "antigravity-gemini-3.8-flash" = {
+              name = "Gemini 3.8 Flash (Antigravity)";
+              limit = {
+                context = 1048576;
+                output = 65536;
+              };
+              modalities = {
+                input = [
+                  "text"
+                  "image"
+                  "pdf"
+                ];
+                output = [ "text" ];
+              };
+              variants = {
+                minimal = {
+                  thinkingLevel = "minimal";
+                };
+                low = {
+                  thinkingLevel = "low";
+                };
+                medium = {
+                  thinkingLevel = "medium";
+                };
+                high = {
+                  thinkingLevel = "high";
+                };
+              };
+            };
+            "antigravity-gemini-4-argon" = {
+              name = "Gemini 4 Argon (Antigravity)";
+              limit = {
+                context = 1048576;
+                output = 65536;
+              };
+              modalities = {
+                input = [
+                  "text"
+                  "image"
+                  "pdf"
+                ];
+                output = [ "text" ];
+              };
+              variants = {
+                low = {
+                  thinkingLevel = "low";
+                };
+                medium = {
+                  thinkingLevel = "medium";
+                };
+                high = {
+                  thinkingLevel = "high";
+                };
+              };
+            };
             antigravity-claude-sonnet-4-6 = {
               name = "Claude Sonnet 4.6 (Antigravity)";
               limit = {
@@ -430,13 +485,12 @@
           provider.kong = lib.mkIf (osConfig.services.ai-services.kong-gateway.enable or false) {
             # Kong runs on nami, not on z0r0 — use Tailnet MagicDNS endpoint.
             # If kong-gateway is locally enabled (nami), use loopback; otherwise
-            # route over the Headscale mesh to nami.nfp.nix:8090.
+            # route over the Headscale mesh to luffy.nfp.nix:8090.
             baseUrl =
-              if (osConfig.services.ai-services.kong-gateway.enable or false)
-              then "http://127.0.0.1:${
-                toString (osConfig.services.ai-services.kong-gateway.proxyPort or 8090)
-              }/v1"
-              else "http://nami.nfp.nix:8090/v1";
+              if (osConfig.services.ai-services.kong-gateway.enable or false) then
+                "http://127.0.0.1:${toString (osConfig.services.ai-services.kong-gateway.proxyPort or 8090)}/v1"
+              else
+                "http://luffy.nfp.nix:8090/v1";
             name = "Kong AI Gateway";
             models = {
               "deepseek-v4-pro" = {
@@ -591,22 +645,22 @@
 
           # Kong AI Gateway — path-specific providers
           provider.kong-er = {
-            baseUrl = "http://nami.nfp.nix:8090/v1";
+            baseUrl = "http://luffy.nfp.nix:8090/v1";
             name = "Kong ExtremeRouter";
           };
 
           provider.kong-omni = {
-            baseUrl = "http://nami.nfp.nix:8090/omni/v1";
+            baseUrl = "http://luffy.nfp.nix:8090/omni/v1";
             name = "Kong OmniRoute (TODO: when merged)";
           };
 
           provider.kong-free = {
-            baseUrl = "http://nami.nfp.nix:8090/llm/free/v1";
+            baseUrl = "http://luffy.nfp.nix:8090/llm/free/v1";
             name = "Kong FreeLLMPool";
           };
 
           provider.kong-frontier = {
-            baseUrl = "http://nami.nfp.nix:8090/llm/frontier/v1";
+            baseUrl = "http://luffy.nfp.nix:8090/llm/frontier/v1";
             name = "Kong Frontier Manifest";
           };
 

@@ -1,0 +1,44 @@
+# Donut Browser AI Agent Definition
+name: "donut-telemetry-agent"
+version: "1.0.0"
+description: "Autonomous browser observability agent capturing performance spans, Web Vitals, and DOM telemetry into OpenTelemetry"
+
+runtime:
+  engine: "donut-browser"
+  headless: true
+  viewport:
+    width: 1920
+    height: 1080
+
+telemetry:
+  otlp_endpoint: "http://127.0.0.1:4318"
+  signals:
+    traces: true
+    metrics: true
+    logs: true
+  sampling:
+    mode: "always_on"
+
+capabilities:
+  - "browser_automation"
+  - "dom_inspection"
+  - "network_tracing"
+  - "core_web_vitals"
+  - "accessibility_audit"
+
+contracts:
+  input_schema: "../79-skills/telemetry/input-config.yaml"
+  import_spec: "../79-skills/telemetry/import-config.yaml"
+  orchestration_workflow: "../79-skills/telemetry/make-modules.yaml"
+  mcp_server: "../75-mcp/telemetry-mcp.json"
+
+actions:
+  navigate_and_trace:
+    description: "Navigate to a URL and record full navigation timing and spans"
+    parameters:
+      url: "string"
+      record_har: "boolean"
+  inspect_web_vitals:
+    description: "Sample LCP, CLS, FID, INP and emit as OpenTelemetry metrics"
+    parameters:
+      target_element: "string"

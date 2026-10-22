@@ -435,7 +435,16 @@ in
             servers = {
               nil_ls.enable = true;
               nixd.enable = true;
-              ts_ls.enable = true;
+              # nixvim builds its own pkgs from `nixpkgs.source = inputs.nixpkgs`
+              # (see above), which BYPASSES our overlays — so its default
+              # typescript-language-server still carries nixpkgs' stale pnpmDeps
+              # pin and aborts the whole build on a hash mismatch (cascading into
+              # neovim → nixvim → home-manager → toplevel on both machines).
+              # Point ts_ls at our overlaid copy, fixed in custom-packages.nix.
+              ts_ls = {
+                enable = true;
+                package = pkgs.typescript-language-server;
+              };
               eslint.enable = true;
               html.enable = true;
               cssls.enable = true;

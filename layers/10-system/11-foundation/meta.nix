@@ -36,7 +36,7 @@
       default = {
         z0r0 = "100.64.0.1";
         luffy = "100.64.0.3";
-        nami = "100.64.0.4";
+        # nami = "100.64.0.4";
       };
       description = "Declarative Tailnet IPv4 per fleet host (Headscale 100.64.0.0/10). Single authority for Tailnet DNS & global resolver.";
     };

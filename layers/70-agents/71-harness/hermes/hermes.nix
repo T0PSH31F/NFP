@@ -468,22 +468,22 @@
 
           providers:
             kong-er:
-              base_url: "http://nami.nfp.nix:8090/v1"
+              base_url: "http://luffy.nfp.nix:8090/v1"
               api_key: "''${KONG_API_KEY}"
               request_timeout_seconds: 180
               fetch_models: true
             kong-omni:
-              base_url: "http://nami.nfp.nix:8090/omni/v1"
+              base_url: "http://luffy.nfp.nix:8090/omni/v1"
               api_key: "''${KONG_API_KEY}"
               request_timeout_seconds: 180
               fetch_models: true
             kong-free:
-              base_url: "http://nami.nfp.nix:8090/llm/free/v1"
+              base_url: "http://luffy.nfp.nix:8090/llm/free/v1"
               api_key: "''${KONG_API_KEY}"
               request_timeout_seconds: 180
               fetch_models: true
             kong-frontier:
-              base_url: "http://nami.nfp.nix:8090/llm/frontier/v1"
+              base_url: "http://luffy.nfp.nix:8090/llm/frontier/v1"
               api_key: "''${KONG_API_KEY}"
               request_timeout_seconds: 180
               fetch_models: true
@@ -493,25 +493,25 @@
               request_timeout_seconds: 180
               fetch_models: true
             kong:
-              base_url: "http://nami.nfp.nix:8090/v1"
+              base_url: "http://luffy.nfp.nix:8090/v1"
               api_key: "''${KONG_API_KEY}"
               request_timeout_seconds: 180
 
           custom_providers:
             kong-er:
-              base_url: "http://nami.nfp.nix:8090/v1"
+              base_url: "http://luffy.nfp.nix:8090/v1"
               api_key: "''${KONG_API_KEY}"
               fetch_models: true
             kong-omni:
-              base_url: "http://nami.nfp.nix:8090/omni/v1"
+              base_url: "http://luffy.nfp.nix:8090/omni/v1"
               api_key: "''${KONG_API_KEY}"
               fetch_models: true
             kong-free:
-              base_url: "http://nami.nfp.nix:8090/llm/free/v1"
+              base_url: "http://luffy.nfp.nix:8090/llm/free/v1"
               api_key: "''${KONG_API_KEY}"
               fetch_models: true
             kong-frontier:
-              base_url: "http://nami.nfp.nix:8090/llm/frontier/v1"
+              base_url: "http://luffy.nfp.nix:8090/llm/frontier/v1"
               api_key: "''${KONG_API_KEY}"
               fetch_models: true
             extreme-direct:

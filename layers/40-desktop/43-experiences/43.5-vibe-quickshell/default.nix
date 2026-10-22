@@ -23,14 +23,26 @@ in
 {
   nixos = lib.mkIf isEnabled {
     # Register session for DM session picker (no-reboot switching)
-    environment.etc."wayland-sessions/custom-vibe-quickshell.desktop".text = ''
-      [Desktop Entry]
-      Name=Vibe Quickshell Lab
-      Comment=Live QML hot-reload workspace on Hyprland
-      Exec=uwsm start hyprland-uwsm.desktop
-      Type=Application
-      DesktopNames=Hyprland
-    '';
+    services.displayManager.sessionPackages = [
+      (
+        (pkgs.writeTextFile {
+          name = "custom-vibe-quickshell-wayland-session";
+          destination = "/share/wayland-sessions/custom-vibe-quickshell.desktop";
+          passthru.providedSessions = [ "custom-vibe-quickshell" ];
+          text = ''
+            [Desktop Entry]
+            Name=Vibe Quickshell Lab
+            Comment=Live QML hot-reload workspace on Hyprland
+            Exec=uwsm start hyprland-uwsm.desktop
+            Type=Application
+            DesktopNames=Hyprland
+          '';
+        })
+        // {
+          providedSessions = [ "custom-vibe-quickshell" ];
+        }
+      )
+    ];
 
     environment.systemPackages = [
       pkgs.quickshell # Quickshell QML compositor shell
@@ -48,32 +60,32 @@ in
 
         # Scaffold the live-reload workspace
         home.activation.vibeQuickshellScaffold = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-          mkdir -p $HOME/.config/quickshell/active
-          if [ ! -f "$HOME/.config/quickshell/active/shell.qml" ]; then
-            cat > "$HOME/.config/quickshell/active/shell.qml" << 'EOF'
-// Vibe Quickshell Lab — starter shell.qml
-// Edit this file; quickshell will hot-reload on save.
-import Quickshell
-import Quickshell.Wayland
-import QtQuick
+                    mkdir -p $HOME/.config/quickshell/active
+                    if [ ! -f "$HOME/.config/quickshell/active/shell.qml" ]; then
+                      cat > "$HOME/.config/quickshell/active/shell.qml" << 'EOF'
+          // Vibe Quickshell Lab — starter shell.qml
+          // Edit this file; quickshell will hot-reload on save.
+          import Quickshell
+          import Quickshell.Wayland
+          import QtQuick
 
-ShellRoot {
-    PanelWindow {
-        anchors {
-            top: true; left: true; right: true
-        }
-        implicitHeight: 32
-        color: "#cc1e1e2e"
-        Text {
-            anchors.centerIn: parent
-            text: "🚀 Vibe Quickshell Lab — edit ~/.config/quickshell/active/shell.qml"
-            color: "#cdd6f4"
-            font.pixelSize: 13
-        }
-    }
-}
-EOF
-          fi
+          ShellRoot {
+              PanelWindow {
+                  anchors {
+                      top: true; left: true; right: true
+                  }
+                  implicitHeight: 32
+                  color: "#cc1e1e2e"
+                  Text {
+                      anchors.centerIn: parent
+                      text: "🚀 Vibe Quickshell Lab — edit ~/.config/quickshell/active/shell.qml"
+                      color: "#cdd6f4"
+                      font.pixelSize: 13
+                  }
+              }
+          }
+          EOF
+                    fi
         '';
 
         # qmlls LSP config so editors find the Quickshell QML modules

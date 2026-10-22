@@ -8,5 +8,6 @@
     (mkDendriticModule "monitoring" ./monitoring.nix)
     (mkDendriticModule "netdata" ./netdata.nix)
     (mkDendriticModule "ntfy-sh" ./ntfy-sh.nix)
+    (mkDendriticModule "telemetry" ./telemetry.nix)
   ];
 }

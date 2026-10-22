@@ -237,7 +237,9 @@
         luffy-service-scope =
           let
             luffyConfig = inputs.self.nixosConfigurations.luffy.config;
-            namiConfig = inputs.self.nixosConfigurations.nami.config;
+            # DECOMMISSIONED 2026-10-14: nami is no longer in nixosConfigurations
+            # (moved to archive/machines/nami), so force-evaluating it here would
+            # fail every flake check the same way homepage-dashboard did.
             z0r0Config = inputs.self.nixosConfigurations.z0r0.config;
           in
           if luffyConfig.services.ai-services.ollama.enable then
@@ -250,8 +252,6 @@
             throw "luffy service scope error: Kong Gateway must be disabled on luffy"
           else if !luffyConfig.layers.layer-20.services.config.netdata.enable then
             throw "luffy service scope error: Netdata must be enabled on luffy"
-          else if !namiConfig.layers.layer-20.services.config.netdata.enable then
-            throw "luffy service scope error: Netdata must be enabled on nami"
           else if !z0r0Config.layers.layer-20.services.config.netdata.enable then
             throw "luffy service scope error: Netdata must be enabled on z0r0"
           else if !luffyConfig.nfp.services.netdata.homepage.enable then

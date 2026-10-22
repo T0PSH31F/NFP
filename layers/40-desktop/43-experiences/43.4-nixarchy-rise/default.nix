@@ -47,14 +47,26 @@ in
 {
   nixos = lib.mkIf isEnabled {
     # Register Wayland session for DM session picker (no-reboot switching)
-    environment.etc."wayland-sessions/nixarchy-rise.desktop".text = ''
-      [Desktop Entry]
-      Name=Nixarchy Rise
-      Comment=Omarchy 4.x with HANCORE Quickshell Rise
-      Exec=nixarchy-session
-      Type=Application
-      DesktopNames=Hyprland
-    '';
+    services.displayManager.sessionPackages = [
+      (
+        (pkgs.writeTextFile {
+          name = "nixarchy-rise-wayland-session";
+          destination = "/share/wayland-sessions/nixarchy-rise.desktop";
+          passthru.providedSessions = [ "nixarchy-rise" ];
+          text = ''
+            [Desktop Entry]
+            Name=Nixarchy Rise
+            Comment=Omarchy 4.x with HANCORE Quickshell Rise
+            Exec=nixarchy-session
+            Type=Application
+            DesktopNames=Hyprland
+          '';
+        })
+        // {
+          providedSessions = [ "nixarchy-rise" ];
+        }
+      )
+    ];
 
     environment.systemPackages = [
       nixarchyPkg

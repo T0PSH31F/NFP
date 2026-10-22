@@ -46,6 +46,32 @@ in
       ];
       description = "List of Noctalia plugins to declaratively fetch and link into ~/.config/noctalia/plugins";
     };
+
+    idle = {
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Enable hypridle management for Hyprland session";
+      };
+
+      dpmsTimeout = lib.mkOption {
+        type = lib.types.nullOr lib.types.int;
+        default = 600;
+        description = "Seconds of inactivity before turning off display via DPMS. Set null to disable.";
+      };
+
+      lockTimeout = lib.mkOption {
+        type = lib.types.nullOr lib.types.int;
+        default = 660;
+        description = "Seconds of inactivity before locking session. Set null to disable.";
+      };
+
+      dpmsIgnoreAc = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = "If true, do not shut off display via DPMS when connected to AC power";
+      };
+    };
   };
 
   home =
@@ -992,6 +1018,33 @@ in
             WantedBy = [ "timers.target" ];
           };
         };
+        # Encapsulated Noctalia Starship Palette sync
+        programs.zsh.initContent = lib.mkAfter ''
+          if command -v starship >/dev/null 2>&1; then
+            local PALETTE_FILE=""
+            if [ -f "$HOME/.cache/noctalia/starship-palette.toml" ]; then
+              PALETTE_FILE="$HOME/.cache/noctalia/starship-palette.toml"
+            elif [ -f "$HOME/.config/noctalia/templates/starship.toml" ]; then
+              PALETTE_FILE="$HOME/.config/noctalia/templates/starship.toml"
+            fi
+
+            if [ -n "$PALETTE_FILE" ] && [ -f "$HOME/.config/starship.toml" ]; then
+              if [ ! -f "$HOME/.cache/starship/starship.toml" ] || [ "$HOME/.config/starship.toml" -nt "$HOME/.cache/starship/starship.toml" ] || [ "$(grep -c '# >>> NOCTALIA STARSHIP PALETTE >>>' "$HOME/.cache/starship/starship.toml" 2>/dev/null)" != "1" ]; then
+                mkdir -p "$HOME/.cache/starship"
+                TMP_FILE=$(mktemp)
+                sed '/^# >>> NOCTALIA STARSHIP PALETTE >>>/,/^# <<< NOCTALIA STARSHIP PALETTE <<</d' "$HOME/.config/starship.toml" > "$TMP_FILE"
+                sed -i -E 's/^([[:space:]]*)palette([[:space:]]*)=.*/\1palette\2= "noctalia"/' "$TMP_FILE" 2>/dev/null || sed -i '1i palette = "noctalia"' "$TMP_FILE"
+                {
+                  echo ""
+                  echo "# >>> NOCTALIA STARSHIP PALETTE >>>"
+                  cat "$PALETTE_FILE"
+                  echo "# <<< NOCTALIA STARSHIP PALETTE <<<"
+                } >> "$TMP_FILE"
+                mv "$TMP_FILE" "$HOME/.cache/starship/starship.toml"
+              fi
+            fi
+          fi
+        '';
       };
     };
 }

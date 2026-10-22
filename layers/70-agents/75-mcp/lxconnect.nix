@@ -12,7 +12,7 @@
 }:
 let
   cfg = config.layers.layer-75.mcp.lxconnect;
-  lxconnectPkg = inputs.lxconnect.packages.${pkgs.system}.default or null;
+  lxconnectPkg = inputs.lxconnect.packages.${pkgs.stdenv.hostPlatform.system}.default or null;
 in
 {
   imports = [

@@ -153,10 +153,15 @@ let
             tags = [ "llm" ];
           }
           # Explicit ExtremeRouter route (/er/v1/* -> extremerouter-llm)
+          #
+          # The service URL is bare (no /v1 path), so strip_path must remove
+          # ONLY the /er prefix and leave /v1/* intact for the upstream.
+          # With paths = ["/er/v1"] + strip_path, Kong stripped the whole
+          # matched path and sent "/models" instead of "/v1/models".
           {
             name = "er-v1";
             service = "extremerouter-llm";
-            paths = [ "/er/v1" ];
+            paths = [ "/er" ];
             methods = [
               "GET"
               "POST"
@@ -172,10 +177,13 @@ let
             ];
           }
           # Explicit OmniRoute route (/omni/v1/* -> omniroute-llm)
+          #
+          # Same strip-path contract as er-v1 above: strip only /omni so the
+          # upstream still sees /v1/*.
           {
             name = "omni-v1";
             service = "omniroute-llm";
-            paths = [ "/omni/v1" ];
+            paths = [ "/omni" ];
             methods = [
               "GET"
               "POST"
@@ -661,7 +669,7 @@ in
       {
         nfp.services.kong-gateway = {
           enable = config.services.ai-services.kong-gateway.enable;
-          host = "nami";
+          host = config.networking.hostName;
           port = 8090;
           homepage = {
             enable = true;

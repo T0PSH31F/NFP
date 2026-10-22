@@ -38,7 +38,8 @@
                 set -euo pipefail
                 nix eval --raw .#nixosConfigurations.luffy.config.system.build.toplevel.drvPath > /dev/null
                 nix eval --raw .#nixosConfigurations.z0r0.config.system.build.toplevel.drvPath > /dev/null
-                nix eval --raw .#nixosConfigurations.nami.config.system.build.toplevel.drvPath > /dev/null
+                # nami dropped 2026-10-15 (decommissioned; config moved to
+                # archive/machines/nami) — evaluating it fails and blocks pre-push.
               ''
             )}";
             stages = [ "pre-push" ];

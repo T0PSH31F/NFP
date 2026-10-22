@@ -139,10 +139,10 @@ static)
 eval)
   TARGET="${1:-all}"
   if [ "${TARGET}" = "all" ]; then
-    echo "==> Evaluating all fleet machine toplevels (z0r0, luffy, nami)"
+    echo "==> Evaluating all fleet machine toplevels (z0r0, luffy, sanji)"
     run_with_timeout nix eval --raw .#nixosConfigurations.z0r0.config.system.build.toplevel.drvPath >/dev/null
     run_with_timeout nix eval --raw .#nixosConfigurations.luffy.config.system.build.toplevel.drvPath >/dev/null
-    run_with_timeout nix eval --raw .#nixosConfigurations.nami.config.system.build.toplevel.drvPath >/dev/null
+    run_with_timeout nix eval --raw .#nixosConfigurations.sanji.config.system.build.toplevel.drvPath >/dev/null
   else
     echo "==> Evaluating host: ${TARGET}"
     run_with_timeout nix eval --raw ".#nixosConfigurations.${TARGET}.config.system.build.toplevel.drvPath" >/dev/null

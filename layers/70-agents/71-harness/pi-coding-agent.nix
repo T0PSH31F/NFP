@@ -2,10 +2,10 @@
 # Module: pi-coding-agent.nix
 # Purpose: Pi Coding Agent terminal AI coding harness wrapper with NFP LLM router & MCP integration.
 # Provider endpoints (Kong path multiplexer + ExtremeRouter backup):
-#   kong-er:       http://nami:8090/v1 (ExtremeRouter)
-#   kong-omni:     http://nami:8090/omni/v1 (OmniRoute - TODO: when merged)
-#   kong-free:     http://nami:8090/llm/free/v1 (FreeLLMPool)
-#   kong-frontier: http://nami:8090/llm/frontier/v1 (Manifest)
+#   kong-er:       http://luffy:8090/v1 (ExtremeRouter)
+#   kong-omni:     http://luffy:8090/omni/v1 (OmniRoute - TODO: when merged)
+#   kong-free:     http://luffy:8090/llm/free/v1 (FreeLLMPool)
+#   kong-frontier: http://luffy:8090/llm/frontier/v1 (Manifest)
 #   extreme-direct: http://127.0.0.1:20128/v1 (ER direct backup)
 # Option Path: programs.pi-coding-agent (and layers.layer-71.harness.pi-coding-agent)
 # Enabling Host Tags: ai-agent, development
@@ -53,7 +53,7 @@ in
 
     routerEndpoint = mkOption {
       type = types.str;
-      default = "http://nami.nfp.nix:8090/v1";
+      default = "http://luffy.nfp.nix:8090/v1";
       description = "NFP LLM router OpenAI-compatible gateway endpoint";
     };
 
@@ -82,10 +82,10 @@ in
     environment.sessionVariables = {
       PI_MODEL = cfg.defaultModel;
       PI_ROUTER_ENDPOINT = cfg.routerEndpoint;
-      OPENAI_BASE_URL_KONG_ER = lib.mkDefault "http://nami.nfp.nix:8090/v1";
-      OPENAI_BASE_URL_KONG_OMNI = "http://nami.nfp.nix:8090/omni/v1";
-      OPENAI_BASE_URL_KONG_FREE = "http://nami.nfp.nix:8090/llm/free/v1";
-      OPENAI_BASE_URL_KONG_FRONTIER = "http://nami.nfp.nix:8090/llm/frontier/v1";
+      OPENAI_BASE_URL_KONG_ER = lib.mkDefault "http://luffy.nfp.nix:8090/v1";
+      OPENAI_BASE_URL_KONG_OMNI = "http://luffy.nfp.nix:8090/omni/v1";
+      OPENAI_BASE_URL_KONG_FREE = "http://luffy.nfp.nix:8090/llm/free/v1";
+      OPENAI_BASE_URL_KONG_FRONTIER = "http://luffy.nfp.nix:8090/llm/frontier/v1";
       OPENAI_BASE_URL_EXTREME_DIRECT = "http://127.0.0.1:20128/v1";
     };
 

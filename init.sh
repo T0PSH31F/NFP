@@ -34,7 +34,7 @@ failed_assertions=$(nix eval --json --expr '
       machine = name;
       failed = builtins.filter (x: !x.assertion) host.config.assertions;
     };
-    results = builtins.map (name: evalHost name flake.nixosConfigurations.${name}) ["luffy" "z0r0" "nami"];
+    results = builtins.map (name: evalHost name flake.nixosConfigurations.${name}) (builtins.attrNames flake.nixosConfigurations);
   in
     builtins.filter (res: builtins.length res.failed > 0) results
 ' 2>/dev/null || echo "[]")
@@ -71,7 +71,7 @@ statix check . || echo "    (statix check reported baseline debt warnings)"
 echo "==> [3/5] Baseline verification"
 "${VERIFY_CMD[@]}"
 
-echo "==> [4/5] Single-pass guarded machine evaluation (luffy, z0r0, nami)"
+echo "==> [4/5] Single-pass guarded machine evaluation (luffy, z0r0, sanji)"
 ./layers/00-cyberia/06-scripts/nfp-check.sh eval all
 echo "    all 3 machines evaluate"
 

@@ -132,5 +132,9 @@
       options = [ "nofail" ];
     }
   ];
-  nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
+  # Plain assignment, not lib.mkDefault: z0r0 sets it this way and evaluates
+  # fine; with mkDefault the option was losing the merge and NixOS then failed
+  # with "Neither nixpkgs.hostPlatform nor the legacy option nixpkgs.system has
+  # been set" while evaluating bluetooth.nix.
+  nixpkgs.hostPlatform = "x86_64-linux";
 }

@@ -1,3 +1,7 @@
+---
+description: orkflow to perform guarded, resource-safe Nix evaluations, flake checks, and builds.
+---
+
 # Safe Nix Verification Workflow
 
 Use this workflow to perform guarded, resource-safe Nix evaluations, flake checks, and builds.

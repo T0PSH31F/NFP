@@ -7,7 +7,6 @@
 }:
 with lib;
 let
-  cfg = config.layers.layer-30.theming.themes.greeter;
 
   # Experience-coupled greeter auto-derivation:
   #   - noctalia-*         → noctalia-greeter   (native Noctalia login screen)
@@ -31,6 +30,7 @@ in
         "sddm-astronaut"
         "sddm" # legacy alias for plain SDDM without astronaut theme
         "greetd" # regreet-in-cage
+        "regreet-wayland" # ReGreet Wayland greeter
         "tuigreet"
       ];
       default = derivedType;
@@ -64,12 +64,22 @@ in
     };
 
     sddm-astronaut = {
+      videoTheme = lib.mkOption {
+        type = lib.types.enum [
+          "thousand-sunny"
+          "one-piece-skull"
+          "zoro-swords"
+          "custom"
+        ];
+        default = "thousand-sunny";
+        description = "Curated video loop presets (thousand-sunny, one-piece-skull, zoro-swords, custom)";
+      };
       videoBackground = lib.mkOption {
         type = lib.types.nullOr lib.types.path;
-        default = ../../00-cyberia/02-assets/sddm_background/thousand-sunny.mp4;
+        default = null;
         description = ''
-          Path to a video file for the SDDM Astronaut background loop.
-          Supports .mp4 / .webm. Set to null for a static image fallback.
+          Path to a custom video file for the SDDM Astronaut background loop.
+          Supports .mp4 / .webm. Used when videoTheme is "custom".
         '';
       };
       staticBackground = lib.mkOption {
@@ -83,6 +93,15 @@ in
   config =
     let
       cfg = config.layers.layer-30.theming.themes.greeter;
+      resolvedVideoBackground =
+        if cfg.sddm-astronaut.videoTheme == "one-piece-skull" then
+          ../../00-cyberia/02-assets/sddm_background/one-piece-skull.1920x1080.mp4
+        else if cfg.sddm-astronaut.videoTheme == "zoro-swords" then
+          ../../00-cyberia/02-assets/sddm_background/zoro-swords.mp4
+        else if cfg.sddm-astronaut.videoTheme == "thousand-sunny" then
+          ../../00-cyberia/02-assets/sddm_background/thousand-sunny.mp4
+        else
+          cfg.sddm-astronaut.videoBackground;
     in
     lib.mkMerge [
       # ── Noctalia Greeter ──────────────────────────────────────────────
@@ -177,12 +196,13 @@ in
 
         environment.systemPackages = [
           (pkgs.sddm-astronaut.override {
-            themeConfig = lib.optionalAttrs (cfg.sddm-astronaut.videoBackground != null) {
-              Background = toString cfg.sddm-astronaut.videoBackground;
-            }
-            // lib.optionalAttrs (cfg.sddm-astronaut.videoBackground == null) {
-              Background = toString cfg.sddm-astronaut.staticBackground;
-            };
+            themeConfig =
+              lib.optionalAttrs (resolvedVideoBackground != null) {
+                Background = toString resolvedVideoBackground;
+              }
+              // lib.optionalAttrs (resolvedVideoBackground == null) {
+                Background = toString cfg.sddm-astronaut.staticBackground;
+              };
           })
         ];
       })
@@ -196,8 +216,8 @@ in
         };
       })
 
-      # ── Greetd + ReGreet in cage ──────────────────────────────────────
-      (mkIf (cfg.type == "greetd") {
+      # ── Greetd + ReGreet in cage (regreet-wayland) ─────────────────────
+      (mkIf (cfg.type == "greetd" || cfg.type == "regreet-wayland") {
         users.users.greeter = {
           isSystemUser = true;
           group = "greeter";

@@ -17,7 +17,7 @@ The `78-llm-routers` tier is responsible for unified API gateways, LLM load bala
 | `omniroute.nix` | OmniRoute Next.js OCI container LLM routing and visual management app. | `services.ai-services.omniroute` | 20129 | Always-on OCI container service | `ai-router`, `homelab` |
 
 > [!NOTE]
-> **Dual Upstream Architecture**: ExtremeRouter runs on `z0r0` on port `20128` (restricted to tailnet interface `tailscale0`), while OmniRoute runs on `nami` on port `20129`. Kong Gateway on `nami` (`:8090`) proxies traffic to both upstreams simultaneously.
+> **Dual Upstream Architecture**: ExtremeRouter runs on `z0r0` on port `20128` (restricted to tailnet interface `tailscale0`), while OmniRoute runs on `luffy` on port `20129`. Kong Gateway on `luffy` (`:8090`) proxies traffic to both upstreams simultaneously.
 
 ## Tier Relationships
 
@@ -25,4 +25,4 @@ The `78-llm-routers` tier is responsible for unified API gateways, LLM load bala
 - **Sits Behind**: Client harnesses in `71-harness` (OpenCode, Hermes, Antigravity), orchestrators in `76-orchestrators` (Polyfloor, LangGraph), and desktop UIs in `77-dash-desk-ui`.
 
 > [!NOTE]
-> **Polyfloor model discovery**: Polyfloor (`76-orchestrators/polyfloor.nix`) points `services.polyfloor.routerEndpoint` at `http://nami:8090/v1` and enumerates models via `GET {base}/models`. Kong exposes this on the `v1-models` route (forwarded to ExtremeRouter); LiteLLM (`/v1/models`) and ExtremeRouter (`/v1/*`) expose it natively.
+> **Polyfloor model discovery**: Polyfloor (`76-orchestrators/polyfloor.nix`) points `services.polyfloor.routerEndpoint` at `http://127.0.0.1:8090/v1` (Kong runs with `--network=host` on the same `luffy` host) and enumerates models via `GET {base}/models`. Kong exposes this on the `v1-models` route (forwarded to ExtremeRouter); LiteLLM (`/v1/models`) and ExtremeRouter (`/v1/*`) expose it natively.

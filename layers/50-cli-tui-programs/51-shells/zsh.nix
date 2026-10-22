@@ -68,33 +68,6 @@ in
         fi
         ${lib.optionalString cfg.theming.enable "[ -f ~/.config/fzf/matugen.conf ] && source ~/.config/fzf/matugen.conf"}
         if command -v starship >/dev/null 2>&1; then
-          # Sync and apply Noctalia theme palette to Starship config
-          local PALETTE_FILE=""
-          if [ -f "$HOME/.cache/noctalia/starship-palette.toml" ]; then
-            PALETTE_FILE="$HOME/.cache/noctalia/starship-palette.toml"
-          elif [ -f "$HOME/.config/noctalia/templates/starship.toml" ]; then
-            PALETTE_FILE="$HOME/.config/noctalia/templates/starship.toml"
-          fi
-
-          if [ ! -f "$HOME/.cache/starship/starship.toml" ] || [ "$HOME/.config/starship.toml" -nt "$HOME/.cache/starship/starship.toml" ] || [ "$(grep -c '# >>> NOCTALIA STARSHIP PALETTE >>>' "$HOME/.cache/starship/starship.toml" 2>/dev/null)" != "1" ]; then
-            mkdir -p "$HOME/.cache/starship"
-            TMP_FILE=$(mktemp)
-            # Strip any existing noctalia section, then write base config
-            sed '/^# >>> NOCTALIA STARSHIP PALETTE >>>/,/^# <<< NOCTALIA STARSHIP PALETTE <<</d' "$HOME/.config/starship.toml" > "$TMP_FILE"
-            if [ -n "$PALETTE_FILE" ]; then
-              # Change palette setting to noctalia
-              sed -i -E 's/^([[:space:]]*)palette([[:space:]]*)=.*/\1palette\2= "noctalia"/' "$TMP_FILE" 2>/dev/null || sed -i '1i palette = "noctalia"' "$TMP_FILE"
-              # Append fresh noctalia palette section
-              {
-                echo ""
-                echo "# >>> NOCTALIA STARSHIP PALETTE >>>"
-                cat "$PALETTE_FILE"
-                echo "# <<< NOCTALIA STARSHIP PALETTE <<<"
-              } >> "$TMP_FILE"
-            fi
-            # Atomic replace — zellij never sees a partial/missing/malformed file
-            mv "$TMP_FILE" "$HOME/.cache/starship/starship.toml"
-          fi
           eval "$(starship init zsh)"
         fi
 

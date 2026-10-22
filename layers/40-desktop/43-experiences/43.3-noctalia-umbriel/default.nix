@@ -30,14 +30,26 @@ in
     layers.desktop.compositors.umbriel.enable = true;
 
     # Register Wayland session entry for DM session picker (no-reboot switching)
-    environment.etc."wayland-sessions/noctalia-umbriel.desktop".text = ''
-      [Desktop Entry]
-      Name=Noctalia (Umbriel)
-      Comment=Noctalia Shell v5 on Umbriel compositor
-      Exec=uwsm start umbriel-uwsm.desktop
-      Type=Application
-      DesktopNames=Umbriel
-    '';
+    services.displayManager.sessionPackages = [
+      (
+        (pkgs.writeTextFile {
+          name = "noctalia-umbriel-wayland-session";
+          destination = "/share/wayland-sessions/noctalia-umbriel.desktop";
+          passthru.providedSessions = [ "noctalia-umbriel" ];
+          text = ''
+            [Desktop Entry]
+            Name=Noctalia (Umbriel)
+            Comment=Noctalia Shell v5 on Umbriel compositor
+            Exec=uwsm start umbriel-uwsm.desktop
+            Type=Application
+            DesktopNames=Umbriel
+          '';
+        })
+        // {
+          providedSessions = [ "noctalia-umbriel" ];
+        }
+      )
+    ];
   };
 
   home =

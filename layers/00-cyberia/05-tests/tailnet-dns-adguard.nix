@@ -76,23 +76,23 @@
       };
 
     # nami is Tailnet client that should resolve via AdGuard on luffy
-    nami =
-      {
-        config,
-        pkgs,
-        lib,
-        ...
-      }:
-      {
-        networking.hostName = "nami";
-        networking.extraHosts = "100.64.0.4 nami.nfp.nix 100.64.0.3 luffy.nfp.nix";
-        services.tailscale.enable = true;
-        environment.systemPackages = [
-          pkgs.dig
-          pkgs.curl
-        ];
-        system.stateVersion = "25.05";
-      };
+    # nami =
+    #   {
+    #     config,
+    #     pkgs,
+    #     lib,
+    #     ...
+    #   }:
+    #   {
+    #     networking.hostName = "nami";
+    #     networking.extraHosts = "100.64.0.4 nami.nfp.nix 100.64.0.3 luffy.nfp.nix";
+    #     services.tailscale.enable = true;
+    #     environment.systemPackages = [
+    #       pkgs.dig
+    #       pkgs.curl
+    #     ];
+    #     system.stateVersion = "25.05";
+    #   };
   };
 
   testScript = ''

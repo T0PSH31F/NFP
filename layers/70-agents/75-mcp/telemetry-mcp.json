@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "telemetry-mcp",
+  "description": "Streamable HTTP MCP Server for OpenTelemetry Metrics, Logs, and Traces",
+  "version": "1.0.0",
+  "transport": "streamable-http",
+  "endpoint": "http://127.0.0.1:8097/mcp",
+  "capabilities": {
+    "tools": [
+      {
+        "name": "query_metrics",
+        "description": "Query live Prometheus metrics from the OpenTelemetry pipeline",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "query": { "type": "string", "description": "PromQL query string" },
+            "time": { "type": "string", "description": "Optional evaluation timestamp" }
+          },
+          "required": ["query"]
+        }
+      },
+      {
+        "name": "query_logs",
+        "description": "Query journal and container logs from Loki via OpenTelemetry",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "query": { "type": "string", "description": "LogQL query string" },
+            "limit": { "type": "integer", "default": 50 }
+          },
+          "required": ["query"]
+        }
+      },
+      {
+        "name": "emit_span",
+        "description": "Emit an execution trace span into the OpenTelemetry Collector",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "operation": { "type": "string", "description": "Span operation name" },
+            "duration_ms": { "type": "number", "description": "Duration in milliseconds" },
+            "attributes": { "type": "object", "description": "Key-value metadata attributes" }
+          },
+          "required": ["operation"]
+        }
+      }
+    ],
+    "resources": [
+      {
+        "uri": "telemetry://fleet/health",
+        "name": "Fleet Telemetry Health",
+        "mimeType": "application/json"
+      }
+    ]
+  }
+}

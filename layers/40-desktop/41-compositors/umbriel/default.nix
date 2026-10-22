@@ -16,7 +16,8 @@
 let
   cfg = config.layers.desktop.compositors.umbriel;
   umbrielPkgs = inputs.umbriel.packages.${pkgs.stdenv.hostPlatform.system} or { };
-  umbrielPkg = umbrielPkgs.default or (throw "umbriel: no default package for ${pkgs.stdenv.hostPlatform.system}");
+  umbrielPkg =
+    umbrielPkgs.default or (throw "umbriel: no default package for ${pkgs.stdenv.hostPlatform.system}");
 in
 {
   options.layers.desktop.compositors.umbriel = {
@@ -46,19 +47,39 @@ in
     xdg.portal = {
       enable = true;
       wlr.enable = true;
-      extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+      extraPortals = [
+        pkgs.xdg-desktop-portal-umbriel
+        pkgs.xdg-desktop-portal-gtk
+      ];
+      config.umbriel = {
+        default = [
+          "umbriel"
+          "gtk"
+        ];
+      };
     };
 
     # ── Session registration ───────────────────────────────────────────
-    # Creates /run/current-system/sw/share/wayland-sessions/umbriel.desktop
-    environment.etc."wayland-sessions/umbriel.desktop".text = ''
-      [Desktop Entry]
-      Name=Umbriel
-      Comment=Umbriel Wayland Compositor
-      Exec=umbriel
-      Type=Application
-      DesktopNames=Umbriel
-    '';
+    services.displayManager.sessionPackages = [
+      (
+        (pkgs.writeTextFile {
+          name = "umbriel-wayland-session";
+          destination = "/share/wayland-sessions/umbriel.desktop";
+          passthru.providedSessions = [ "umbriel" ];
+          text = ''
+            [Desktop Entry]
+            Name=Umbriel
+            Comment=Umbriel Wayland Compositor
+            Exec=umbriel
+            Type=Application
+            DesktopNames=Umbriel
+          '';
+        })
+        // {
+          providedSessions = [ "umbriel" ];
+        }
+      )
+    ];
 
     # ── UWSM integration (same pattern as Hyprland) ───────────────────
     programs.uwsm = {

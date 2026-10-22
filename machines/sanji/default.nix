@@ -62,7 +62,17 @@
       sessionResilience.enable = true;
     };
     layer-30.theming.themes.greeter.type = "tuigreet";
+    layer-40.desktop.noctalia.idle = {
+      dpmsIgnoreAc = true; # Never shut screen off while plugged in to AC power
+    };
     desktop.experience = "noctalia-hyprland";
+  };
+
+  # Prevent display power-off / blanking when plugged in
+  boot.kernelParams = [ "consoleblank=0" ];
+  services.logind.settings.Login = {
+    IdleAction = "ignore";
+    LidSwitchExternalPower = "ignore";
   };
 
   # ============================================================================

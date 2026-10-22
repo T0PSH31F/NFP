@@ -30,6 +30,27 @@ in
 
   nixos = lib.mkIf isEnabled {
     layers.layer-40.desktop.noctalia.enable = true;
+
+    services.displayManager.sessionPackages = [
+      (
+        (pkgs.writeTextFile {
+          name = "noctalia-hyprland-wayland-session";
+          destination = "/share/wayland-sessions/noctalia-hyprland.desktop";
+          passthru.providedSessions = [ "noctalia-hyprland" ];
+          text = ''
+            [Desktop Entry]
+            Name=Noctalia (Hyprland)
+            Comment=Native Noctalia Shell v5 on Hyprland
+            Exec=uwsm start hyprland-uwsm.desktop
+            Type=Application
+            DesktopNames=Hyprland
+          '';
+        })
+        // {
+          providedSessions = [ "noctalia-hyprland" ];
+        }
+      )
+    ];
   };
 
   home =

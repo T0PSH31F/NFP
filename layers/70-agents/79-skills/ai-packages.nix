@@ -66,7 +66,7 @@ in
             skills
             beads
             openshell
-            gemini-cli
+            # gemini-cli removed from nixpkgs — superseded by Antigravity CLI
             # jan
             cherry-studio
             lmstudio

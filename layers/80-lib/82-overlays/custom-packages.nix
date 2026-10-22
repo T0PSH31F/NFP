@@ -77,7 +77,7 @@ final: prev: {
   # upstream attr. Referenced nowhere in the repo.
 
   # Upstream nixpkgs has 1.2.16; pin 1.4.4 for Gemini 4 Argon support
-  antigravity-cli = prev.antigravity-cli.overrideAttrs (oldAttrs: rec {
+  antigravity-cli = prev.antigravity-cli.overrideAttrs (_oldAttrs: rec {
     version = "1.4.4";
     wholeVersion = "${version}-4783783166214144";
     src = prev.fetchurl {

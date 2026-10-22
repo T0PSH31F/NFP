@@ -65,6 +65,7 @@
 - `36-sfx`: System sound event themes
 
 ### 40-desktop
+- `41-compositors`: Standalone Wayland compositors (Umbriel)
 - `41-hyprland`: Hyprland Wayland compositor base
 - `42-niri`: Niri scrollable tiling compositor
 - `43-experiences`: Experience adapters (e.g. Noctalia-Hyprland)

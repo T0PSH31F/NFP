@@ -1,14 +1,17 @@
 # Kong AI Gateway Stack
 
-Unified LLM/API gateway for all agents and services. All LLM traffic flows through Kong (`nami:8090`) → upstream routers → providers.
+Unified LLM/API gateway for all agents and services. All LLM traffic flows through Kong (`luffy.nfp.nix:8090`) → upstream routers → providers.
+
+> **Host note (2026-10-15):** Kong moved off `nami` (decommissioned 2026-10-14) onto `luffy`.
+> Kong runs with `--network=host`, so loopback upstreams (`127.0.0.1:*`) resolve to `luffy`.
 
 ## Architecture
 
 ```
 Agents (Hermes, OpenCode, Claude-Code, Codex, Cursor, Deerflow, Polyfloor)
-  │  1 Kong endpoint (http://nami:8090/v1) + 1 API key
+  │  1 Kong endpoint (http://luffy.nfp.nix:8090/v1) + 1 API key
   ▼
-Kong AI Gateway on nami (:8090 proxy, :8091 admin)
+Kong AI Gateway on luffy (:8090 proxy, :8091 admin)
   ├── /v1/*                     → ExtremeRouter on z0r0:20128 (default primary)
   ├── /er/v1/*                  → ExtremeRouter on z0r0:20128 (explicit)
   ├── /omni/v1/*                → OmniRoute on 127.0.0.1:20129 (explicit)
@@ -19,9 +22,9 @@ Kong AI Gateway on nami (:8090 proxy, :8091 admin)
   ▼
 Upstream Routers
   ├── ExtremeRouter :20128 (z0r0 — 154+ providers, RTK savings)
-  ├── OmniRoute :20129      (nami — Next.js router, RTK compression)
+  ├── OmniRoute :20129      (luffy — Next.js router, RTK compression)
   ├── Manifest :2099       (frontier: GPT-5, Claude, Gemini, DeepSeek)
-  ├── FreeLLMAPI :3003     (aggregated pool)
+  ├── FreeLLMAPI :3001     (aggregated pool)
   └── freellmpool :8083     (pure free tier)
   ▼
 Providers (OpenRouter, Anthropic, Gemini, Groq, Cerebras, etc.)
@@ -44,13 +47,13 @@ Providers (OpenRouter, Anthropic, Gemini, Groq, Cerebras, etc.)
 
 ```bash
 # Verify ExtremeRouter via Kong default primary route
-curl -s http://nami:8090/v1/models -H "apikey: $KONG_KEY_HERMES" | jq '.data|length>0'
+curl -s http://luffy.nfp.nix:8090/v1/models -H "apikey: $KONG_KEY_HERMES" | jq '.data|length>0'
 
 # Verify OmniRoute via explicit route
-curl -s http://nami:8090/omni/v1/models -H "apikey: $KONG_KEY_HERMES" | jq '.data|length>0'
+curl -s http://luffy.nfp.nix:8090/omni/v1/models -H "apikey: $KONG_KEY_HERMES" | jq '.data|length>0'
 
 # Verify unauthenticated request returns 401
-curl -s http://nami:8090/v1/models # 401 Unauthenticated
+curl -s http://luffy.nfp.nix:8090/v1/models # 401 Unauthenticated
 ```
 
 ## Routing Tiers
@@ -68,9 +71,9 @@ curl -s http://nami:8090/v1/models # 401 Unauthenticated
 
 | Port | Service | Host |
 |------|---------|------|
-| 8090 | Kong proxy (API traffic) | nami |
-| 8091 | Kong Admin API | nami |
+| 8090 | Kong proxy (API traffic) | luffy |
+| 8091 | Kong Admin API | luffy |
 | 20128 | ExtremeRouter | z0r0 |
-| 20129 | OmniRoute | nami |
-| 3003 | FreeLLMAPI | nami |
-| 8083 | freellmpool | nami |
+| 20129 | OmniRoute | luffy |
+| 3001 | FreeLLMAPI | luffy |
+| 8083 | freellmpool | luffy |

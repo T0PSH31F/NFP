@@ -245,7 +245,7 @@ in
           action = "fleet-homepage";
           desc = "Open NFP Homepage Dashboard";
           category = "fleet";
-          cmd = "xdg-open http://nami.nfp.nix:3007";
+          cmd = "xdg-open http://luffy.nfp.nix:3007";
           scope = "fleet-remote";
         })
         (mkAction {
@@ -253,7 +253,7 @@ in
           action = "fleet-grafana";
           desc = "Open Grafana Observability";
           category = "fleet";
-          cmd = "xdg-open http://nami.nfp.nix:3000";
+          cmd = "xdg-open http://luffy.nfp.nix:3008";
           scope = "fleet-remote";
         })
         (mkAction {
@@ -269,7 +269,7 @@ in
           action = "fleet-ssh-selector";
           desc = "SSH Fleet Host Selector";
           category = "fleet";
-          cmd = "uwsm app -- ghostty -e ssh nami";
+          cmd = "uwsm app -- ghostty -e ssh luffy";
           scope = "fleet-remote";
         })
         (mkAction {
@@ -319,7 +319,7 @@ in
           action = "agent-router";
           desc = "Polyfloor / Router API Control";
           category = "agents";
-          cmd = "xdg-open http://nami.nfp.nix:7777/healthz";
+          cmd = "xdg-open http://luffy.nfp.nix:7777/healthz";
           scope = "fleet-remote";
         })
         (mkAction {

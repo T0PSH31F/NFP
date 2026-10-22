@@ -10,7 +10,10 @@
         azure-cli.enable = lib.mkDefault true;
       };
       layer-71.harness = {
-        antigravity.enable = lib.mkDefault true;
+        antigravity = {
+          enable = lib.mkDefault true;
+          enableIde = lib.mkDefault true;
+        };
         claude-code.enable = lib.mkDefault true;
         codex.enable = lib.mkDefault true;
         crush.enable = lib.mkDefault true;

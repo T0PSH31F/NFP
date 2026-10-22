@@ -101,7 +101,7 @@ in
       services.polyfloor = {
         # Full daemon (backend + bundled static SPA frontend) built from flake input.
         package = polyfloorFullPkg;
-        host = lib.mkForce "0.0.0.0"; # Tailnet-reachable (firewall restricts to tailscale0/loopback via trustedInterfaces) — healthcheck probes nami.nfp.nix:7777
+        host = lib.mkForce "0.0.0.0"; # Tailnet-reachable (firewall restricts to tailscale0/loopback via trustedInterfaces) — healthcheck probes luffy.nfp.nix:7777
         dataDir = "/var/lib/polyfloor";
 
         # Polyfloor talks to any OpenAI-compatible router. It enumerates models
@@ -120,7 +120,7 @@ in
 
         # Health: GET http://127.0.0.1:7777/healthz -> {"status":"ok"} (also /metrics Prometheus)
         # Tailnet: polyfloor.lovelain.duckdns.org is intentionally NOT exposed via public Caddy 80/443.
-        # It is reachable only via Tailscale: http://nami.nfp.nix:7777 or via Caddy on tailscale0 when proxied.
+        # It is reachable only via Tailscale: http://luffy.nfp.nix:7777 or via Caddy on tailscale0 when proxied.
         # Headscale ACL: tag:control-plane (includes polyfloor) is group:admin-only, so only t0psh31f@nfp.nix can reach 7777 via tailnet. http://127.0.0.1:7777/healthz -> {"status":"ok"}  (also /metrics Prometheus)
 
         # Default HR orchestrator model: Xiaomi MiMo-V2.5 Pro.

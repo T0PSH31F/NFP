@@ -44,8 +44,11 @@
 
         serviceConfig = {
           Type = "simple";
-          User = "t0psh31f";
-          Group = "users";
+          # Must run as the hermes user: HERMES_HOME (${hermesState}) is
+          # mode 0700 hermes:hermes, so any other user crashes at startup
+          # with PermissionError on .hermes/.env (env_loader.load_hermes_dotenv).
+          User = "hermes";
+          Group = "hermes";
           WorkingDirectory = config.services.hermes-agent.stateDir;
           ExecStart = "${hermesBin} dashboard --port ${toString cfg.port} --host ${cfg.host} --insecure --skip-build";
           EnvironmentFile = "${hermesState}/.env";

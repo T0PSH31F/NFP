@@ -41,15 +41,26 @@ in
     ];
 
     # Register lightweight session for DM session picker
-    environment.etc."wayland-sessions/micro-smol-ai.desktop".text = ''
-      [Desktop Entry]
-      Name=Micro Smol-AI
-      Comment=Minimal Wayland session for low-power AI inference
-      Exec=dwl
-      Type=Application
-      DesktopNames=dwl
-    '';
-
+    services.displayManager.sessionPackages = [
+      (
+        (pkgs.writeTextFile {
+          name = "micro-smol-ai-wayland-session";
+          destination = "/share/wayland-sessions/micro-smol-ai.desktop";
+          passthru.providedSessions = [ "micro-smol-ai" ];
+          text = ''
+            [Desktop Entry]
+            Name=Micro Smol-AI
+            Comment=Minimal Wayland session for low-power AI inference
+            Exec=dwl
+            Type=Application
+            DesktopNames=dwl
+          '';
+        })
+        // {
+          providedSessions = [ "micro-smol-ai" ];
+        }
+      )
+    ];
   };
 
   home =

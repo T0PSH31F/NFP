@@ -19,6 +19,17 @@
   home =
     let
       cfg = osConfig.layers.layer-30.theming.qt;
+      isNoctalia = osConfig.layers.layer-40.desktop.noctalia.enable or false;
+      colorSchemeLine5 =
+        if isNoctalia then
+          "color_scheme_path=~/.config/qt5ct/colors/noctalia.conf\ncustom_palette=true"
+        else
+          "custom_palette=false";
+      colorSchemeLine6 =
+        if isNoctalia then
+          "color_scheme_path=~/.config/qt6ct/colors/noctalia.conf\ncustom_palette=true"
+        else
+          "custom_palette=false";
     in
     lib.mkIf cfg.enable {
       home.packages = with pkgs; [
@@ -36,12 +47,10 @@
         style.name = "kvantum";
       };
 
-      # Connect qt5ct and qt6ct to Noctalia's dynamically generated color palette
       xdg.configFile."qt5ct/qt5ct.conf" = {
         text = ''
           [Appearance]
-          color_scheme_path=~/.config/qt5ct/colors/noctalia.conf
-          custom_palette=true
+          ${colorSchemeLine5}
           icon_theme=whitesur-icons
           standard_dialogs=default
           style=Fusion
@@ -69,8 +78,7 @@
       xdg.configFile."qt6ct/qt6ct.conf" = {
         text = ''
           [Appearance]
-          color_scheme_path=~/.config/qt6ct/colors/noctalia.conf
-          custom_palette=true
+          ${colorSchemeLine6}
           icon_theme=whitesur-icons
           standard_dialogs=default
           style=Fusion

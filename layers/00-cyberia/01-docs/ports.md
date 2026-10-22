@@ -1,13 +1,13 @@
 # Port Allocation Registry
 
-> **Last updated:** 2026-08-21  
+> **Last updated:** 2026-10-15  
 > **Purpose:** Canonical reference for all network port allocations across the fleet to prevent conflicts.  
 > **NOTE:** This port allocation registry MUST be regenerated/updated whenever service port assignments or module defaults change.
 
 ## Legend
 - **z0r0** = LG laptop workstation (`127.0.0.1` / Tailnet `100.64.0.1` `z0r0.nfp.nix`)
 - **luffy** = Intel 9th-gen homelab server (`100.64.0.3` `luffy.nfp.nix` / Tailnet + LAN `192.168.1.54`)
-- **nami** = Cloud control plane (`47.254.90.69` / Tailnet `100.64.0.4` `nami.nfp.nix`)
+- **nami** = ~~Cloud control plane~~ **DECOMMISSIONED 2026-10-14** (Alibaba ECS ran out of credits; `47.254.90.69` unreachable since 2026-10-12). All services moved to `luffy` / `z0r0`. Config archived at `archive/machines/nami/`.
 - **Both** = Deployed on both workstation and server
 - **Tailnet** = `nfp.nix` MagicDNS via Headscale on luffy; **WAN** = `lovelain.duckdns.org` via Caddy/ACME on luffy
 
@@ -28,7 +28,7 @@
 | **3000** | Hermes Workspace       | z0r0   | `layers/70-agents/71-harness/hermes/`              | Hermes Agent Web GUI            |
 | **3001** | HedgeDoc               | z0r0   | `machines/z0r0/default.nix`                        | Collaborative Markdown Editor   |
 | **3002** | AdGuard Web            | luffy  | `layers/20-services/21-networking/adguard.nix`    | AdGuard Admin Dashboard         |
-| **3003** | FreeLLMAPI             | z0r0   | `layers/70-agents/78-llm-routers/freellmapi.nix`  | Free-tier LLM API Router        |
+| **3001** | FreeLLMAPI             | luffy  | `layers/70-agents/78-llm-routers/freellmapi.nix`  | Free-tier LLM API Router (moved off nami 2026-10-13; real port is 3001, not 3003) |
 | **3005** | Langfuse               | z0r0   | `layers/70-agents/73-memory/langfuse.nix`         | LLM Observability & Tracing     |
 | **3006** | AionUI                 | z0r0   | `layers/70-agents/76-orchestrators/aionui.nix`    | AI Cowork Web Interface         |
 | **3007** | N8N Web / Karakeep     | luffy  | `machines/luffy/default.nix`                       | Workflow Automation Primary     |
@@ -56,19 +56,19 @@
 | **8008** | Matrix Synapse         | luffy  | `machines/luffy/default.nix`                       | Matrix Federation & Homeserver  |
 | **8010** | Brain Service          | luffy  | `layers/70-agents/73-memory/brain-service.nix`    | Personal Knowledge Base API     |
 | **8080** | Signal CLI             | z0r0   | `machines/z0r0/default.nix`                        | Signal Messenger REST Daemon    |
-| **8081** | Kong Gateway (legacy)  | nami   | `layers/70-agents/78-llm-routers/kong-gateway.nix` | Deprecated stale reference      |
+| **8081** | Kong Gateway (legacy)  | luffy  | `layers/70-agents/78-llm-routers/kong-gateway.nix` | Deprecated stale reference      |
 | **8082** | Homepage Dashboard     | z0r0   | `layers/20-services/26-monitoring/`                | Main Desktop Service Dashboard  |
-| **8083** | FreeLLMPool            | z0r0   | `layers/70-agents/78-llm-routers/freellmpool.nix`  | Free-tier LLM Provider Pool     |
+| **8083** | FreeLLMPool            | luffy  | `layers/70-agents/78-llm-routers/freellmpool.nix`  | Free-tier LLM Provider Pool (moved off nami 2026-10-13; on luffy it uses 8083 because signal-cli owns 8080) |
 | **8084** | Paperless-ngx          | luffy  | `machines/luffy/default.nix`                       | Document Archival System        |
 | **8085** | Hermes Agent Gateway   | z0r0   | `layers/70-agents/71-harness/hermes/`              | Hermes Agent MCP Control Gateway|
 | **8086** | Headscale              | luffy  | `layers/20-services/21-networking/headscale.nix`  | Tailscale Control Plane (migrated from nami 2026-09-15) |         |
 | **8088** | Open WebUI             | luffy  | `layers/70-agents/77-dash-desk-ui/open-webui.nix` | LLM Web Chat Interface          |
-| **8090** | Kong Gateway (proxy)   | nami   | `layers/70-agents/78-llm-routers/kong-gateway.nix` | Unified LLM/API gateway (Polyfloor routerEndpoint `http://127.0.0.1:8090/v1`) |
-| **7777** | Polyfloor API (Tailnet-only) | nami | `layers/70-agents/76-orchestrators/polyfloor.nix` | Polyfloor FastAPI `host 0.0.0.0:7777` Tailnet `nami.nfp.nix:7777` (Headscale ACL `tag:control-plane` + firewall `trustedInterfaces tailscale0`), WAN `47.254.90.69:7777` blocked. `dataDir /var/lib/polyfloor`, `routerEndpoint http://127.0.0.1:8090/v1` |
-| **8091** | Kong Admin API         | nami   | `layers/70-agents/78-llm-routers/kong-gateway.nix` | Kong declarative admin API
+| **8090** | Kong Gateway (proxy)   | luffy  | `layers/70-agents/78-llm-routers/kong-gateway.nix` | Unified LLM/API gateway, moved off nami 2026-10-13 (Polyfloor routerEndpoint `http://127.0.0.1:8090/v1`) |
+| **7777** | Polyfloor API (Tailnet-only) | luffy | `layers/70-agents/76-orchestrators/polyfloor.nix` | Polyfloor FastAPI `host 0.0.0.0:7777` Tailnet `luffy.nfp.nix:7777` (Headscale ACL `tag:control-plane` + firewall `trustedInterfaces tailscale0`), WAN `47.254.90.69:7777` blocked. `dataDir /var/lib/polyfloor`, `routerEndpoint http://127.0.0.1:8090/v1` |
+| **8091** | Kong Admin API         | luffy  | `layers/70-agents/78-llm-routers/kong-gateway.nix` | Kong declarative admin API
 | **8092** | EverOS Memory Server   | z0r0   | `layers/70-agents/73-memory/everos.nix`           | Memory consolidation engine     |
 | **7119** | CalibreWeb             | luffy  | `layers/20-services/23-media/calibre-web.nix`   | E-book Web Reader |
-| **8093** | Kong Manager GUI       | z0r0   | `layers/70-agents/78-llm-routers/kong-gateway.nix` | Kong dashboard loopback-only `http://127.0.0.1:8093` |
+| **8093** | Kong Manager GUI       | luffy  | `layers/70-agents/78-llm-routers/kong-gateway.nix` | Kong dashboard loopback-only `http://127.0.0.1:8093` |
 | **8095** | qBittorrent WebUI      | luffy  | `layers/20-services/23-media/download-clients.nix`| Torrent Client Web Interface    |
 | **8096** | Jellyfin               | luffy  | `layers/20-services/23-media/media-stack.nix`     | Media Streaming Server          |
 | **8098** | RomM                   | luffy  | `layers/20-services/23-media/romm.nix`             | ROM Manager & Web Emulator      |
@@ -94,7 +94,7 @@
 | **11434**| Ollama                 | Both   | `layers/20-services/22-ai/ollama.nix`              | Local LLM Inference Engine      |
 | **20127**| Jev Router Pre-Flight  | z0r0   | `layers/70-agents/78-llm-routers/jev-router-plugin.nix`| Jev LLM router pre-flight optimization hook (`:20127`) |
 | **20128**| ExtremeRouter          | z0r0   | `layers/70-agents/78-llm-routers/extreme-router.nix` | Coding LLM router — 154+ providers, web UI + `/v1/*` API |
-| **20129**| OmniRoute              | nami   | `layers/70-agents/78-llm-routers/omniroute.nix`      | Next.js LLM router & RTK compressor |
+| **20129**| OmniRoute              | luffy  | `layers/70-agents/78-llm-routers/omniroute.nix`      | Next.js LLM router & RTK compressor (moved off nami 2026-10-13) |
 | **20130**| Jev Engine             | luffy  | `layers/70-agents/74-ai-infra/jev-engine.nix`        | Jev System-1 decision & routing daemon (`luffy.nfp.nix:20130`) |
 | **20131**| Lead Triage Webhook    | luffy  | `layers/20-services/22-ai/lead-triage-webhook.nix`   | Inbound lead qualification & deal triage webhook (`luffy.nfp.nix:20131`) |
 | **20132**| Jev Metrics Exporter   | luffy  | `layers/20-services/26-monitoring/jev-exporter.nix`  | Jev System-1 Prometheus metrics exporter (`:20132`) |

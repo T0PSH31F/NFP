@@ -11,7 +11,7 @@ description: System-1 Decision Model (Jev / JEPA) for Fleet Email & Filesystem T
 
 - **Zero Hallucination:** Constrained to deterministic enum options and boolean states.
 - **Cost & Speed:** Sub-cent, high-throughput routing before invoking heavy System-2 models (Claude Sonnet, Hermes, GPT-4o).
-- **Fleet Interfacing:** Exposes an MCP server (`jev-decision`) across `z0r0`, `luffy`, and `nami`.
+- **Fleet Interfacing:** Exposes an MCP server (`jev-decision`) across `z0r0` and `luffy` (nami decommissioned 2026-10-14).
 - **Core Engine:** Bound to Tailnet on `luffy.nfp.nix:20130`.
 
 ---

@@ -58,7 +58,7 @@ in
         "headless-console" # TUI-only / server profile
         "none"
       ];
-      default = "none";
+      default = "noctalia-hyprland";
       description = ''
         Single active desktop experience preset.  Only ONE value is active at
         a time; switching to a different value and rebuilding produces a clean

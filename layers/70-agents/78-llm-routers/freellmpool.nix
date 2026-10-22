@@ -79,8 +79,8 @@ with lib;
       {
         nfp.services.freellmpool = {
           enable = config.services.ai-services.freellmpool.enable;
-          host = "nami";
-          port = 8080;
+          host = config.networking.hostName;
+          port = config.services.ai-services.freellmpool.port;
           homepage = {
             enable = true;
             category = "luffy";

@@ -11,7 +11,13 @@ stdenv.mkDerivation {
   src = fetchFromGitHub {
     owner = "justchokingaround";
     repo = "lobster";
-    rev = "main";
+    # PINNED (2026-10-15): was `rev = "main"`, a moving ref that will drift
+    # and break this FOD's hash on the next upstream push (same failure mode
+    # as lazyskills/agentburn). This commit's tarball unpacks to exactly the
+    # sha256 recorded below, so nothing else changed.
+    # To bump: nix-prefetch-github justchokingaround/lobster --rev <new>, then
+    # update `rev` + `sha256`.
+    rev = "ad9688fd1f759abaf3ffa741e77ea9d54bfe38b7";
     sha256 = "sha256-qMdRBiiBDD8OaSEZ1cnfjA3fKbIrMaGTgrlZGOU8sGg=";
   };
 

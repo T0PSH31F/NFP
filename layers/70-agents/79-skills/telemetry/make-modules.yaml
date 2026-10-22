@@ -1,0 +1,55 @@
+# Modular Make Orchestration Workflow for OpenTelemetry Pipeline
+version: "1.0"
+pipeline: "otel-telemetry-orchestration"
+
+modules:
+  - id: "trigger"
+    name: "Telemetry Ingestion Trigger"
+    type: "webhook"
+    description: "Receives raw OTLP webhook notifications or batch span events"
+    config:
+      port: 8096
+      path: "/webhook/telemetry-event"
+      auth_type: "bearer"
+      secret_env: "TELEMETRY_WEBHOOK_SECRET"
+
+  - id: "parse"
+    name: "Payload Parser & Schema Validation"
+    type: "transform"
+    description: "Validates incoming payload against input-config.yaml"
+    depends_on: ["trigger"]
+    config:
+      schema_file: "./input-config.yaml"
+      drop_invalid: true
+      strict_mode: false
+
+  - id: "transform"
+    name: "Enrichment & Format Normalization"
+    type: "processor"
+    description: "Enriches payload with fleet tags, Machine ID, and MagicDNS hostnames"
+    depends_on: ["parse"]
+    config:
+      enrichment_fields:
+        fleet.network: "tailnet"
+        fleet.tld: "nfp.nix"
+      rules:
+        - match: "service_name == 'hermes'"
+          set:
+            tier: "71-harness"
+        - match: "service_name == 'polyfloor'"
+          set:
+            tier: "76-orchestrators"
+
+  - id: "deploy"
+    name: "Sink Dispatch & Exporter"
+    type: "exporter"
+    description: "Dispatches normalized telemetry to Prometheus, Loki, and OTel Collector"
+    depends_on: ["transform"]
+    config:
+      targets:
+        - name: "otel-collector-http"
+          endpoint: "http://127.0.0.1:4318/v1/traces"
+          method: "POST"
+        - name: "loki-push"
+          endpoint: "http://luffy.nfp.nix:3100/loki/api/v1/push"
+          condition: "has(signals.logs)"

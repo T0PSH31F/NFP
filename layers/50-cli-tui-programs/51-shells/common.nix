@@ -35,6 +35,11 @@ in
       NPM_CONFIG_INIT_MODULE = "${xdgConfig}/npm/config/npm-init.js";
       # Ensure X cursor themes remain resolvable after leaving ~/.icons
       XCURSOR_PATH = "/run/current-system/sw/share/icons:${xdgData}/icons";
+
+      # Required for Noctalia v5 (native C++/OpenGL ES) to find the EGL display.
+      # Without this, noctalia.service crashes with "fatal: eglGetDisplay failed"
+      # because the systemd user environment does not inherit it from the compositor.
+      EGL_PLATFORM = "wayland";
     };
 
     home.shellAliases = {

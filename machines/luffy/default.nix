@@ -88,7 +88,10 @@ in
     efi.canTouchEfiVariables = true;
     timeout = 5;
   };
-  boot.kernelParams = [ "nvidia-drm.modeset=1" ];
+  boot.kernelParams = [
+    "nvidia-drm.modeset=1"
+    "consoleblank=120"
+  ];
 
   nix.gc.automatic = lib.mkForce false; # Do not run automatic GC/delete generations
 
@@ -104,6 +107,11 @@ in
       virtualization.enable = true;
       mobile.android.enable = true;
       peripherals.razer.enable = lib.mkForce false; # Disabled: openrazer driver incompatible with linux 7.0.10
+    };
+    layer-40.desktop.noctalia.idle = {
+      dpmsTimeout = 120; # 2 minutes screen off (like Sanji was)
+      lockTimeout = 180; # 3 minutes session lock
+      dpmsIgnoreAc = false;
     };
   };
   layers.layer-20.services.config.your-spotify.enable = true;

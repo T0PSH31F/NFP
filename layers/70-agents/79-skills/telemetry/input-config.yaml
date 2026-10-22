@@ -1,0 +1,66 @@
+# OpenTelemetry Ingestion Payload Contract
+# Schema for Donut Browser and AI Agent Telemetry Intake
+schema_version: "2.0.0"
+agent:
+  name: "donut-browser-telemetry-agent"
+  harness: "streamable-http"
+  version: "1.0.0"
+
+payload_structure:
+  trace_context:
+    trace_id:
+      type: "string"
+      format: "hex32"
+      required: true
+      description: "Unique 128-bit W3C Trace Context trace ID"
+    span_id:
+      type: "string"
+      format: "hex16"
+      required: true
+      description: "Unique 64-bit W3C Trace Context span ID"
+    parent_span_id:
+      type: "string"
+      format: "hex16"
+      required: false
+      description: "Parent span identifier for nested agent invocations"
+
+  metadata:
+    host:
+      type: "string"
+      required: true
+      description: "Fleet hostname (e.g., z0r0, luffy, sanji)"
+    service_name:
+      type: "string"
+      required: true
+      description: "Originating service or AI agent harness"
+    environment:
+      type: "string"
+      enum: ["production", "staging", "development"]
+      default: "production"
+
+  signals:
+    metrics:
+      type: "array"
+      items:
+        name: "string"
+        value: "number"
+        timestamp_unix_nano: "integer"
+        tags: "map[string]string"
+
+    logs:
+      type: "array"
+      items:
+        level: "string"
+        message: "string"
+        timestamp_unix_nano: "integer"
+        attributes: "map[string]string"
+
+    spans:
+      type: "array"
+      items:
+        name: "string"
+        start_time_unix_nano: "integer"
+        end_time_unix_nano: "integer"
+        status_code: "integer"
+        attributes: "map[string]string"
+        events: "array"

@@ -20,7 +20,6 @@ in
       # Non-Noctalia experiences that don't set $ipc will see no-op fallback.
       "$ipc" = lib.mkDefault "true";
 
-
       bind = [
         # ── Core App Launchers ─────────────────────────────────────────
         "$mod, Return, exec, uwsm app -- ghostty"

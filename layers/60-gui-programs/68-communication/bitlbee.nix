@@ -38,7 +38,11 @@ in
     };
 
     authMode = lib.mkOption {
-      type = lib.types.enum [ "Open" "Closed" "Registered" ];
+      type = lib.types.enum [
+        "Open"
+        "Closed"
+        "Registered"
+      ];
       default = "Registered";
       description = ''
         Authentication mode:
@@ -83,8 +87,8 @@ in
     services.bitlbee = {
       enable = true;
       portNumber = cfg.port;
-      interface = cfg.interface;
-      authMode = cfg.authMode;
+      inherit (cfg) interface;
+      inherit (cfg) authMode;
       authBackend = "storage";
 
       # Native bitlbee plugins (compiled against bitlbee's plugin ABI)
@@ -98,8 +102,8 @@ in
         (lib.optional cfg.facebook pkgs.bitlbee-facebook)
       ];
 
-      extraSettings = cfg.extraSettings;
-      extraDefaults = cfg.extraDefaults;
+      inherit (cfg) extraSettings;
+      inherit (cfg) extraDefaults;
     };
 
     # Open firewall only on loopback — IRC clients connect locally.

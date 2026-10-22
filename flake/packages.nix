@@ -23,6 +23,18 @@
           ];
         }).config.system.build.isoImage;
 
+      packages.installer-iso =
+        (inputs.nixpkgs.lib.nixosSystem {
+          inherit system;
+          specialArgs = {
+            inherit inputs;
+            modulesPath = "${inputs.nixpkgs}/nixos/modules";
+          };
+          modules = [
+            ../layers/00-cyberia/08-iso/nfp-installer-iso.nix
+          ];
+        }).config.system.build.isoImage;
+
       apps.deploy = {
         type = "app";
         program = "${
