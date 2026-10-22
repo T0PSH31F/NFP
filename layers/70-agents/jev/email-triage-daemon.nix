@@ -58,6 +58,7 @@ in
   config = lib.mkIf cfg.enable {
     # System CLI helper
     environment.systemPackages = [
+      pkgs.himalaya
       (pkgs.writeShellScriptBin "jev-email-triage" ''
         exec ${pkgs.python3}/bin/python3 ${./email-triage-daemon.py} \
           --jev-url "${cfg.jevUrl}" \
@@ -73,6 +74,10 @@ in
     systemd.services.email-triage-daemon = {
       description = "Jev Email Triage Daemon";
       after = [ "network.target" ];
+      path = [
+        pkgs.himalaya
+        pkgs.coreutils
+      ];
       serviceConfig = {
         Type = "oneshot";
         User = user;

@@ -4,7 +4,6 @@
     {
       pkgs,
       system,
-      inputs',
       ...
     }:
     let

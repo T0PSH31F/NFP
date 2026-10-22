@@ -64,16 +64,13 @@
     layer-30.theming.themes.greeter.type = "tuigreet";
     layer-40.desktop.noctalia.idle = {
       dpmsIgnoreAc = true; # Never shut screen off while plugged in to AC power
+      lockIgnoreAc = true; # Never lock screen while plugged in to AC power
     };
     desktop.experience = "nixarchy-rise";
   };
 
   # Prevent display power-off / blanking when plugged in
   boot.kernelParams = [ "consoleblank=0" ];
-  services.logind.settings.Login = {
-    IdleAction = "ignore";
-    LidSwitchExternalPower = "ignore";
-  };
 
   # ============================================================================
   # 03 - HARDWARE & GRAPHICS (Dell Precision 7680)
@@ -92,36 +89,56 @@
   };
 
   # ============================================================================
-  # 04 - AI ROUTER & LOCAL INFERENCE STACK (Migrated from nami/luffy)
+  # 04 - SERVICES & AI STACK
   # ============================================================================
-  # Local inference on RTX 1000 Ada (4GB VRAM) for 2B-3B abliterated/uncensored models
-  services.ai-services.ollama = {
-    enable = true;
-    acceleration = "cuda";
-  };
+  services = {
+    logind.settings.Login = {
+      IdleAction = "ignore";
+      LidSwitchExternalPower = "ignore";
+    };
 
-  # Always-on AI router stack
-  services.ai-services = {
-    kong-gateway.enable = true;
-    omniroute.enable = true;
-    freellmapi.enable = true;
-    freellmpool.enable = true;
-  };
+    ai-services = {
+      ollama = {
+        enable = true;
+        acceleration = "cuda";
+      };
+      kong-gateway = {
+        enable = true;
+        routers = {
+          extreme-router.host = "100.64.0.1";
+          freellmapi.port = lib.mkForce 3001;
+          freellmpool.port = lib.mkForce 8080;
+        };
+      };
+      omniroute = {
+        enable = true;
+        environmentFile = config.sops.templates."omniroute-env".path;
+      };
+      freellmapi.enable = true;
+      freellmpool.enable = true;
+    };
 
-  # OmniRoute credential sync from ExtremeRouter
-  services.ai-services.omniroute.environmentFile = config.sops.templates."omniroute-env".path;
+    jev-engine = {
+      enable = true;
+      port = 20130;
+      host = "0.0.0.0";
+      mode = "local";
+    };
 
-  # Kong router listener and upstream alignment
-  services.ai-services.kong-gateway.routers.extreme-router.host = "100.64.0.1";
-  services.ai-services.kong-gateway.routers.freellmapi.port = lib.mkForce 3001;
-  services.ai-services.kong-gateway.routers.freellmpool.port = lib.mkForce 8080;
+    email-triage-daemon = {
+      enable = true;
+      jevUrl = "http://127.0.0.1:20130";
+      himalayaAccount = "wrighterik77";
+      confidenceThreshold = 0.80;
+      interval = "5m";
+    };
 
-  # Jev System-1 Decision Engine & Discriminative LLM Router Pre-Flight Hook
-  services.jev-engine = {
-    enable = true;
-    port = 20130;
-    host = "0.0.0.0";
-    mode = "local";
+    infrastructure.langfuse = {
+      enable = true;
+      port = 3005;
+    };
+
+    polyfloor.enable = true;
   };
 
   layers.layer-78.llm-routers.jev-router-plugin = {
@@ -131,24 +148,6 @@
     jevEngineUrl = "http://127.0.0.1:20130";
     localSlmUrl = "http://127.0.0.1:11434";
   };
-
-  # Autonomous Email Triage Daemon (Himalaya IMAP & Maildir)
-  services.email-triage-daemon = {
-    enable = true;
-    jevUrl = "http://127.0.0.1:20130";
-    himalayaAccount = "wrighterik77";
-    confidenceThreshold = 0.80;
-    interval = "5m";
-  };
-
-  # Langfuse LLM Observability & Tracing Platform
-  services.infrastructure.langfuse = {
-    enable = true;
-    port = 3005;
-  };
-
-  # Polyfloor agent company OS (talks to Kong on localhost:8090)
-  services.polyfloor.enable = true;
 
   # ============================================================================
   # 05 - SECURITY & SECRETS (SOPS)

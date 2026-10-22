@@ -113,10 +113,10 @@ in
       # Firewall handled explicitly below with CIDR-scoped rules (Tailnet + LAN + localhost only).
       # Do not open to WAN — task requires AdGuard never publicly exposed as open resolver.
       openFirewall = false;
-      inherit (cfg) port;
       mutableSettings = true;
       allowDHCP = cfg.dhcp;
       settings = {
+        http.address = "0.0.0.0:${toString cfg.port}";
         dns = {
           # Listener: localhost + LAN + Tailnet-reachable. Sourced from fleetAddresses authority
           # for tailnet binding; cfg.bindHosts remains override but defaults tightened per task.

@@ -59,13 +59,19 @@
   layers = {
     layer-10.system = {
       hardware.kernel = "zen"; # Zen kernel for z0r0 laptop workstation
-      peripherals.corsair.enable = true;
-      peripherals.openrgb.enable = true;
-      peripherals.razer.enable = lib.mkForce false; # Disabled: openrazer driver incompatible with linux 7.0.10
-      mobile.android.enable = true;
-      mobile.ios.enable = true;
-      config.impermanence.enable = true;
-      config.nas-mount.enable = true;
+      peripherals = {
+        corsair.enable = true;
+        openrgb.enable = true;
+        razer.enable = lib.mkForce false; # Disabled: openrazer driver incompatible with linux 7.0.10
+      };
+      mobile = {
+        android.enable = true;
+        ios.enable = true;
+      };
+      config = {
+        impermanence.enable = true;
+        nas-mount.enable = true;
+      };
       virtualization.enable = true;
       sessionResilience.enable = true;
     };
@@ -156,36 +162,38 @@
   # only (luffy has the same vulnerability but is left untouched per user
   # request — consider applying the same fix to luffy in the future).
 
-  system.activationScripts.gcroot-util-linux = ''
-    mkdir -p /nix/var/nix/gcroots
-    _ulbin="${pkgs.util-linux.bin}"
-    if [ -d "$_ulbin/bin" ]; then
-      for link in "$_ulbin"/bin/*; do
-        [ -L "$link" ] || continue
-        target=$(readlink -f "$link" 2>/dev/null) || continue
-        case "$target" in
-          /nix/store/*)
-            storepath=$(echo "$target" | cut -d/ -f1-4)
-            name=$(basename "$storepath")
-            ln -sfn "$storepath" "/nix/var/nix/gcroots/util-linux-fix-$name"
-            ;;
-        esac
-      done
-    fi
-  '';
+  system.activationScripts = {
+    gcroot-util-linux = ''
+      mkdir -p /nix/var/nix/gcroots
+      _ulbin="${pkgs.util-linux.bin}"
+      if [ -d "$_ulbin/bin" ]; then
+        for link in "$_ulbin"/bin/*; do
+          [ -L "$link" ] || continue
+          target=$(readlink -f "$link" 2>/dev/null) || continue
+          case "$target" in
+            /nix/store/*)
+              storepath=$(echo "$target" | cut -d/ -f1-4)
+              name=$(basename "$storepath")
+              ln -sfn "$storepath" "/nix/var/nix/gcroots/util-linux-fix-$name"
+              ;;
+          esac
+        done
+      fi
+    '';
 
-  system.activationScripts.clean-boot-entries = ''
-    if [ -d /boot/loader/entries ]; then
-      for f in /boot/loader/entries/*.conf; do
-        [ -f "$f" ] || continue
-        init_path=$(${pkgs.gnugrep}/bin/grep -E 'options.*init=' "$f" | ${pkgs.gnused}/bin/sed -E 's/.*init=([^ ]+).*/\1/')
-        if [ -n "$init_path" ] && [ ! -e "$init_path" ]; then
-          echo "Pruning orphan boot entry: $f (init $init_path missing)"
-          rm -f "$f"
-        fi
-      done
-    fi
-  '';
+    clean-boot-entries = ''
+      if [ -d /boot/loader/entries ]; then
+        for f in /boot/loader/entries/*.conf; do
+          [ -f "$f" ] || continue
+          init_path=$(${pkgs.gnugrep}/bin/grep -E 'options.*init=' "$f" | ${pkgs.gnused}/bin/sed -E 's/.*init=([^ ]+).*/\1/')
+          if [ -n "$init_path" ] && [ ! -e "$init_path" ]; then
+            echo "Pruning orphan boot entry: $f (init $init_path missing)"
+            rm -f "$f"
+          fi
+        done
+      fi
+    '';
+  };
 
   # Safe automatic garbage collection — only removes old generations,
   # never unreferenced paths that might have broken reference metadata.
