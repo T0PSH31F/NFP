@@ -30,6 +30,7 @@ in
       # Active Desktop Experience (Noctalia Hyprland)
       source = ${config.home.homeDirectory}/.config/hypr/experiences/noctalia-hyprland.conf
     '';
+    xdg.configFile."hypr/vibrancy.frag".source = ../../../layers/00-cyberia/02-assets/vibrancy.frag;
 
     # ── Kitty ──────────────────────────────────────────────────────────
     # Noctalia's built-in kitty template generates to:

@@ -109,7 +109,9 @@ in
           }
 
           # Quickshell Rise layer rules
-          layerrule = blur 1, match:namespace ^omarchy-(bar|menu|notifications|dock|osd)$
+          # Only blur opaque surfaces (bar, dock). Transparent full-screen canvases
+          # (menu overlay, notifications, osd) must NOT be blurred or they black out the viewport.
+          layerrule = blur 1, match:namespace ^omarchy-(bar|dock)$
           layerrule = no_anim 1, match:namespace ^omarchy-(bar|menu|notifications|dock|osd)$
 
           # Omarchy shortcuts & bindings

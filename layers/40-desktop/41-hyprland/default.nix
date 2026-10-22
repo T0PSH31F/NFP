@@ -195,7 +195,9 @@ in
             };
 
             decoration = {
-              screen_shader = "${config.home.homeDirectory}/.config/hypr/vibrancy.frag";
+              # Base compositor has ZERO default screen shaders.
+              # Shaders are strictly applied by active experiences when selected.
+              screen_shader = lib.mkDefault "";
             };
 
             exec-once = [
@@ -212,7 +214,7 @@ in
             ];
 
             general = {
-              border_size = 4;
+              border_size = lib.mkDefault 2;
               # Border colors ($primary, $surface) are provided by active experience
               # templates — do NOT override here.
               resize_on_border = true;
@@ -234,7 +236,6 @@ in
           };
         };
 
-        xdg.configFile."hypr/vibrancy.frag".source = ../../../layers/00-cyberia/02-assets/vibrancy.frag;
         xdg.configFile."hypr/hyprland.conf".force = true;
         xdg.configFile."hypr/pyprland.toml".text = ''
           [pyprland]
