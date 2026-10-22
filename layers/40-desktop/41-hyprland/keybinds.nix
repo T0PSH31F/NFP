@@ -39,6 +39,8 @@ in
         "$mod ALT, B, exec, uwsm app -- dillo"
         "$mod SHIFT, T, exec, uwsm app -- kitty"
         "$mod SHIFT, A, exec, wlr-which-key agents"
+        "$mod, V, exec, glados-ptt"
+        "$mod SHIFT, V, exec, uwsm app -- ghostty -e glados-voice --tui"
 
         "$mod, Space, exec, vicinae toggle"
         "$mod, slash, exec, cheatsheet"

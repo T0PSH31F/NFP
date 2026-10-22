@@ -92,6 +92,20 @@ in
       category = "scratchpad";
       cmd = "pypr toggle gemini";
     })
+    (mkAction {
+      chord = "Super+V";
+      action = "glados-voice-ptt";
+      desc = "GLaDOS Push-to-Talk voice query";
+      category = "agents";
+      cmd = "glados-ptt";
+    })
+    (mkAction {
+      chord = "Super+Shift+V";
+      action = "glados-voice-duplex";
+      desc = "GLaDOS Duplex interactive voice chamber";
+      category = "agents";
+      cmd = "uwsm app -- ghostty -e glados-voice --tui";
+    })
   ];
 
   # ── Mnemonic Which-Key & Rofi Groups ────────────────────────────────
@@ -342,6 +356,20 @@ in
           desc = "Agent Resource Monitor";
           category = "agents";
           cmd = "uwsm app -- ghostty -e btop";
+        })
+        (mkAction {
+          chord = "V";
+          action = "agent-glados-ptt";
+          desc = "GLaDOS Push-to-Talk";
+          category = "agents";
+          cmd = "glados-ptt";
+        })
+        (mkAction {
+          chord = "D";
+          action = "agent-glados-duplex";
+          desc = "GLaDOS Duplex Voice Chamber";
+          category = "agents";
+          cmd = "uwsm app -- ghostty -e glados-voice --tui";
         })
       ];
     };

@@ -47,8 +47,15 @@ Configuration logic is strictly compartmentalized across 10 numbered layers. See
 
 NFP includes a production-grade multi-agent autonomous framework structured across tiers 71–79:
 
+* **Voice-to-Voice AI & GLaDOS Subsystem** (`72-voice`):
+  - **Aperture Science Neural Voice:** Fully local GLaDOS vocal synthesis via Piper ONNX (`glados-speak`, `glados-tts-cli`) and real-time FastConformer STT (`glados-transcribe`).
+  - **Universal Desktop Shortcuts:**
+    - `Super + V`: Instant Push-to-Talk voice query (`glados-ptt`).
+    - `Super + Shift + V`: Interactive duplex voice chamber with barge-in interruption (`glados-voice --tui`).
+    - `Super + Shift + A -> V/D`: Integrated into the global Action Registry and Which-Key menus.
 * **Agent Harnesses** (`71-harness`): Hermes Agent Gateway (`:8085`), OpenCode, Antigravity IDE, DSH.
-* **LLM Routing** (`78-llm-routers`): Kong Gateway (`:8090`), ExtremeRouter (`:20128`), LiteLLM, FreeLLMAPI.
+* **LLM Routing & Token Guard** (`78-llm-routers`): Kong Gateway (`:8090`), Jev System-1 Pre-Flight Proxy (`:20127` — 0-token classification bypass), ExtremeRouter (`:20128`), OmniRoute (`:20129`), FreeLLMAPI (`:3001`), FreeLLMPool (`:8080`).
+* **Autonomous Email Triage** (`layers/70-agents/jev`): Himalaya IMAP daemon + Jev Engine (`:20130`) sorting messages into domain anchors with proactive GLaDOS vocal alerts.
 * **Memory & PKB** (`73-memory`): Brain-service (`:8010`), EverOS (`:8092`), ContextForge (`:8094`), Honcho, GNO.
 * **Inference Runtimes** (`74-ai-infra`): Ollama (`:11434`), llama.cpp (`:8080`), vLLM (`:8000`), LocalAI.
 * **Orchestration & UIs** (`76-orchestrators`, `77-dash-desk-ui`): Polyfloor (`:7777` API-only on `luffy`), Open WebUI (`:8088`), AionUI, Mission Control.
