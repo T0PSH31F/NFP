@@ -6,7 +6,7 @@
   imports = [
     ./layers/10-system
     ./layers/20-services
-    ./layers/30-theming
+    ./layers/30-environments
     ./layers/40-desktop
     ./layers/50-cli-tui-programs
     ./layers/60-gui-programs

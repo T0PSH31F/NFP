@@ -12,8 +12,8 @@
 | **00–09** | `00-cyberia` | Architecture docs, asset templates, scripts, ISOs, tools | `10` |
 | **10–19** | `10-system` | OS foundation, hardware, cpu/gpu drivers, users, impermanence | `20` |
 | **20–29** | `20-services` | System services, networking, AI stack, media, monitoring, CI | `30` |
-| **30–39** | `30-theming` | System-wide themes, fonts, boot themes, GTK/Qt assets | `37` |
-| **40–49** | `40-desktop` | Wayland compositors (Hyprland, Niri), Noctalia, DE frameworks | `49` |
+| **30–39** | `30-environments` | Desktop environments, human visual shells, environments & identity | `39` |
+| **40–49** | `40-desktop` | Wayland compositors (Hyprland, Niri, Umbriel), DE frameworks, tools | `49` |
 | **50–59** | `50-cli-tui-programs` | Shells (zsh, nushell), editors, TUI tools, zellij, prompts | `60` |
 | **60–69** | `60-gui-programs` | Browsers, media players, GUI dev tools, communication | `69` |
 | **70–79** | `70-agents` | AI agents (Hermes, OpenCode), MCP servers, skills registry | `77` |
@@ -57,20 +57,22 @@
 - `28-clan-services`: Clan module wrappers
 - `29-ci`: Continuous integration runners
 
-### 30-theming
-- `31-cursor`: Mouse cursor themes
-- `32-boot`: Plymouth & GRUB themes
-- `33-gtk`: GTK2/3/4 themes & Matugen
-- `34-qt`: Qt5/6 Kvantum & Breeze themes
-- `36-sfx`: System sound event themes
+### 30-environments
+- `30-selector`: Master experience selector (layers.desktop.experience enum)
+- `31-noctalia`: Noctalia desktop shell v5 & compositor adapters (Hyprland, Niri, Umbriel)
+- `32-nixarchy-rise`: Nixarchy (Omarchy 4.5 + Quickshell Rise)
+- `33-end4`: End4 AGS/Hyprland environment
+- `34-vibe-lab`: Custom live QML dev environment
+- `35-smol-ai`: Ultra-light cage/dwl environment
+- `36-cursor`: Mouse cursor themes
+- `37-boot`: Plymouth & GRUB boot themes, greeters
+- `38-theming`: GTK, Qt & SFX system theme assets
 
 ### 40-desktop
-- `41-compositors`: Standalone Wayland compositors (Umbriel)
-- `41-hyprland`: Hyprland Wayland compositor base
-- `42-niri`: Niri scrollable tiling compositor
-- `43-experiences`: Experience adapters (e.g. Noctalia-Hyprland)
-- `43-noctalia`: Noctalia desktop shell v5
-- `44-de-frameworks`: Vicinae launcher & desktop framework
+- `41-hyprland`: Hyprland Wayland compositor base (headless substrate)
+- `42-niri`: Niri scrollable tiling compositor base
+- `43-umbriel`: Umbriel Wayland compositor base
+- `44-de-frameworks`: Vicinae launcher, desktop portals, action registry
 - `45-file-managers`: Nautilus, Thunar GUI file managers
 - `46-terminal-emulators`: Ghostty, Kitty, Foot
 - `47-display`: Wayland display manager & greetd

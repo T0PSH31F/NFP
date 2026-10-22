@@ -12,7 +12,7 @@
     "${modulesPath}/installer/cd-dvd/installation-cd-minimal.nix"
     inputs.sops-nix.nixosModules.sops
     # Import theme modules to allow consistent styling
-    ../../30-theming/32-boot
+    ../../30-environments/37-boot
     ../../10-system/11-foundation/fonts.nix
   ];
 

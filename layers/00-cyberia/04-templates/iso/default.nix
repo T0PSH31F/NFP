@@ -29,7 +29,7 @@
     ../../../10-system
     ../../../10-system/12-processor
     ../../../10-system/11-foundation
-    ../../../30-theming
+    ../../../30-environments
     ../../../10-system/13-users/t0psh31f.nix
     ../../../40-desktop
   ];
