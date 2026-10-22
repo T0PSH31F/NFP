@@ -767,8 +767,8 @@
 
           # ── LLM Providers ────────────────────────────────────────────
           OPENROUTER_API_KEY=${config.sops.placeholder.openrouter_api_key_2}
-          GEMINI_API_KEY=${config.sops.placeholder.gemini_api_key}
-          GOOGLE_API_KEY=${config.sops.placeholder.gemini_api_key}
+          GEMINI_API_KEY=${config.sops.placeholder.gemini_api_key_we77}
+          GOOGLE_API_KEY=${config.sops.placeholder.gemini_api_key_we77}
           HF_TOKEN=${config.sops.placeholder.hf_token}
           GROQ_API_KEY=${config.sops.placeholder.groq_api_key}
           CEREBRAS_API_KEY=${config.sops.placeholder.cerebras_api_key}

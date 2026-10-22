@@ -389,7 +389,7 @@
 
         # Export API keys as environment variables
         home.sessionVariables = {
-          GEMINI_API_KEY = "$(cat ${config.sops.secrets.gemini_api_key.path})";
+          GEMINI_API_KEY = "$(cat ${config.sops.secrets.gemini_api_key_we77.path})";
           OPENROUTER_API_KEY = "$(cat ${config.sops.secrets.openrouter_api_key.path})";
         };
 

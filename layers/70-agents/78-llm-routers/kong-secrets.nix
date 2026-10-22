@@ -163,7 +163,7 @@ with lib;
         content = ''
           # OmniRoute provider keys and transferred ExtremeRouter secrets
           ANTHROPIC_API_KEY=${config.sops.placeholder.anthropic_api_key}
-          GEMINI_API_KEY=${config.sops.placeholder.gemini_api_key_lovelain}
+          GEMINI_API_KEY=${config.sops.placeholder.gemini_api_key_we77}
           OPENROUTER_API_KEY=${config.sops.placeholder.openrouter_api_key_1}
           GROQ_API_KEY=${config.sops.placeholder.groq_api_key}
           CEREBRAS_API_KEY=${config.sops.placeholder.cerebras_api_key}
@@ -188,7 +188,7 @@ with lib;
           OPENROUTER_API_KEY=${config.sops.placeholder.openrouter_api_key_1}
           GROQ_API_KEY=${config.sops.placeholder.groq_api_key}
           CEREBRAS_API_KEY=${config.sops.placeholder.cerebras_api_key}
-          GEMINI_API_KEY=${config.sops.placeholder.gemini_api_key_lovelain}
+          GEMINI_API_KEY=${config.sops.placeholder.gemini_api_key_we77}
           GITHUB_MODELS_API_KEY=${config.sops.placeholder.github_models_api}
           NVIDIA_API_KEY=${config.sops.placeholder.nvidia_api_key}
         '';

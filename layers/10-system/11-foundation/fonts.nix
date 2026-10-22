@@ -35,6 +35,7 @@
       # ── Symbols & emoji ──
       font-awesome
       material-design-icons
+      material-symbols
       twitter-color-emoji
       noto-fonts-cjk-sans # CJK characters
       noto-fonts-color-emoji # Google emoji

@@ -116,19 +116,16 @@ in
       OPENAI_BASE_URL_EXTREME_DIRECT = lib.mkDefault "http://127.0.0.1:20128/v1";
     };
 
-    home-manager.users.${user} = { pkgs, ... }: {
-      config = {
-        # Pi User Settings (~/.pi/agent/settings.json)
-        home.file.".pi/agent/settings.json".text = builtins.toJSON {
+    home-manager.users.${user} = { pkgs, ... }:
+      let
+        piSettings = {
           defaultProvider = "kong";
           inherit (cfg) defaultModel;
           inherit (cfg) autoCommit;
           inherit (cfg) thinkingBudget;
         };
 
-        # Pi Models Configuration (~/.pi/agent/models.json)
-        # Speaks native OpenAI-compatible completions format supported by Kong, ExtremeRouter & Ollama
-        home.file.".pi/agent/models.json".text = builtins.toJSON {
+        piModels = {
           "$schema" = "https://pi.dev/schemas/models.schema.json";
           providers = {
             kong = {
@@ -171,6 +168,18 @@ in
                 }
               ];
             };
+            groq = {
+              baseUrl = "https://api.groq.com/openai/v1";
+              api = "openai-completions";
+              apiKey = "$GROQ_API_KEY";
+              models = [
+                {
+                  id = "qwen/qwen3.8-27b";
+                  name = "Qwen 3.8 27B";
+                  input = [ "text" ];
+                }
+              ];
+            };
             ollama = {
               baseUrl = "http://127.0.0.1:11434/v1";
               api = "openai-completions";
@@ -186,8 +195,7 @@ in
           };
         };
 
-        # Pi MCP Servers (~/.pi/agent/mcp.json)
-        home.file.".pi/agent/mcp.json".text = builtins.toJSON {
+        piMcp = {
           mcpServers = optionalAttrs cfg.enableMcp {
             hermes-a2a = {
               url = "http://127.0.0.1:8085/mcp";
@@ -204,15 +212,29 @@ in
             };
           };
         };
+      in
+      {
+        config = {
+          # Pi User Settings (~/.pi/agent/settings.json and ~/.config/pi/agent/settings.json)
+          home.file.".pi/agent/settings.json".text = builtins.toJSON piSettings;
+          xdg.configFile."pi/agent/settings.json".text = builtins.toJSON piSettings;
 
-        # Backward compatibility symlink (~/.config/pi/config.json)
-        xdg.configFile."pi/config.json".text = builtins.toJSON {
-          model = cfg.defaultModel;
-          apiBase = cfg.routerEndpoint;
-          inherit (cfg) autoCommit;
-          inherit (cfg) thinkingBudget;
+          # Pi Models Configuration (~/.pi/agent/models.json and ~/.config/pi/agent/models.json)
+          home.file.".pi/agent/models.json".text = builtins.toJSON piModels;
+          xdg.configFile."pi/agent/models.json".text = builtins.toJSON piModels;
+
+          # Pi MCP Servers (~/.pi/agent/mcp.json and ~/.config/pi/agent/mcp.json)
+          home.file.".pi/agent/mcp.json".text = builtins.toJSON piMcp;
+          xdg.configFile."pi/agent/mcp.json".text = builtins.toJSON piMcp;
+
+          # Backward compatibility symlink (~/.config/pi/config.json)
+          xdg.configFile."pi/config.json".text = builtins.toJSON {
+            model = cfg.defaultModel;
+            apiBase = cfg.routerEndpoint;
+            inherit (cfg) autoCommit;
+            inherit (cfg) thinkingBudget;
+          };
         };
       };
-    };
   };
 }

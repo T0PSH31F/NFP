@@ -95,8 +95,9 @@ in
         # $ipc uses Quickshell IPC — NOT noctalia msg
         wayland.windowManager.hyprland.settings."$ipc" = lib.mkForce "qs ipc";
 
-        # Deploy Rise shell config to ~/.config/quickshell/rise
+        # Deploy Rise shell config to ~/.config/quickshell/rise and ~/.config/quickshell/bar
         xdg.configFile."quickshell/rise".source = "${hancore-quickshell-rise}/share/quickshell/rise";
+        xdg.configFile."quickshell/bar".source = "${hancore-quickshell-rise}/share/quickshell/rise";
 
         # Ensure Ghostty is the default terminal for xdg-terminal-exec
         xdg.configFile."xdg-terminals.list".text = "ghostty.desktop\ncom.mitchellh.ghostty.desktop\n";
@@ -168,7 +169,7 @@ in
           Service = {
             Type = "oneshot";
             RemainAfterExit = true;
-            ExecStart = "${pkgs.bash}/bin/bash -c 'mkdir -p %h/.local/state/omarchy/current && if [ ! -e %h/.local/state/omarchy/current/theme ]; then ln -sfn ${nixarchyPkg}/share/omarchy/themes/catppuccin %h/.local/state/omarchy/current/theme && ln -sfn ${nixarchyPkg}/share/omarchy/themes/catppuccin/backgrounds/2-waves.webp %h/.local/state/omarchy/current/background && echo Catppuccin > %h/.local/state/omarchy/current/theme.name && echo 1 > %h/.local/state/omarchy/current/theme.generation; fi; mkdir -p %h/.cache && [ ! -f %h/.cache/quickshell_splits ] && echo \"1 1 1 1 3 color02\" > %h/.cache/quickshell_splits || true'";
+            ExecStart = "${pkgs.bash}/bin/bash -c 'mkdir -p %h/.local/state/omarchy/current && if [ ! -e %h/.local/state/omarchy/current/theme ]; then ln -sfn ${nixarchyPkg}/share/omarchy/themes/catppuccin %h/.local/state/omarchy/current/theme && ln -sfn ${nixarchyPkg}/share/omarchy/themes/catppuccin/backgrounds/2-waves.webp %h/.local/state/omarchy/current/background && echo Catppuccin > %h/.local/state/omarchy/current/theme.name && echo 1 > %h/.local/state/omarchy/current/theme.generation; fi; mkdir -p %h/.cache && [ ! -f %h/.cache/quickshell_splits ] && echo \"1 1 1 1 3 color02\" > %h/.cache/quickshell_splits || true; [ ! -f %h/.cache/quickshell_barsplits ] && printf \"010000|000000|11\" > %h/.cache/quickshell_barsplits || true'";
           };
         };
 
