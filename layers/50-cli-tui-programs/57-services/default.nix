@@ -1,4 +1,4 @@
-{ lib, mkDendriticModule, ... }:
+{ mkDendriticModule, ... }:
 {
   imports = [
     (mkDendriticModule "podman" ./podman.nix)

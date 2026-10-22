@@ -1,4 +1,4 @@
-{ lib, mkDendriticModule, ... }:
+{ mkDendriticModule, ... }:
 {
   imports = [
     (mkDendriticModule "dev-tools" ./dev-tools.nix)

@@ -111,6 +111,11 @@ in
           layerrule = blur 1, match:namespace ^omarchy-(bar|menu|notifications|dock|osd)$
           layerrule = no_anim 1, match:namespace ^omarchy-(bar|menu|notifications|dock|osd)$
 
+          # Omarchy shortcuts & bindings
+          bind = $mod, SPACE, exec, omarchy-menu toggle
+          bind = $mod, D, exec, omarchy-menu toggle apps
+          bind = $mod, comma, exec, omarchy-menu toggle setup
+
           # Autostart Quickshell Rise bar
           exec-once = OMARCHY_PATH=${nixarchyPkg}/share/omarchy quickshell -p ~/.config/quickshell/rise
         '';

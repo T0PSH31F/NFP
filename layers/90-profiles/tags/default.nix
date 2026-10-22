@@ -1,7 +1,6 @@
 # Tag Profile Registry — Tags as Pure Data
 {
   config,
-  lib,
   mkDendriticModule,
   mkDendriticTree,
   ...
