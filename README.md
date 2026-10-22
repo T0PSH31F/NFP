@@ -21,6 +21,7 @@ Welcome to the **Nix Flake Pirates (NFP)** NixOS configuration repository. This 
 | :---: | :---: | :---: | :---: | :---: |
 | ![Zoro](assets/machines/zoro.png) | **z0r0** | Workstation & AI Hub | **Workstation**: LG Gram 17, **CPU**: i7-1260P, **RAM**: 16GB, **Tags**: `desktop`, `workstation`, `ai-server` | 🟢 Active |
 | ![Luffy](assets/machines/luffy.png) | **luffy** | Homelab & Control Plane | **Server**: Custom Desktop, **CPU**: i7-9700F, **RAM**: 24GB, **Tags**: `server`, `homelab`, `ai-control` | 🟢 Active |
+| ![Sanji](assets/machines/sanji.png) | **sanji** | Mobile Workstation & AI Router | **Mobile Workstation**: Dell Precision 7680, **CPU**: i7-13850HX, **RAM**: 64GB, **GPU**: RTX 1000 Ada, **Tags**: `desktop`, `workstation`, `laptop`, `ai-router`, `ai-inference`, `agent-orchestrator` | 🟢 Active |
 
 ---
 

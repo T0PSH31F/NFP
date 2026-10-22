@@ -112,9 +112,9 @@ in
     layers.layer-40.desktop.niri.enable = lib.mkDefault (derivedCompositor == "niri");
     layers.desktop.compositors.umbriel.enable = lib.mkDefault (derivedCompositor == "umbriel");
 
-    services.displayManager.defaultSession =
-      lib.mkIf (exp == "noctalia" || lib.hasPrefix "noctalia-" exp)
-        (if exp == "noctalia" then "noctalia-${config.layers.desktop.noctalia.defaultCompositor}" else exp);
+    services.displayManager.defaultSession = lib.mkIf (
+      exp == "noctalia" || lib.hasPrefix "noctalia-" exp
+    ) (if derivedCompositor == "hyprland" then "hyprland-uwsm" else derivedCompositor);
 
     assertions = [
       {

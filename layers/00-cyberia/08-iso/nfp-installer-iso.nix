@@ -23,8 +23,8 @@
   ];
 
   # ── ISO metadata ────────────────────────────────────────────────────────
+  image.fileName = "nfp-installer-${pkgs.stdenv.hostPlatform.system}.iso";
   isoImage = {
-    isoName = "nfp-installer-${pkgs.stdenv.hostPlatform.system}.iso";
     volumeID = "NFP_FLEET_INSTALLER";
     squashfsCompression = "zstd -Xcompression-level 19";
     makeEfiBootable = true;
@@ -33,6 +33,7 @@
 
   # ── Boot & kernel ────────────────────────────────────────────────────────
   boot.kernelPackages = pkgs.linuxPackages_latest;
+  boot.zfs.forceImportRoot = false;
   boot.supportedFilesystems = [
     "btrfs"
     "vfat"
@@ -57,7 +58,6 @@
       "networkmanager"
       "disk"
     ];
-    password = ""; # passwordless for live session
   };
   security.sudo.wheelNeedsPassword = false;
 

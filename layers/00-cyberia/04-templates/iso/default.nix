@@ -24,6 +24,7 @@
     inputs.clan-core.nixosModules.clanCore
     inputs.home-manager.nixosModules.home-manager
     # inputs.sops-nix.nixosModules.sops # Included in clanCore
+    inputs.nixos-passthru-cache.nixosModules.nixos-passthru-cache
 
     # New flake-parts based system core
     ../../../10-system
@@ -107,7 +108,7 @@
   # ============================================================================
   # Enable auto-login for t0psh31f so the user lands in their custom environment
   services.displayManager.autoLogin.user = "t0psh31f";
-  services.displayManager.defaultSession = "hyprland";
+  services.displayManager.defaultSession = lib.mkForce "hyprland-uwsm";
 
   users.users.nixos = {
     initialHashedPassword = lib.mkForce "$6$o5YE7K.oDW2Ow8iK$xxFnhKRYuM1EOaoQoyaV6VjsqkkVMf1hX/g9snl4nW1SjFFtREwmZljaOuU7H1IDsTueQIqcicGksJ34AO3Mj0";
