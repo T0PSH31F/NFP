@@ -116,7 +116,8 @@ in
       OPENAI_BASE_URL_EXTREME_DIRECT = lib.mkDefault "http://127.0.0.1:20128/v1";
     };
 
-    home-manager.users.${user} = { pkgs, ... }:
+    home-manager.users.${user} =
+      { pkgs, ... }:
       let
         piSettings = {
           defaultProvider = "kong";

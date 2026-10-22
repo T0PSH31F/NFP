@@ -26,6 +26,17 @@ in
         User = "root";
         ExecStart = "${pkgs.writeShellScript "nfp-auto-update" ''
           set -e
+
+          # RAM Pre-flight Check (< 75% cap)
+          TOTAL_RAM=$(awk '/MemTotal:/ { print $2 }' /proc/meminfo)
+          AVAIL_RAM=$(awk '/MemAvailable:/ { print $2 }' /proc/meminfo)
+          USED_PCT=$(( ((TOTAL_RAM - AVAIL_RAM) * 100) / TOTAL_RAM ))
+
+          if [ "$USED_PCT" -ge 75 ]; then
+            echo "Pre-flight aborted: System RAM usage at ''${USED_PCT}% (>= 75% threshold)." >&2
+            exit 1
+          fi
+
           cd /home/t0psh31f/Clan/NFP
           nix flake update
           git add flake.lock
@@ -52,12 +63,24 @@ in
         nix
         git
         openssh
+        gawk
       ];
       serviceConfig = {
         Type = "oneshot";
         User = "root";
         ExecStart = "${pkgs.writeShellScript "nfp-update-ai" ''
           set -e
+
+          # RAM Pre-flight Check (< 75% cap)
+          TOTAL_RAM=$(awk '/MemTotal:/ { print $2 }' /proc/meminfo)
+          AVAIL_RAM=$(awk '/MemAvailable:/ { print $2 }' /proc/meminfo)
+          USED_PCT=$(( ((TOTAL_RAM - AVAIL_RAM) * 100) / TOTAL_RAM ))
+
+          if [ "$USED_PCT" -ge 75 ]; then
+            echo "Pre-flight aborted: System RAM usage at ''${USED_PCT}% (>= 75% threshold)." >&2
+            exit 1
+          fi
+
           cd /home/t0psh31f/Clan/NFP
           nix flake update nixpkgs-ai
           git add flake.lock

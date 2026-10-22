@@ -80,7 +80,7 @@ in
     yazelixIntegration.enable = lib.mkOption {
       type = lib.types.bool;
       default = false;
-      description = "Enable Helix + Yazi + Zellij integration (deprecated — use zellij.yazelix.* flags instead)";
+      description = "Enable Helix + Yazi + Zellij integration (DEPRECATED: migrate to zellij.yazelix.* flags).";
     };
 
     zellij = {

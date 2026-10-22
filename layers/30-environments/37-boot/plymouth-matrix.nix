@@ -11,22 +11,23 @@ with lib;
   };
 
   config = mkIf config.layers.layer-30.theming.themes.plymouth-matrix.enable {
-    # Enable Plymouth
-    boot.plymouth = {
-      enable = true;
-      theme = "matrix";
-      themePackages = [
-        (pkgs.adi1090x-plymouth-themes.override {
-          selected_themes = [ "matrix" ];
-        })
+    # Boot configuration
+    boot = {
+      plymouth = {
+        enable = true;
+        theme = "matrix";
+        themePackages = [
+          (pkgs.adi1090x-plymouth-themes.override {
+            selected_themes = [ "matrix" ];
+          })
+        ];
+      };
+
+      consoleLogLevel = 3;
+      kernelParams = [
+        "quiet"
+        "splash"
       ];
     };
-
-    # Enable silent boot for a clean plymouth experience
-    boot.consoleLogLevel = 3;
-    boot.kernelParams = [
-      "quiet"
-      "splash"
-    ];
   };
 }

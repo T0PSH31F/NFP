@@ -7,8 +7,9 @@
 ## Legend
 - **z0r0** = LG laptop workstation (`127.0.0.1` / Tailnet `100.64.0.1` `z0r0.nfp.nix`)
 - **luffy** = Intel 9th-gen homelab server (`100.64.0.3` `luffy.nfp.nix` / Tailnet + LAN `192.168.1.54`)
-- **nami** = ~~Cloud control plane~~ **DECOMMISSIONED 2026-10-14** (Alibaba ECS ran out of credits; `47.254.90.69` unreachable since 2026-10-12). All services moved to `luffy` / `z0r0`. Config archived at `archive/machines/nami/`.
-- **Both** = Deployed on both workstation and server
+- **sanji** = Dell Precision 7680 mobile workstation & AI router (`100.64.0.6` `sanji.nfp.nix` / Tailnet + LAN `192.168.1.51`)
+- **nami** = ~~Cloud control plane~~ **DECOMMISSIONED 2026-10-14** (Alibaba ECS credits expired; archived at `archive/machines/nami/`)
+- **Both / Fleet** = Deployed across multiple nodes
 - **Tailnet** = `nfp.nix` MagicDNS via Headscale on luffy; **WAN** = `lovelain.duckdns.org` via Caddy/ACME on luffy
 
 ---

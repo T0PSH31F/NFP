@@ -68,38 +68,38 @@ in
   };
 
   config = mkIf config.layers.layer-30.theming.themes.plymouth-hellonavi.enable {
-    # Enable systemd initrd for proper Plymouth support
-    boot.initrd.systemd.enable = lib.mkDefault true;
-
-    # Ensure your specific machine's hardware.nix specifies its own boot.initrd.kernelModules
-    # for early KMS, otherwise Plymouth will not show until late boot.
-
     # Install the theme package to system
     environment.systemPackages = [ hellonavi-theme ];
 
-    # Enable Plymouth
-    boot.plymouth = {
-      enable = true;
-      theme = "hellonavi";
-      themePackages = [ hellonavi-theme ];
-      # Force fbdev console for better vt transition
-      extraConfig = ''
-        DeviceScale=1
-      '';
+    # Boot configuration
+    boot = {
+      # Enable systemd initrd for proper Plymouth support
+      initrd = {
+        systemd.enable = lib.mkDefault true;
+        verbose = false;
+      };
+
+      # Enable Plymouth
+      plymouth = {
+        enable = true;
+        theme = "hellonavi";
+        themePackages = [ hellonavi-theme ];
+        # Force fbdev console for better vt transition
+        extraConfig = ''
+          DeviceScale=1
+        '';
+      };
+
+      # Enable silent boot for a clean plymouth experience
+      consoleLogLevel = 0;
+      kernelParams = [
+        "quiet"
+        "splash"
+        "loglevel=3"
+        "rd.udev.log_level=3"
+        "vt.global_cursor_default=0"
+        "systemd.show_status=auto"
+      ];
     };
-
-    # Enable silent boot for a clean plymouth experience
-    boot.consoleLogLevel = 0;
-    boot.kernelParams = [
-      "quiet"
-      "splash"
-      "loglevel=3"
-      "rd.udev.log_level=3"
-      "vt.global_cursor_default=0"
-      "systemd.show_status=auto"
-    ];
-
-    # Hide kernel messages during boot
-    boot.initrd.verbose = false;
   };
 }
