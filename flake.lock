@@ -2834,6 +2834,22 @@
         "type": "github"
       }
     },
+    "quickshell-rise": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1785399876,
+        "narHash": "sha256-Se6XviQbi+saJkhZ37hDsRDCw0i/SgT2sOYHo6srHyc=",
+        "owner": "HANCORE-linux",
+        "repo": "quickshell-dots",
+        "rev": "d0896fc532a216b281951157563ff34092b91a0a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "HANCORE-linux",
+        "repo": "quickshell-dots",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "camoufox-nix": "camoufox-nix",
@@ -2869,6 +2885,7 @@
         "noctalia-official-plugins": "noctalia-official-plugins",
         "pi": "pi",
         "polyfloor": "polyfloor",
+        "quickshell-rise": "quickshell-rise",
         "sops-nix": "sops-nix_2",
         "spicetify-nix": "spicetify-nix",
         "stellar": "stellar",

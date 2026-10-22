@@ -2,6 +2,7 @@
 { ... }:
 {
   imports = [
+    ./70-jev
     ./71-harness
     ./72-voice
     ./73-memory
@@ -11,6 +12,5 @@
     ./77-dash-desk-ui
     ./78-llm-routers
     ./79-skills
-    ./jev
   ];
 }

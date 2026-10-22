@@ -25,6 +25,20 @@ let
   nixarchyPkgs = inputs.nixarchy.packages.${pkgs.stdenv.hostPlatform.system} or { };
   nixarchyPkg = nixarchyPkgs.default or pkgs.hello; # fallback: build will error clearly if missing
 
+  # HANCORE Quickshell Rise modular bar with live-wire particle animations
+  hancore-quickshell-rise = pkgs.stdenv.mkDerivation {
+    pname = "hancore-quickshell-rise";
+    version = "2.8.0";
+    src = inputs.quickshell-rise;
+    installPhase = ''
+      mkdir -p $out/share/quickshell/rise
+      cp -r versions/V1/. $out/share/quickshell/rise/
+      mkdir -p $out/bin
+      cp scripts/qs-barctl $out/bin/qs-barctl
+      chmod +x $out/bin/qs-barctl
+    '';
+  };
+
   # Launcher for the Nixarchy Rise Hyprland session
   nixarchy-session = pkgs.writeShellScriptBin "nixarchy-session" ''
     export OMARCHY_PATH="${nixarchyPkg}/share/omarchy"
@@ -58,12 +72,14 @@ in
 
     environment.systemPackages = [
       nixarchyPkg
+      hancore-quickshell-rise
       nixarchy-session
       nixarchy-rise-wayland-session
       pkgs.quickshell
       pkgs.inotify-tools
       pkgs.qt6.qtimageformats
       pkgs.xdg-terminal-exec
+      pkgs.mako
       pkgs.matugen # Material You color token generator
     ];
 
@@ -80,7 +96,7 @@ in
         wayland.windowManager.hyprland.settings."$ipc" = lib.mkForce "qs ipc";
 
         # Deploy Rise shell config to ~/.config/quickshell/rise
-        xdg.configFile."quickshell/rise".source = "${nixarchyPkg}/share/omarchy/shell";
+        xdg.configFile."quickshell/rise".source = "${hancore-quickshell-rise}/share/quickshell/rise";
 
         # Ensure Ghostty is the default terminal for xdg-terminal-exec
         xdg.configFile."xdg-terminals.list".text = "ghostty.desktop\ncom.mitchellh.ghostty.desktop\n";
@@ -152,7 +168,7 @@ in
           Service = {
             Type = "oneshot";
             RemainAfterExit = true;
-            ExecStart = "${pkgs.bash}/bin/bash -c 'mkdir -p %h/.local/state/omarchy/current && if [ ! -e %h/.local/state/omarchy/current/theme ]; then ln -sfn ${nixarchyPkg}/share/omarchy/themes/catppuccin %h/.local/state/omarchy/current/theme && ln -sfn ${nixarchyPkg}/share/omarchy/themes/catppuccin/backgrounds/2-waves.webp %h/.local/state/omarchy/current/background && echo Catppuccin > %h/.local/state/omarchy/current/theme.name && echo 1 > %h/.local/state/omarchy/current/theme.generation; fi'";
+            ExecStart = "${pkgs.bash}/bin/bash -c 'mkdir -p %h/.local/state/omarchy/current && if [ ! -e %h/.local/state/omarchy/current/theme ]; then ln -sfn ${nixarchyPkg}/share/omarchy/themes/catppuccin %h/.local/state/omarchy/current/theme && ln -sfn ${nixarchyPkg}/share/omarchy/themes/catppuccin/backgrounds/2-waves.webp %h/.local/state/omarchy/current/background && echo Catppuccin > %h/.local/state/omarchy/current/theme.name && echo 1 > %h/.local/state/omarchy/current/theme.generation; fi; mkdir -p %h/.cache && [ ! -f %h/.cache/quickshell_splits ] && echo \"1 1 1 1 3 color02\" > %h/.cache/quickshell_splits || true'";
           };
         };
 

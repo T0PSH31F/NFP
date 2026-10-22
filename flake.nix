@@ -120,6 +120,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
     };
+    quickshell-rise = {
+      # Quickshell Rise (HANCORE) modular bar with live-wire particle stream
+      url = "github:HANCORE-linux/quickshell-dots";
+      flake = false;
+    };
 
     # ── AI & Agents ────────────────────────────────────────────
     camoufox-nix = {

@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `70-agents` layer structure divides AI capabilities across 9 focused sub-tiers (71–79). This architecture establishes strict boundaries between user-facing agent harnesses, voice engines, memory/RAG databases, inference hardware infrastructure, Model Context Protocol (MCP) tool catalogs, multi-agent orchestrators, web/desktop UIs, LLM routing proxies, and skill packages.
+The `70-agents` layer structure divides AI capabilities across 10 focused sub-tiers (70–79). This architecture establishes strict boundaries between deterministic pre-flight decision engines (`70-jev`), user-facing agent harnesses (`71-harness`), voice engines (`72-voice`), memory/RAG databases (`73-memory`), inference hardware infrastructure (`74-ai-infra`), Model Context Protocol (MCP) tool catalogs (`75-mcp`), multi-agent orchestrators (`76-orchestrators`), web/desktop UIs (`77-dash-desk-ui`), LLM routing proxies (`78-llm-routers`), and skill packages (`79-skills`).
 
 ```
                   +-----------------------------------+
@@ -56,6 +56,7 @@ Based on machine tags and hardware specs:
 
 | Tier | Host Placement | Primary Machine | Enabling Tag Rationale |
 | :--- | :--- | :--- | :--- |
+| `70-jev` | Edge Router & Triage Nodes | `sanji`, `luffy` | `ai-router`, `workstation`, `homelab` |
 | `71-harness` | Thin-Client & Workstation | `z0r0`, `luffy` | `ai-agent`, `workstation`, `development` |
 | `72-voice` | Local Workstation & Homelab | `z0r0`, `luffy` | `ai-agent`, `desktop`, `homelab` |
 | `73-memory` | Central PKB Node & Server | `luffy` | `pkb-node`, `ai-server`, `homelab` |

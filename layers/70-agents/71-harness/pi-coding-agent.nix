@@ -197,6 +197,11 @@ in
               url = osConfig.layers.layer-20.endpoints.context-forge.baseUrl or "http://127.0.0.1:8000";
               description = "ContextForge Universal MCP/A2A Gateway";
             };
+            jev-decision = {
+              command = "${pkgs.python3}/bin/python3";
+              args = [ "${../75-mcp/jev-mcp.py}" ];
+              description = "Jev System-1 Decision Engine, Telemetry & Triage Oversight";
+            };
           };
         };
 
