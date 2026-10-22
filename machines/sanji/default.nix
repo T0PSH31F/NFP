@@ -108,9 +108,44 @@
     freellmpool.enable = true;
   };
 
-  # Kong router listener port alignment
+  # OmniRoute credential sync from ExtremeRouter
+  services.ai-services.omniroute.environmentFile = config.sops.templates."omniroute-env".path;
+
+  # Kong router listener and upstream alignment
+  services.ai-services.kong-gateway.routers.extreme-router.host = "100.64.0.1";
   services.ai-services.kong-gateway.routers.freellmapi.port = lib.mkForce 3001;
   services.ai-services.kong-gateway.routers.freellmpool.port = lib.mkForce 8080;
+
+  # Jev System-1 Decision Engine & Discriminative LLM Router Pre-Flight Hook
+  services.jev-engine = {
+    enable = true;
+    port = 20130;
+    host = "0.0.0.0";
+    mode = "local";
+  };
+
+  layers.layer-78.llm-routers.jev-router-plugin = {
+    enable = true;
+    port = 20127;
+    upstreamRouterUrl = "http://127.0.0.1:8090";
+    jevEngineUrl = "http://127.0.0.1:20130";
+    localSlmUrl = "http://127.0.0.1:11434";
+  };
+
+  # Autonomous Email Triage Daemon (Himalaya IMAP & Maildir)
+  services.email-triage-daemon = {
+    enable = true;
+    jevUrl = "http://127.0.0.1:20130";
+    himalayaAccount = "wrighterik77";
+    confidenceThreshold = 0.80;
+    interval = "5m";
+  };
+
+  # Langfuse LLM Observability & Tracing Platform
+  services.infrastructure.langfuse = {
+    enable = true;
+    port = 3005;
+  };
 
   # Polyfloor agent company OS (talks to Kong on localhost:8090)
   services.polyfloor.enable = true;

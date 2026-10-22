@@ -404,10 +404,8 @@
           ''
             # Himalaya email client configuration
             # Multi-account Gmail setup for OpenCode + Hermes shared pipeline
-            # Format: himalaya v1.2.0
-            #
-            # Passwords are managed via SOPS secrets — /run/secrets/ equivalents
-            # deployed by sops-nix home-manager module.
+            # Format: himalaya v2.2+
+            # Passwords managed via SOPS secrets
 
             # ==============================================================================
             # Account: wrighterik77 (default)
@@ -416,21 +414,13 @@
             email = "wrighterik77@gmail.com"
             default = true
 
-            backend.type = "imap"
-            backend.host = "imap.gmail.com"
-            backend.port = 993
-            backend.encryption.type = "tls"
-            backend.login = "wrighterik77@gmail.com"
-            backend.auth.type = "password"
-            backend.auth.cmd = "cat ${wrighterik77Pass}"
+            imap.server = "imaps://imap.gmail.com:993"
+            imap.sasl.plain.username = "wrighterik77@gmail.com"
+            imap.sasl.plain.password.cmd = "cat ${wrighterik77Pass}"
 
-            message.send.backend.type = "smtp"
-            message.send.backend.host = "smtp.gmail.com"
-            message.send.backend.port = 465
-            message.send.backend.encryption.type = "tls"
-            message.send.backend.login = "wrighterik77@gmail.com"
-            message.send.backend.auth.type = "password"
-            message.send.backend.auth.cmd = "cat ${wrighterik77Pass}"
+            smtp.server = "smtps://smtp.gmail.com:465"
+            smtp.sasl.plain.username = "wrighterik77@gmail.com"
+            smtp.sasl.plain.password.cmd = "cat ${wrighterik77Pass}"
 
             # ==============================================================================
             # Account: lovelainautomations
@@ -438,21 +428,13 @@
             [accounts.lovelainautomations]
             email = "lovelainautomations@gmail.com"
 
-            backend.type = "imap"
-            backend.host = "imap.gmail.com"
-            backend.port = 993
-            backend.encryption.type = "tls"
-            backend.login = "lovelainautomations@gmail.com"
-            backend.auth.type = "password"
-            backend.auth.cmd = "cat ${lovelainautomationsPass}"
+            imap.server = "imaps://imap.gmail.com:993"
+            imap.sasl.plain.username = "lovelainautomations@gmail.com"
+            imap.sasl.plain.password.cmd = "cat ${lovelainautomationsPass}"
 
-            message.send.backend.type = "smtp"
-            message.send.backend.host = "smtp.gmail.com"
-            message.send.backend.port = 465
-            message.send.backend.encryption.type = "tls"
-            message.send.backend.login = "lovelainautomations@gmail.com"
-            message.send.backend.auth.type = "password"
-            message.send.backend.auth.cmd = "cat ${lovelainautomationsPass}"
+            smtp.server = "smtps://smtp.gmail.com:465"
+            smtp.sasl.plain.username = "lovelainautomations@gmail.com"
+            smtp.sasl.plain.password.cmd = "cat ${lovelainautomationsPass}"
           ''
         );
 

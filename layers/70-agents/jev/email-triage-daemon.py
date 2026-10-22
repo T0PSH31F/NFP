@@ -6,18 +6,82 @@ and applies deterministic tags & flags without deleting emails.
 """
 
 import argparse
+import base64
+import datetime
 import email
 from email import policy
 import json
 import os
 import re
+import subprocess
 import sys
 import time
 import urllib.error
 import urllib.request
+import uuid
 
-DEFAULT_JEV_URL = os.environ.get("JEV_ENGINE_URL", "http://luffy.nfp.nix:20130")
+DEFAULT_JEV_URL = os.environ.get("JEV_ENGINE_URL", "http://127.0.0.1:20130")
 DEFAULT_THRESHOLD = 0.80
+
+
+def send_langfuse_trace(name, input_data, output_data, metadata=None, langfuse_host="http://127.0.0.1:3005", public_key=None, secret_key=None):
+    """Send trace event to Langfuse ingestion API."""
+    if not public_key:
+        public_key = os.environ.get("LANGFUSE_PUBLIC_KEY")
+    if not secret_key:
+        secret_key = os.environ.get("LANGFUSE_SECRET_KEY")
+    if not public_key or not secret_key:
+        pk_path = os.path.expanduser("~/.config/sops-nix/secrets/langfuse_public_key")
+        sk_path = os.path.expanduser("~/.config/sops-nix/secrets/langfuse_secret_key")
+        if os.path.exists(pk_path) and os.path.exists(sk_path):
+            try:
+                with open(pk_path) as f:
+                    public_key = f.read().strip()
+                with open(sk_path) as f:
+                    secret_key = f.read().strip()
+            except Exception:
+                pass
+    if not public_key or not secret_key:
+        return
+
+    now_iso = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    trace_id = str(uuid.uuid4())
+    event = {
+        "batch": [
+            {
+                "id": str(uuid.uuid4()),
+                "type": "trace-create",
+                "timestamp": now_iso,
+                "body": {
+                    "id": trace_id,
+                    "name": name,
+                    "timestamp": now_iso,
+                    "input": input_data,
+                    "output": output_data,
+                    "metadata": metadata or {}
+                }
+            }
+        ]
+    }
+    auth_str = f"{public_key}:{secret_key}"
+    auth_b64 = base64.b64encode(auth_str.encode()).decode()
+    urls = [langfuse_host.rstrip("/"), "http://127.0.0.1:3005", "http://luffy.nfp.nix:3005"]
+    for host in urls:
+        try:
+            req = urllib.request.Request(
+                f"{host}/api/public/ingestion",
+                data=json.dumps(event).encode("utf-8"),
+                headers={
+                    "Content-Type": "application/json",
+                    "Authorization": f"Basic {auth_b64}"
+                },
+                method="POST"
+            )
+            with urllib.request.urlopen(req, timeout=1.5) as resp:
+                if resp.status in (200, 201):
+                    return
+        except Exception:
+            continue
 
 EMAIL_TRIAGE_QUESTIONS = [
     {
@@ -185,6 +249,89 @@ def update_maildir_flags(file_path, action_required):
     return file_path
 
 
+def triage_himalaya_account(account, args, processed_keys, history):
+    """Triage remote IMAP account via himalaya CLI."""
+    cmd = ["himalaya", "-a", account, "envelope", "list", "--page-size", "25", "--json"]
+    try:
+        res = subprocess.run(cmd, capture_output=True, text=True, timeout=15)
+        if res.returncode != 0:
+            sys.stderr.write(f"Himalaya envelope list failed for {account}: {res.stderr}\n")
+            return 0, 0
+        data = json.loads(res.stdout)
+        envelopes = data.get("envelopes", [])
+    except Exception as e:
+        sys.stderr.write(f"Failed to fetch himalaya envelopes for {account}: {e}\n")
+        return 0, 0
+
+    scanned = 0
+    triaged = 0
+    for env in envelopes:
+        msg_id = str(env.get("id"))
+        unique_key = f"{account}:{msg_id}:{env.get('message-id', '')}"
+        if not args.scan_all and unique_key in processed_keys:
+            continue
+        scanned += 1
+
+        subject = env.get("subject", "")
+        from_list = env.get("from", [])
+        from_str = ", ".join([f"{f.get('name') or ''} <{f.get('email')}>" for f in from_list if isinstance(f, dict)])
+        date_str = env.get("date", "")
+
+        state_repr = (
+            f"Account: {account}\n"
+            f"From: {from_str}\n"
+            f"Subject: {subject}\n"
+            f"Date: {date_str}\n"
+            f"ID: {msg_id}"
+        )
+
+        decision_res = query_jev_engine(state_repr, args.jev_url)
+        decisions = decision_res.get("decisions", {})
+        agg_conf = decision_res.get("aggregate_confidence", 0.0)
+
+        category = decisions.get("category", {}).get("value", "automated_alert")
+        action_req = decisions.get("action_required", {}).get("value", False)
+        target_agent = decisions.get("target_agent", {}).get("value", "archive_silent")
+        is_escalation = agg_conf < args.confidence_threshold
+
+        sys.stdout.write(
+            f"[Jev Himalaya:{account}] #{msg_id} | {subject[:40]} | cat={category} | action={action_req} "
+            f"| agent={target_agent} | conf={agg_conf:.2f} "
+            f"{'(!ESCALATE)' if is_escalation else ''}\n"
+        )
+
+        if not args.dry_run:
+            if action_req:
+                subprocess.run(["himalaya", "-a", account, "flag", "add", "-f", "flagged", msg_id], capture_output=True, timeout=10)
+            elif category == "newsletter":
+                subprocess.run(["himalaya", "-a", account, "flag", "add", "-f", "seen", msg_id], capture_output=True, timeout=10)
+
+            record = {
+                "timestamp": time.time(),
+                "account": account,
+                "msg_id": msg_id,
+                "subject": subject,
+                "from": from_str,
+                "category": category,
+                "action_required": action_req,
+                "target_agent": target_agent,
+                "confidence": agg_conf,
+                "escalate": is_escalation
+            }
+            history.append(record)
+            processed_keys.add(unique_key)
+            triaged += 1
+
+            send_langfuse_trace(
+                name="jev-email-triage",
+                input_data={"subject": subject, "from": from_str, "account": account},
+                output_data={"category": category, "action_required": action_req, "target_agent": target_agent, "confidence": agg_conf},
+                metadata={"account": account, "engine": "jev-system1", "latency_ms": decision_res.get("latency_ms", 0.0)}
+            )
+
+    return scanned, triaged
+
+
 def run_triage(args):
     maildir_paths = []
     if args.maildir:
@@ -263,6 +410,22 @@ def run_triage(args):
                 processed_keys.add(fname)
                 history.append(record)
                 total_triaged += 1
+
+                send_langfuse_trace(
+                    name="jev-email-triage-maildir",
+                    input_data={"subject": parsed["subject"], "from": parsed["from"]},
+                    output_data={"category": category, "action_required": action_req, "target_agent": target_agent, "confidence": agg_conf},
+                    metadata={"engine": "jev-system1", "latency_ms": decision_res.get("latency_ms", 0.0)}
+                )
+
+    # Always check himalaya if available and either no maildir or himalaya-account requested
+    if args.himalaya_account or not maildir_paths:
+        accounts = [args.himalaya_account] if args.himalaya_account else ["wrighterik77", "lovelainautomations"]
+        for acct in accounts:
+            sys.stderr.write(f"Scanning Himalaya account: {acct}\n")
+            h_scanned, h_triaged = triage_himalaya_account(acct, args, processed_keys, history)
+            total_scanned += h_scanned
+            total_triaged += h_triaged
 
     if not args.dry_run:
         # Keep last 500 history entries

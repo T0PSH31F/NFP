@@ -10,6 +10,8 @@ Evaluates complexity in ~6ms via Jev System-1:
 - prompt_compression_eligible: Prunes redundant boilerplate and whitespace
 """
 
+import base64
+import datetime
 import json
 import os
 import re
@@ -17,14 +19,95 @@ import sys
 import time
 import urllib.error
 import urllib.request
+import uuid
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from socketserver import ThreadingMixIn
 
 HOST = os.environ.get("JEV_ROUTER_HOST", "0.0.0.0")
 PORT = int(os.environ.get("JEV_ROUTER_PORT", "20127"))
-UPSTREAM_ROUTER_URL = os.environ.get("UPSTREAM_ROUTER_URL", "http://127.0.0.1:20128")
+UPSTREAM_ROUTER_URL = os.environ.get("UPSTREAM_ROUTER_URL", "http://127.0.0.1:8090")
 JEV_ENGINE_URL = os.environ.get("JEV_ENGINE_URL", "http://127.0.0.1:20130")
 LOCAL_SLM_URL = os.environ.get("LOCAL_SLM_URL", "http://127.0.0.1:11434")
+LANGFUSE_HOST = os.environ.get("LANGFUSE_HOST", "http://127.0.0.1:3005")
+
+
+def send_langfuse_trace(name, input_data, output_data, metadata=None, tokens_saved=0):
+    """Report LLM routing and token savings to Langfuse ingestion API."""
+    pk = os.environ.get("LANGFUSE_PUBLIC_KEY")
+    sk = os.environ.get("LANGFUSE_SECRET_KEY")
+    if not pk or not sk:
+        pk_path = os.path.expanduser("~/.config/sops-nix/secrets/langfuse_public_key")
+        sk_path = os.path.expanduser("~/.config/sops-nix/secrets/langfuse_secret_key")
+        if os.path.exists(pk_path) and os.path.exists(sk_path):
+            try:
+                with open(pk_path) as f: pk = f.read().strip()
+                with open(sk_path) as f: sk = f.read().strip()
+            except Exception:
+                pass
+    if not pk or not sk:
+        return
+
+    now_iso = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    trace_id = str(uuid.uuid4())
+    event = {
+        "batch": [
+            {
+                "id": str(uuid.uuid4()),
+                "type": "trace-create",
+                "timestamp": now_iso,
+                "body": {
+                    "id": trace_id,
+                    "name": name,
+                    "timestamp": now_iso,
+                    "input": input_data,
+                    "output": output_data,
+                    "metadata": metadata or {}
+                }
+            }
+        ]
+    }
+    if tokens_saved > 0:
+        event["batch"].append({
+            "id": str(uuid.uuid4()),
+            "type": "generation-create",
+            "timestamp": now_iso,
+            "body": {
+                "id": str(uuid.uuid4()),
+                "traceId": trace_id,
+                "name": "jev-system1-bypass",
+                "model": "jev-system1-decision",
+                "usage": {
+                    "input": 0,
+                    "output": 0,
+                    "total": 0,
+                    "unit": "TOKENS"
+                },
+                "metadata": {
+                    "tokens_saved": tokens_saved,
+                    "cost_saved_usd": round(tokens_saved * 0.000015, 6)
+                }
+            }
+        })
+
+    auth_str = f"{pk}:{sk}"
+    auth_b64 = base64.b64encode(auth_str.encode()).decode()
+    urls = [LANGFUSE_HOST.rstrip("/"), "http://127.0.0.1:3005", "http://luffy.nfp.nix:3005"]
+    for host in urls:
+        try:
+            req = urllib.request.Request(
+                f"{host}/api/public/ingestion",
+                data=json.dumps(event).encode("utf-8"),
+                headers={
+                    "Content-Type": "application/json",
+                    "Authorization": f"Basic {auth_b64}"
+                },
+                method="POST"
+            )
+            with urllib.request.urlopen(req, timeout=1.5) as resp:
+                if resp.status in (200, 201):
+                    return
+        except Exception:
+            continue
 
 ROUTER_PREFLIGHT_QUESTIONS = [
     {
@@ -292,10 +375,18 @@ class RouterPreflightHandler(BaseHTTPRequestHandler):
             # Route 1: Deterministic / Pure Classification task -> Return instant Jev decision (0 LLM tokens)
             if target_tier == "direct_jev_decision" or is_class:
                 resp_json = build_direct_jev_response(state, decisions, t_eval_ms)
+                tokens_saved = resp_json["usage"]["tokens_saved"]
+                send_langfuse_trace(
+                    name="jev-preflight-direct-bypass",
+                    input_data={"prompt_preview": state[:300]},
+                    output_data=resp_json["choices"][0]["message"]["content"],
+                    metadata={"tier": "direct_jev_decision", "latency_ms": t_eval_ms, "tokens_saved": tokens_saved},
+                    tokens_saved=tokens_saved
+                )
                 self.send_json(200, resp_json, extra_headers={
                     "X-Jev-Routed-Tier": "direct_jev_decision",
                     "X-Jev-Eval-Ms": t_eval_ms,
-                    "X-Tokens-Saved": resp_json["usage"]["tokens_saved"]
+                    "X-Tokens-Saved": tokens_saved
                 })
                 return
 
@@ -312,6 +403,13 @@ class RouterPreflightHandler(BaseHTTPRequestHandler):
             if target_tier == "local_slm_free" and not payload.get("model", "").startswith("claude"):
                 # Suggest local SLM model to ExtremeRouter or Ollama
                 payload["model"] = payload.get("model") or "llama3.2"
+
+            send_langfuse_trace(
+                name=f"jev-router-{target_tier}",
+                input_data={"model": payload.get("model"), "prompt_preview": state[:300]},
+                output_data={"target_tier": target_tier, "compressed": comp_eligible},
+                metadata={"target_tier": target_tier, "latency_ms": t_eval_ms, "upstream": dest_url}
+            )
 
             mod_body = json.dumps(payload).encode("utf-8")
             self.forward_request(dest_url, mod_body, method="POST", headers=req_headers)

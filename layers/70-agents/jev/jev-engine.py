@@ -27,44 +27,57 @@ ANCHORS = {
     "invoice_financial": [
         "invoice", "billing", "bill", "receipt", "payment", "due date", "amount due",
         "tax", "statement", "balance", "paypal", "stripe", "hetzner", "order", "purchase",
-        "renewal", "checkout", "subscription", "fee", "charged", "pricing", "remittance"
+        "renewal", "checkout", "subscription", "fee", "charged", "pricing", "remittance",
+        "order confirmation", "shipment", "shipped", "tracking", "delivery", "delivered",
+        "amazon", "ebay", "apple", "google store", "receipt for", "your order"
     ],
     "security_auth": [
         "2fa", "verification code", "otp", "security alert", "unauthorized", "reset password",
         "login attempt", "token", "authenticator", "sign-in", "suspicious", "credentials",
-        "password changed", "new login", "mfa", "passcode", "access granted", "security notification"
+        "password changed", "new login", "mfa", "passcode", "access granted", "security notification",
+        "security code", "verify your account", "login detected", "unrecognized device"
     ],
     "personal": [
         "hey", "hi", "hello", "regards", "thanks", "meet", "coffee", "family", "weekend",
-        "catch up", "chat", "dinner", "holiday", "friend", "cheers", "talk soon"
+        "catch up", "chat", "dinner", "holiday", "friend", "cheers", "talk soon", "how are you"
     ],
     "newsletter": [
         "unsubscribe", "digest", "issue", "weekly", "monthly digest", "newsletter",
-        "read online", "view in browser", "substack", "trends", "edition", "stories of the week"
+        "read online", "view in browser", "substack", "trends", "edition", "stories of the week",
+        "market", "investopedia", "roundup", "pre-market", "briefing", "forward future",
+        "news", "daily update", "weekly update", "edition", "insights", "tech news"
     ],
     "automated_alert": [
         "alert", "failure", "degraded", "cron", "error", "exception", "incident",
         "resolved", "build failed", "deployment", "pipeline", "grafana", "prometheus",
-        "statuscake", "pagerduty", "datadog", "cpu spike", "disk full", "service down"
+        "statuscake", "pagerduty", "datadog", "cpu spike", "disk full", "service down",
+        "camera", "motion", "detected", "saw someone", "nest", "doorbell", "sensor",
+        "notification", "offline", "online", "ping", "heartbeat", "battery", "system alert"
     ],
     "spam": [
         "congratulations", "lottery", "casino", "crypto profit", "winner", "earn cash",
         "weight loss", "cheap meds", "viagra", "wire transfer", "inheritance", "claim prize",
-        "100% free", "urgent investment"
+        "100% free", "urgent investment", "act now", "exclusive offer", "click here",
+        "winning numbers", "powerball", "superlotto", "fantasy 5", "jackpot"
     ],
 
     # Target agent anchors
     "hermes_billing": [
         "invoice", "receipt", "billing", "payment", "charge", "subscription",
-        "tax", "expense", "refund", "remittance", "statement", "pay", "order total"
+        "tax", "expense", "refund", "remittance", "statement", "pay", "order total",
+        "purchase", "order confirmation", "overdue", "past due"
     ],
     "paperclip_ops": [
         "alert", "failed", "server", "crash", "kubernetes", "systemd", "down",
-        "disk full", "high cpu", "monitor", "cluster", "ci/cd", "infra", "incident"
+        "disk full", "high cpu", "monitor", "cluster", "ci/cd", "infra", "incident",
+        "security disclosure", "vulnerability"
     ],
     "archive_silent": [
         "newsletter", "promo", "digest", "statement confirmed", "receipt archived",
-        "no action", "informational", "automated", "report", "summary"
+        "no action", "informational", "automated", "report", "summary", "notification",
+        "camera", "saw someone", "motion", "doorbell", "sensor", "nest", "routine",
+        "privacy notice", "terms of service", "airtable", "posted", "new listings",
+        "winning numbers", "holiday love"
     ],
 
     # Filesystem vault anchors
@@ -247,13 +260,15 @@ ACTION_REQUIRED_TRIGGERS = [
     "action required", "action needed", "please verify", "immediate attention",
     "pay by", "due date", "confirm your", "please reply", "deadline", "expires in",
     "resolve by", "respond within", "requires confirmation", "needs your approval",
-    "failure", "alert", "error", "unauthorized", "suspended", "warning"
+    "failure", "alert", "error", "unauthorized", "suspended", "warning",
+    "overdue", "past due", "security disclosure", "validate", "critical update"
 ]
 
 PASSIVE_TRIGGERS = [
     "no action required", "informational only", "for your records", "auto-generated",
     "successfully processed", "receipt for your records", "digest", "newsletter",
-    "unsubscribe", "weekly update", "no response needed"
+    "unsubscribe", "weekly update", "no response needed", "winning numbers",
+    "privacy notice", "terms of service", "posted", "new listings"
 ]
 
 TECHNICAL_FIT_TRIGGERS = [
@@ -415,11 +430,12 @@ def tokenize(text):
 def compute_option_score(state_text, option, tokens_set):
     """Compute affinity score between state and an option."""
     opt_key = option.lower().replace("-", "_")
+    state_lower = state_text.lower()
     score = 0.1  # base smoothing prior
 
     # Direct substring/option name match in state
-    if opt_key in state_text.lower():
-        score += 2.5
+    if opt_key in state_lower:
+        score += 3.0
 
     # Check anchors
     anchors = ANCHORS.get(opt_key, [])
@@ -428,13 +444,19 @@ def compute_option_score(state_text, option, tokens_set):
         anchors = opt_key.split("_")
 
     matched_anchors = 0
+    multiword_matches = 0
     for anchor in anchors:
-        if anchor in tokens_set or anchor in state_text.lower():
-            matched_anchors += 1
+        if " " in anchor:
+            if anchor in state_lower:
+                matched_anchors += 1
+                multiword_matches += 1
+        else:
+            if anchor in tokens_set or anchor in state_lower:
+                matched_anchors += 1
 
-    if anchors:
+    if anchors and matched_anchors > 0:
         coverage = matched_anchors / len(anchors)
-        score += coverage * 4.0 + matched_anchors * 1.5
+        score += (coverage * 5.0) + (matched_anchors * 2.5) + (multiword_matches * 3.0)
 
     return score
 
@@ -505,6 +527,15 @@ def evaluate_local(state, questions):
                 for trigger in unrelated_triggers:
                     if trigger in state_lower:
                         neg_score += 3.0
+            elif q_id == "action_required":
+                pos_score = 0.2
+                neg_score = 1.8
+                for trigger in ACTION_REQUIRED_TRIGGERS:
+                    if trigger in state_lower:
+                        pos_score += 3.5
+                for trigger in PASSIVE_TRIGGERS:
+                    if trigger in state_lower:
+                        neg_score += 3.0
             else:
                 for trigger in ACTION_REQUIRED_TRIGGERS:
                     if trigger in state_lower:
@@ -513,7 +544,7 @@ def evaluate_local(state, questions):
                     if trigger in state_lower:
                         neg_score += 2.0
 
-            probs = softmax({"true": pos_score, "false": neg_score}, temperature=0.7)
+            probs = softmax({"true": pos_score, "false": neg_score}, temperature=0.5)
             val = probs["true"] >= 0.5
             conf = probs["true"] if val else probs["false"]
 

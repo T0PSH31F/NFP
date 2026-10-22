@@ -327,6 +327,10 @@ let
             ];
             plugins = [
               {
+                name = "key-auth";
+                enabled = false;
+              }
+              {
                 name = "request-termination";
                 config = {
                   status_code = 200;
@@ -772,9 +776,9 @@ in
             KONG_PLUGINS = "bundled";
             KONG_NGINX_WORKER_PROCESSES = "2";
             KONG_NGINX_EVENTS_WORKER_CONNECTIONS = "1024";
-            # DNS resolver for container networking
-            KONG_DNS_RESOLVER = "127.0.0.11";
-            KONG_DNS_HOSTS = "host.docker.internal";
+            # DNS resolver for host networking (systemd-resolved + tailnet)
+            KONG_DNS_RESOLVER = "127.0.0.53,100.100.100.100,1.1.1.1";
+            KONG_DNS_HOSTS = "host.docker.internal,z0r0.nfp.nix,sanji.nfp.nix,luffy.nfp.nix";
           };
           volumes = [
             "${cfg.dataDir}/declarative.json:/etc/kong/declarative.json:ro"

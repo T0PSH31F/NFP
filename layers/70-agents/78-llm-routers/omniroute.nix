@@ -44,8 +44,11 @@ with lib;
         services:
           omniroute:
             image: ghcr.io/diegosouzapw/omniroute:latest
+            user: "0:0"
             ports:
               - "${toString cfg.port}:20128"
+            env_file:
+              - .env
             environment:
               - NODE_ENV=production
               - PORT=20128
@@ -79,9 +82,15 @@ with lib;
         ENV_FILE="$DATA_DIR/.env"
 
         mkdir -p "$DATA_DIR"
+        chmod 777 "$DATA_DIR"
         cp -f ${composeTemplate} "$COMPOSE_FILE"
         chmod 644 "$COMPOSE_FILE"
         touch "$ENV_FILE"
+        ${lib.optionalString (cfg.environmentFile != null) ''
+          if [ -f "${toString cfg.environmentFile}" ]; then
+            cat "${toString cfg.environmentFile}" > "$ENV_FILE"
+          fi
+        ''}
         chmod 600 "$ENV_FILE"
 
         case "''${1:-up}" in
@@ -156,13 +165,13 @@ with lib;
                   directory = cfg.dataDir;
                   user = "root";
                   group = "root";
-                  mode = "0700";
+                  mode = "0777";
                 }
               ];
             };
 
         systemd.tmpfiles.rules = [
-          "d ${cfg.dataDir} 0700 root root -"
+          "d ${cfg.dataDir} 0777 root root -"
         ];
 
         systemd.services.omniroute = {
