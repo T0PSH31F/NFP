@@ -79,12 +79,8 @@ in
         ExecStart = "${pkgs.python3}/bin/python3 ${./jev-engine.py}";
         Restart = "on-failure";
         RestartSec = 5;
-        DynamicUser = true;
-        StateDirectory = "jev-engine";
         NoNewPrivileges = true;
         PrivateTmp = true;
-        ProtectSystem = "strict";
-        ProtectHome = true;
       };
     };
 
