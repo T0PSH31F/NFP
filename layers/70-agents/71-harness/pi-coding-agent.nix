@@ -3,13 +3,13 @@
 # Purpose: Pi Durable Coding Agent (earendil-works/Pi) terminal AI harness with
 #          durable execution, NFP LLM router hierarchy & MCP integration.
 #
-# Provider endpoints (Kong path multiplexer + ExtremeRouter + Jev System-1):
-#   kong-er:        http://luffy.nfp.nix:8090/v1 (ExtremeRouter)
-#   kong-omni:      http://luffy.nfp.nix:8090/omni/v1 (OmniRoute)
-#   kong-free:      http://luffy.nfp.nix:8090/llm/free/v1 (FreeLLMPool)
-#   kong-frontier:  http://luffy.nfp.nix:8090/llm/frontier/v1 (Manifest)
-#   jev-preflight:  http://127.0.0.1:20127/v1 (Jev System-1 0-token discriminative pre-flight)
-#   extreme-direct: http://127.0.0.1:20128/v1 (ER direct backup)
+# Provider endpoints (Kong path multiplexer + ExtremeRouter + Jev Tier Router):
+#   kong:           http://127.0.0.1:8090/v1 (or http://sanji.nfp.nix:8090/v1 / http://nami:8090/v1)
+#   jev:            http://127.0.0.1:8090/jev/v1 (Jev async streaming tier router via Kong)
+#   kong-omni:      http://sanji.nfp.nix:8090/omni/v1 (OmniRoute)
+#   kong-free:      http://sanji.nfp.nix:8090/llm/free/v1 (FreeLLMPool)
+#   kong-frontier:  http://sanji.nfp.nix:8090/llm/frontier/v1 (Manifest)
+#   extreme-direct: http://z0r0.nfp.nix:20128/v1 (ER direct backup)
 #   local-ollama:   http://127.0.0.1:11434/v1 (Ollama local inference)
 #
 # Option Path: layers.layer-71.harness.pi-coding-agent (and programs.pi / programs.pi-durable)
@@ -71,13 +71,17 @@ in
 
     defaultModel = mkOption {
       type = types.str;
-      default = "mimo-v2.5-pro";
-      description = "Default model for Pi coding agent";
+      default = "Coding";
+      description = "Default model or router combo for Pi coding agent";
     };
 
     routerEndpoint = mkOption {
       type = types.str;
-      default = "http://127.0.0.1:8090/v1";
+      default =
+        if (osConfig.services.ai-services.kong-gateway.enable or false) then
+          "http://127.0.0.1:${toString (osConfig.services.ai-services.kong-gateway.proxyPort or 8090)}/v1"
+        else
+          "http://sanji.nfp.nix:8090/v1";
       description = "NFP LLM router OpenAI-compatible gateway endpoint";
     };
 
@@ -101,24 +105,181 @@ in
   };
 
   config = mkIf cfg.enable {
-    environment.systemPackages = optional (cfg.package != null) cfg.package;
+    environment.systemPackages = optional (cfg.package != null) cfg.package ++ [
+      (pkgs.writeShellScriptBin "nfp-llm-doctor" (
+        builtins.readFile ../../00-cyberia/06-scripts/nfp-llm-doctor.sh
+      ))
+    ];
 
     environment.sessionVariables = {
-      PI_MODEL = cfg.defaultModel;
-      PI_ROUTER_ENDPOINT = cfg.routerEndpoint;
       PI_CODING_AGENT_DIR = "$HOME/.pi/agent";
       OPENAI_BASE_URL = lib.mkDefault cfg.routerEndpoint;
-      OPENAI_BASE_URL_KONG_ER = lib.mkDefault "http://127.0.0.1:8090/v1";
-      OPENAI_BASE_URL_KONG_OMNI = lib.mkDefault "http://127.0.0.1:8090/omni/v1";
-      OPENAI_BASE_URL_KONG_FREE = lib.mkDefault "http://127.0.0.1:8090/llm/free/v1";
-      OPENAI_BASE_URL_KONG_FRONTIER = lib.mkDefault "http://127.0.0.1:8090/llm/frontier/v1";
+      OPENAI_BASE_URL_KONG_ER = lib.mkDefault cfg.routerEndpoint;
+      OPENAI_BASE_URL_KONG_OMNI = lib.mkDefault "http://sanji.nfp.nix:8090/omni/v1";
+      OPENAI_BASE_URL_KONG_FREE = lib.mkDefault "http://sanji.nfp.nix:8090/llm/free/v1";
+      OPENAI_BASE_URL_KONG_FRONTIER = lib.mkDefault "http://sanji.nfp.nix:8090/llm/frontier/v1";
       OPENAI_BASE_URL_JEV_PREFLIGHT = lib.mkDefault "http://127.0.0.1:20127/v1";
-      OPENAI_BASE_URL_EXTREME_DIRECT = lib.mkDefault "http://127.0.0.1:20128/v1";
+      OPENAI_BASE_URL_EXTREME_DIRECT = lib.mkDefault "http://z0r0.nfp.nix:20128/v1";
     };
 
     home-manager.users.${user} =
       { pkgs, ... }:
       let
+        piApiKeyCmd = "!cat /home/t0psh31f/.config/sops-nix/secrets/kong_key_pi 2>/dev/null || cat /run/secrets/kong_key_pi 2>/dev/null || printf '%s' \"$KONG_KEY_PI\"";
+
+        # Explicit model IDs pulled from Kong/ExtremeRouter /v1/models (combos + top providers)
+        explicitKongModels = [
+          {
+            id = "Coding";
+            name = "ExtremeRouter Coding Combo (Cascade)";
+            input = [
+              "text"
+              "image"
+            ];
+          }
+          {
+            id = "DailyDrive";
+            name = "ExtremeRouter DailyDrive Combo (Round-Robin)";
+            input = [ "text" ];
+          }
+          {
+            id = "Penny-Pincher";
+            name = "ExtremeRouter Penny-Pincher Combo (Voice/Fast)";
+            input = [ "text" ];
+          }
+          {
+            id = "Free";
+            name = "ExtremeRouter Free Combo (Zero-Cost Swarm)";
+            input = [ "text" ];
+          }
+          {
+            id = "Research";
+            name = "ExtremeRouter Research Combo (Smart-Routing)";
+            input = [ "text" ];
+          }
+          {
+            id = "Judge";
+            name = "ExtremeRouter Judge Combo (Frontier Fusion)";
+            input = [ "text" ];
+          }
+          {
+            id = "deepseek-swarm";
+            name = "ExtremeRouter DeepSeek Swarm Combo";
+            input = [ "text" ];
+          }
+          {
+            id = "ag/claude-sonnet-4-6";
+            name = "Claude Sonnet 4.6 (Antigravity via ER)";
+            input = [
+              "text"
+              "image"
+            ];
+          }
+          {
+            id = "ag/claude-opus-4-6-thinking";
+            name = "Claude Opus 4.6 Thinking (Antigravity via ER)";
+            input = [
+              "text"
+              "image"
+            ];
+          }
+          {
+            id = "ag/gemini-3.6-flash-high";
+            name = "Gemini 3.6 Flash High (Antigravity via ER)";
+            input = [
+              "text"
+              "image"
+            ];
+          }
+          {
+            id = "ag/gemini-3-flash";
+            name = "Gemini 3 Flash (Antigravity via ER)";
+            input = [
+              "text"
+              "image"
+            ];
+          }
+          {
+            id = "ag/gemini-pro-agent";
+            name = "Gemini Pro Agent (Antigravity via ER)";
+            input = [
+              "text"
+              "image"
+            ];
+          }
+          {
+            id = "kr/claude-sonnet-4.5";
+            name = "Claude Sonnet 4.5 (Kiro via ER)";
+            input = [
+              "text"
+              "image"
+            ];
+          }
+          {
+            id = "kr/claude-haiku-4.5";
+            name = "Claude Haiku 4.5 (Kiro via ER)";
+            input = [
+              "text"
+              "image"
+            ];
+          }
+          {
+            id = "kr/deepseek-3.2";
+            name = "DeepSeek 3.2 (Kiro via ER)";
+            input = [ "text" ];
+          }
+          {
+            id = "ocg/mimo-v2.5-pro";
+            name = "MiMo V2.5 Pro (OpenCode Go via ER)";
+            input = [ "text" ];
+          }
+          {
+            id = "xmtp/mimo-v2.5-pro";
+            name = "MiMo V2.5 Pro (Xiaomi Token Plan via ER)";
+            input = [ "text" ];
+          }
+          {
+            id = "nvidia/deepseek-ai/deepseek-v4-pro";
+            name = "DeepSeek V4 Pro (NVIDIA NIM via ER)";
+            input = [ "text" ];
+          }
+          {
+            id = "nvidia/deepseek-ai/deepseek-v4-flash";
+            name = "DeepSeek V4 Flash (NVIDIA NIM via ER)";
+            input = [ "text" ];
+          }
+          {
+            id = "nvidia/z-ai/glm-5.2";
+            name = "GLM 5.2 (NVIDIA NIM via ER)";
+            input = [ "text" ];
+          }
+          {
+            id = "nvidia/moonshotai/kimi-k2.6";
+            name = "Kimi K2.6 (NVIDIA NIM via ER)";
+            input = [ "text" ];
+          }
+          {
+            id = "cx/gpt-5.3-codex";
+            name = "GPT-5.3 Codex (Codex via ER)";
+            input = [ "text" ];
+          }
+          {
+            id = "groq/llama-3.3-70b-versatile";
+            name = "Llama 3.3 70B Versatile (Groq via ER)";
+            input = [ "text" ];
+          }
+          {
+            id = "cerebras/llama-3.3-70b";
+            name = "Llama 3.3 70B (Cerebras via ER)";
+            input = [ "text" ];
+          }
+          {
+            id = "ollama/qwen3.5";
+            name = "Qwen 3.5 (Ollama via ER)";
+            input = [ "text" ];
+          }
+        ];
+
         piSettings = {
           defaultProvider = "kong";
           inherit (cfg) defaultModel;
@@ -132,54 +293,48 @@ in
             kong = {
               baseUrl = cfg.routerEndpoint;
               api = "openai-completions";
-              apiKey = "nfp-router-internal";
-              models = [
-                {
-                  id = "mimo-v2.5-pro";
-                  name = "MiMo Pro 2.5";
-                  input = [ "text" ];
-                }
-                {
-                  id = "claude-3-5-sonnet";
-                  name = "Claude 3.5 Sonnet";
-                  input = [
-                    "text"
-                    "image"
-                  ];
-                }
-                {
-                  id = "gpt-4o";
-                  name = "GPT-4o";
-                  input = [
-                    "text"
-                    "image"
-                  ];
-                }
-              ];
+              apiKey = piApiKeyCmd;
+              models = explicitKongModels;
             };
-            jev-preflight = {
+            nami = {
+              baseUrl = "http://nami:8090/v1";
+              api = "openai-completions";
+              apiKey = piApiKeyCmd;
+              models = explicitKongModels;
+            };
+            jev = {
               baseUrl = "http://127.0.0.1:20127/v1";
               api = "openai-completions";
-              apiKey = "jev-zero-token";
+              apiKey = piApiKeyCmd;
               models = [
                 {
-                  id = "mimo-v2.5-pro";
-                  name = "MiMo Pro 2.5 (Jev Pre-Flight Proxy)";
+                  id = "voice-fast";
+                  name = "Jev Tier: Voice Fast (Penny-Pincher)";
                   input = [ "text" ];
                 }
-              ];
-            };
-            groq = {
-              baseUrl = "https://api.groq.com/openai/v1";
-              api = "openai-completions";
-              apiKey = "$GROQ_API_KEY";
-              models = [
                 {
-                  id = "qwen/qwen3.8-27b";
-                  name = "Qwen 3.8 27B";
+                  id = "free-first";
+                  name = "Jev Tier: Free First (Free Swarm)";
                   input = [ "text" ];
                 }
-              ];
+                {
+                  id = "cascade-balanced";
+                  name = "Jev Tier: Cascade Balanced (Coding)";
+                  input = [
+                    "text"
+                    "image"
+                  ];
+                }
+                {
+                  id = "frontier";
+                  name = "Jev Tier: Frontier (Judge / Research)";
+                  input = [
+                    "text"
+                    "image"
+                  ];
+                }
+              ]
+              ++ explicitKongModels;
             };
             ollama = {
               baseUrl = "http://127.0.0.1:11434/v1";
@@ -195,6 +350,8 @@ in
             };
           };
         };
+
+        piModelsBaseFile = pkgs.writeText "pi-models-base.json" (builtins.toJSON piModels);
 
         piMcp = {
           mcpServers = optionalAttrs cfg.enableMcp {
@@ -220,20 +377,53 @@ in
           home.file.".pi/agent/settings.json".text = builtins.toJSON piSettings;
           xdg.configFile."pi/agent/settings.json".text = builtins.toJSON piSettings;
 
-          # Pi Models Configuration (~/.pi/agent/models.json and ~/.config/pi/agent/models.json)
-          home.file.".pi/agent/models.json".text = builtins.toJSON piModels;
-          xdg.configFile."pi/agent/models.json".text = builtins.toJSON piModels;
-
           # Pi MCP Servers (~/.pi/agent/mcp.json and ~/.config/pi/agent/mcp.json)
           home.file.".pi/agent/mcp.json".text = builtins.toJSON piMcp;
           xdg.configFile."pi/agent/mcp.json".text = builtins.toJSON piMcp;
 
-          # Backward compatibility symlink (~/.config/pi/config.json)
-          xdg.configFile."pi/config.json".text = builtins.toJSON {
-            model = cfg.defaultModel;
-            apiBase = cfg.routerEndpoint;
-            inherit (cfg) autoCommit;
-            inherit (cfg) thinkingBudget;
+          # Generate ~/.pi/agent/models.json and ~/.config/pi/agent/models.json at activation time,
+          # pulling explicit model IDs from Kong /v1/models when reachable and merging with baseline.
+          home.activation.syncPiModelsFromKong = {
+            after = [ "writeBoundary" ];
+            before = [ ];
+            data = ''
+              for target_dir in "$HOME/.pi/agent" "$HOME/.config/pi/agent"; do
+                mkdir -p "$target_dir"
+                rm -f "$target_dir/models.json"
+                cp "${piModelsBaseFile}" "$target_dir/models.json"
+                chmod 0644 "$target_dir/models.json"
+              done
+              KONG_KEY=""
+              if [ -r "$HOME/.config/sops-nix/secrets/kong_key_pi" ]; then
+                KONG_KEY="$(cat "$HOME/.config/sops-nix/secrets/kong_key_pi")"
+              elif [ -r "/run/secrets/kong_key_pi" ]; then
+                KONG_KEY="$(cat "/run/secrets/kong_key_pi")"
+              fi
+              if [ -n "$KONG_KEY" ]; then
+                ${pkgs.python3}/bin/python3 - "$KONG_KEY" "${cfg.routerEndpoint}" <<'PYEOF' || true
+              import json, os, sys, urllib.request
+              key, base_url = sys.argv[1], sys.argv[2].rstrip("/")
+              req = urllib.request.Request(f"{base_url}/models", headers={"apikey": key})
+              with urllib.request.urlopen(req, timeout=4) as resp:
+                  payload = json.loads(resp.read().decode())
+              live_ids = [m["id"] for m in payload.get("data", []) if isinstance(m, dict) and m.get("id")]
+              if live_ids:
+                  for p in [os.path.expanduser("~/.pi/agent/models.json"), os.path.expanduser("~/.config/pi/agent/models.json")]:
+                      with open(p, "r") as f:
+                          doc = json.load(f)
+                      existing = {m["id"]: m for m in doc["providers"]["kong"]["models"]}
+                      for mid in live_ids:
+                          if mid not in existing:
+                              existing[mid] = {"id": mid, "name": mid, "input": ["text"]}
+                      merged = list(existing.values())
+                      doc["providers"]["kong"]["models"] = merged
+                      if "nami" in doc["providers"]:
+                          doc["providers"]["nami"]["models"] = merged
+                      with open(p, "w") as f:
+                          json.dump(doc, f, indent=2)
+              PYEOF
+              fi
+            '';
           };
         };
       };

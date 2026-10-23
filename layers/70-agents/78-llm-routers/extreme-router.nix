@@ -57,7 +57,41 @@ with lib;
     environmentFile = mkOption {
       type = types.nullOr types.path;
       default = null;
-      description = "Environment file for ExtremeRouter secrets (JWT_SECRET, etc.)";
+      description = "Environment file for ExtremeRouter secrets (JWT_SECRET, API_KEY_SECRET, etc.)";
+    };
+
+    requireApiKey = mkOption {
+      type = types.bool;
+      default = true;
+      description = "Require API key authentication on all /v1/* and /api/* requests";
+    };
+
+    tosAvoidProviders = mkOption {
+      type = types.listOf types.str;
+      default = [
+        "felo-web"
+        "freebuff-web"
+        "perplexity-web"
+        "puter"
+        "v0-vercel-web"
+        "veoaifree-web"
+      ];
+      description = "Web-cookie / ToS-risky providers flagged as tos:avoid (excluded from sensitive prompts)";
+    };
+
+    trustedProviders = mkOption {
+      type = types.listOf types.str;
+      default = [
+        "ollama"
+        "anthropic"
+        "openrouter"
+        "gemini"
+        "groq"
+        "mistral"
+        "nvidia"
+        "xiaomi-tokenplan"
+      ];
+      description = "Trusted API/local providers eligible for sensitive prompts";
     };
 
     extraEnvironment = mkOption {
@@ -70,6 +104,12 @@ with lib;
   config =
     let
       cfg = config.layers.layer-78.llm-routers.extreme-router;
+      secretsFile = ../../00-cyberia/03-treasure/secrets/external_services.yaml;
+      effectiveEnvFile =
+        if cfg.environmentFile != null then
+          cfg.environmentFile
+        else
+          config.sops.templates."extremerouter-secrets-env".path;
     in
     mkMerge [
       {
@@ -105,12 +145,48 @@ with lib;
           }
         ];
 
-        # Create data directory with open permissions for container user
+        # Sops secret & environment template for persistent JWT_SECRET and API_KEY_SECRET
+        sops.secrets.extremerouter_api_key = {
+          sopsFile = secretsFile;
+          owner = "root";
+          group = "root";
+          mode = "0400";
+        };
+
+        sops.templates."extremerouter-secrets-env" = {
+          content = ''
+            JWT_SECRET=${config.sops.placeholder.extremerouter_api_key}
+            API_KEY_SECRET=${config.sops.placeholder.extremerouter_api_key}
+            EXTREMEROUTER_API_KEY=${config.sops.placeholder.extremerouter_api_key}
+            REQUIRE_API_KEY=${boolToString cfg.requireApiKey}
+          '';
+          owner = "root";
+          group = "root";
+          mode = "0400";
+        };
+
+        # Create data directory with restricted permissions (0750, UID 1000) instead of 0777
         systemd.tmpfiles.rules = [
-          "d ${cfg.dataDir} 0777 root root -"
+          "d ${cfg.dataDir} 0750 1000 1000 -"
         ];
 
-        # OCI container via podman
+        # Write declarative provider policy metadata (ToS-risky vs trusted providers)
+        environment.etc."extreme-router/provider-policy.json".text = builtins.toJSON {
+          inherit (cfg) requireApiKey;
+          inherit (cfg) tosAvoidProviders;
+          inherit (cfg) trustedProviders;
+          labels = builtins.listToAttrs (
+            map (p: {
+              name = p;
+              value = [
+                "web-cookie"
+                "tos:avoid"
+              ];
+            }) cfg.tosAvoidProviders
+          );
+        };
+
+        # OCI container via podman (non-root UID 1000:1000)
         virtualisation.oci-containers.containers.extreme-router = {
           inherit (cfg) image;
           ports = [
@@ -122,14 +198,16 @@ with lib;
             HOSTNAME = "0.0.0.0";
             DATA_DIR = "/app/data";
             NEXT_PUBLIC_BASE_URL = "http://localhost:${toString cfg.port}";
+            REQUIRE_API_KEY = boolToString cfg.requireApiKey;
+            TOS_AVOID_PROVIDERS = concatStringsSep "," cfg.tosAvoidProviders;
           }
           // cfg.extraEnvironment;
           volumes = [
             "${cfg.dataDir}:/app/data"
           ];
-          environmentFiles = optional (cfg.environmentFile != null) cfg.environmentFile;
+          environmentFiles = [ effectiveEnvFile ];
           extraOptions = [
-            "--user=root"
+            "--user=1000:1000"
             "--health-cmd=node -e \"fetch('http://127.0.0.1:20128/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""
             "--health-interval=30s"
             "--health-timeout=5s"
@@ -155,9 +233,9 @@ with lib;
               directories = [
                 {
                   directory = cfg.dataDir;
-                  user = "root";
-                  group = "root";
-                  mode = "0777";
+                  user = "1000";
+                  group = "1000";
+                  mode = "0750";
                 }
               ];
             };

@@ -30,7 +30,12 @@ in
       extreme-router = mkEndpoint "127.0.0.1" (config.layers.layer-78.llm-routers.extreme-router.port
         or 20128
       ) "/v1";
-      freellmapi = mkEndpoint "127.0.0.1" (config.layers.layer-78.llm-routers.freellmapi.port or 3003
+      freellmapi = mkEndpoint "127.0.0.1" (config.services.ai-services.freellmapi.port or 3001) "/v1";
+      freellmpool = mkEndpoint "127.0.0.1" (config.services.ai-services.freellmpool.port or 8083) "/v1";
+      manifest = mkEndpoint "127.0.0.1" (config.services.ai-services.manifest.port or 2099) "/v1";
+      kong = mkEndpoint "127.0.0.1" (config.services.ai-services.kong-gateway.proxyPort or 8090) "/v1";
+      jev-router = mkEndpoint "127.0.0.1" (config.layers.layer-78.llm-routers.jev-router-plugin.port
+        or 20127
       ) "/v1";
       ollama = mkEndpoint "127.0.0.1" (config.layers.layer-74.ai-infra.ollama.port or 11434) "/v1";
       hermes-gateway = mkEndpoint "127.0.0.1" (config.layers.layer-76.hermes.gatewayPort or 8085) "";
@@ -49,6 +54,14 @@ in
   };
 
   config = {
+    # Static Headscale tailnet host mappings so container --network=host and CLI harnesses
+    # resolve fleet nodes (and legacy `nami` router alias -> sanji) in <1ms without DNS recursion lag.
+    networking.extraHosts = mkAfter ''
+      100.64.0.1 z0r0.nfp.nix z0r0
+      100.64.0.3 luffy.nfp.nix luffy
+      100.64.0.6 sanji.nfp.nix sanji nami
+    '';
+
     assertions = [
       {
         assertion =

@@ -25,14 +25,14 @@ in
 
     host = lib.mkOption {
       type = lib.types.str;
-      default = "0.0.0.0";
-      description = "Host IP to bind to";
+      default = "127.0.0.1";
+      description = "Host IP to bind to (loopback/tailnet only; sits behind Kong)";
     };
 
     upstreamRouterUrl = lib.mkOption {
       type = lib.types.str;
-      default = "http://127.0.0.1:20128";
-      description = "Upstream router URL (e.g. ExtremeRouter or Kong AI Gateway)";
+      default = "http://100.64.0.1:20128";
+      description = "Upstream primary router URL (ExtremeRouter)";
     };
 
     jevEngineUrl = lib.mkOption {
@@ -49,14 +49,14 @@ in
 
     openFirewall = lib.mkOption {
       type = lib.types.bool;
-      default = true;
-      description = "Open port in firewall";
+      default = false;
+      description = "Open port in firewall (disabled by default; accessed via Kong)";
     };
   };
 
   config = lib.mkIf cfg.enable {
     systemd.services.jev-router-plugin = {
-      description = "Jev-Driven LLM Router Pre-Flight Gateway Hook";
+      description = "Jev Tier Router — Async Streaming Decision-Only Proxy";
       after = [
         "network.target"
         "jev-engine.service"
@@ -73,7 +73,7 @@ in
 
       serviceConfig = {
         ExecStart = "${pkgs.python3}/bin/python3 ${./jev-router-proxy.py}";
-        Restart = "on-failure";
+        Restart = "always";
         RestartSec = 3;
         DynamicUser = true;
         NoNewPrivileges = true;

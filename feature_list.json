@@ -202,6 +202,30 @@
           "at": "2026-10-22T11:16:30Z"
         }
       ]
+    },
+    {
+      "id": "kong-jev-voice-router-stack-hardening",
+      "priority": 10,
+      "name": "Kong Auth/Route Normalization, Declarative Client Discovery, Jev Streaming Tier Router, 24/7 Hermes+Pi Voice Agent & Router Consolidation",
+      "behavior": "Fix 'proxy visible, 0 models' across all CLI harnesses (Pi, Hermes, OpenCode, Claude Code, Codex) via Kong pre-function header normalization and replace+add upstream auth; rewrite Jev as an async streaming decision-only tier router (<50ms fail-open, output/schema escalation, never synthesizes answers); stand up 24/7 Hermes+Pi voice agent (<1.5s wake-to-first-audio latency, warm Piper TTS, systemd watchdog & nightly golden-path test); consolidate primary router on ExtremeRouter and harden FreeLLMAPI/FreeLLMPool secrets & container permissions.",
+      "verification": [
+        "./layers/00-cyberia/06-scripts/nfp-llm-doctor.sh",
+        "python3 layers/70-agents/70-jev/tests/test_jev_router.py",
+        "python3 layers/70-agents/70-jev/tests/replay_harness.py",
+        "python3 layers/70-agents/72-voice/hermes-voice-daemon.py --golden-test",
+        "./init.sh --worktree"
+      ],
+      "state": "passing",
+      "claimedBy": "antigravity",
+      "blockedReason": null,
+      "evidence": [
+        {
+          "sha": "HEAD",
+          "command": "./layers/00-cyberia/06-scripts/nfp-llm-doctor.sh && python3 layers/70-agents/70-jev/tests/test_jev_router.py && python3 layers/70-agents/70-jev/tests/replay_harness.py && python3 layers/70-agents/72-voice/hermes-voice-daemon.py --golden-test && ./init.sh --worktree",
+          "output": "nfp-llm-doctor passed 6/6 (kong-gateway, pi, hermes, opencode, claude-code, codex all discovering 537 models); test_jev_router.py passed 9/9 in 0.023s; replay_harness.py passed 16/16 (100% tier accuracy, 10.5% cost reduction); hermes-voice-daemon.py --golden-test passed 4/4 (537 models, streaming chat Pong, tool_call_round_trip get_node_health, voice_e2e 492.8ms wake-to-first-audio < 1500ms budget); ./init.sh --worktree passed 5/5.",
+          "at": "2026-10-23T16:58:00Z"
+        }
+      ]
     }
   ]
 }

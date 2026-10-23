@@ -118,6 +118,15 @@ in
   services.searxng.enable = true;
   services.calibre-web-app.enable = true;
   services.jev-engine.enable = true;
+  services.wyoming-services.enable = true;
+  layers.layer-76.hermes-live-voice.enable = true;
+  layers.layer-78.llm-routers.jev-router-plugin = {
+    enable = true;
+    port = 20127;
+    host = "127.0.0.1";
+    openFirewall = false;
+    upstreamRouterUrl = "http://100.64.0.1:20128";
+  };
   services.lead-triage-webhook.enable = true;
   services.ad-hook-miner.enable = true;
   layers.layer-20.services.config.nixarr-stack.enable = true;

@@ -25,8 +25,20 @@ let
 
         # ── Services (upstream LLM routers) ──────────────────────────
         services =
+          # Jev Tier Router — streaming decision-only pre-flight router
+          (optional cfg.routers.jev.enable {
+            name = "jev-llm";
+            url = "http://${cfg.routers.jev.host}:${toString cfg.routers.jev.port}";
+            read_timeout = 180000;
+            write_timeout = 180000;
+            connect_timeout = 5000;
+            tags = [
+              "llm"
+              "jev"
+            ];
+          })
           # Manifest — frontier model routing
-          (optional cfg.routers.manifest.enable {
+          ++ (optional cfg.routers.manifest.enable {
             name = "manifest-llm";
             url = "http://127.0.0.1:${toString cfg.routers.manifest.port}";
             tags = [
@@ -66,6 +78,9 @@ let
           ++ (optional cfg.routers.extreme-router.enable {
             name = "extremerouter-llm";
             url = "http://${cfg.routers.extreme-router.host}:${toString cfg.routers.extreme-router.port}";
+            read_timeout = 180000;
+            write_timeout = 180000;
+            connect_timeout = 10000;
             tags = [
               "llm"
               "coding"
@@ -75,96 +90,245 @@ let
 
         # ── Routes ───────────────────────────────────────────────────
         # Two schemes coexist:
-        #  1. OpenAI-native `/v1/*` paths (what Hermes/OpenCode call, since their
-        #     base_url ends in `/v1`) — strip_path=false so the full `/v1/*` path
-        #     is forwarded upstream verbatim.
-        #  2. Legacy `/llm/{pool}/v1/*` pool-split paths — strip_path=true strips
-        #     the `/llm/{pool}` prefix so the upstream still sees `/v1/*`.
-        routes = [
-          # ★ Primary — chat completions → ExtremeRouter
-          {
-            name = "v1-chat";
-            service = "extremerouter-llm";
-            paths = [ "/v1/chat/completions" ];
-            methods = [ "POST" ];
-            strip_path = false;
-            protocols = [
-              "http"
-              "https"
-            ];
-            tags = [
-              "llm"
-              "coding"
-            ];
-          }
-          # Primary — legacy completions → ExtremeRouter
-          {
-            name = "v1-completions";
-            service = "extremerouter-llm";
-            paths = [ "/v1/completions" ];
-            methods = [ "POST" ];
-            strip_path = false;
-            protocols = [
-              "http"
-              "https"
-            ];
-            tags = [ "llm" ];
-          }
-          # Primary — embeddings → ExtremeRouter
-          {
-            name = "v1-embeddings";
-            service = "extremerouter-llm";
-            paths = [ "/v1/embeddings" ];
-            methods = [ "POST" ];
-            strip_path = false;
-            protocols = [
-              "http"
-              "https"
-            ];
-            tags = [ "llm" ];
-          }
-          # Primary — model discovery → ExtremeRouter
-          {
-            name = "v1-models";
-            service = "extremerouter-llm";
-            paths = [ "/v1/models" ];
-            methods = [ "GET" ];
-            strip_path = false;
-            protocols = [
-              "http"
-              "https"
-            ];
-            tags = [
-              "llm"
-              "models"
-            ];
-          }
-          # Primary — v1 root -> ExtremeRouter
-          {
-            name = "v1-root";
-            service = "extremerouter-llm";
-            paths = [ "/v1" ];
-            methods = [ "GET" ];
-            strip_path = false;
-            protocols = [
-              "http"
-              "https"
-            ];
-            tags = [ "llm" ];
-          }
-          # Explicit ExtremeRouter route (/er/v1/* -> extremerouter-llm)
-          #
-          # The service URL is bare (no /v1 path), so strip_path must remove
-          # ONLY the /er prefix and leave /v1/* intact for the upstream.
-          # With paths = ["/er/v1"] + strip_path, Kong stripped the whole
-          # matched path and sent "/models" instead of "/v1/models".
-          {
-            name = "er-v1";
-            service = "extremerouter-llm";
-            paths = [ "/er" ];
+        #  1. OpenAI/Anthropic-native `/v1/*` paths — strip_path=false so the full
+        #     `/v1/*` path is forwarded upstream verbatim.
+        #  2. Explicit `/er/*`, `/omni/*`, `/jev/*`, and `/llm/{pool}/v1/*` paths —
+        #     strip_path=true strips the prefix so the upstream still sees `/v1/*`.
+        routes =
+          let
+            chatService = if cfg.routers.jev.enable then "jev-llm" else "extremerouter-llm";
+          in
+          [
+            # ★ Primary — chat completions → Jev Tier Router (if enabled) or ExtremeRouter
+            {
+              name = "v1-chat";
+              service = chatService;
+              paths = [ "/v1/chat/completions" ];
+              methods = [
+                "POST"
+                "OPTIONS"
+              ];
+              strip_path = false;
+              protocols = [
+                "http"
+                "https"
+              ];
+              tags = [
+                "llm"
+                "coding"
+              ];
+            }
+            # Primary — legacy completions → ExtremeRouter
+            {
+              name = "v1-completions";
+              service = chatService;
+              paths = [ "/v1/completions" ];
+              methods = [
+                "POST"
+                "OPTIONS"
+              ];
+              strip_path = false;
+              protocols = [
+                "http"
+                "https"
+              ];
+              tags = [ "llm" ];
+            }
+            # Primary — Anthropic Messages API → Jev Tier Router or ExtremeRouter
+            {
+              name = "v1-messages";
+              service = chatService;
+              paths = [ "/v1/messages" ];
+              methods = [
+                "POST"
+                "OPTIONS"
+              ];
+              strip_path = false;
+              protocols = [
+                "http"
+                "https"
+              ];
+              tags = [
+                "llm"
+                "anthropic"
+              ];
+            }
+            # Primary — Anthropic token counting → ExtremeRouter
+            {
+              name = "v1-messages-count-tokens";
+              service = "extremerouter-llm";
+              paths = [ "/v1/messages/count_tokens" ];
+              methods = [
+                "POST"
+                "OPTIONS"
+              ];
+              strip_path = false;
+              protocols = [
+                "http"
+                "https"
+              ];
+              tags = [
+                "llm"
+                "anthropic"
+              ];
+            }
+            # Primary — OpenAI Responses API (Codex CLI) → Jev Tier Router or ExtremeRouter
+            {
+              name = "v1-responses";
+              service = chatService;
+              paths = [ "/v1/responses" ];
+              methods = [
+                "POST"
+                "OPTIONS"
+              ];
+              strip_path = false;
+              protocols = [
+                "http"
+                "https"
+              ];
+              tags = [
+                "llm"
+                "responses"
+              ];
+            }
+            # Primary — OpenAI Audio Speech (TTS) → ExtremeRouter
+            {
+              name = "v1-audio-speech";
+              service = "extremerouter-llm";
+              paths = [ "/v1/audio/speech" ];
+              methods = [
+                "POST"
+                "OPTIONS"
+              ];
+              strip_path = false;
+              protocols = [
+                "http"
+                "https"
+              ];
+              tags = [
+                "llm"
+                "audio"
+              ];
+            }
+            # Primary — OpenAI Audio Transcriptions (STT) → ExtremeRouter
+            {
+              name = "v1-audio-transcriptions";
+              service = "extremerouter-llm";
+              paths = [ "/v1/audio/transcriptions" ];
+              methods = [
+                "POST"
+                "OPTIONS"
+              ];
+              strip_path = false;
+              protocols = [
+                "http"
+                "https"
+              ];
+              tags = [
+                "llm"
+                "audio"
+              ];
+            }
+            # Primary — OpenAI Images Generations → ExtremeRouter
+            {
+              name = "v1-images-generations";
+              service = "extremerouter-llm";
+              paths = [ "/v1/images/generations" ];
+              methods = [
+                "POST"
+                "OPTIONS"
+              ];
+              strip_path = false;
+              protocols = [
+                "http"
+                "https"
+              ];
+              tags = [
+                "llm"
+                "images"
+              ];
+            }
+            # Primary — embeddings → ExtremeRouter
+            {
+              name = "v1-embeddings";
+              service = "extremerouter-llm";
+              paths = [ "/v1/embeddings" ];
+              methods = [
+                "POST"
+                "OPTIONS"
+              ];
+              strip_path = false;
+              protocols = [
+                "http"
+                "https"
+              ];
+              tags = [ "llm" ];
+            }
+            # Primary — model discovery → ExtremeRouter
+            {
+              name = "v1-models";
+              service = "extremerouter-llm";
+              paths = [ "/v1/models" ];
+              methods = [
+                "GET"
+                "OPTIONS"
+              ];
+              strip_path = false;
+              protocols = [
+                "http"
+                "https"
+              ];
+              tags = [
+                "llm"
+                "models"
+              ];
+            }
+            # Primary — v1 root -> ExtremeRouter
+            {
+              name = "v1-root";
+              service = "extremerouter-llm";
+              paths = [ "/v1" ];
+              methods = [
+                "GET"
+                "OPTIONS"
+              ];
+              strip_path = false;
+              protocols = [
+                "http"
+                "https"
+              ];
+              tags = [ "llm" ];
+            }
+            # Explicit ExtremeRouter route (/er/v1/* -> extremerouter-llm)
+            {
+              name = "er-v1";
+              service = "extremerouter-llm";
+              paths = [ "/er" ];
+              methods = [
+                "GET"
+                "POST"
+                "OPTIONS"
+              ];
+              strip_path = true;
+              protocols = [
+                "http"
+                "https"
+              ];
+              tags = [
+                "llm"
+                "extreme"
+              ];
+            }
+            # Explicit Jev Tier Router route (/jev/v1/* -> jev-llm)
+          ]
+          ++ (optional cfg.routers.jev.enable {
+            name = "jev-v1";
+            service = "jev-llm";
+            paths = [ "/jev" ];
             methods = [
               "GET"
               "POST"
+              "OPTIONS"
             ];
             strip_path = true;
             protocols = [
@@ -173,20 +337,18 @@ let
             ];
             tags = [
               "llm"
-              "extreme"
+              "jev"
             ];
-          }
-          # Explicit OmniRoute route (/omni/v1/* -> omniroute-llm)
-          #
-          # Same strip-path contract as er-v1 above: strip only /omni so the
-          # upstream still sees /v1/*.
-          {
+          })
+          ++ (optional cfg.routers.omniroute.enable {
+            # Explicit OmniRoute route (/omni/v1/* -> omniroute-llm)
             name = "omni-v1";
             service = "omniroute-llm";
             paths = [ "/omni" ];
             methods = [
               "GET"
               "POST"
+              "OPTIONS"
             ];
             strip_path = true;
             protocols = [
@@ -197,50 +359,64 @@ let
               "llm"
               "omni"
             ];
-          }
-          # Legacy pool split — chat via FreeLLMAPI
-          {
-            name = "llm-chat";
-            service = "freellmapi-llm";
-            paths = [ "/llm/v1/chat/completions" ];
-            methods = [ "POST" ];
-            strip_path = true;
-            protocols = [
-              "http"
-              "https"
-            ];
-            tags = [ "llm" ];
-          }
-          {
-            name = "llm-completions";
-            service = "freellmapi-llm";
-            paths = [ "/llm/v1/completions" ];
-            methods = [ "POST" ];
-            strip_path = true;
-            protocols = [
-              "http"
-              "https"
-            ];
-            tags = [ "llm" ];
-          }
-          {
-            name = "llm-embeddings";
-            service = "freellmapi-llm";
-            paths = [ "/llm/v1/embeddings" ];
-            methods = [ "POST" ];
-            strip_path = true;
-            protocols = [
-              "http"
-              "https"
-            ];
-            tags = [ "llm" ];
-          }
-          # Frontier traffic → Manifest
-          {
+          })
+          ++ [
+            # Legacy pool split — chat via FreeLLMAPI
+            {
+              name = "llm-chat";
+              service = "freellmapi-llm";
+              paths = [ "/llm/v1/chat/completions" ];
+              methods = [
+                "POST"
+                "OPTIONS"
+              ];
+              strip_path = true;
+              protocols = [
+                "http"
+                "https"
+              ];
+              tags = [ "llm" ];
+            }
+            {
+              name = "llm-completions";
+              service = "freellmapi-llm";
+              paths = [ "/llm/v1/completions" ];
+              methods = [
+                "POST"
+                "OPTIONS"
+              ];
+              strip_path = true;
+              protocols = [
+                "http"
+                "https"
+              ];
+              tags = [ "llm" ];
+            }
+            {
+              name = "llm-embeddings";
+              service = "freellmapi-llm";
+              paths = [ "/llm/v1/embeddings" ];
+              methods = [
+                "POST"
+                "OPTIONS"
+              ];
+              strip_path = true;
+              protocols = [
+                "http"
+                "https"
+              ];
+              tags = [ "llm" ];
+            }
+          ]
+          ++ (optional cfg.routers.manifest.enable {
+            # Frontier traffic → Manifest
             name = "llm-frontier";
             service = "manifest-llm";
             paths = [ "/llm/frontier/v1/chat/completions" ];
-            methods = [ "POST" ];
+            methods = [
+              "POST"
+              "OPTIONS"
+            ];
             strip_path = true;
             protocols = [
               "http"
@@ -250,102 +426,134 @@ let
               "llm"
               "frontier"
             ];
-          }
-          # Coding traffic → ExtremeRouter
-          {
-            name = "llm-coding";
-            service = "extremerouter-llm";
-            paths = [ "/llm/coding/v1/chat/completions" ];
-            methods = [ "POST" ];
-            strip_path = true;
-            protocols = [
-              "http"
-              "https"
-            ];
-            tags = [
-              "llm"
-              "coding"
-            ];
-          }
-          # Free pool → freellmpool
-          {
-            name = "llm-free";
-            service = "freellmpool-llm";
-            paths = [ "/llm/free/v1/chat/completions" ];
-            methods = [ "POST" ];
-            strip_path = true;
-            protocols = [
-              "http"
-              "https"
-            ];
-            tags = [
-              "llm"
-              "free"
-            ];
-          }
-          # Legacy model discovery → ExtremeRouter
-          {
-            name = "llm-models";
-            service = "extremerouter-llm";
-            paths = [ "/llm/v1/models" ];
-            methods = [ "GET" ];
-            strip_path = true;
-            protocols = [
-              "http"
-              "https"
-            ];
-            tags = [
-              "llm"
-              "models"
-            ];
-          }
-          # MCP gateway
-          {
-            name = "mcp-gateway";
-            service = "freellmapi-llm";
-            paths = [ "/mcp" ];
-            methods = [
-              "GET"
-              "POST"
-            ];
-            strip_path = false;
-            protocols = [
-              "http"
-              "https"
-            ];
-            tags = [ "mcp" ];
-          }
-          # Health check
-          {
-            name = "health";
-            paths = [ "/health" ];
-            methods = [ "GET" ];
-            strip_path = false;
-            protocols = [
-              "http"
-              "https"
-            ];
-            plugins = [
-              {
-                name = "key-auth";
-                enabled = false;
-              }
-              {
-                name = "request-termination";
-                config = {
-                  status_code = 200;
-                  content_type = "application/json";
-                  body = ''{"status":"ok","gateway":"kong"}'';
-                };
-              }
-            ];
-            tags = [ "infra" ];
-          }
-        ];
+          })
+          ++ [
+            # Coding traffic → ExtremeRouter
+            {
+              name = "llm-coding";
+              service = "extremerouter-llm";
+              paths = [ "/llm/coding/v1/chat/completions" ];
+              methods = [
+                "POST"
+                "OPTIONS"
+              ];
+              strip_path = true;
+              protocols = [
+                "http"
+                "https"
+              ];
+              tags = [
+                "llm"
+                "coding"
+              ];
+            }
+            # Free pool → freellmpool
+            {
+              name = "llm-free";
+              service = "freellmpool-llm";
+              paths = [ "/llm/free/v1/chat/completions" ];
+              methods = [
+                "POST"
+                "OPTIONS"
+              ];
+              strip_path = true;
+              protocols = [
+                "http"
+                "https"
+              ];
+              tags = [
+                "llm"
+                "free"
+              ];
+            }
+            # Legacy model discovery → ExtremeRouter
+            {
+              name = "llm-models";
+              service = "extremerouter-llm";
+              paths = [ "/llm/v1/models" ];
+              methods = [
+                "GET"
+                "OPTIONS"
+              ];
+              strip_path = true;
+              protocols = [
+                "http"
+                "https"
+              ];
+              tags = [
+                "llm"
+                "models"
+              ];
+            }
+            # MCP gateway
+            {
+              name = "mcp-gateway";
+              service = "freellmapi-llm";
+              paths = [ "/mcp" ];
+              methods = [
+                "GET"
+                "POST"
+                "OPTIONS"
+              ];
+              strip_path = false;
+              protocols = [
+                "http"
+                "https"
+              ];
+              tags = [ "mcp" ];
+            }
+            # Health check
+            {
+              name = "health";
+              paths = [ "/health" ];
+              methods = [ "GET" ];
+              strip_path = false;
+              protocols = [
+                "http"
+                "https"
+              ];
+              plugins = [
+                {
+                  name = "key-auth";
+                  enabled = false;
+                }
+                {
+                  name = "request-termination";
+                  config = {
+                    status_code = 200;
+                    content_type = "application/json";
+                    body = ''{"status":"ok","gateway":"kong"}'';
+                  };
+                }
+              ];
+              tags = [ "infra" ];
+            }
+          ];
 
         # ── Upstreams (for load balancing) ────────────────────────────
         upstreams =
-          (optional cfg.routers.manifest.enable {
+          (optional cfg.routers.jev.enable {
+            name = "jev-upstream";
+            targets = [
+              {
+                target = "${cfg.routers.jev.host}:${toString cfg.routers.jev.port}";
+                weight = 100;
+              }
+            ];
+            healthchecks = {
+              active = {
+                type = "http";
+                http_path = "/health";
+                healthy = {
+                  interval = 10;
+                };
+                unhealthy = {
+                  interval = 5;
+                };
+              };
+            };
+          })
+          ++ (optional cfg.routers.manifest.enable {
             name = "manifest-upstream";
             targets = [
               {
@@ -377,7 +585,7 @@ let
             healthchecks = {
               active = {
                 type = "http";
-                http_path = "/health";
+                http_path = "/api/ping";
                 healthy = {
                   interval = 10;
                 };
@@ -398,7 +606,7 @@ let
             healthchecks = {
               active = {
                 type = "http";
-                http_path = "/health";
+                http_path = "/v1/models";
                 healthy = {
                   interval = 10;
                 };
@@ -459,12 +667,47 @@ let
 
         # ── Global plugins ────────────────────────────────────────────
         plugins = [
+          # Pre-function (access phase, runs before key-auth):
+          # Normalizes `Authorization: Bearer <token>` and `x-api-key: <token>`
+          # into `apikey: <token>` and clears the original header so key-auth
+          # validates OpenAI and Anthropic SDK clients and never leaks consumer
+          # tokens upstream.
+          {
+            name = "pre-function";
+            config = {
+              access = [
+                ''
+                  local uri = ngx.var.uri
+                  if uri and string.sub(uri, 1, 7) == "/v1/v1/" then
+                    ngx.req.set_uri("/v1/" .. string.sub(uri, 8), false)
+                  end
+                  local auth = kong.request.get_header("Authorization")
+                  if auth then
+                    local m = string.match(auth, "^[Bb]earer%s+(.+)$")
+                    if m then
+                      kong.service.request.set_header("apikey", m)
+                      kong.service.request.clear_header("Authorization")
+                    end
+                  end
+                  local xkey = kong.request.get_header("x-api-key")
+                  if xkey and xkey ~= "" then
+                    if not kong.request.get_header("apikey") then
+                      kong.service.request.set_header("apikey", xkey)
+                    end
+                    kong.service.request.clear_header("x-api-key")
+                  end
+                ''
+              ];
+            };
+            tags = [ "auth-normalize" ];
+          }
           # Auth — key-auth on all LLM routes
           {
             name = "key-auth";
             config = {
               key_names = [
                 "apikey"
+                "x-api-key"
                 "Authorization"
               ];
               hide_credentials = true;
@@ -483,31 +726,63 @@ let
             };
             tags = [ "observability" ];
           }
-          # Rate limiting
+          # Rate limiting — per consumer (not global)
           {
             name = "rate-limiting";
             config = {
               minute = 120;
               hour = 2000;
+              limit_by = "consumer";
               policy = "local";
               fault_tolerant = true;
             };
             tags = [ "rate-limit" ];
           }
+          # Dedicated rate limit for low-latency voice consumers
+          {
+            name = "rate-limiting";
+            consumer = "voice";
+            config = {
+              minute = 300;
+              hour = 6000;
+              limit_by = "consumer";
+              policy = "local";
+              fault_tolerant = true;
+            };
+            tags = [
+              "rate-limit"
+              "voice"
+            ];
+          }
+          {
+            name = "rate-limiting";
+            consumer = "hermes-voice";
+            config = {
+              minute = 300;
+              hour = 6000;
+              limit_by = "consumer";
+              policy = "local";
+              fault_tolerant = true;
+            };
+            tags = [
+              "rate-limit"
+              "voice"
+            ];
+          }
           # Request size limiting
           {
             name = "request-size-limiting";
             config = {
-              allowed_payload_size = 10;
+              allowed_payload_size = 25;
               size_unit = "megabytes";
             };
             tags = [ "security" ];
           }
-          # CORS for browser-based agents
+          # CORS for trusted browser-based agents
           {
             name = "cors";
             config = {
-              origins = [ "*" ];
+              origins = cfg.corsOrigins;
               methods = [
                 "GET"
                 "POST"
@@ -518,8 +793,16 @@ let
                 "Authorization"
                 "Content-Type"
                 "apikey"
+                "x-api-key"
+                "anthropic-version"
+                "anthropic-beta"
+                "OpenAI-Beta"
               ];
-              exposed_headers = [ "X-Auth-Token" ];
+              exposed_headers = [
+                "X-Auth-Token"
+                "X-Jev-Decision"
+                "X-Jev-Routed-Tier"
+              ];
               credentials = true;
               max_age = 3600;
             };
@@ -565,15 +848,40 @@ in
 
     image = mkOption {
       type = types.str;
-      default = "docker.io/kong/kong-gateway:latest";
-      description = "Kong Docker image";
+      default = "docker.io/library/kong:3.9.1";
+      description = "Pinned Kong OSS Docker image tag";
+    };
+
+    corsOrigins = mkOption {
+      type = types.listOf types.str;
+      default = [
+        "http://localhost"
+        "http://127.0.0.1"
+        "http://*.nfp.nix"
+        "https://*.nfp.nix"
+        "https://*.lovelain.duckdns.org"
+      ];
+      description = "Allowed CORS origins for browser-based agent UIs";
     };
 
     # ── Upstream router endpoints ──────────────────────────────────
     routers = {
+      jev = {
+        enable = mkEnableOption "Route chat/messages/responses through Jev Tier Router before ExtremeRouter";
+        host = mkOption {
+          type = types.str;
+          default = "127.0.0.1";
+          description = "Jev Tier Router host";
+        };
+        port = mkOption {
+          type = types.port;
+          default = 20127;
+          description = "Jev Tier Router port";
+        };
+      };
       manifest = {
         enable = mkEnableOption "Route traffic to Manifest" // {
-          default = true;
+          default = false;
         };
         port = mkOption {
           type = types.port;
@@ -586,7 +894,7 @@ in
         };
         port = mkOption {
           type = types.port;
-          default = 3003;
+          default = 3001;
         };
       };
       freellmpool = {
@@ -601,7 +909,7 @@ in
 
       omniroute = {
         enable = mkEnableOption "Route traffic to OmniRoute" // {
-          default = true;
+          default = false;
         };
         host = mkOption {
           type = types.str;
@@ -621,8 +929,8 @@ in
         };
         host = mkOption {
           type = types.str;
-          default = "z0r0";
-          description = "ExtremeRouter host IP or hostname";
+          default = "100.64.0.1";
+          description = "ExtremeRouter host Tailnet IP or FQDN";
         };
         port = mkOption {
           type = types.port;
@@ -637,6 +945,9 @@ in
       type = types.listOf types.str;
       default = [
         "hermes"
+        "hermes-voice"
+        "voice"
+        "pi"
         "opencode"
         "claude-code"
         "codex"
@@ -688,7 +999,7 @@ in
           };
           healthcheck = {
             enable = true;
-            path = "/status";
+            path = "/health";
             expectedStatus = [ 200 ];
           };
         };
@@ -719,8 +1030,8 @@ in
                 FILES=("${kongYml}")
                 for f in "${config.sops.templates."kong-consumers".path}" "${
                   config.sops.templates."kong-extremerouter-auth".path
-                }" "${config.sops.templates."kong-omniroute-auth".path}"; do
-                  if [ -f "$f" ]; then
+                }" ${optionalString cfg.routers.omniroute.enable ''"${config.sops.templates."kong-omniroute-auth".path}"''} ${optionalString cfg.routers.jev.enable ''"${config.sops.templates."kong-jev-auth".path}"''}; do
+                  if [ -n "$f" ] && [ -f "$f" ]; then
                     FILES+=("$f")
                   fi
                 done

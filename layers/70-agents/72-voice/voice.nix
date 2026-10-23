@@ -62,7 +62,7 @@ with lib;
         wants = [ "network-online.target" ];
         serviceConfig = {
           ExecStart = "${pkgs.whisper-cpp}/bin/whisper-server -m /var/lib/whisper/ggml-base.en.bin --port ${toString cfg.sttPort}";
-          Restart = "on-failure";
+          Restart = "always";
           RestartSec = 5;
           StateDirectory = "whisper";
         };
@@ -96,5 +96,16 @@ with lib;
       };
 
       networking.firewall.allowedTCPPorts = [ cfg.sttPort ] ++ (lib.optional cfg.useXTTSv2 cfg.ttsPort);
+
+      environment.persistence."/persist" =
+        lib.mkIf (config.layers.layer-10.system.config.impermanence.enable or false)
+          {
+            directories = [
+              {
+                directory = "/var/lib/whisper";
+                mode = "0750";
+              }
+            ];
+          };
     };
 }

@@ -8,13 +8,13 @@ The `78-llm-routers` tier is responsible for unified API gateways, LLM load bala
 
 | Module | Description | Option Path | Default Port(s) | Service Type | Enabling Tag(s) |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| `extreme-router.nix` | ExtremeRouter OCI container proxy — 154+ LLM providers with web UI & `/v1/*` endpoint. | `layers.layer-78.llm-routers.extreme-router` | 20128 | Always-on OCI container service | `ai-router`, `ai-agent`, `workstation` |
-| `freellmapi.nix` | FreeLLMAPI aggregated pool proxy for zero-cost free-tier provider models. | `services.ai-services.freellmapi` | 3003 | Always-on systemd service | `ai-router`, `homelab` |
+| `extreme-router.nix` | ExtremeRouter OCI container proxy — primary LLM router with 537+ models, 7 native combos, & `/v1/*` endpoints. | `layers.layer-78.llm-routers.extreme-router` | 20128 | Always-on OCI container service | `ai-router`, `ai-agent`, `workstation` |
+| `freellmapi.nix` | FreeLLMAPI aggregated pool proxy for zero-cost free-tier provider models. | `services.ai-services.freellmapi` | 3001 | Always-on systemd service | `ai-router`, `homelab` |
 | `freellmpool.nix` | FreeLLMPool connection pool manager maintaining healthy provider sockets. | `services.ai-services.freellmpool` | 8083 | Always-on systemd service | `ai-router`, `homelab` |
 | `kong-gateway.nix` | Kong API Gateway — central authenticated LLM proxy, plugin engine, & consumer secret gateway. | `services.ai-services.kong-gateway` | 8090 (Proxy), 8091 (Admin) | Always-on OCI container service | `ai-router`, `homelab`, `server` |
 | `litellm.nix` | LiteLLM proxy server — unified OpenAI-compatible format with cost tracking & load balancing. | `services.litellm-proxy` | 4000 | Always-on systemd service | `ai-router`, `homelab` |
-| `manifest.nix` | Manifest frontier router selecting dynamic model fallbacks based on query complexity. | `services.ai-services.manifest` | 3002 | Always-on systemd service | `ai-router`, `homelab` |
-| `omniroute.nix` | OmniRoute Next.js OCI container LLM routing and visual management app. | `services.ai-services.omniroute` | 20129 | Always-on OCI container service | `ai-router`, `homelab` |
+| `manifest.nix` | Manifest frontier router selecting dynamic model fallbacks based on query complexity. | `services.ai-services.manifest` | 2099 | Always-on systemd service | `ai-router`, `homelab` |
+| `omniroute.nix` | OmniRoute Next.js OCI container LLM routing app (disabled by default in favor of ExtremeRouter). | `services.ai-services.omniroute` | 20129 | Always-on OCI container service | `ai-router`, `homelab` |
 
 > [!NOTE]
 > **Dual Upstream Architecture**: ExtremeRouter runs on `z0r0` on port `20128` (restricted to tailnet interface `tailscale0`), while OmniRoute runs on `luffy` on port `20129`. Kong Gateway on `luffy` (`:8090`) proxies traffic to both upstreams simultaneously.

@@ -128,6 +128,8 @@
         "elevenlabs_api_key"
         "xiaomi_mimo_api_key_wright"
         "kong_key_hermes"
+        "kong_key_hermes_voice"
+        "kong_key_voice"
         "extremerouter_api_key"
       ];
 
@@ -256,6 +258,31 @@
                 mkdir -p $out/ui-tui
                 cp -r ${fixedTui}/lib/hermes-tui/* $out/ui-tui/
 
+                # Prevent upstream secure_parent_dir() and cron._secure_dir() from running
+                # os.chmod(..., 0o700) on /var/lib/hermes/.hermes when HERMES_MANAGED=true,
+                # which locks out interactive users in the hermes group with PermissionError.
+                mkdir -p $out/share/hermes-agent/sitecustomize
+                cat > $out/share/hermes-agent/sitecustomize/sitecustomize.py <<'SITECUSTOMIZE'
+                import os
+                import stat
+                _orig_chmod = os.chmod
+                def _managed_safe_chmod(path, mode, *args, **kwargs):
+                    if os.environ.get("HERMES_MANAGED", "").strip().lower() in ("true", "1", "yes"):
+                        try:
+                            p_str = os.fspath(path)
+                            if isinstance(p_str, bytes):
+                                p_str = p_str.decode("utf-8", errors="ignore")
+                            hermes_home = os.environ.get("HERMES_HOME", "/var/lib/hermes/.hermes").rstrip("/")
+                            if p_str.rstrip("/") == hermes_home or p_str.startswith(hermes_home + "/"):
+                                st = os.stat(path)
+                                if stat.S_ISDIR(st.st_mode) and (mode & 0o070) == 0:
+                                    mode = (mode | 0o2770) & ~0o002
+                        except OSError:
+                            pass
+                    return _orig_chmod(path, mode, *args, **kwargs)
+                os.chmod = _managed_safe_chmod
+                SITECUSTOMIZE
+
                 # Intercept `hermes desktop`/`hermes gui` — the Python CLI's cmd_gui
                 # hardcodes PROJECT_ROOT/apps/desktop which doesn't exist in the Nix
                 # package.  Delegate to the pre-built Electron binary instead.
@@ -281,6 +308,8 @@
                     --suffix PATH : "${runtimePath}" \
                     --suffix LIBRARY_PATH : "${pkgs.portaudio.out}/lib" \
                     --prefix LD_LIBRARY_PATH : "${pkgs.portaudio.out}/lib" \
+                    --prefix PYTHONPATH : "$out/share/hermes-agent/sitecustomize" \
+                    --set-default HERMES_MANAGED true \
                     --set HERMES_BUNDLED_SKILLS $out/share/hermes-agent/skills \
                     --set HERMES_BUNDLED_PLUGINS $out/share/hermes-agent/plugins \
                     --set HERMES_BUNDLED_LOCALES $out/share/hermes-agent/locales \
@@ -297,6 +326,8 @@
                   --suffix PATH : "${runtimePath}" \
                   --suffix LIBRARY_PATH : "${pkgs.portaudio.out}/lib" \
                   --prefix LD_LIBRARY_PATH : "${pkgs.portaudio.out}/lib" \
+                  --prefix PYTHONPATH : "$out/share/hermes-agent/sitecustomize" \
+                  --set-default HERMES_MANAGED true \
                   --set HERMES_BUNDLED_SKILLS $out/share/hermes-agent/skills \
                   --set HERMES_BUNDLED_PLUGINS $out/share/hermes-agent/plugins \
                   --set HERMES_BUNDLED_LOCALES $out/share/hermes-agent/locales \
@@ -345,6 +376,11 @@
       };
 
       systemd.services.hermes-agent.serviceConfig.UMask = lib.mkForce "0002";
+      systemd.services.hermes-agent.environment.HERMES_HOME_MODE = "2775";
+      environment.sessionVariables = {
+        HERMES_MANAGED = "true";
+        HERMES_HOME_MODE = "2775";
+      };
       # Fix #16: Suppress hermes journal spam — agent emits frequent SSE/health
       # pings that can flood journald with 100+ lines/sec under active sessions.
       systemd.services.hermes-agent.serviceConfig.LogRateLimitBurst = 200;
@@ -448,68 +484,112 @@
           # Mutable runtime prefs live in ~/.hermes/config.yaml (user-owned).
 
           model:
-            default: "kong-er/claude-3-7-sonnet"
-            fallback: "extreme-direct/claude-3-5-sonnet"
+            default: "kong-er/Coding"
+            fallback: "extreme-direct/Coding"
             api_mode: chat_completions
 
           providers:
             kong-er:
-              base_url: "http://luffy.nfp.nix:8090/v1"
+              base_url: "http://${
+                if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
+              }:8090/v1"
               api_key: "''${KONG_API_KEY}"
               request_timeout_seconds: 180
               fetch_models: true
+            jev:
+              base_url: "http://${
+                if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
+              }:8090/jev/v1"
+              api_key: "''${KONG_API_KEY}"
+              request_timeout_seconds: 180
+              fetch_models: true
+            kong-voice:
+              base_url: "http://${
+                if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
+              }:8090/jev/v1"
+              api_key: "''${KONG_KEY_HERMES_VOICE}"
+              request_timeout_seconds: 30
+              fetch_models: true
             kong-omni:
-              base_url: "http://luffy.nfp.nix:8090/omni/v1"
+              base_url: "http://${
+                if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
+              }:8090/omni/v1"
               api_key: "''${KONG_API_KEY}"
               request_timeout_seconds: 180
               fetch_models: true
             kong-free:
-              base_url: "http://luffy.nfp.nix:8090/llm/free/v1"
+              base_url: "http://${
+                if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
+              }:8090/llm/free/v1"
               api_key: "''${KONG_API_KEY}"
               request_timeout_seconds: 180
               fetch_models: true
             kong-frontier:
-              base_url: "http://luffy.nfp.nix:8090/llm/frontier/v1"
+              base_url: "http://${
+                if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
+              }:8090/llm/frontier/v1"
               api_key: "''${KONG_API_KEY}"
               request_timeout_seconds: 180
               fetch_models: true
             extreme-direct:
-              base_url: "http://127.0.0.1:20128/v1"
+              base_url: "http://z0r0.nfp.nix:20128/v1"
               api_key: "''${EXTREMEROUTER_API_KEY}"
               request_timeout_seconds: 180
               fetch_models: true
             kong:
-              base_url: "http://luffy.nfp.nix:8090/v1"
+              base_url: "http://${
+                if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
+              }:8090/v1"
               api_key: "''${KONG_API_KEY}"
               request_timeout_seconds: 180
+              fetch_models: true
 
           custom_providers:
             kong-er:
-              base_url: "http://luffy.nfp.nix:8090/v1"
+              base_url: "http://${
+                if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
+              }:8090/v1"
               api_key: "''${KONG_API_KEY}"
               fetch_models: true
+            jev:
+              base_url: "http://${
+                if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
+              }:8090/jev/v1"
+              api_key: "''${KONG_API_KEY}"
+              fetch_models: true
+            kong-voice:
+              base_url: "http://${
+                if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
+              }:8090/jev/v1"
+              api_key: "''${KONG_KEY_HERMES_VOICE}"
+              fetch_models: true
             kong-omni:
-              base_url: "http://luffy.nfp.nix:8090/omni/v1"
+              base_url: "http://${
+                if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
+              }:8090/omni/v1"
               api_key: "''${KONG_API_KEY}"
               fetch_models: true
             kong-free:
-              base_url: "http://luffy.nfp.nix:8090/llm/free/v1"
+              base_url: "http://${
+                if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
+              }:8090/llm/free/v1"
               api_key: "''${KONG_API_KEY}"
               fetch_models: true
             kong-frontier:
-              base_url: "http://luffy.nfp.nix:8090/llm/frontier/v1"
+              base_url: "http://${
+                if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
+              }:8090/llm/frontier/v1"
               api_key: "''${KONG_API_KEY}"
               fetch_models: true
             extreme-direct:
-              base_url: "http://127.0.0.1:20128/v1"
+              base_url: "http://z0r0.nfp.nix:20128/v1"
               api_key: "''${EXTREMEROUTER_API_KEY}"
               fetch_models: true
 
           fallback_providers:
             - kong-er
-            - kong-omni
+            - jev
             - kong-free
-            - kong-frontier
             - extreme-direct
 
           credential_pool_strategies:
@@ -742,8 +822,21 @@
                 - mcp
                 - serve
               env: {}
+            hermes-a2a:
+              command: ${pkgs.python3}/bin/python3
+              args:
+                - ${../../75-mcp/pi-a2a-mcp.py}
+              env: {}
+            jev-decision:
+              command: ${pkgs.python3}/bin/python3
+              args:
+                - ${../../75-mcp/jev-mcp.py}
+              env: {}
         '';
       };
+
+      users.users.hermes.linger = lib.mkDefault true;
+      users.users.t0psh31f.linger = lib.mkDefault true;
 
       sops.templates."hermes-env" = {
         path = "/run/secrets/hermes-env";
@@ -790,6 +883,9 @@
 
           # Kong AI Gateway — unified LLM routing (routes to ExtremeRouter, FreeLLMAPI, etc.)
           KONG_API_KEY=${config.sops.placeholder.kong_key_hermes}
+          KONG_KEY_HERMES=${config.sops.placeholder.kong_key_hermes}
+          KONG_KEY_HERMES_VOICE=${config.sops.placeholder.kong_key_hermes_voice}
+          KONG_KEY_VOICE=${config.sops.placeholder.kong_key_voice}
 
           # ── Tool API Keys ────────────────────────────────────────────
           TINYBIRD_API_KEY=${config.sops.placeholder.tinybird_api_gh}

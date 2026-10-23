@@ -136,7 +136,7 @@
           };
           healthcheck = {
             enable = true;
-            path = "/";
+            path = "/api/ping";
             expectedStatus = 200;
           };
         };

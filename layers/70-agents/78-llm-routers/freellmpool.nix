@@ -17,8 +17,8 @@ with lib;
 
     port = mkOption {
       type = types.port;
-      default = 8080;
-      description = "HTTP API port";
+      default = 8083;
+      description = "HTTP API port (8083 avoids collision with signal-cli-daemon on 8080)";
     };
 
     host = mkOption {
@@ -94,7 +94,7 @@ with lib;
           };
           healthcheck = {
             enable = true;
-            path = "/";
+            path = "/v1/models";
             expectedStatus = 200;
           };
         };

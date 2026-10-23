@@ -326,6 +326,35 @@
           sopsFile = ../../../layers/00-cyberia/03-treasure/secrets/external_services.yaml;
         };
 
+        # ── Kong AI Gateway & Primary Router Keys ──────────────────
+        sops.secrets.kong_key_hermes = {
+          sopsFile = ../../../layers/00-cyberia/03-treasure/secrets/external_services.yaml;
+        };
+        sops.secrets.kong_key_hermes_voice = {
+          sopsFile = ../../../layers/00-cyberia/03-treasure/secrets/external_services.yaml;
+        };
+        sops.secrets.kong_key_voice = {
+          sopsFile = ../../../layers/00-cyberia/03-treasure/secrets/external_services.yaml;
+        };
+        sops.secrets.kong_key_pi = {
+          sopsFile = ../../../layers/00-cyberia/03-treasure/secrets/external_services.yaml;
+        };
+        sops.secrets.kong_key_opencode = {
+          sopsFile = ../../../layers/00-cyberia/03-treasure/secrets/external_services.yaml;
+        };
+        sops.secrets.kong_key_claude_code = {
+          sopsFile = ../../../layers/00-cyberia/03-treasure/secrets/external_services.yaml;
+        };
+        sops.secrets.kong_key_codex = {
+          sopsFile = ../../../layers/00-cyberia/03-treasure/secrets/external_services.yaml;
+        };
+        sops.secrets.extremerouter_api_key = {
+          sopsFile = ../../../layers/00-cyberia/03-treasure/secrets/external_services.yaml;
+        };
+        sops.secrets.omniroute_api_key = {
+          sopsFile = ../../../layers/00-cyberia/03-treasure/secrets/external_services.yaml;
+        };
+
         # Note: rclone.conf is persisted dynamically via impermanence
         # (/persist/home/t0psh31f/.config/rclone/rclone.conf) to support interactive OAuth token refreshes.
 
@@ -388,6 +417,16 @@
         home.sessionVariables = {
           GEMINI_API_KEY = "$(cat ${config.sops.secrets.gemini_api_key_we77.path})";
           OPENROUTER_API_KEY = "$(cat ${config.sops.secrets.openrouter_api_key.path})";
+          KONG_API_KEY = "$(cat ${config.sops.secrets.kong_key_hermes.path})";
+          KONG_KEY_PI = "$(cat ${config.sops.secrets.kong_key_pi.path})";
+          KONG_KEY_OPENCODE = "$(cat ${config.sops.secrets.kong_key_opencode.path})";
+          KONG_KEY_CLAUDE_CODE = "$(cat ${config.sops.secrets.kong_key_claude_code.path})";
+          ANTHROPIC_AUTH_TOKEN = "$(cat ${config.sops.secrets.kong_key_claude_code.path})";
+          KONG_KEY_CODEX = "$(cat ${config.sops.secrets.kong_key_codex.path})";
+          KONG_KEY_HERMES = "$(cat ${config.sops.secrets.kong_key_hermes.path})";
+          KONG_KEY_HERMES_VOICE = "$(cat ${config.sops.secrets.kong_key_hermes_voice.path})";
+          KONG_KEY_VOICE = "$(cat ${config.sops.secrets.kong_key_voice.path})";
+          EXTREMEROUTER_API_KEY = "$(cat ${config.sops.secrets.extremerouter_api_key.path})";
         };
 
         # Himalaya email client config (see layers/50-cli-tui-programs/53-tools/himalaya.nix

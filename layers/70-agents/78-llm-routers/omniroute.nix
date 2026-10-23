@@ -44,7 +44,7 @@ with lib;
         services:
           omniroute:
             image: ghcr.io/diegosouzapw/omniroute:latest
-            user: "0:0"
+            user: "1000:1000"
             ports:
               - "${toString cfg.port}:20128"
             env_file:
@@ -54,6 +54,7 @@ with lib;
               - PORT=20128
               - HOSTNAME=0.0.0.0
               - DATA_DIR=/app/data
+              - REQUIRE_API_KEY=true
               - NODE_OPTIONS=--max-old-space-size=512
             volumes:
               - ${cfg.dataDir}:/app/data
@@ -82,7 +83,8 @@ with lib;
         ENV_FILE="$DATA_DIR/.env"
 
         mkdir -p "$DATA_DIR"
-        chmod 777 "$DATA_DIR"
+        chmod 750 "$DATA_DIR"
+        chown -R 1000:1000 "$DATA_DIR" 2>/dev/null || true
         cp -f ${composeTemplate} "$COMPOSE_FILE"
         chmod 644 "$COMPOSE_FILE"
         touch "$ENV_FILE"
@@ -163,15 +165,15 @@ with lib;
               directories = [
                 {
                   directory = cfg.dataDir;
-                  user = "root";
-                  group = "root";
-                  mode = "0777";
+                  user = "1000";
+                  group = "1000";
+                  mode = "0750";
                 }
               ];
             };
 
         systemd.tmpfiles.rules = [
-          "d ${cfg.dataDir} 0777 root root -"
+          "d ${cfg.dataDir} 0750 1000 1000 -"
         ];
 
         systemd.services.omniroute = {

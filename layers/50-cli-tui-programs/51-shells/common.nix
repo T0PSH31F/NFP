@@ -27,7 +27,7 @@ in
       ANDROID_USER_HOME = "${xdgData}/android";
       ANDROID_AVD_HOME = "${xdgData}/android/avd";
       KODI_DATA = "${xdgData}/kodi";
-      PI_CODING_AGENT_DIR = "${xdgConfig}/pi/agent";
+      PI_CODING_AGENT_DIR = "${homeDir}/.pi/agent";
       WINEPREFIX = "${xdgData}/wine";
       GNUPGHOME = lib.mkForce "${xdgData}/gnupg";
       NPM_CONFIG_CACHE = "${xdgCache}/npm";

@@ -483,190 +483,319 @@
 
             # Kong AI Gateway — unified LLM provider
             # Routes to ExtremeRouter (coding), FreeLLMAPI (free), etc.
-            kong = lib.mkIf (osConfig.services.ai-services.kong-gateway.enable or false) {
-              # Kong runs on nami, not on z0r0 — use Tailnet MagicDNS endpoint.
-              # If kong-gateway is locally enabled (nami), use loopback; otherwise
-              # route over the Headscale mesh to luffy.nfp.nix:8090.
-              baseUrl =
-                if (osConfig.services.ai-services.kong-gateway.enable or false) then
-                  "http://127.0.0.1:${toString (osConfig.services.ai-services.kong-gateway.proxyPort or 8090)}/v1"
-                else
-                  "http://luffy.nfp.nix:8090/v1";
-              name = "Kong AI Gateway";
-              models = {
-                "deepseek-v4-pro" = {
-                  name = "DeepSeek V4 Pro (via Kong)";
-                  limit = {
-                    context = 128000;
-                    output = 16384;
-                  };
+            kong =
+              let
+                kongUrl =
+                  if (osConfig.services.ai-services.kong-gateway.enable or false) then
+                    "http://127.0.0.1:${toString (osConfig.services.ai-services.kong-gateway.proxyPort or 8090)}/v1"
+                  else
+                    "http://sanji.nfp.nix:8090/v1";
+              in
+              {
+                npm = "@ai-sdk/openai-compatible";
+                env = [
+                  "KONG_KEY_OPENCODE"
+                  "KONG_API_KEY"
+                ];
+                baseUrl = kongUrl;
+                options = {
+                  baseURL = kongUrl;
+                  apiKey = "{env:KONG_KEY_OPENCODE}";
                 };
-                "deepseek-v4-flash" = {
-                  name = "DeepSeek V4 Flash (via Kong)";
-                  limit = {
-                    context = 128000;
-                    output = 16384;
+                name = "Kong AI Gateway";
+                models = {
+                  "Coding" = {
+                    name = "ExtremeRouter Coding Combo (Cascade via Kong)";
+                    limit = {
+                      context = 200000;
+                      output = 64000;
+                    };
                   };
-                };
-                "deepseek-r1" = {
-                  name = "DeepSeek R1 (via Kong)";
-                  limit = {
-                    context = 128000;
-                    output = 16384;
+                  "DailyDrive" = {
+                    name = "ExtremeRouter DailyDrive Combo (via Kong)";
+                    limit = {
+                      context = 128000;
+                      output = 16384;
+                    };
                   };
-                };
-                "mimo-2.5-pro" = {
-                  name = "Mimo 2.5 Pro (via Kong — token plan)";
-                  limit = {
-                    context = 128000;
-                    output = 16384;
+                  "Penny-Pincher" = {
+                    name = "ExtremeRouter Penny-Pincher Combo (Voice/Fast via Kong)";
+                    limit = {
+                      context = 128000;
+                      output = 8192;
+                    };
                   };
-                };
-                "xiaomi-tokenplan/mimo-v2.5-pro" = {
-                  name = "MiMo V2.5 Pro (Xiaomi Token Plan, via Kong)";
-                  limit = {
-                    context = 128000;
-                    output = 16384;
+                  "Free" = {
+                    name = "ExtremeRouter Free Swarm Combo (via Kong)";
+                    limit = {
+                      context = 128000;
+                      output = 16384;
+                    };
                   };
-                };
-                "hy3" = {
-                  name = "Hunyuan 3 / HY3 (via Kong)";
-                  limit = {
-                    context = 128000;
-                    output = 8192;
+                  "Research" = {
+                    name = "ExtremeRouter Research Combo (via Kong)";
+                    limit = {
+                      context = 200000;
+                      output = 32768;
+                    };
                   };
-                };
-                "kimi-k3" = {
-                  name = "Kimi K3 (via Kong)";
-                  limit = {
-                    context = 200000;
-                    output = 16384;
+                  "Judge" = {
+                    name = "ExtremeRouter Judge Combo (Frontier via Kong)";
+                    limit = {
+                      context = 200000;
+                      output = 64000;
+                    };
                   };
-                };
-                "kimi-k2.7code" = {
-                  name = "Kimi K2.7 Code (via Kong)";
-                  limit = {
-                    context = 200000;
-                    output = 16384;
+                  "ag/claude-sonnet-4-6" = {
+                    name = "Claude Sonnet 4.6 (via Kong)";
+                    limit = {
+                      context = 200000;
+                      output = 64000;
+                    };
                   };
-                };
-                "kimi-k2.6" = {
-                  name = "Kimi K2.6 (via Kong)";
-                  limit = {
-                    context = 200000;
-                    output = 8192;
+                  "ag/claude-opus-4-6-thinking" = {
+                    name = "Claude Opus 4.6 Thinking (via Kong)";
+                    limit = {
+                      context = 200000;
+                      output = 64000;
+                    };
                   };
-                };
-                "glm-5.3" = {
-                  name = "GLM 5.3 (via Kong)";
-                  limit = {
-                    context = 128000;
-                    output = 16384;
+                  "ocg/mimo-v2.5-pro" = {
+                    name = "MiMo V2.5 Pro (OpenCode Go via Kong)";
+                    limit = {
+                      context = 128000;
+                      output = 16384;
+                    };
                   };
-                };
-                "glm-5.2" = {
-                  name = "GLM 5.2 (via Kong)";
-                  limit = {
-                    context = 128000;
-                    output = 8192;
+                  "xmtp/mimo-v2.5-pro" = {
+                    name = "MiMo V2.5 Pro (Xiaomi Token Plan via Kong)";
+                    limit = {
+                      context = 128000;
+                      output = 16384;
+                    };
                   };
-                };
-                "claude-3-7-sonnet" = {
-                  name = "Claude 3.7 Sonnet (via Kong)";
-                  limit = {
-                    context = 200000;
-                    output = 64000;
+                  "cx/gpt-5.3-codex" = {
+                    name = "GPT-5.3 Codex (via Kong)";
+                    limit = {
+                      context = 200000;
+                      output = 32768;
+                    };
                   };
-                };
-                "claude-3-5-sonnet" = {
-                  name = "Claude 3.5 Sonnet (via Kong)";
-                  limit = {
-                    context = 200000;
-                    output = 8192;
+                  "deepseek-v4-pro" = {
+                    name = "DeepSeek V4 Pro (via Kong)";
+                    limit = {
+                      context = 128000;
+                      output = 16384;
+                    };
                   };
-                };
-                "gpt-4o" = {
-                  name = "GPT-4o (via Kong)";
-                  limit = {
-                    context = 128000;
-                    output = 16384;
+                  "deepseek-v4-flash" = {
+                    name = "DeepSeek V4 Flash (via Kong)";
+                    limit = {
+                      context = 128000;
+                      output = 16384;
+                    };
                   };
-                };
-                "qwen-2.5-coder-32b" = {
-                  name = "Qwen 2.5 Coder 32B (via Kong)";
-                  limit = {
-                    context = 128000;
-                    output = 8192;
+                  "deepseek-r1" = {
+                    name = "DeepSeek R1 (via Kong)";
+                    limit = {
+                      context = 128000;
+                      output = 16384;
+                    };
                   };
-                };
-                "free-deepseek-r1" = {
-                  name = "Free DeepSeek R1 (via Kong)";
-                  limit = {
-                    context = 128000;
-                    output = 16384;
+                  "mimo-2.5-pro" = {
+                    name = "Mimo 2.5 Pro (via Kong — token plan)";
+                    limit = {
+                      context = 128000;
+                      output = 16384;
+                    };
                   };
-                };
-                "free-claude-3-7-sonnet" = {
-                  name = "Free Claude 3.7 Sonnet (via Kong)";
-                  limit = {
-                    context = 200000;
-                    output = 64000;
+                  "xiaomi-tokenplan/mimo-v2.5-pro" = {
+                    name = "MiMo V2.5 Pro (Xiaomi Token Plan, via Kong)";
+                    limit = {
+                      context = 128000;
+                      output = 16384;
+                    };
                   };
-                };
-                "free-gpt-4o" = {
-                  name = "Free GPT-4o (via Kong)";
-                  limit = {
-                    context = 128000;
-                    output = 16384;
+                  "hy3" = {
+                    name = "Hunyuan 3 / HY3 (via Kong)";
+                    limit = {
+                      context = 128000;
+                      output = 8192;
+                    };
                   };
-                };
-                "free-gemini-2.5-pro" = {
-                  name = "Free Gemini 2.5 Pro (via Kong)";
-                  limit = {
-                    context = 1048576;
-                    output = 65536;
+                  "kimi-k3" = {
+                    name = "Kimi K3 (via Kong)";
+                    limit = {
+                      context = 200000;
+                      output = 16384;
+                    };
                   };
-                };
-                "free-qwen-2.5-coder-32b" = {
-                  name = "Free Qwen 2.5 Coder 32B (via Kong)";
-                  limit = {
-                    context = 128000;
-                    output = 8192;
+                  "kimi-k2.7code" = {
+                    name = "Kimi K2.7 Code (via Kong)";
+                    limit = {
+                      context = 200000;
+                      output = 16384;
+                    };
                   };
-                };
-                "free-llama-3.3-70b" = {
-                  name = "Free Llama 3.3 70B (via Kong)";
-                  limit = {
-                    context = 128000;
-                    output = 8192;
+                  "kimi-k2.6" = {
+                    name = "Kimi K2.6 (via Kong)";
+                    limit = {
+                      context = 200000;
+                      output = 8192;
+                    };
+                  };
+                  "glm-5.3" = {
+                    name = "GLM 5.3 (via Kong)";
+                    limit = {
+                      context = 128000;
+                      output = 16384;
+                    };
+                  };
+                  "glm-5.2" = {
+                    name = "GLM 5.2 (via Kong)";
+                    limit = {
+                      context = 128000;
+                      output = 8192;
+                    };
+                  };
+                  "claude-3-7-sonnet" = {
+                    name = "Claude 3.7 Sonnet (via Kong)";
+                    limit = {
+                      context = 200000;
+                      output = 64000;
+                    };
+                  };
+                  "claude-3-5-sonnet" = {
+                    name = "Claude 3.5 Sonnet (via Kong)";
+                    limit = {
+                      context = 200000;
+                      output = 8192;
+                    };
+                  };
+                  "gpt-4o" = {
+                    name = "GPT-4o (via Kong)";
+                    limit = {
+                      context = 128000;
+                      output = 16384;
+                    };
+                  };
+                  "qwen-2.5-coder-32b" = {
+                    name = "Qwen 2.5 Coder 32B (via Kong)";
+                    limit = {
+                      context = 128000;
+                      output = 8192;
+                    };
+                  };
+                  "free-deepseek-r1" = {
+                    name = "Free DeepSeek R1 (via Kong)";
+                    limit = {
+                      context = 128000;
+                      output = 16384;
+                    };
+                  };
+                  "free-claude-3-7-sonnet" = {
+                    name = "Free Claude 3.7 Sonnet (via Kong)";
+                    limit = {
+                      context = 200000;
+                      output = 64000;
+                    };
+                  };
+                  "free-gpt-4o" = {
+                    name = "Free GPT-4o (via Kong)";
+                    limit = {
+                      context = 128000;
+                      output = 16384;
+                    };
+                  };
+                  "free-gemini-2.5-pro" = {
+                    name = "Free Gemini 2.5 Pro (via Kong)";
+                    limit = {
+                      context = 1048576;
+                      output = 65536;
+                    };
+                  };
+                  "free-qwen-2.5-coder-32b" = {
+                    name = "Free Qwen 2.5 Coder 32B (via Kong)";
+                    limit = {
+                      context = 128000;
+                      output = 8192;
+                    };
+                  };
+                  "free-llama-3.3-70b" = {
+                    name = "Free Llama 3.3 70B (via Kong)";
+                    limit = {
+                      context = 128000;
+                      output = 8192;
+                    };
                   };
                 };
               };
-            };
 
             # Kong AI Gateway — path-specific providers
             kong-er = {
-              baseUrl = "http://luffy.nfp.nix:8090/v1";
+              npm = "@ai-sdk/openai-compatible";
+              env = [
+                "KONG_KEY_OPENCODE"
+                "KONG_API_KEY"
+              ];
+              baseUrl = "http://sanji.nfp.nix:8090/v1";
+              options = {
+                baseURL = "http://sanji.nfp.nix:8090/v1";
+                apiKey = "{env:KONG_KEY_OPENCODE}";
+              };
               name = "Kong ExtremeRouter";
             };
 
             kong-omni = {
-              baseUrl = "http://luffy.nfp.nix:8090/omni/v1";
+              npm = "@ai-sdk/openai-compatible";
+              env = [
+                "KONG_KEY_OPENCODE"
+                "KONG_API_KEY"
+              ];
+              baseUrl = "http://sanji.nfp.nix:8090/omni/v1";
+              options = {
+                baseURL = "http://sanji.nfp.nix:8090/omni/v1";
+                apiKey = "{env:KONG_KEY_OPENCODE}";
+              };
               name = "Kong OmniRoute";
             };
 
             kong-free = {
-              baseUrl = "http://luffy.nfp.nix:8090/llm/free/v1";
+              npm = "@ai-sdk/openai-compatible";
+              env = [
+                "KONG_KEY_OPENCODE"
+                "KONG_API_KEY"
+              ];
+              baseUrl = "http://sanji.nfp.nix:8090/llm/free/v1";
+              options = {
+                baseURL = "http://sanji.nfp.nix:8090/llm/free/v1";
+                apiKey = "{env:KONG_KEY_OPENCODE}";
+              };
               name = "Kong FreeLLMPool";
             };
 
             kong-frontier = {
-              baseUrl = "http://luffy.nfp.nix:8090/llm/frontier/v1";
+              npm = "@ai-sdk/openai-compatible";
+              env = [
+                "KONG_KEY_OPENCODE"
+                "KONG_API_KEY"
+              ];
+              baseUrl = "http://sanji.nfp.nix:8090/llm/frontier/v1";
+              options = {
+                baseURL = "http://sanji.nfp.nix:8090/llm/frontier/v1";
+                apiKey = "{env:KONG_KEY_OPENCODE}";
+              };
               name = "Kong Frontier Manifest";
             };
 
             extreme-direct = {
-              baseUrl = "http://127.0.0.1:20128/v1";
+              npm = "@ai-sdk/openai-compatible";
+              env = [ "EXTREMEROUTER_API_KEY" ];
+              baseUrl = "http://z0r0.nfp.nix:20128/v1";
+              options = {
+                baseURL = "http://z0r0.nfp.nix:20128/v1";
+                apiKey = "{env:EXTREMEROUTER_API_KEY}";
+              };
               name = "ExtremeRouter Direct (Backup)";
             };
 

@@ -20,6 +20,14 @@ with lib;
         group = "root";
         mode = "0400";
       };
+
+      # Helper for consumer keys readable by CLI harnesses in `users` group
+      mkConsumerSecret = _name: {
+        sopsFile = mkDefault secretsFile;
+        owner = mkDefault "root";
+        group = mkDefault "users";
+        mode = mkDefault "0440";
+      };
     in
     mkIf cfg.enable {
       # ── Provider API keys ────────────────────────────────────────────
@@ -41,18 +49,22 @@ with lib;
         github_models_api = mkSecret "github_models_api";
         nvidia_api_key = mkSecret "nvidia_api_key";
 
-        # Kong consumer API keys (generated per consumer in sops)
-        kong_key_hermes = mkSecret "kong_key_hermes";
-        kong_key_opencode = mkSecret "kong_key_opencode";
-        kong_key_claude_code = mkSecret "kong_key_claude_code";
-        kong_key_codex = mkSecret "kong_key_codex";
-        kong_key_cursor = mkSecret "kong_key_cursor";
-        kong_key_deerflow = mkSecret "kong_key_deerflow";
-        kong_key_polyfloor = mkSecret "kong_key_polyfloor";
+        # Kong consumer API keys (generated per consumer in sops, readable by users group)
+        kong_key_hermes = mkConsumerSecret "kong_key_hermes";
+        kong_key_hermes_voice = mkConsumerSecret "kong_key_hermes_voice";
+        kong_key_voice = mkConsumerSecret "kong_key_voice";
+        kong_key_pi = mkConsumerSecret "kong_key_pi";
+        kong_key_opencode = mkConsumerSecret "kong_key_opencode";
+        kong_key_claude_code = mkConsumerSecret "kong_key_claude_code";
+        kong_key_codex = mkConsumerSecret "kong_key_codex";
+        kong_key_cursor = mkConsumerSecret "kong_key_cursor";
+        kong_key_deerflow = mkConsumerSecret "kong_key_deerflow";
+        kong_key_polyfloor = mkConsumerSecret "kong_key_polyfloor";
 
-        # ExtremeRouter & OmniRoute remote API keys
+        # ExtremeRouter, OmniRoute & FreeLLMAPI keys
         extremerouter_api_key = mkSecret "extremerouter_api_key";
         omniroute_api_key = mkSecret "omniroute_api_key";
+        freellmapi_encryption_key = mkSecret "freellmapi_encryption_key";
       };
 
       # ── Environment file template for Kong ──────────────────────────
@@ -73,6 +85,9 @@ with lib;
 
           # Kong consumer keys (agents authenticate with these)
           KONG_KEY_HERMES=${config.sops.placeholder.kong_key_hermes}
+          KONG_KEY_HERMES_VOICE=${config.sops.placeholder.kong_key_hermes_voice}
+          KONG_KEY_VOICE=${config.sops.placeholder.kong_key_voice}
+          KONG_KEY_PI=${config.sops.placeholder.kong_key_pi}
           KONG_KEY_OPENCODE=${config.sops.placeholder.kong_key_opencode}
           KONG_KEY_CLAUDE_CODE=${config.sops.placeholder.kong_key_claude_code}
           KONG_KEY_CODEX=${config.sops.placeholder.kong_key_codex}
@@ -100,7 +115,7 @@ with lib;
                   if (hasAttr keyName config.sops.placeholder) then
                     config.sops.placeholder.${keyName}
                   else
-                    "nfp-${consumer}-key-placeholder";
+                    "${config.sops.placeholder.kong_key_hermes}-${consumer}";
               }
             ];
           }) cfg.consumers;
@@ -111,6 +126,8 @@ with lib;
       };
 
       # ── ExtremeRouter upstream auth (request-transformer plugin) ────
+      # Uses remove + replace + add so the Kong consumer key never leaks
+      # or prevents the upstream router Bearer key from being injected.
       sops.templates."kong-extremerouter-auth" = {
         content = builtins.toJSON {
           _format_version = "3.0";
@@ -119,6 +136,51 @@ with lib;
               name = "request-transformer";
               service = "extremerouter-llm";
               config = {
+                remove = {
+                  headers = [
+                    "apikey"
+                    "x-api-key"
+                  ];
+                };
+                replace = {
+                  headers = [
+                    "Authorization: Bearer ${config.sops.placeholder.extremerouter_api_key}"
+                  ];
+                };
+                add = {
+                  headers = [
+                    "Authorization: Bearer ${config.sops.placeholder.extremerouter_api_key}"
+                  ];
+                };
+              };
+            }
+          ];
+        };
+        owner = "root";
+        group = "root";
+        mode = "0400";
+      };
+
+      # ── Jev Tier Router upstream auth (request-transformer plugin) ──
+      sops.templates."kong-jev-auth" = {
+        content = builtins.toJSON {
+          _format_version = "3.0";
+          plugins = [
+            {
+              name = "request-transformer";
+              service = "jev-llm";
+              config = {
+                remove = {
+                  headers = [
+                    "apikey"
+                    "x-api-key"
+                  ];
+                };
+                replace = {
+                  headers = [
+                    "Authorization: Bearer ${config.sops.placeholder.extremerouter_api_key}"
+                  ];
+                };
                 add = {
                   headers = [
                     "Authorization: Bearer ${config.sops.placeholder.extremerouter_api_key}"
@@ -142,6 +204,19 @@ with lib;
               name = "request-transformer";
               service = "omniroute-llm";
               config = {
+                remove = {
+                  headers = [
+                    "apikey"
+                    "x-api-key"
+                  ];
+                };
+                replace = {
+                  headers = [
+                    "Authorization: Bearer ${
+                      config.sops.placeholder.omniroute_api_key or config.sops.placeholder.extremerouter_api_key
+                    }"
+                  ];
+                };
                 add = {
                   headers = [
                     "Authorization: Bearer ${
@@ -153,6 +228,20 @@ with lib;
             }
           ];
         };
+        owner = "root";
+        group = "root";
+        mode = "0400";
+      };
+
+      # ── Environment file for ExtremeRouter ──────────────────────────
+      sops.templates."extremerouter-env" = {
+        content = ''
+          # ExtremeRouter persistent signing & API key secrets (managed by sops-nix)
+          JWT_SECRET=${config.sops.placeholder.extremerouter_api_key}
+          API_KEY_SECRET=${config.sops.placeholder.extremerouter_api_key}
+          EXTREMEROUTER_API_KEY=${config.sops.placeholder.extremerouter_api_key}
+          REQUIRE_API_KEY=true
+        '';
         owner = "root";
         group = "root";
         mode = "0400";
@@ -183,8 +272,8 @@ with lib;
       # ── Environment file for FreeLLMAPI ─────────────────────────────
       sops.templates."freellmapi-env" = lib.mkIf config.services.ai-services.freellmapi.enable {
         content = ''
-          # FreeLLMAPI provider keys
-          ENCRYPTION_KEY=c3f1a098b7e2d4f5c6a8b9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0
+          # FreeLLMAPI provider keys & sops-managed encryption key
+          ENCRYPTION_KEY=${config.sops.placeholder.freellmapi_encryption_key}
           OPENROUTER_API_KEY=${config.sops.placeholder.openrouter_api_key_1}
           GROQ_API_KEY=${config.sops.placeholder.groq_api_key}
           CEREBRAS_API_KEY=${config.sops.placeholder.cerebras_api_key}

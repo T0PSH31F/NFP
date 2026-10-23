@@ -113,7 +113,7 @@
         };
       };
       omniroute = {
-        enable = true;
+        enable = false;
         environmentFile = config.sops.templates."omniroute-env".path;
       };
       freellmapi.enable = true;
@@ -141,12 +141,17 @@
     };
 
     polyfloor.enable = true;
+    wyoming-services.enable = true;
   };
+
+  layers.layer-76.hermes-live-voice.enable = true;
 
   layers.layer-78.llm-routers.jev-router-plugin = {
     enable = true;
     port = 20127;
-    upstreamRouterUrl = "http://127.0.0.1:8090";
+    host = "127.0.0.1";
+    openFirewall = false;
+    upstreamRouterUrl = "http://100.64.0.1:20128";
     jevEngineUrl = "http://127.0.0.1:20130";
     localSlmUrl = "http://127.0.0.1:11434";
   };
