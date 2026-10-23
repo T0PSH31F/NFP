@@ -46,25 +46,43 @@ in
           sort_by = "natural";
           sort_dir_first = true;
         };
-        opener.edit = [
-          {
-            run = ''${editorBin} "$@"'';
-            block = true;
-          }
-        ];
-        keymap.manager.prepend_keymap = [
-          {
-            on = [ "e" ];
-            run = "open";
-            desc = "Open with Neovim";
-          }
-        ];
+        opener = {
+          edit = [
+            {
+              run = ''${editorBin} "$@"'';
+              block = true;
+              desc = "Neovim";
+            }
+          ];
+          helix = [
+            {
+              run = ''hx "$@"'';
+              block = true;
+              desc = "Helix";
+            }
+          ];
+        };
+        open = {
+          rules = [
+            { name = "*/"; use = [ "edit" "helix" "open" "reveal" ]; }
+            { mime = "text/*"; use = [ "edit" "helix" "reveal" ]; }
+            { mime = "application/json"; use = [ "edit" "helix" "reveal" ]; }
+            { mime = "application/javascript"; use = [ "edit" "helix" "reveal" ]; }
+            { mime = "application/x-sh"; use = [ "edit" "helix" "reveal" ]; }
+            { mime = "*"; use = [ "edit" "helix" "open" "reveal" ]; }
+          ];
+        };
       };
       keymap.manager.prepend_keymap = [
         {
           on = [ "e" ];
-          run = "open";
-          desc = "Open with Neovim";
+          run = "open --interactive";
+          desc = "Open with editor";
+        }
+        {
+          on = [ "E" ];
+          run = "open --hovered --interactive";
+          desc = "Choose opener interactively";
         }
         {
           on = [ "<C-s>" ];

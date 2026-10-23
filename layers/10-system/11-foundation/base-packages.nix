@@ -27,6 +27,7 @@
     usbutils
     util-linux
     which
+    bun
 
     # Development basics
     git # (Installed via gitFull in dev-packages or other suites)
