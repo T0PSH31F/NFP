@@ -188,6 +188,14 @@ in
         # Explicit model IDs pulled from Kong/ExtremeRouter /v1/models (combos + top providers)
         explicitKongModels = [
           {
+            id = "openrouter/auto";
+            name = "OpenRouter Auto (via Kong)";
+            input = [
+              "text"
+              "image"
+            ];
+          }
+          {
             id = "Coding";
             name = "ExtremeRouter Coding Combo (Cascade)";
             input = [
@@ -400,8 +408,35 @@ in
               apiKey = "ollama";
               models = [
                 {
+                  id = "qwen3:4b";
+                  name = "Qwen 3 4B (Local)";
+                  input = [ "text" ];
+                }
+                {
                   id = "qwen2.5-coder:7b";
                   name = "Qwen 2.5 Coder 7B (Local)";
+                  input = [ "text" ];
+                }
+              ];
+            };
+            kong-free = {
+              baseUrl = "http://127.0.0.1:8090/llm/free/v1";
+              api = "openai-completions";
+              apiKey = piApiKeyCmd;
+              models = [
+                {
+                  id = "ovh/Qwen3-Coder-30B-A3B-Instruct";
+                  name = "Qwen 3 Coder 30B (OVH FreeLLMPool)";
+                  input = [ "text" ];
+                }
+                {
+                  id = "kilo/openrouter/free";
+                  name = "OpenRouter Free (FreeLLMPool)";
+                  input = [ "text" ];
+                }
+                {
+                  id = "auto";
+                  name = "Auto (FreeLLMPool)";
                   input = [ "text" ];
                 }
               ];

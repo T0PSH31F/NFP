@@ -365,38 +365,9 @@ let
             {
               name = "llm-chat";
               service = "freellmapi-llm";
-              paths = [ "/llm/v1/chat/completions" ];
+              paths = [ "/llm" ];
               methods = [
-                "POST"
-                "OPTIONS"
-              ];
-              strip_path = true;
-              protocols = [
-                "http"
-                "https"
-              ];
-              tags = [ "llm" ];
-            }
-            {
-              name = "llm-completions";
-              service = "freellmapi-llm";
-              paths = [ "/llm/v1/completions" ];
-              methods = [
-                "POST"
-                "OPTIONS"
-              ];
-              strip_path = true;
-              protocols = [
-                "http"
-                "https"
-              ];
-              tags = [ "llm" ];
-            }
-            {
-              name = "llm-embeddings";
-              service = "freellmapi-llm";
-              paths = [ "/llm/v1/embeddings" ];
-              methods = [
+                "GET"
                 "POST"
                 "OPTIONS"
               ];
@@ -412,8 +383,9 @@ let
             # Frontier traffic → Manifest
             name = "llm-frontier";
             service = "manifest-llm";
-            paths = [ "/llm/frontier/v1/chat/completions" ];
+            paths = [ "/llm/frontier" ];
             methods = [
+              "GET"
               "POST"
               "OPTIONS"
             ];
@@ -432,8 +404,9 @@ let
             {
               name = "llm-coding";
               service = "extremerouter-llm";
-              paths = [ "/llm/coding/v1/chat/completions" ];
+              paths = [ "/llm/coding" ];
               methods = [
+                "GET"
                 "POST"
                 "OPTIONS"
               ];
@@ -451,8 +424,9 @@ let
             {
               name = "llm-free";
               service = "freellmpool-llm";
-              paths = [ "/llm/free/v1/chat/completions" ];
+              paths = [ "/llm/free" ];
               methods = [
+                "GET"
                 "POST"
                 "OPTIONS"
               ];
