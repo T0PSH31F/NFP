@@ -106,6 +106,48 @@ in
       category = "agents";
       cmd = "uwsm app -- ghostty -e glados-voice --tui";
     })
+    (mkAction {
+      chord = "Super+.";
+      action = "rofi-shared-todo";
+      desc = "Shared Multi-Agent Todo List (toggle, filter, quick-add)";
+      category = "agents";
+      cmd = "rofi-todo";
+    })
+    (mkAction {
+      chord = "Super+Shift+.";
+      action = "rofi-todo-quick-add";
+      desc = "Quick-Add Task to Shared Todo (@hermes/@pi/@opencode/@me)";
+      category = "agents";
+      cmd = "rofi-todo --quick-add";
+    })
+    (mkAction {
+      chord = "Super+I";
+      action = "infomarchy-toggle";
+      desc = "Infomarchy Toggle Wallpaper Dashboard";
+      category = "desktop";
+      cmd = "infomarchy-ctl toggle";
+    })
+    (mkAction {
+      chord = "Super+Shift+I";
+      action = "infomarchy-privacy";
+      desc = "Infomarchy Toggle Stream Privacy Mode";
+      category = "desktop";
+      cmd = "infomarchy-ctl privacy";
+    })
+    (mkAction {
+      chord = "Super+Alt+I";
+      action = "infomarchy-refresh";
+      desc = "Infomarchy Hard Refresh Widgets & Theme";
+      category = "desktop";
+      cmd = "infomarchy-ctl refresh";
+    })
+    (mkAction {
+      chord = "Super+Ctrl+I";
+      action = "infomarchy-overlay";
+      desc = "Infomarchy Interactive Overlay Desk";
+      category = "desktop";
+      cmd = "infomarchy-ctl overlay";
+    })
   ];
 
   # ── Mnemonic Which-Key & Rofi Groups ────────────────────────────────
@@ -363,6 +405,13 @@ in
           desc = "GLaDOS Push-to-Talk";
           category = "agents";
           cmd = "glados-ptt";
+        })
+        (mkAction {
+          chord = "T";
+          action = "agent-shared-todo";
+          desc = "Shared Multi-Agent Todo List";
+          category = "agents";
+          cmd = "rofi-todo";
         })
         (mkAction {
           chord = "D";

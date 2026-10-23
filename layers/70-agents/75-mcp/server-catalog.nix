@@ -266,19 +266,40 @@ in
           cacheTtlSeconds = 0;
           description = "High-speed System-1 Jev decision, email triage & filesystem routing engine";
         };
+        nfp-todo = {
+          enable = true;
+          transport = "stdio";
+          command = "${pkgs.python3}/bin/python3";
+          args = [
+            "${./nfp-todo-mcp.py}"
+            "--mcp"
+          ];
+          domain = "memory";
+          risk = "write";
+          approval = "never";
+          maxResultBytes = 262144;
+          cacheTtlSeconds = 0;
+          description = "Shared multi-agent Todo list MCP server with flock and per-agent section write guards";
+        };
       };
 
       layers.layer-75.mcp.clientConfigs = clientConfigs;
 
-      environment.systemPackages = with pkgs; [
-        mcp-nixos
-        ha-mcp
-        github-mcp-server
-        perplexity-mcp
-        thunderbird-mcp
-        mcporter
-        headroom-ai
-      ];
+      environment.systemPackages =
+        (with pkgs; [
+          mcp-nixos
+          ha-mcp
+          github-mcp-server
+          perplexity-mcp
+          thunderbird-mcp
+          mcporter
+          headroom-ai
+        ])
+        ++ [
+          (pkgs.writeShellScriptBin "nfp-todo" ''
+            exec ${pkgs.python3}/bin/python3 ${./nfp-todo-mcp.py} "$@"
+          '')
+        ];
 
       home-manager.users.${user} = {
         xdg.configFile."mcp/config.json".text = builtins.toJSON {

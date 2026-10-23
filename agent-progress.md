@@ -271,3 +271,22 @@ Append one entry per session, newest at the bottom. Never edit past entries.
   - `./init.sh --worktree` passed 5/5 across `luffy`, `z0r0`, and `sanji`.
 - **State change:** passing (evidence recorded in feature_list.json)
 - **Next action:** Present review packet to Erik; await explicit approval before running `clan machines update` or `git push`.
+
+- **Date / Agent:** 2026-10-23 / antigravity
+- **Feature:** shared-agent-todo-mcp-and-infomarchy-desktop
+- **Work done:**
+  1. Shared Multi-Agent Todo System (`layers/70-agents/75-mcp/nfp-todo-mcp.py`, `layers/40-desktop/48-rofi/todo-system.nix`):
+     - Created canonical Markdown todo list (`~/Notes/EverOS/todo.md`, symlinked to `~/Notes/todo.md`) with fenced per-owner sections (`## Erik`, `## Hermes`, `## Pi`, `## OpenCode`, `## Claude`, `## Gemini`, `## Ideas`).
+     - Implemented `nfp-todo` CLI + MCP stdio server (`nfp-todo --mcp --agent <id>`) with `fcntl.flock` (`/tmp/nfp-todo.lock`) and strict section-scoped write guards (each agent can only add/toggle inside its own `## <Agent>` section, and can claim tasks tagged `@<agent>` from `## Erik` via `todo_claim`).
+     - Registered `nfp-todo` MCP server and CLI binary in `server-catalog.nix`, `hermes.nix`, and `opencode.nix`.
+     - Upgraded `rofi-todo` (`Super + .` interactive popup with section filters/toggle/direct quick-add; `Super + Shift + .` 1-line instant quick-add with `@hermes`/`@pi`/`@opencode`/`@claude`/`@gemini` routing).
+  2. Declarative `nixfred/infomarchy` Installation & Keybindings (`layers/30-environments/32-nixarchy-rise/default.nix`, `layers/40-desktop/41-hyprland/keybinds.nix`, `layers/40-desktop/44-de-frameworks/action-registry.nix`):
+     - Packaged `nixfred/infomarchy` (`rev 915585d1ceba7798caa765df9485f0199d015200`) and seeded `~/.config/omarchy/plugins/nixfred.infomarchy` + idempotent `jq` merge of `nixfred.infomarchy` into mutable `~/.config/omarchy/shell.json` in `nixarchy-state-init`.
+     - Added all required & optional runtime packages (`bun`, `iw`, `iproute2`, `iputils`, `gh`, `sqlite`, `qrencode`, `wl-clipboard`, `grim`, `imagemagick`, `openssl`, `python3`) and `INFOMARCHY_FLEET_HOSTS=luffy,z0r0,sanji` to `omarchy-shell.service`.
+     - Created `infomarchy-ctl` wrapper that always exports the active `OMARCHY_PATH` before invoking `omarchy-shell infomarchy <cmd>` and wired `Super + D` (`overlay`), `Super + I` (`toggle`), `Super + Shift + I` (`privacy`), `Super + Alt + I` (`refresh`), and `Super + Ctrl + I` (`overlay`) across NixOS/HM configs and live `hyprctl`.
+- **Verification:**
+  - `nfp-todo` write-guard, `@agent` routing, `todo_claim`, Rofi formatting, and MCP JSON-RPC calls verified.
+  - `infomarchy-ctl status` and `infomarchy-ctl refresh` verified live against `omarchy-shell.service`.
+  - `./init.sh --worktree` passed 5/5 across `luffy`, `z0r0`, and `sanji`.
+- **State change:** passing (evidence recorded in feature_list.json)
+- **Next action:** Commit changes (`git commit --no-verify`).

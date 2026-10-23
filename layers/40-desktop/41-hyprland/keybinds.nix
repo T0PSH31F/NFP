@@ -42,6 +42,12 @@ in
         "$mod, V, exec, glados-ptt"
         "$mod SHIFT, V, exec, uwsm app -- ghostty -e glados-voice --tui"
 
+        # ── Infomarchy Desktop Dashboard & Overlay ─────────────────────
+        "$mod, I, exec, infomarchy-ctl toggle"
+        "$mod SHIFT, I, exec, infomarchy-ctl privacy"
+        "$mod ALT, I, exec, infomarchy-ctl refresh"
+        "$mod CTRL, I, exec, infomarchy-ctl overlay"
+
         "$mod, Space, exec, vicinae toggle"
         "$mod, slash, exec, cheatsheet"
         "$mod, Return, exec, wlr-which-key"

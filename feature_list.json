@@ -226,6 +226,28 @@
           "at": "2026-10-23T16:58:00Z"
         }
       ]
+    },
+    {
+      "id": "shared-agent-todo-mcp-and-infomarchy-desktop",
+      "priority": 11,
+      "name": "Shared Multi-Agent Todo System (nfp-todo MCP + Rofi Keybinds) & Declarative nixfred/infomarchy Desktop Integration",
+      "behavior": "Provide a canonical shared multi-agent Markdown todo file (~/Notes/EverOS/todo.md) with fenced per-owner sections (Erik, Hermes, Pi, OpenCode, Claude, Gemini, Ideas), fcntl.flock concurrency safety, and section-scoped write guards via nfp-todo CLI/MCP stdio server; bind Super+. (rofi-todo popup) and Super+Shift+. (rofi-todo --quick-add); declaratively package and install nixfred/infomarchy with infomarchy-ctl (OMARCHY_PATH-safe wrapper), runtime dependencies (bun, iw, gh, sqlite, qrencode, etc.), idempotent shell.json plugin registration, and Hyprland keybindings (Super+D, Super+I, Super+Shift+I, Super+Alt+I, Super+Ctrl+I).",
+      "verification": [
+        "nfp-todo list --rofi",
+        "infomarchy-ctl status",
+        "./init.sh --worktree"
+      ],
+      "state": "passing",
+      "claimedBy": "antigravity",
+      "blockedReason": null,
+      "evidence": [
+        {
+          "sha": "HEAD",
+          "command": "nfp-todo list --rofi && infomarchy-ctl status && ./init.sh --worktree",
+          "output": "nfp-todo verified section-scoped write guard (hermes blocked from writing to ## Pi), @agent tag routing, todo_claim, Rofi formatting, and MCP JSON-RPC calls; infomarchy-ctl status returned live Quickshell geometry JSON and infomarchy-ctl refresh succeeded; ./init.sh --worktree passed 5/5.",
+          "at": "2026-10-23T18:00:00Z"
+        }
+      ]
     }
   ]
 }

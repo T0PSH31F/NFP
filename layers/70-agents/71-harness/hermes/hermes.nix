@@ -832,6 +832,15 @@
               args:
                 - ${../../75-mcp/jev-mcp.py}
               env: {}
+            nfp-todo:
+              command: ${pkgs.python3}/bin/python3
+              args:
+                - ${../../75-mcp/nfp-todo-mcp.py}
+                - --mcp
+                - --agent
+                - hermes
+              env:
+                NFP_AGENT_ID: hermes
         '';
       };
 

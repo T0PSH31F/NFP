@@ -138,6 +138,20 @@
               enabled = true;
               type = "local";
             };
+            nfp-todo = {
+              command = [
+                "${pkgs.python3}/bin/python3"
+                "${../75-mcp/nfp-todo-mcp.py}"
+                "--mcp"
+                "--agent"
+                "opencode"
+              ];
+              enabled = true;
+              type = "local";
+              env = {
+                NFP_AGENT_ID = "opencode";
+              };
+            };
 
             # ── Disabled ───────────────────────────────────────────
             browser-use.enabled = false; # 100% error rate, not needed

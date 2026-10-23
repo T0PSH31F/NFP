@@ -2,46 +2,35 @@
 
 > Compact state for the next session. Overwrite entirely at the end of each session.
 
-- **Active feature:** `kong-jev-voice-router-stack-hardening`
+- **Active feature:** `shared-agent-todo-mcp-and-infomarchy-desktop`
 - **Last verified green:**
   - `./init.sh --worktree` -> PASSED (5/5 checks passed across all 3 machines: `luffy`, `z0r0`, `sanji`)
-  - `./layers/00-cyberia/06-scripts/nfp-llm-doctor.sh` -> PASSED (6/6 checks: `kong-gateway`, `pi`, `hermes`, `opencode`, `claude-code`, `codex` all discovering `537` models)
-  - `python3 layers/70-agents/70-jev/tests/test_jev_router.py` -> PASSED (9/9 unit tests in 0.023s, zero network)
-  - `python3 layers/70-agents/70-jev/tests/replay_harness.py` -> PASSED (16/16 golden prompts, 100.0% tier accuracy, 10.5% net cost reduction vs plain cascade)
-  - `python3 layers/70-agents/72-voice/hermes-voice-daemon.py --golden-test` -> PASSED (4/4 live E2E: `537` models via Kong, streaming chat `Pong.`, tool-call round trip `get_node_health({"node":"sanji"})`, and `492.8ms` wake-to-first-audio `< 1500ms` latency budget)
-- **Blockers:** None. Awaiting explicit user approval on the Review Packet before executing `clan machines update` or `git push`.
+  - `nfp-todo list --rofi` -> PASSED (multi-agent fenced sections, write guards, `@agent` tag routing, `todo_claim`, and MCP JSON-RPC verified)
+  - `infomarchy-ctl status` & `infomarchy-ctl refresh` -> PASSED (live Quickshell geometry JSON returned and widgets refreshed)
+  - `./layers/00-cyberia/06-scripts/nfp-llm-doctor.sh` -> PASSED (6/6 checks: `537` models)
+  - `python3 layers/70-agents/72-voice/hermes-voice-daemon.py --golden-test` -> PASSED (4/4 live E2E, `492.8ms` wake-to-first-audio)
+- **Blockers:** None.
 
 ## Work Completed This Session
 
-1. **Phase 0 & 1 — Kong Gateway (`layers/70-agents/78-llm-routers/`)**:
-   - Diagnosed exact failure layers across ExtremeRouter (`:20128`), OmniRoute (`:20129`), and Kong (`:8090`).
-   - Added global `pre-function` (access phase) in `kong-gateway.nix` that normalizes `/v1/v1/` -> `/v1/`, extracts `Authorization: Bearer <KONG_KEY>` or `x-api-key` into `apikey`, and clears the original header before `key-auth` runs.
-   - Updated `kong-secrets.nix` (`kong-extremerouter-auth`, `kong-jev-auth`, `kong-omniroute-auth`) so `request-transformer` uses `remove` (`apikey`, `x-api-key`) + `replace` (`Authorization: Bearer <UPSTREAM_KEY>`) + `add` (`Authorization: Bearer <UPSTREAM_KEY>`), preventing client Bearer tokens from leaking upstream.
-   - Added routes `/v1/messages`, `/v1/messages/count_tokens`, `/v1/responses`, `/v1/audio/speech`, `/v1/audio/transcriptions`, `/v1/images/generations`, and `/jev` with `OPTIONS` method and restricted CORS origins.
-   - Switched rate limiting to `policy = "local"`, `limit_by = "consumer"` with dedicated `300/min, 6000/hr` plugins for `voice` and `hermes-voice`. Added `pi`, `hermes-voice`, and `voice` consumers and sops keys.
-   - Reconciled `freellmpool` (`8083`) and `manifest` (`2099`) ports, fixed healthcheck paths, removed `127.0.0.11` Docker DNS resolver under `--network=host`, and pinned `docker.io/library/kong:3.9.1`.
+1. **Committed Kong Gateway, Declarative Client Discovery, Jev Tier Router, 24/7 Voice Agent & Router Consolidation (`commit 9c24609`)**:
+   - All Phases 0–5 verified green and committed cleanly.
 
-2. **Phase 2 — Declarative Client Configs & `nfp-llm-doctor`**:
-   - `pi-coding-agent.nix`: Declaratively generates `~/.pi/agent/models.json` (`PI_CODING_AGENT_DIR`) with `baseUrl` via Kong, `api = "openai-completions"`, `apiKey = "!cat ~/.config/sops-nix/secrets/kong_key_pi"`, and explicit model/combo IDs synced from `/v1/models` on Home Manager activation; removed unverified `PI_MODEL`, `PI_ROUTER_ENDPOINT`, and `~/.config/pi/config.json`.
-   - `claude-code.nix`: Set `ANTHROPIC_BASE_URL`, `ANTHROPIC_AUTH_TOKEN` (from sops), and `CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY=1`.
-   - `codex.nix`: Fixed config path from `deepseek/config.toml` to `codex/config.toml` using provider `kong` and `wire_api = "responses"`.
-   - `opencode.nix` & `hermes.nix`: Wired Kong provider blocks and sops keys.
-   - Created `layers/00-cyberia/06-scripts/nfp-llm-doctor.sh` and registered `nfp-llm-doctor` in `common.nix`.
+2. **Shared Multi-Agent Todo System (`nfp-todo` + `rofi-todo` + MCP Server)**:
+   - Created `layers/70-agents/75-mcp/nfp-todo-mcp.py`:
+     - Manages canonical `~/Notes/EverOS/todo.md` (symlinked to `~/Notes/todo.md` for Obsidian/Syncthing) with fenced sections (`## Erik`, `## Hermes`, `## Pi`, `## OpenCode`, `## Claude`, `## Gemini`, `## Ideas`).
+     - Enforces `fcntl.flock` (`/tmp/nfp-todo.lock`) and strict per-agent section write guards (`hermes` can only add/toggle in `## Hermes` or claim `@hermes` items from `## Erik`).
+     - Exposes MCP tools `todo_list`, `todo_add`, `todo_complete`, and `todo_claim` to Hermes, OpenCode, Pi, Claude, and Gemini (`server-catalog.nix`, `hermes.nix`, `opencode.nix`).
+   - Upgraded `layers/40-desktop/48-rofi/todo-system.nix`:
+     - `Super + .` (`rofi-todo`): Interactive Rofi popup to view/toggle tasks, filter by section, or type `[+] Buy milk @hermes` directly into the search bar.
+     - `Super + Shift + .` (`rofi-todo --quick-add`): Instant 1-line quick-add prompt with `@hermes` / `@pi` / `@opencode` / `@claude` / `@gemini` / `#idea` routing.
 
-3. **Phase 3 — Jev Streaming Decision-Only Tier Router (`layers/70-agents/70-jev/`)**:
-   - Rewrote `jev-router-proxy.py` as an async streaming reverse proxy (`127.0.0.1:20127`, `openFirewall = false`, `Restart = "always"`).
-   - Never synthesizes an answer; selects canonical tier (`voice-fast` -> `Penny-Pincher`, `free-first` -> `Free`, `cascade-balanced` -> `Coding`, `frontier` -> `Judge`/`ag/claude-opus-4-6-thinking`), sets `X-Jev-Decision`, enforces tool/destructive/sensitive guardrails, validates output and tool-call JSON schemas, retries once at the same tier then escalates one tier (`MAX_ATTEMPTS = 3`), fails open in `<50ms`, and exports Prometheus `/metrics` + Langfuse traces.
-   - Added `tests/test_jev_router.py`, `tests/replay_harness.py`, and `layers/00-cyberia/01-docs/jev-router-report.md`.
-
-4. **Phase 4 — 24/7 Hermes + Pi Voice Agent (`layers/70-agents/71-harness/hermes/` & `72-voice/`)**:
-   - Created `layers/70-agents/75-mcp/pi-a2a-mcp.py` (`hermes-a2a` MCP worker delegating coding/CLI tasks from Hermes front door to Pi).
-   - Created `layers/70-agents/72-voice/hermes-voice-daemon.py` (`:8880`) with persistent warm Piper TTS subprocess (`<50ms` synthesis) achieving `492.8ms`–`600.2ms` wake-to-first-audio latency (`< 1500ms` budget).
-   - Hardened `hermes-live-voice.nix`, `voice.nix`, and `wyoming.nix` with `Restart = "always"`, `/persist` state directories, `users.users.t0psh31f.linger = true`, `hermes-voice-watchdog` timer (every 2m), and `nfp-voice-golden-test` nightly timer (04:15).
-
-5. **Phase 5 — Consolidate & Harden (`layers/70-agents/78-llm-routers/`)**:
-   - Consolidated on `ExtremeRouter` (`:20128`) as primary router with `FreeLLMAPI` (`:3001`) and `FreeLLMPool` (`:8083`) as upstream custom providers; disabled unused secondary routers in `ai-router.nix`.
-   - Moved hardcoded `FreeLLMAPI` `ENCRYPTION_KEY` to sops (`freellmapi_encryption_key`); replaced `0777 root:root` tmpfiles and `--user=0:0` with `0750 1000:1000`; enforced `REQUIRE_API_KEY=true`; documented `tos:avoid` / `web-cookie` providers in `layers/70-agents/78-llm-routers/README.md`.
+3. **Finished Declarative `nixfred/infomarchy` Installation & Keybindings (`layers/30-environments/32-nixarchy-rise/default.nix`)**:
+   - Packaged `nixfred/infomarchy` (`rev 915585d1ceba7798caa765df9485f0199d015200`) in Nix and configured `nixarchy-state-init` to seed `~/.config/omarchy/plugins/nixfred.infomarchy` and idempotently register `"nixfred.infomarchy"` in mutable `~/.config/omarchy/shell.json`.
+   - Added all required and optional runtime tools (`bun`, `iw`, `iproute2`, `iputils`, `gh`, `sqlite`, `qrencode`, `wl-clipboard`, `grim`, `imagemagick`, `openssl`, `python3`) and `INFOMARCHY_FLEET_HOSTS=luffy,z0r0,sanji` to `omarchy-shell.service`.
+   - Added `infomarchy-ctl` wrapper that always sets `OMARCHY_PATH` to the active Omarchy store path before calling `omarchy-shell infomarchy <cmd>`.
+   - Bound `Super + D` (`infomarchy-ctl overlay`), `Super + I` (`infomarchy-ctl toggle`), `Super + Shift + I` (`infomarchy-ctl privacy`), `Super + Alt + I` (`infomarchy-ctl refresh`), and `Super + Ctrl + I` (`infomarchy-ctl overlay`) declaratively and live via `hyprctl`.
 
 ## Next Workstreams
 
-1. Await Erik's review of the Review Packet and explicit approval before running `clan machines update` or `git push`.
+1. Deploy when ready (`clan machines update sanji` / `luffy` / `z0r0`) after user approval.
