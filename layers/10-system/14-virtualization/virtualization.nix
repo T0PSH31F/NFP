@@ -18,12 +18,11 @@ with lib;
 
   config = mkMerge [
     (mkIf config.layers.layer-10.system.virtualization.enable {
-      programs.extra-container = {
-        enable = true;
+      programs = {
+        extra-container.enable = true;
+        # Ensure dconf is enabled for virt-manager to save settings
+        dconf.enable = true;
       };
-
-      # Ensure dconf is enabled for virt-manager to save settings
-      programs.dconf.enable = true;
 
       # Add your user to the virtualization group
       users.users."${config.layers.layer-10.system.virtualization.user}".extraGroups = [
@@ -32,26 +31,28 @@ with lib;
       ];
 
       # Enable IOMMU and nested virtualization for PCI/USB passthrough and VM performance
-      boot.kernelParams = [
-        "iommu=pt"
-      ]
-      ++ lib.optional (
-        builtins.elem "intel-9th-gen" (config.machine.tags or [ ])
-        || builtins.elem "intel-12th-gen" (config.machine.tags or [ ])
-        || builtins.elem "intel-13th-gen" (config.machine.tags or [ ])
-      ) "intel_iommu=on"
-      ++ lib.optional (builtins.elem "amd" (config.machine.tags or [ ])) "amd_iommu=on";
-
-      boot.extraModprobeConfig =
-        ""
-        + lib.optionalString (
+      boot = {
+        kernelParams = [
+          "iommu=pt"
+        ]
+        ++ lib.optional (
           builtins.elem "intel-9th-gen" (config.machine.tags or [ ])
           || builtins.elem "intel-12th-gen" (config.machine.tags or [ ])
           || builtins.elem "intel-13th-gen" (config.machine.tags or [ ])
-        ) "options kvm_intel nested=1\n"
-        + lib.optionalString (builtins.elem "amd" (
-          config.machine.tags or [ ]
-        )) "options kvm_amd nested=1\n";
+        ) "intel_iommu=on"
+        ++ lib.optional (builtins.elem "amd" (config.machine.tags or [ ])) "amd_iommu=on";
+
+        extraModprobeConfig =
+          ""
+          + lib.optionalString (
+            builtins.elem "intel-9th-gen" (config.machine.tags or [ ])
+            || builtins.elem "intel-12th-gen" (config.machine.tags or [ ])
+            || builtins.elem "intel-13th-gen" (config.machine.tags or [ ])
+          ) "options kvm_intel nested=1\n"
+          + lib.optionalString (builtins.elem "amd" (
+            config.machine.tags or [ ]
+          )) "options kvm_amd nested=1\n";
+      };
 
       # Enable virtualization
       virtualisation = {

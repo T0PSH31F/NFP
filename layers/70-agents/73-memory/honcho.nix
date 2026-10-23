@@ -86,69 +86,69 @@ with lib;
         '';
       };
 
-      # Honcho API server (containerized)
-      virtualisation.oci-containers.containers.honcho-api = {
-        image = "ghcr.io/plastic-labs/honcho:latest"; # nicepkg/honcho on ghcr no longer exists (403)
-        ports = [ "127.0.0.1:${toString cfg.port}:8000" ];
-        environment = {
-          CACHE_ENABLED = "true";
-          CACHE_URL = "redis://host.containers.internal:6379";
-          AUTH_USE_AUTH = "false";
-          METRICS_ENABLED = "true";
-        }
-        // optionalAttrs (cfg.databaseUrlFile == null) {
-          DATABASE_URL = cfg.databaseUrl;
-        }
-        // optionalAttrs (cfg.llmBaseUrl != "") {
-          DERIVER_MODEL_CONFIG__OVERRIDES__BASE_URL = cfg.llmBaseUrl;
-          DIALECTIC_MODEL_CONFIG__OVERRIDES__BASE_URL = cfg.llmBaseUrl;
-          SUMMARY_MODEL_CONFIG__OVERRIDES__BASE_URL = cfg.llmBaseUrl;
+      # Containers
+      virtualisation.oci-containers.containers = {
+        honcho-api = {
+          image = "ghcr.io/plastic-labs/honcho:latest"; # nicepkg/honcho on ghcr no longer exists (403)
+          ports = [ "127.0.0.1:${toString cfg.port}:8000" ];
+          environment = {
+            CACHE_ENABLED = "true";
+            CACHE_URL = "redis://host.containers.internal:6379";
+            AUTH_USE_AUTH = "false";
+            METRICS_ENABLED = "true";
+          }
+          // optionalAttrs (cfg.databaseUrlFile == null) {
+            DATABASE_URL = cfg.databaseUrl;
+          }
+          // optionalAttrs (cfg.llmBaseUrl != "") {
+            DERIVER_MODEL_CONFIG__OVERRIDES__BASE_URL = cfg.llmBaseUrl;
+            DIALECTIC_MODEL_CONFIG__OVERRIDES__BASE_URL = cfg.llmBaseUrl;
+            SUMMARY_MODEL_CONFIG__OVERRIDES__BASE_URL = cfg.llmBaseUrl;
+          };
+          # When databaseUrlFile is set, inject DATABASE_URL at runtime via
+          # podman --env-file (sops template renders KEY=value content).
+          extraOptions = mkIf (cfg.databaseUrlFile != null) [
+            "--env-file=${cfg.databaseUrlFile}"
+          ];
+          volumes = [
+            "${cfg.dataDir}:/app/data"
+          ];
+          dependsOn = [ "honcho-redis" ];
+          autoStart = true;
         };
-        # When databaseUrlFile is set, inject DATABASE_URL at runtime via
-        # podman --env-file (sops template renders KEY=value content).
-        extraOptions = mkIf (cfg.databaseUrlFile != null) [
-          "--env-file=${cfg.databaseUrlFile}"
-        ];
-        volumes = [
-          "${cfg.dataDir}:/app/data"
-        ];
-        dependsOn = [ "honcho-redis" ];
-        autoStart = true;
-      };
 
-      # Honcho deriver (background worker for memory processing)
-      virtualisation.oci-containers.containers.honcho-deriver = mkIf cfg.enableDeriver {
-        image = "ghcr.io/plastic-labs/honcho:latest"; # nicepkg/honcho on ghcr no longer exists (403)
-        cmd = [
-          "uv"
-          "run"
-          "python"
-          "-m"
-          "honcho.deriver"
-        ];
-        environment = {
-          DATABASE_URL = cfg.databaseUrl;
-          CACHE_ENABLED = "true";
-          CACHE_URL = "redis://host.containers.internal:6379";
-        }
-        // optionalAttrs (cfg.llmBaseUrl != "") {
-          DERIVER_MODEL_CONFIG__OVERRIDES__BASE_URL = cfg.llmBaseUrl;
+        honcho-deriver = mkIf cfg.enableDeriver {
+          image = "ghcr.io/plastic-labs/honcho:latest"; # nicepkg/honcho on ghcr no longer exists (403)
+          cmd = [
+            "uv"
+            "run"
+            "python"
+            "-m"
+            "honcho.deriver"
+          ];
+          environment = {
+            DATABASE_URL = cfg.databaseUrl;
+            CACHE_ENABLED = "true";
+            CACHE_URL = "redis://host.containers.internal:6379";
+          }
+          // optionalAttrs (cfg.llmBaseUrl != "") {
+            DERIVER_MODEL_CONFIG__OVERRIDES__BASE_URL = cfg.llmBaseUrl;
+          };
+          volumes = [
+            "${cfg.dataDir}:/app/data"
+          ];
+          dependsOn = [ "honcho-redis" ];
+          autoStart = true;
         };
-        volumes = [
-          "${cfg.dataDir}:/app/data"
-        ];
-        dependsOn = [ "honcho-redis" ];
-        autoStart = true;
-      };
 
-      # Redis for caching
-      virtualisation.oci-containers.containers.honcho-redis = {
-        image = "docker.io/library/redis:7-alpine";
-        ports = [ "127.0.0.1:6379:6379" ];
-        volumes = [
-          "${cfg.dataDir}/redis:/data"
-        ];
-        autoStart = true;
+        honcho-redis = {
+          image = "docker.io/library/redis:7-alpine";
+          ports = [ "127.0.0.1:6379:6379" ];
+          volumes = [
+            "${cfg.dataDir}/redis:/data"
+          ];
+          autoStart = true;
+        };
       };
 
       # Data directory

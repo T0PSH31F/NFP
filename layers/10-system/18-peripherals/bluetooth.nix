@@ -25,27 +25,29 @@ in
     };
 
     # Bluetooth services
-    services.blueman.enable = true;
+    services = {
+      blueman.enable = true;
 
-    # Prevent Bluetooth USB controllers from auto-suspending (turning off on idle)
-    services.udev.extraRules = ''
-      # Disable USB autosuspend for Bluetooth controllers
-      ACTION=="add", SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", ATTR{bDeviceClass}=="e0", ATTR{bDeviceSubClass}=="01", ATTR{bDeviceProtocol}=="01", ATTR{power/control}="on"
-      ACTION=="add", SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", ENV{ID_USB_INTERFACES}=="*:e00101:*", ATTR{power/control}="on"
-      ACTION=="add", SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_interface", DRIVERS=="btusb", RUN+="/bin/sh -c 'echo on > /sys$env{DEVPATH}/../power/control'"
-    '';
+      # Prevent Bluetooth USB controllers from auto-suspending (turning off on idle)
+      udev.extraRules = ''
+        # Disable USB autosuspend for Bluetooth controllers
+        ACTION=="add", SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", ATTR{bDeviceClass}=="e0", ATTR{bDeviceSubClass}=="01", ATTR{bDeviceProtocol}=="01", ATTR{power/control}="on"
+        ACTION=="add", SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", ENV{ID_USB_INTERFACES}=="*:e00101:*", ATTR{power/control}="on"
+        ACTION=="add", SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_interface", DRIVERS=="btusb", RUN+="/bin/sh -c 'echo on > /sys$env{DEVPATH}/../power/control'"
+      '';
 
-    # Prevent TLP from turning off bluetooth on boot or when switching power sources
-    services.tlp.settings = lib.mkIf (config.services.tlp.enable or false) {
-      DEVICES_TO_DISABLE_ON_STARTUP = "none";
-      DEVICES_TO_DISABLE_ON_BAT_NOT_IN_USE = "none";
-      DEVICES_TO_DISABLE_ON_LAN_CONNECT = "none";
-      DEVICES_TO_DISABLE_ON_WIFI_CONNECT = "none";
-      DEVICES_TO_DISABLE_ON_WWAN_CONNECT = "none";
-      DEVICES_TO_ENABLE_ON_STARTUP = "bluetooth";
-      DEVICES_TO_ENABLE_ON_AC = "bluetooth";
-      DEVICES_TO_ENABLE_ON_BAT = "bluetooth";
-      USB_EXCLUDE_BTUSB = 1;
+      # Prevent TLP from turning off bluetooth on boot or when switching power sources
+      tlp.settings = lib.mkIf (config.services.tlp.enable or false) {
+        DEVICES_TO_DISABLE_ON_STARTUP = "none";
+        DEVICES_TO_DISABLE_ON_BAT_NOT_IN_USE = "none";
+        DEVICES_TO_DISABLE_ON_LAN_CONNECT = "none";
+        DEVICES_TO_DISABLE_ON_WIFI_CONNECT = "none";
+        DEVICES_TO_DISABLE_ON_WWAN_CONNECT = "none";
+        DEVICES_TO_ENABLE_ON_STARTUP = "bluetooth";
+        DEVICES_TO_ENABLE_ON_AC = "bluetooth";
+        DEVICES_TO_ENABLE_ON_BAT = "bluetooth";
+        USB_EXCLUDE_BTUSB = 1;
+      };
     };
 
     # Bluetooth packages

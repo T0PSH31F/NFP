@@ -87,6 +87,7 @@ graph TD
 - [AI Agents Catalog](file:///home/t0psh31f/Clan/NFP/layers/00-cyberia/01-docs/ai-agents.md) — Active agents, tool sets, and capabilities.
 - [Hermes Agent Architecture](file:///home/t0psh31f/Clan/NFP/layers/00-cyberia/01-docs/hermes-agent.md) — Hermes Gateway, workspace, and sandbox.
 - [Jev System-1 Decision Engine](file:///home/t0psh31f/Clan/NFP/layers/00-cyberia/01-docs/jev.md) — Deterministic discriminative routing & triage.
+- [Jev AI Router Performance & Hardware Report](file:///home/t0psh31f/Clan/NFP/layers/00-cyberia/01-docs/jev-router-report.md) — Sanji benchmark results, Kong gateway latencies, and RTX 1000 Ada inference profiles.
 - [Agent Onboarding Guide](file:///home/t0psh31f/Clan/NFP/layers/00-cyberia/01-docs/agent-onboarding.md) — Instructions for autonomous agent initialization.
 - [Agentbox Sandbox Instructions](file:///home/t0psh31f/Clan/NFP/layers/00-cyberia/01-docs/agentbox-instructions.md) — Containerized execution boundaries.
 - [Memory Platform Audit](file:///home/t0psh31f/Clan/NFP/layers/00-cyberia/01-docs/memory-platform-audit.md) — EverOS, Honcho, and brain-service analysis.

@@ -111,27 +111,6 @@ in
       ];
     };
 
-    # Fix for STATE_DIRECTORY failure with impermanence
-    systemd.services.n8n = {
-      wants = [ "network-online.target" ];
-      after = [
-        "network-online.target"
-        "postgresql.service"
-        "persist.mount"
-      ];
-      serviceConfig = {
-        DynamicUser = lib.mkForce false; # Must be false for persistent storage
-        User = "n8n";
-        Group = "n8n";
-        StateDirectory = lib.mkForce [ ];
-        ReadWritePaths = [ cfg.dataDir ];
-        # Robustness
-        Restart = lib.mkForce "always";
-        RestartSec = lib.mkForce "10s";
-        StartLimitIntervalSec = 0;
-      };
-    };
-
     # Ensure the user exists since DynamicUser is disabled
     users.users.n8n = {
       isSystemUser = true;
@@ -140,10 +119,56 @@ in
     };
     users.groups.n8n = { };
 
-    systemd.tmpfiles.rules = [
-      "d /persist${cfg.dataDir} 0700 n8n n8n -"
-      "d ${cfg.dataDir} 0700 n8n n8n -"
-    ];
+    systemd = {
+      tmpfiles.rules = [
+        "d /persist${cfg.dataDir} 0700 n8n n8n -"
+        "d ${cfg.dataDir} 0700 n8n n8n -"
+      ];
+
+      # Fix for STATE_DIRECTORY failure with impermanence
+      services = {
+        n8n = {
+          wants = [ "network-online.target" ];
+          after = [
+            "network-online.target"
+            "postgresql.service"
+            "persist.mount"
+          ];
+          serviceConfig = {
+            DynamicUser = lib.mkForce false; # Must be false for persistent storage
+            User = "n8n";
+            Group = "n8n";
+            StateDirectory = lib.mkForce [ ];
+            ReadWritePaths = [ cfg.dataDir ];
+            # Robustness
+            Restart = lib.mkForce "always";
+            RestartSec = lib.mkForce "10s";
+            StartLimitIntervalSec = 0;
+          };
+        };
+
+        # Optional: Add a systemd service for health monitoring
+        n8n-healthcheck = {
+          description = "n8n Health Check";
+          after = [ "n8n.service" ];
+          requires = [ "n8n.service" ];
+          serviceConfig = {
+            Type = "oneshot";
+            ExecStart = "${pkgs.curl}/bin/curl --max-time 10 -sf http://localhost:${toString cfg.port}/healthz";
+          };
+        };
+      };
+
+      # Timer for periodic health checks
+      timers.n8n-healthcheck = {
+        description = "n8n Health Check Timer";
+        wantedBy = [ "timers.target" ];
+        timerConfig = {
+          OnCalendar = "*:0/5"; # Every 5 minutes
+          Persistent = true;
+        };
+      };
+    };
 
     # Additional packages for n8n integrations
     environment.systemPackages = with pkgs; [
@@ -155,26 +180,5 @@ in
       python3
       # For Python nodes
     ];
-
-    # Optional: Add a systemd service for health monitoring
-    systemd.services.n8n-healthcheck = {
-      description = "n8n Health Check";
-      after = [ "n8n.service" ];
-      requires = [ "n8n.service" ];
-      serviceConfig = {
-        Type = "oneshot";
-        ExecStart = "${pkgs.curl}/bin/curl --max-time 10 -sf http://localhost:${toString cfg.port}/healthz";
-      };
-    };
-
-    # Timer for periodic health checks
-    systemd.timers.n8n-healthcheck = {
-      description = "n8n Health Check Timer";
-      wantedBy = [ "timers.target" ];
-      timerConfig = {
-        OnCalendar = "*:0/5"; # Every 5 minutes
-        Persistent = true;
-      };
-    };
   };
 }

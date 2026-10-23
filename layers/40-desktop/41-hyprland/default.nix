@@ -9,10 +9,10 @@
 let
   cfg = osConfig.layers.layer-40.desktop.hyprland;
 
-  # ── Screenshot script: save to file + copy to clipboard ────────────
+  # ── Screenshot script: annotate (Swappy), copy, save, or menu ──────
   hypr-screenshot = pkgs.writeShellScriptBin "hypr-screenshot" ''
     set -e
-    MODE="''${1:-region}"
+    MODE="''${1:-edit}"
     SAVE_DIR="''${HOME}/Pictures/Screenshots"
     TIMESTAMP=$(date +%Y-%m-%d-%H%M%S)
     FILENAME="screenshot-$TIMESTAMP.png"
@@ -20,27 +20,53 @@ let
     mkdir -p "$SAVE_DIR"
 
     case "$MODE" in
-      region)
-        grim -g "$(slurp)" - | tee "$SAVE_DIR/$FILENAME" | wl-copy
+      edit|region)
+        GEOM=$(slurp 2>/dev/null) || exit 0
+        [ -z "$GEOM" ] && exit 0
+        grim -g "$GEOM" - | swappy -f -
         ;;
-      full)
-        grim - | tee "$SAVE_DIR/$FILENAME" | wl-copy
-        ;;
-      edit)
-        grim -g "$(slurp)" - | swappy -f -
-        exit $?
-        ;;
-      edit-full)
+      edit-full|full)
         grim - | swappy -f -
-        exit $?
+        ;;
+      copy-region)
+        GEOM=$(slurp 2>/dev/null) || exit 0
+        [ -z "$GEOM" ] && exit 0
+        grim -g "$GEOM" - | wl-copy --type image/png
+        notify-send -t 2000 -u low -i camera-photo "Screenshot Copied" "Region copied to clipboard"
+        ;;
+      copy-full)
+        grim - | wl-copy --type image/png
+        notify-send -t 2000 -u low -i camera-photo "Screenshot Copied" "Full screen copied to clipboard"
+        ;;
+      save-region)
+        GEOM=$(slurp 2>/dev/null) || exit 0
+        [ -z "$GEOM" ] && exit 0
+        grim -g "$GEOM" "$SAVE_DIR/$FILENAME"
+        wl-copy --type image/png < "$SAVE_DIR/$FILENAME"
+        notify-send -t 2000 -u low -i camera-photo "Screenshot Saved" "$FILENAME → clipboard + $SAVE_DIR"
+        ;;
+      save-full)
+        grim "$SAVE_DIR/$FILENAME"
+        wl-copy --type image/png < "$SAVE_DIR/$FILENAME"
+        notify-send -t 2000 -u low -i camera-photo "Screenshot Saved" "$FILENAME → clipboard + $SAVE_DIR"
+        ;;
+      menu)
+        CHOICE=$(printf "1. ✏️  Region (Annotate / Swappy)\n2. 🖥️  Full Screen (Annotate / Swappy)\n3. 📋 Quick Copy Region (Clipboard only)\n4. 💾 Quick Save Region (File + Clipboard)\n5. 📋 Quick Copy Screen (Clipboard only)\n6. 💾 Quick Save Screen (File + Clipboard)" | rofi -dmenu -p "Screenshot" -i 2>/dev/null) || exit 0
+        case "$CHOICE" in
+          *Region*Annotate*) exec "$0" edit ;;
+          *Full*Annotate*) exec "$0" edit-full ;;
+          *Quick*Copy*Region*) exec "$0" copy-region ;;
+          *Quick*Save*Region*) exec "$0" save-region ;;
+          *Quick*Copy*Screen*) exec "$0" copy-full ;;
+          *Quick*Save*Screen*) exec "$0" save-full ;;
+          *) exit 0 ;;
+        esac
         ;;
       *)
-        echo "Usage: hypr-screenshot {region|full|edit|edit-full}"
+        echo "Usage: hypr-screenshot {edit|region|edit-full|full|copy-region|copy-full|save-region|save-full|menu}"
         exit 1
         ;;
     esac
-
-    notify-send -t 2000 -u low -i camera-photo "Screenshot saved" "$FILENAME → clipboard + $SAVE_DIR"
   '';
 in
 {
@@ -130,14 +156,24 @@ in
           kdePackages.kservice
         ];
 
-        xdg.configFile."menus/applications.menu".source =
-          "${pkgs.kdePackages.plasma-workspace}/etc/xdg/menus/plasma-applications.menu";
+        xdg.configFile = {
+          "menus/applications.menu".source =
+            "${pkgs.kdePackages.plasma-workspace}/etc/xdg/menus/plasma-applications.menu";
 
-        # Swappy screenshot tool config → save to ~/Pictures/Screenshots
-        xdg.configFile."swappy/config".text = ''
-          [Default]
-          save_dir=$HOME/Pictures/Screenshots
-        '';
+          # Swappy screenshot tool config → annotate, copy, or save to ~/Pictures/Screenshots
+          "swappy/config".text = ''
+            [Default]
+            save_dir=$HOME/Pictures/Screenshots
+            save_filename_format=screenshot-%Y%m%d-%H%M%S.png
+            show_panel=true
+            line_size=5
+            text_size=20
+            text_font=sans-serif
+            paint_mode=brush
+            early_exit=true
+            fill_shape=false
+          '';
+        };
 
         # Ensure screenshots directory exists
         systemd.user.tmpfiles.rules = [

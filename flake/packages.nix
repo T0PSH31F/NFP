@@ -6,34 +6,48 @@
       ...
     }:
     {
-      packages.iso =
-        (inputs.nixpkgs.lib.nixosSystem {
-          inherit system;
-          specialArgs = {
-            inherit inputs;
-            inherit (import ../layers/80-lib/81-helpers/mkDendriticModule.nix { inherit (inputs.nixpkgs) lib; })
-              mkDendriticModule
-              ;
-            inherit (import ../layers/80-lib/81-helpers/mkDendriticTree.nix { inherit (inputs.nixpkgs) lib; })
-              mkDendriticTree
-              ;
-          };
-          modules = [
-            ../layers/00-cyberia/04-templates/iso/default.nix
-          ];
-        }).config.system.build.isoImage;
+      packages = {
+        iso =
+          (inputs.nixpkgs.lib.nixosSystem {
+            inherit system;
+            specialArgs = {
+              inherit inputs;
+              inherit (import ../layers/80-lib/81-helpers/mkDendriticModule.nix { inherit (inputs.nixpkgs) lib; })
+                mkDendriticModule
+                ;
+              inherit (import ../layers/80-lib/81-helpers/mkDendriticTree.nix { inherit (inputs.nixpkgs) lib; })
+                mkDendriticTree
+                ;
+            };
+            modules = [
+              ../layers/00-cyberia/04-templates/iso/default.nix
+            ];
+          }).config.system.build.isoImage;
 
-      packages.installer-iso =
-        (inputs.nixpkgs.lib.nixosSystem {
-          inherit system;
-          specialArgs = {
-            inherit inputs;
-            modulesPath = "${inputs.nixpkgs}/nixos/modules";
-          };
-          modules = [
-            ../layers/00-cyberia/08-iso/nfp-installer-iso.nix
-          ];
-        }).config.system.build.isoImage;
+        installer-iso =
+          (inputs.nixpkgs.lib.nixosSystem {
+            inherit system;
+            specialArgs = {
+              inherit inputs;
+              modulesPath = "${inputs.nixpkgs}/nixos/modules";
+            };
+            modules = [
+              ../layers/00-cyberia/08-iso/nfp-installer-iso.nix
+            ];
+          }).config.system.build.isoImage;
+
+        noctalia-iso =
+          (inputs.nixpkgs.lib.nixosSystem {
+            inherit system;
+            specialArgs = {
+              inherit inputs;
+              modulesPath = "${inputs.nixpkgs}/nixos/modules";
+            };
+            modules = [
+              ../layers/00-cyberia/08-iso/noctalia-installer.nix
+            ];
+          }).config.system.build.isoImage;
+      };
 
       apps.deploy = {
         type = "app";

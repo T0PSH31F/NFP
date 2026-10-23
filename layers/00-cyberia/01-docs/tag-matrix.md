@@ -19,7 +19,8 @@ The table below maps active machines (`z0r0`, `luffy`, `sanji`, `T14`) against a
 | `gaming` | `[X]` | `[ ]` | `[ ]` | `[ ]` | Enabled exclusively on z0r0 for Steam, GameMode, Lutris. |
 | `gpu-compute` | `[ ]` | `[X]` | `[X]` | `[ ]` | GPU compute workloads (RTX Ada on sanji, Intel/Nvidia on luffy). |
 | `homelab` | `[ ]` | `[X]` | `[ ]` | `[ ]` | Enabled on luffy to run containerized services and storage. |
-| `intel-12th-gen` | `[X]` | `[ ]` | `[ ]` | `[X]` | Enabled on 12th/13th gen Intel mobile processors (z0r0, T14). |
+| `intel-12th-gen` | `[X]` | `[ ]` | `[ ]` | `[X]` | Enabled on 12th gen Alder Lake Intel mobile processors (z0r0, T14). |
+| `intel-13th-gen` | `[ ]` | `[ ]` | `[X]` | `[ ]` | Enabled on 13th gen Raptor Lake Intel mobile processors (sanji Dell Precision 7680: i7-13850HX, 20C/28T, thermald and P/E-core hybrid scheduler tuning). |
 | `intel-9th-gen` | `[ ]` | `[X]` | `[ ]` | `[ ]` | Enabled on luffy for 9th gen Intel CPU microcode tuning. |
 | `laptop` | `[X]` | `[ ]` | `[X]` | `[X]` | Enabled on portable battery-powered machines (z0r0, sanji, T14) for power profiles. |
 | `media` | `[ ]` | `[X]` | `[ ]` | `[ ]` | Enabled on luffy for media services (Jellyfin, *arr stack, Kavita, n8n). |

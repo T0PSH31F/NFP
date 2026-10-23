@@ -57,12 +57,15 @@ in
         "ALT, N, exec, pypr toggle gedit"
         "ALT, G, exec, pypr toggle gemini"
 
-        # ── Screenshots (save to ~/Pictures/Screenshots + clipboard) ────
-        ", Print, exec, hypr-screenshot region"
-        "SHIFT, Print, exec, hypr-screenshot full"
+        # ── Screenshots (annotate with Swappy, copy or save) ───────────
+        ", Print, exec, hypr-screenshot edit"
+        "SHIFT, Print, exec, hypr-screenshot edit-full"
+        "CTRL, Print, exec, hypr-screenshot copy-region"
+        "CTRL SHIFT, Print, exec, hypr-screenshot copy-full"
+        "$mod, Print, exec, hypr-screenshot menu"
         "$mod CTRL, S, exec, hypr-screenshot edit"
-        ", XF86AudioEject, exec, hypr-screenshot region"
-        "SHIFT, XF86AudioEject, exec, hypr-screenshot full"
+        ", XF86AudioEject, exec, hypr-screenshot edit"
+        "SHIFT, XF86AudioEject, exec, hypr-screenshot edit-full"
         "CTRL SHIFT, S, exec, hypr-screenshot edit"
 
         # ── System / Session ───────────────────────────────────────────

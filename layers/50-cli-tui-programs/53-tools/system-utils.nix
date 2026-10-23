@@ -30,9 +30,11 @@ in
       tailscale
       tmuxai
     ];
-    programs.rbw.enable = true;
-    programs.aria2.enable = true;
-    programs.aria2p.enable = true;
-    programs.pistol.enable = true;
+    programs = {
+      rbw.enable = true;
+      aria2.enable = true;
+      aria2p.enable = true;
+      pistol.enable = true;
+    };
   };
 }

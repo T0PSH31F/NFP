@@ -10,67 +10,79 @@
 {
   imports = [
     "${modulesPath}/installer/cd-dvd/installation-cd-minimal.nix"
-    inputs.sops-nix.nixosModules.sops
-    # Import theme modules to allow consistent styling
-    ../../30-environments/37-boot
     ../../10-system/11-foundation/fonts.nix
   ];
 
-  sops.secrets."user-password-t0psh31f" = {
-    sopsFile = ../vars/shared/user-password-t0psh31f/user-password-hash/secret;
-    format = "json";
-    key = "data";
-  };
-
   # ISO metadata
+  image.fileName = "noctalia-recovery-${pkgs.stdenv.hostPlatform.system}.iso";
   isoImage = {
-    isoName = "noctalia-installer-${pkgs.stdenv.hostPlatform.system}.iso";
-    volumeID = "NOCTALIA_INSTALLER";
+    volumeID = "NOCTALIA_RECOVERY";
     squashfsCompression = "zstd -Xcompression-level 15";
     makeEfiBootable = true;
     makeUsbBootable = true;
   };
 
-  # Themes - match z0r0 for consistency
-  themes = {
-    sugar-dark = {
-      enable = true;
-      background = "${
-        ./../../../layers/00-cyberia/02-assets/sddm_background/the-world-of-one-piece_800.gif
-      }";
-    };
-    plymouth-hellonavi.enable = true;
-  };
-
   # Kernel
   boot.kernelPackages = pkgs.linuxPackages_latest;
+  boot.zfs.forceImportRoot = false;
 
   # Include desktop environment components
-  services.xserver.enable = true;
-  # SDDM is already enabled by themes.sugar-dark.enable
   programs.hyprland.enable = true;
 
   # Network tools
   networking = {
     wireless.enable = lib.mkForce false;
     networkmanager.enable = true;
+    hostName = "noctalia-recovery";
   };
 
-  # Pentest tools suite
+  # Auto-login to nixos user via greetd into Hyprland
+  services.greetd = {
+    enable = true;
+    settings = {
+      initial_session = {
+        command = "${pkgs.hyprland}/bin/Hyprland";
+        user = "nixos";
+      };
+      default_session = {
+        command = "${pkgs.tuigreet}/bin/tuigreet --time --remember --cmd ${pkgs.hyprland}/bin/Hyprland";
+        user = "greeter";
+      };
+    };
+  };
+
+  # Installer user setup
+  users.users.nixos = {
+    isNormalUser = true;
+    extraGroups = [
+      "wheel"
+      "networkmanager"
+      "video"
+      "audio"
+      "disk"
+    ];
+  };
+
+  security.sudo.wheelNeedsPassword = false;
+
+  # Pentest and recovery tools suite
   environment.systemPackages = with pkgs; [
-    # Desktop
+    # Desktop & Terminal
     kitty
     firefox
 
-    # Network scanning
+    # Network scanning & analysis
     nmap
     masscan
     rustscan
+    wireshark
+    tcpdump
+    ettercap
 
     # Wireless
     aircrack-ng
     wifite2
-    reaver
+    reaverwps-t6x
     bully
 
     # Password cracking
@@ -85,19 +97,11 @@
     wpscan
     dirb
 
-    # Exploitation
+    # Exploitation & Forensics
     metasploit
     exploitdb
-
-    # Forensics
-    # autopsy # Can be large/heavy, omitting or use specific nixpkgs if needed
     sleuthkit
     volatility3
-
-    # Sniffing
-    wireshark
-    tcpdump
-    ettercap
 
     # Utilities
     netcat
@@ -105,7 +109,7 @@
     proxychains
     tor
 
-    # System tools
+    # System & Editor
     vim
     git
     curl
@@ -114,34 +118,19 @@
     tree
     tmux
 
-    # Disk tools
+    # Disk & Filesystem recovery
     gparted
     parted
     btrfs-progs
     cryptsetup
+    dosfstools
+    e2fsprogs
 
     # NixOS tools
     nixos-install-tools
   ];
 
-  # Auto-login to installer user
-  services.displayManager.autoLogin = {
-    enable = true;
-    user = "t0psh31f";
-  };
-  services.displayManager.defaultSession = "hyprland";
-
-  # Installer user setup
-  users.users.t0psh31f = {
-    isNormalUser = true;
-    extraGroups = [
-      "wheel"
-      "networkmanager"
-    ];
-    hashedPasswordFile = config.sops.secrets."user-password-t0psh31f".path;
-  };
-
-  # Allow unfree packages (for some pentest tools)
+  # Allow unfree packages (burpsuite, unfree firmware, etc.)
   nixpkgs.config.allowUnfree = true;
 
   system.stateVersion = "25.05";

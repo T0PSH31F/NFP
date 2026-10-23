@@ -249,120 +249,125 @@
       # Grant postgres access to traverse /home/t0psh31f/ for PKB books
       users.users.postgres.extraGroups = [ "users" ];
 
-      # Create data directory
-      systemd.tmpfiles.rules = [
-        "d /var/lib/brain-service 0750 postgres postgres -"
-        "d /var/lib/brain-service/tiktoken-cache 0755 postgres postgres -"
-      ];
-
-      # Main API service
-      systemd.services.brain-service = {
-        description = "Brain Service PKB API";
-        wantedBy = [ "multi-user.target" ];
-        after = [
-          "postgresql.service"
-          "postgresql-extensions.service"
+      systemd = {
+        # Create data directory
+        tmpfiles.rules = [
+          "d /var/lib/brain-service 0750 postgres postgres -"
+          "d /var/lib/brain-service/tiktoken-cache 0755 postgres postgres -"
         ];
-        requires = [ "postgresql.service" ];
 
-        environment = {
-          DB_NAME = cfg.dbName;
-          DB_USER = cfg.dbUser;
-          DB_HOST = cfg.dbHost;
-          DB_PORT = toString cfg.dbPort;
-          LLM_PROVIDER = cfg.llmProvider;
-          LLM_API_BASE = cfg.llmApiBase;
-          LLM_MODEL = cfg.llmModel;
-          OLLAMA_URL = "http://127.0.0.1:11434";
-          EMBED_MODEL = cfg.embedModel;
-          EMBED_DIM = toString cfg.embedDim;
-          PORT = toString cfg.port;
-          HOST = cfg.host;
-          BRAIN_MODE = "api";
-          MANIFEST_PATH = "/var/lib/brain-service/manifest.json";
-          TIKTOKEN_CACHE_DIR = "/var/lib/brain-service/tiktoken-cache";
-        }
-        // lib.optionalAttrs (cfg.booksDir != null) {
-          BOOKS_DIR = cfg.booksDir;
-        };
+        # Services
+        services = {
+          # Main API service
+          brain-service = {
+            description = "Brain Service PKB API";
+            wantedBy = [ "multi-user.target" ];
+            after = [
+              "postgresql.service"
+              "postgresql-extensions.service"
+            ];
+            requires = [ "postgresql.service" ];
 
-        serviceConfig = {
-          ExecStart = "${pythonEnv}/bin/python ${brainScript}";
-          ExecStartPre = [
-            "+${pkgs.writeShellScript "brain-service-db-init" ''
-              set -euo pipefail
-              # Coexists with honcho's postgresql.initialScript (which owns the
-              # global initialScript); provision brain_db's vector extension +
-              # ownership idempotently here. The "+" prefix runs this as root,
-              # so psql must drop to the postgres superuser role explicitly.
-              PSQL() { ${pkgs.util-linux}/bin/runuser -u postgres -- ${pkgs.postgresql}/bin/psql -v ON_ERROR_STOP=1 "$@"; }
-              PSQL -d postgres -c "ALTER DATABASE ${cfg.dbName} OWNER TO ${cfg.dbUser};"
-              PSQL -d ${cfg.dbName} -c "CREATE EXTENSION IF NOT EXISTS vector;"
-              PSQL -d ${cfg.dbName} -c "GRANT ALL ON SCHEMA public TO ${cfg.dbUser};"
-            ''}"
-          ];
-          Restart = "on-failure";
-          User = "postgres";
-          EnvironmentFile = secretFile;
-          MemoryMax = "1G";
-          MemoryHigh = "800M";
-        };
-      };
+            environment = {
+              DB_NAME = cfg.dbName;
+              DB_USER = cfg.dbUser;
+              DB_HOST = cfg.dbHost;
+              DB_PORT = toString cfg.dbPort;
+              LLM_PROVIDER = cfg.llmProvider;
+              LLM_API_BASE = cfg.llmApiBase;
+              LLM_MODEL = cfg.llmModel;
+              OLLAMA_URL = "http://127.0.0.1:11434";
+              EMBED_MODEL = cfg.embedModel;
+              EMBED_DIM = toString cfg.embedDim;
+              PORT = toString cfg.port;
+              HOST = cfg.host;
+              BRAIN_MODE = "api";
+              MANIFEST_PATH = "/var/lib/brain-service/manifest.json";
+              TIKTOKEN_CACHE_DIR = "/var/lib/brain-service/tiktoken-cache";
+            }
+            // lib.optionalAttrs (cfg.booksDir != null) {
+              BOOKS_DIR = cfg.booksDir;
+            };
 
-      # MCP server for Hermes (runs on-demand via stdin/stdout)
-      systemd.services.brain-mcp = lib.mkIf cfg.mcpEnable {
-        description = "Brain Service MCP Server";
-        # Triggered on-demand by Hermes, not at boot
-        serviceConfig = {
-          Type = "oneshot";
-          ExecStart = "${pythonEnv}/bin/python ${brainScript}";
-          User = "postgres";
-          EnvironmentFile = secretFile;
-          Environment = [
-            "BRAIN_MODE=mcp"
-            "DB_NAME=${cfg.dbName}"
-            "DB_USER=${cfg.dbUser}"
-            "DB_HOST=${cfg.dbHost}"
-            "DB_PORT=${toString cfg.dbPort}"
-            "LLM_PROVIDER=${cfg.llmProvider}"
-            "LLM_API_BASE=${cfg.llmApiBase}"
-            "LLM_MODEL=${cfg.llmModel}"
-            "OLLAMA_URL=http://127.0.0.1:11434"
-            "EMBED_MODEL=${cfg.embedModel}"
-            "EMBED_DIM=${toString cfg.embedDim}"
-            "MANIFEST_PATH=/var/lib/brain-service/manifest.json"
-            "TIKTOKEN_CACHE_DIR=/var/lib/brain-service/tiktoken-cache"
-          ];
-        };
-      };
+            serviceConfig = {
+              ExecStart = "${pythonEnv}/bin/python ${brainScript}";
+              ExecStartPre = [
+                "+${pkgs.writeShellScript "brain-service-db-init" ''
+                  set -euo pipefail
+                  # Coexists with honcho's postgresql.initialScript (which owns the
+                  # global initialScript); provision brain_db's vector extension +
+                  # ownership idempotently here. The "+" prefix runs this as root,
+                  # so psql must drop to the postgres superuser role explicitly.
+                  PSQL() { ${pkgs.util-linux}/bin/runuser -u postgres -- ${pkgs.postgresql}/bin/psql -v ON_ERROR_STOP=1 "$@"; }
+                  PSQL -d postgres -c "ALTER DATABASE ${cfg.dbName} OWNER TO ${cfg.dbUser};"
+                  PSQL -d ${cfg.dbName} -c "CREATE EXTENSION IF NOT EXISTS vector;"
+                  PSQL -d ${cfg.dbName} -c "GRANT ALL ON SCHEMA public TO ${cfg.dbUser};"
+                ''}"
+              ];
+              Restart = "on-failure";
+              User = "postgres";
+              EnvironmentFile = secretFile;
+              MemoryMax = "1G";
+              MemoryHigh = "800M";
+            };
+          };
 
-      # File watcher service (optional)
-      systemd.services.brain-watcher = lib.mkIf (cfg.booksDir != null) {
-        description = "Brain Service File Watcher";
-        wantedBy = [ "multi-user.target" ];
-        after = [ "brain-service.service" ];
-        requires = [ "brain-service.service" ];
+          # MCP server for Hermes (runs on-demand via stdin/stdout)
+          brain-mcp = lib.mkIf cfg.mcpEnable {
+            description = "Brain Service MCP Server";
+            # Triggered on-demand by Hermes, not at boot
+            serviceConfig = {
+              Type = "oneshot";
+              ExecStart = "${pythonEnv}/bin/python ${brainScript}";
+              User = "postgres";
+              EnvironmentFile = secretFile;
+              Environment = [
+                "BRAIN_MODE=mcp"
+                "DB_NAME=${cfg.dbName}"
+                "DB_USER=${cfg.dbUser}"
+                "DB_HOST=${cfg.dbHost}"
+                "DB_PORT=${toString cfg.dbPort}"
+                "LLM_PROVIDER=${cfg.llmProvider}"
+                "LLM_API_BASE=${cfg.llmApiBase}"
+                "LLM_MODEL=${cfg.llmModel}"
+                "OLLAMA_URL=http://127.0.0.1:11434"
+                "EMBED_MODEL=${cfg.embedModel}"
+                "EMBED_DIM=${toString cfg.embedDim}"
+                "MANIFEST_PATH=/var/lib/brain-service/manifest.json"
+                "TIKTOKEN_CACHE_DIR=/var/lib/brain-service/tiktoken-cache"
+              ];
+            };
+          };
 
-        environment = {
-          BRAIN_MODE = "watcher";
-          DB_NAME = cfg.dbName;
-          DB_USER = cfg.dbUser;
-          DB_HOST = cfg.dbHost;
-          DB_PORT = toString cfg.dbPort;
-          LLM_PROVIDER = cfg.llmProvider;
-          OLLAMA_URL = "http://127.0.0.1:11434";
-          EMBED_MODEL = cfg.embedModel;
-          EMBED_DIM = toString cfg.embedDim;
-          BOOKS_DIR = cfg.booksDir;
-          MANIFEST_PATH = "/var/lib/brain-service/manifest.json";
-          TIKTOKEN_CACHE_DIR = "/var/lib/brain-service/tiktoken-cache";
-        };
+          # File watcher service (optional)
+          brain-watcher = lib.mkIf (cfg.booksDir != null) {
+            description = "Brain Service File Watcher";
+            wantedBy = [ "multi-user.target" ];
+            after = [ "brain-service.service" ];
+            requires = [ "brain-service.service" ];
 
-        serviceConfig = {
-          ExecStart = "${pythonEnv}/bin/python ${brainScript}";
-          Restart = "on-failure";
-          User = "postgres";
-          EnvironmentFile = secretFile;
+            environment = {
+              BRAIN_MODE = "watcher";
+              DB_NAME = cfg.dbName;
+              DB_USER = cfg.dbUser;
+              DB_HOST = cfg.dbHost;
+              DB_PORT = toString cfg.dbPort;
+              LLM_PROVIDER = cfg.llmProvider;
+              OLLAMA_URL = "http://127.0.0.1:11434";
+              EMBED_MODEL = cfg.embedModel;
+              EMBED_DIM = toString cfg.embedDim;
+              BOOKS_DIR = cfg.booksDir;
+              MANIFEST_PATH = "/var/lib/brain-service/manifest.json";
+              TIKTOKEN_CACHE_DIR = "/var/lib/brain-service/tiktoken-cache";
+            };
+
+            serviceConfig = {
+              ExecStart = "${pythonEnv}/bin/python ${brainScript}";
+              Restart = "on-failure";
+              User = "postgres";
+              EnvironmentFile = secretFile;
+            };
+          };
         };
       };
 

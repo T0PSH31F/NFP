@@ -154,12 +154,6 @@ with lib;
       };
     in
     mkIf cfg.enable {
-      # Systemd tmpfiles rule for data directories
-      systemd.tmpfiles.rules = [
-        "d ${cfg.dataDir} 0775 ${primaryUser} users -"
-        "d ${cfg.vaultPath} 0775 ${primaryUser} users -"
-      ];
-
       # Impermanence persistence
       environment.persistence."/persist" =
         mkIf (config.layers.layer-10.system.config.impermanence.enable or false)
@@ -174,45 +168,56 @@ with lib;
         everosServer
       ];
 
-      # Native Systemd Service for EverOS
-      systemd.services.everos = {
-        description = "EverOS Memory Engine Service";
-        after = [ "network.target" ];
-        wantedBy = [ "multi-user.target" ];
-        environment = {
-          VAULT_PATH = cfg.vaultPath;
-          DATA_DIR = cfg.dataDir;
-          PORT = toString cfg.port;
-        };
-        serviceConfig = {
-          ExecStart = "${everosServer}/bin/everos-server";
-          User = primaryUser;
-          Group = "users";
-          Restart = "always";
-          RestartSec = 5;
-          WorkingDirectory = cfg.dataDir;
-          MemoryMax = "800M";
-          MemoryHigh = "600M";
-        };
-      };
+      systemd = {
+        # Systemd tmpfiles rule for data directories
+        tmpfiles.rules = [
+          "d ${cfg.dataDir} 0775 ${primaryUser} users -"
+          "d ${cfg.vaultPath} 0775 ${primaryUser} users -"
+        ];
 
-      # Nightly consolidation service and timer
-      systemd.services.everos-consolidation = {
-        description = "Nightly EverOS Memory Consolidation";
-        after = [ "everos.service" ];
-        serviceConfig = {
-          Type = "oneshot";
-          ExecStart = "${consolidationScript}/bin/everos-consolidation";
-          User = primaryUser;
-        };
-      };
+        # Services
+        services = {
+          # Native Systemd Service for EverOS
+          everos = {
+            description = "EverOS Memory Engine Service";
+            after = [ "network.target" ];
+            wantedBy = [ "multi-user.target" ];
+            environment = {
+              VAULT_PATH = cfg.vaultPath;
+              DATA_DIR = cfg.dataDir;
+              PORT = toString cfg.port;
+            };
+            serviceConfig = {
+              ExecStart = "${everosServer}/bin/everos-server";
+              User = primaryUser;
+              Group = "users";
+              Restart = "always";
+              RestartSec = 5;
+              WorkingDirectory = cfg.dataDir;
+              MemoryMax = "800M";
+              MemoryHigh = "600M";
+            };
+          };
 
-      systemd.timers.everos-consolidation = {
-        description = "Timer for nightly EverOS memory consolidation";
-        wantedBy = [ "timers.target" ];
-        timerConfig = {
-          OnCalendar = cfg.consolidationSchedule;
-          Persistent = true;
+          # Nightly consolidation service and timer
+          everos-consolidation = {
+            description = "Nightly EverOS Memory Consolidation";
+            after = [ "everos.service" ];
+            serviceConfig = {
+              Type = "oneshot";
+              ExecStart = "${consolidationScript}/bin/everos-consolidation";
+              User = primaryUser;
+            };
+          };
+        };
+
+        timers.everos-consolidation = {
+          description = "Timer for nightly EverOS memory consolidation";
+          wantedBy = [ "timers.target" ];
+          timerConfig = {
+            OnCalendar = cfg.consolidationSchedule;
+            Persistent = true;
+          };
         };
       };
     };

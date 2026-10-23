@@ -30,6 +30,7 @@ agent-progress.md
 .slim/
 .codegraph/
 .archive/
+archive/
 .omo/
 session-state.json
 docs/*

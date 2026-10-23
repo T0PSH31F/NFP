@@ -58,21 +58,26 @@ with lib;
     # Enable firmware updates
     services.fwupd.enable = true;
 
-    # Enable CPU microcode updates
-    hardware.cpu.intel.updateMicrocode = lib.mkDefault true;
-    hardware.cpu.amd.updateMicrocode = lib.mkDefault true;
+    # Hardware support
+    hardware = {
+      # Enable CPU microcode updates
+      cpu = {
+        intel.updateMicrocode = lib.mkDefault true;
+        amd.updateMicrocode = lib.mkDefault true;
+      };
 
-    # Enable redistributable firmware (doesn't require allowUnfree)
-    hardware.enableRedistributableFirmware = true;
-    hardware.firmware = [
-      pkgs.linux-firmware
-      pkgs.sof-firmware
-    ];
+      # Enable redistributable firmware (doesn't require allowUnfree)
+      enableRedistributableFirmware = true;
+      firmware = [
+        pkgs.linux-firmware
+        pkgs.sof-firmware
+      ];
 
-    # Graphics support
-    hardware.graphics = {
-      enable = true;
-      enable32Bit = true; # For 32-bit applications and games
+      # Graphics support
+      graphics = {
+        enable = true;
+        enable32Bit = true; # For 32-bit applications and games
+      };
     };
   };
 }

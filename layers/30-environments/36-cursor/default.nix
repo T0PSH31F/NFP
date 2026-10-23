@@ -47,33 +47,35 @@ in
       cfg = osConfig.layers.layer-30.theming.cursor;
     in
     lib.mkIf cfg.enable {
-      home.packages = with pkgs; [
-        hyprcursor
-        sonic-hyprcursor
-        rose-pine-hyprcursor
-      ];
+      home = {
+        packages = with pkgs; [
+          hyprcursor
+          sonic-hyprcursor
+          rose-pine-hyprcursor
+        ];
 
-      home.activation.cleanSonicCursor = lib.hm.dag.entryBefore [ "checkLinkTargets" ] ''
-        for target in "Sonic-Hyprcursor" "rose-pine"; do
-          for path in "$HOME/.local/share/icons/$target" "$HOME/.icons/$target"; do
-            if [ -d "$path" ] && [ ! -L "$path" ]; then
-              echo "Removing physical directory $path to avoid Home Manager symlink conflict"
-              rm -rf "$path"
-            fi
+        activation.cleanSonicCursor = lib.hm.dag.entryBefore [ "checkLinkTargets" ] ''
+          for target in "Sonic-Hyprcursor" "rose-pine"; do
+            for path in "$HOME/.local/share/icons/$target" "$HOME/.icons/$target"; do
+              if [ -d "$path" ] && [ ! -L "$path" ]; then
+                echo "Removing physical directory $path to avoid Home Manager symlink conflict"
+                rm -rf "$path"
+              fi
+            done
           done
-        done
-      '';
+        '';
 
-      home.pointerCursor = {
-        enable = lib.mkForce true; # explicit — relying on non-null to auto-enable is deprecated
-        package = lib.mkForce sonic-hyprcursor;
-        name = lib.mkForce "Sonic-Hyprcursor";
-        size = lib.mkForce cfg.size;
-        gtk.enable = lib.mkForce true;
-        x11.enable = lib.mkForce true;
-        hyprcursor = {
-          enable = lib.mkForce true;
+        pointerCursor = {
+          enable = lib.mkForce true; # explicit — relying on non-null to auto-enable is deprecated
+          package = lib.mkForce sonic-hyprcursor;
+          name = lib.mkForce "Sonic-Hyprcursor";
           size = lib.mkForce cfg.size;
+          gtk.enable = lib.mkForce true;
+          x11.enable = lib.mkForce true;
+          hyprcursor = {
+            enable = lib.mkForce true;
+            size = lib.mkForce cfg.size;
+          };
         };
       };
     };

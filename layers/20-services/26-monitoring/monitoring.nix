@@ -100,86 +100,88 @@ with lib;
         ) httpServices;
       in
       {
-        nfp.services.prometheus = {
-          enable = true;
-          host = config.networking.hostName;
-          bind = "127.0.0.1";
-          port = config.layers.layer-20.services.config.monitoring.prometheus.port;
-          tailnetName = "prometheus";
-          tls = "headscale";
-          healthcheck = {
+        nfp.services = {
+          prometheus = {
             enable = true;
-            path = "/-/healthy";
-            expectedStatus = [ 200 ];
-          };
-          homepage = {
-            enable = true;
-            category = "usopp";
-            order = 10;
-            title = "Prometheus";
-            subtitle = "Tactical Metric Radar";
-            icon = "prometheus";
-            metric = {
-              mode = "native-api";
-              adapter = "prometheus";
-              fields = [
-                "targetsUp"
-                "targetsTotal"
-                "alertsActive"
-              ];
+            host = config.networking.hostName;
+            bind = "127.0.0.1";
+            port = config.layers.layer-20.services.config.monitoring.prometheus.port;
+            tailnetName = "prometheus";
+            tls = "headscale";
+            healthcheck = {
+              enable = true;
+              path = "/-/healthy";
+              expectedStatus = [ 200 ];
+            };
+            homepage = {
+              enable = true;
+              category = "usopp";
+              order = 10;
+              title = "Prometheus";
+              subtitle = "Tactical Metric Radar";
+              icon = "prometheus";
+              metric = {
+                mode = "native-api";
+                adapter = "prometheus";
+                fields = [
+                  "targetsUp"
+                  "targetsTotal"
+                  "alertsActive"
+                ];
+              };
             };
           };
-        };
 
-        nfp.services.grafana = {
-          enable = true;
-          host = config.networking.hostName;
-          bind = "0.0.0.0";
-          port = config.layers.layer-20.services.config.monitoring.grafana.port;
-          tailnetName = "grafana";
-          tls = "none";
-          healthcheck = {
+          grafana = {
             enable = true;
-            path = "/api/health";
-            expectedStatus = [ 200 ];
-          };
-          homepage = {
-            enable = true;
-            category = "usopp";
-            order = 20;
-            title = "Grafana";
-            subtitle = "Tactical Command Views";
-            icon = "grafana";
-            metric = {
-              mode = "health-only";
+            host = config.networking.hostName;
+            bind = "0.0.0.0";
+            port = config.layers.layer-20.services.config.monitoring.grafana.port;
+            tailnetName = "grafana";
+            tls = "none";
+            healthcheck = {
+              enable = true;
+              path = "/api/health";
+              expectedStatus = [ 200 ];
+            };
+            homepage = {
+              enable = true;
+              category = "usopp";
+              order = 20;
+              title = "Grafana";
+              subtitle = "Tactical Command Views";
+              icon = "grafana";
+              metric = {
+                mode = "health-only";
+              };
             };
           };
-        };
 
-        nfp.services.loki = {
-          enable = true;
-          host = config.networking.hostName;
-          bind = "127.0.0.1";
-          port = config.layers.layer-20.services.config.monitoring.loki.port;
-          tailnetName = "loki";
-          tls = "none";
-          healthcheck = {
+          loki = {
             enable = true;
-            path = "/ready";
-            expectedStatus = [ 200 ];
-          };
-          homepage = {
-            enable = true;
-            category = "usopp";
-            order = 22;
-            title = "Loki Logs";
-            subtitle = "Grafana Explore Log Viewer";
-            icon = "loki";
-            dashboardUrl = "http://${config.networking.hostName}.${
-              config.layers.meta.tailnetDomain or "nfp.nix"
-            }:${toString config.layers.layer-20.services.config.monitoring.grafana.port}/explore";
-            metric = {
-              mode = "health-only";
+            host = config.networking.hostName;
+            bind = "127.0.0.1";
+            port = config.layers.layer-20.services.config.monitoring.loki.port;
+            tailnetName = "loki";
+            tls = "none";
+            healthcheck = {
+              enable = true;
+              path = "/ready";
+              expectedStatus = [ 200 ];
+            };
+            homepage = {
+              enable = true;
+              category = "usopp";
+              order = 22;
+              title = "Loki Logs";
+              subtitle = "Grafana Explore Log Viewer";
+              icon = "loki";
+              dashboardUrl = "http://${config.networking.hostName}.${
+                config.layers.meta.tailnetDomain or "nfp.nix"
+              }:${toString config.layers.layer-20.services.config.monitoring.grafana.port}/explore";
+              metric = {
+                mode = "health-only";
+              };
             };
           };
         };
