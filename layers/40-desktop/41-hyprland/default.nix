@@ -173,6 +173,17 @@ in
             early_exit=true
             fill_shape=false
           '';
+
+          # Ensure sourced files always exist declaratively so Hyprland never errors on missing source
+          "hypr/experiences/active-experience.conf".text = lib.mkDefault ''
+            # Auto-generated fallback for active-experience.conf
+          '';
+          "hypr/monitors.conf".text = lib.mkDefault ''
+            # Auto-generated fallback for monitors.conf
+          '';
+          "hypr/hyprviz.conf".text = lib.mkDefault ''
+            # Auto-generated fallback for hyprviz.conf
+          '';
         };
 
         # Ensure screenshots directory exists
