@@ -38,6 +38,7 @@ with lib;
       ++ lib.optional (
         builtins.elem "intel-9th-gen" (config.machine.tags or [ ])
         || builtins.elem "intel-12th-gen" (config.machine.tags or [ ])
+        || builtins.elem "intel-13th-gen" (config.machine.tags or [ ])
       ) "intel_iommu=on"
       ++ lib.optional (builtins.elem "amd" (config.machine.tags or [ ])) "amd_iommu=on";
 
@@ -46,6 +47,7 @@ with lib;
         + lib.optionalString (
           builtins.elem "intel-9th-gen" (config.machine.tags or [ ])
           || builtins.elem "intel-12th-gen" (config.machine.tags or [ ])
+          || builtins.elem "intel-13th-gen" (config.machine.tags or [ ])
         ) "options kvm_intel nested=1\n"
         + lib.optionalString (builtins.elem "amd" (
           config.machine.tags or [ ]

@@ -10,7 +10,7 @@ in
 {
   config = lib.mkMerge [
     # Common Intel & GPU settings
-    (lib.mkIf (hasTag "intel-9th-gen" || hasTag "intel-12th-gen") {
+    (lib.mkIf (hasTag "intel-9th-gen" || hasTag "intel-12th-gen" || hasTag "intel-13th-gen") {
       boot.kernelModules = [ "kvm-intel" ];
       hardware.enableRedistributableFirmware = true;
       hardware.graphics = {
@@ -47,6 +47,23 @@ in
       # Modern power management for hybrid architectures
       services.power-profiles-daemon.enable = lib.mkDefault true;
       services.thermald.enable = lib.mkForce false; # Often fails on 12th gen laptops
+      services.hardware.bolt.enable = true;
+    })
+
+    # i7-13850HX (13th gen Raptor Lake) - sanji
+    (lib.mkIf (hasTag "intel-13th-gen") {
+      boot.initrd.kernelModules = [ "i915" ];
+
+      hardware.graphics.extraPackages = with pkgs; [
+        intel-media-driver # iHD driver
+        intel-compute-runtime
+        intel-ocl
+        vpl-gpu-rt # Intel Quick Sync / VPL runtime
+      ];
+
+      # Modern power management for hybrid architectures
+      services.power-profiles-daemon.enable = lib.mkDefault true;
+      services.thermald.enable = lib.mkForce false;
       services.hardware.bolt.enable = true;
     })
   ];

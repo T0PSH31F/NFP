@@ -95,66 +95,65 @@ in
         # $ipc uses Quickshell IPC — NOT noctalia msg
         wayland.windowManager.hyprland.settings."$ipc" = lib.mkForce "qs ipc";
 
-        # Deploy Rise shell config to ~/.config/quickshell/rise and ~/.config/quickshell/bar
-        xdg.configFile."quickshell/rise".source = "${hancore-quickshell-rise}/share/quickshell/rise";
-        xdg.configFile."quickshell/bar".source = "${hancore-quickshell-rise}/share/quickshell/rise";
+        # Deploy configuration files
+        xdg.configFile = {
+          "quickshell/rise".source = "${hancore-quickshell-rise}/share/quickshell/rise";
+          "quickshell/bar".source = "${hancore-quickshell-rise}/share/quickshell/rise";
 
-        # Ensure Ghostty is the default terminal for xdg-terminal-exec
-        xdg.configFile."xdg-terminals.list".text = "ghostty.desktop\ncom.mitchellh.ghostty.desktop\n";
+          # Ensure Ghostty is the default terminal for xdg-terminal-exec
+          "xdg-terminals.list".text = "ghostty.desktop\ncom.mitchellh.ghostty.desktop\n";
 
-        # Active experience configuration for standard Hyprland sessions
-        xdg.configFile."hypr/experiences/nixarchy-rise.conf".text = ''
-          # Nixarchy Rise Hyprland Experience Configuration
-          $ipc = qs ipc
+          # Active experience configuration for standard Hyprland sessions
+          "hypr/experiences/nixarchy-rise.conf".text = ''
+            # Nixarchy Rise Hyprland Experience Configuration
+            $ipc = qs ipc
 
-          # Environment variables for Omarchy runtime
-          env = OMARCHY_PATH,${nixarchyPkg}/share/omarchy
-          env = LUA_PATH,${nixarchyPkg}/share/omarchy/config/?.lua;${nixarchyPkg}/share/omarchy/?.lua;;
+            # Environment variables for Omarchy runtime
+            env = OMARCHY_PATH,${nixarchyPkg}/share/omarchy
+            env = LUA_PATH,${nixarchyPkg}/share/omarchy/config/?.lua;${nixarchyPkg}/share/omarchy/?.lua;;
 
-          # Theme color definitions for Hyprland borders and lightsaber aura
-          $primary = rgb(89b4fa)
-          $surface = rgb(1e1e2e)
-          $secondary = rgb(b4befe)
-          $surfaceContainer = rgb(313244)
-          $error = rgb(f38ba8)
-          $tertiary = rgb(f5c2e7)
-          $surface_lowest = rgb(11111b)
+            # Theme color definitions for Hyprland borders and lightsaber aura
+            $primary = rgb(89b4fa)
+            $surface = rgb(1e1e2e)
+            $secondary = rgb(b4befe)
+            $surfaceContainer = rgb(313244)
+            $error = rgb(f38ba8)
+            $tertiary = rgb(f5c2e7)
+            $surface_lowest = rgb(11111b)
 
-          general {
-            col.active_border = $primary
-            col.inactive_border = $surface
-          }
+            general {
+              col.active_border = $primary
+              col.inactive_border = $surface
+            }
 
-          # Quickshell Rise layer rules
-          # Only blur opaque surfaces (bar, dock). Transparent full-screen canvases
-          # (menu overlay, notifications, osd) must NOT be blurred or they black out the viewport.
-          layerrule = blur 1, match:namespace ^omarchy-(bar|dock)$
-          layerrule = no_anim 1, match:namespace ^omarchy-(bar|menu|notifications|dock|osd)$
+            # Quickshell Rise layer rules
+            # Only blur opaque surfaces (bar, dock). Transparent full-screen canvases
+            # (menu overlay, notifications, osd) must NOT be blurred or they black out the viewport.
+            layerrule = blur 1, match:namespace ^omarchy-(bar|dock)$
+            layerrule = no_anim 1, match:namespace ^omarchy-(bar|menu|notifications|dock|osd)$
 
-          # Omarchy shortcuts & bindings
-          bind = $mod, SPACE, exec, omarchy-menu toggle
-          bind = $mod, A, exec, omarchy-menu toggle apps
-          bind = $mod, comma, exec, omarchy-menu toggle setup
+            # Omarchy shortcuts & bindings
+            bind = $mod, SPACE, exec, omarchy-menu toggle
+            bind = $mod, A, exec, omarchy-menu toggle apps
+            bind = $mod, comma, exec, omarchy-menu toggle setup
 
-          # Autostart Quickshell Rise bar
-          exec-once = OMARCHY_PATH=${nixarchyPkg}/share/omarchy quickshell -p ~/.config/quickshell/rise
-        '';
+            # Autostart Quickshell Rise bar
+            exec-once = OMARCHY_PATH=${nixarchyPkg}/share/omarchy quickshell -p ~/.config/quickshell/rise
+          '';
 
-        xdg.configFile."hypr/experiences/active-experience.conf".text = ''
-          source = ${config.home.homeDirectory}/.config/hypr/experiences/nixarchy-rise.conf
-        '';
+          "hypr/experiences/active-experience.conf".text = ''
+            source = ${config.home.homeDirectory}/.config/hypr/experiences/nixarchy-rise.conf
+          '';
 
-        # Link Omarchy Hyprland Lua configs so both standalone and standard Hyprland sessions work
-        xdg.configFile."hypr/monitors.lua".source =
-          lib.mkDefault "${nixarchyPkg}/share/omarchy/config/hypr/monitors.lua";
-        xdg.configFile."hypr/input.lua".source =
-          lib.mkDefault "${nixarchyPkg}/share/omarchy/config/hypr/input.lua";
-        xdg.configFile."hypr/bindings.lua".source =
-          lib.mkDefault "${nixarchyPkg}/share/omarchy/config/hypr/bindings.lua";
-        xdg.configFile."hypr/looknfeel.lua".source =
-          lib.mkDefault "${nixarchyPkg}/share/omarchy/config/hypr/looknfeel.lua";
-        xdg.configFile."hypr/autostart.lua".source =
-          lib.mkDefault "${nixarchyPkg}/share/omarchy/config/hypr/autostart.lua";
+          # Link Omarchy Hyprland Lua configs so both standalone and standard Hyprland sessions work
+          "hypr/monitors.lua".source = lib.mkDefault "${nixarchyPkg}/share/omarchy/config/hypr/monitors.lua";
+          "hypr/input.lua".source = lib.mkDefault "${nixarchyPkg}/share/omarchy/config/hypr/input.lua";
+          "hypr/bindings.lua".source = lib.mkDefault "${nixarchyPkg}/share/omarchy/config/hypr/bindings.lua";
+          "hypr/looknfeel.lua".source =
+            lib.mkDefault "${nixarchyPkg}/share/omarchy/config/hypr/looknfeel.lua";
+          "hypr/autostart.lua".source =
+            lib.mkDefault "${nixarchyPkg}/share/omarchy/config/hypr/autostart.lua";
+        };
 
         # Ensure default Omarchy theme and background state exist on login
         systemd.user.services.nixarchy-state-init = {

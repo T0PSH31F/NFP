@@ -148,105 +148,107 @@ with lib;
     # NATIVE NIXOS SERVICES
     # ============================================================================
 
-    # Mautrix-Telegram (Native)
-    services.mautrix-telegram = mkIf config.services.mautrix-bridges.telegram.enable {
-      enable = true;
-      serviceDependencies = [ "postgresql.service" ];
-      settings = {
-        homeserver = {
-          address = config.services.mautrix-bridges.homeserverUrl;
-          domain = config.services.mautrix-bridges.homeserverDomain;
-        };
-        appservice = {
-          address = "http://localhost:${toString config.services.mautrix-bridges.telegram.port}";
-          port = config.services.mautrix-bridges.telegram.port;
-          database = "postgresql:///mautrix-telegram?host=/run/postgresql";
-        };
-        bridge = {
-          permissions = {
-            "*" = "relay";
-            ${config.services.mautrix-bridges.homeserverDomain} = "user";
-            "@t0psh31f:${config.services.mautrix-bridges.homeserverDomain}" = "admin";
+    services = {
+      # Mautrix-Telegram (Native)
+      mautrix-telegram = mkIf config.services.mautrix-bridges.telegram.enable {
+        enable = true;
+        serviceDependencies = [ "postgresql.service" ];
+        settings = {
+          homeserver = {
+            address = config.services.mautrix-bridges.homeserverUrl;
+            domain = config.services.mautrix-bridges.homeserverDomain;
+          };
+          appservice = {
+            address = "http://localhost:${toString config.services.mautrix-bridges.telegram.port}";
+            port = config.services.mautrix-bridges.telegram.port;
+            database = "postgresql:///mautrix-telegram?host=/run/postgresql";
+          };
+          bridge = {
+            permissions = {
+              "*" = "relay";
+              ${config.services.mautrix-bridges.homeserverDomain} = "user";
+              "@t0psh31f:${config.services.mautrix-bridges.homeserverDomain}" = "admin";
+            };
           };
         };
       };
-    };
 
-    # Mautrix-WhatsApp (Native)
-    services.mautrix-whatsapp = mkIf config.services.mautrix-bridges.whatsapp.enable {
-      enable = true;
-      serviceDependencies = [ "postgresql.service" ];
-      settings = {
-        homeserver = {
-          address = config.services.mautrix-bridges.homeserverUrl;
-          domain = config.services.mautrix-bridges.homeserverDomain;
-        };
-        appservice = {
-          address = "http://localhost:${toString config.services.mautrix-bridges.whatsapp.port}";
-          port = config.services.mautrix-bridges.whatsapp.port;
-        };
-        database = {
-          type = "postgres";
-          uri = "postgresql:///mautrix-whatsapp?host=/run/postgresql";
-        };
-        bridge = {
-          permissions = {
-            "*" = "relay";
-            ${config.services.mautrix-bridges.homeserverDomain} = "user";
-            "@t0psh31f:${config.services.mautrix-bridges.homeserverDomain}" = "admin";
+      # Mautrix-WhatsApp (Native)
+      mautrix-whatsapp = mkIf config.services.mautrix-bridges.whatsapp.enable {
+        enable = true;
+        serviceDependencies = [ "postgresql.service" ];
+        settings = {
+          homeserver = {
+            address = config.services.mautrix-bridges.homeserverUrl;
+            domain = config.services.mautrix-bridges.homeserverDomain;
           };
-        };
-      };
-    };
-
-    # Mautrix-Signal (Native)
-    services.mautrix-signal = mkIf config.services.mautrix-bridges.signal.enable {
-      enable = true;
-      serviceDependencies = [ "postgresql.service" ];
-      settings = {
-        homeserver = {
-          address = config.services.mautrix-bridges.homeserverUrl;
-          domain = config.services.mautrix-bridges.homeserverDomain;
-        };
-        appservice = {
-          address = "http://localhost:${toString config.services.mautrix-bridges.signal.port}";
-          port = config.services.mautrix-bridges.signal.port;
-        };
-        database = {
-          type = "postgres";
-          uri = "postgresql:///mautrix-signal?host=/run/postgresql";
-        };
-        bridge = {
-          permissions = {
-            "*" = "relay";
-            ${config.services.mautrix-bridges.homeserverDomain} = "user";
-            "@t0psh31f:${config.services.mautrix-bridges.homeserverDomain}" = "admin";
+          appservice = {
+            address = "http://localhost:${toString config.services.mautrix-bridges.whatsapp.port}";
+            port = config.services.mautrix-bridges.whatsapp.port;
           };
-        };
-      };
-    };
-
-    # Mautrix-Discord (Native)
-    services.mautrix-discord = mkIf config.services.mautrix-bridges.discord.enable {
-      enable = true;
-      settings = {
-        homeserver = {
-          address = config.services.mautrix-bridges.homeserverUrl;
-          domain = config.services.mautrix-bridges.homeserverDomain;
-        };
-        appservice = {
-          address = "http://localhost:${toString config.services.mautrix-bridges.discord.port}";
-          port = config.services.mautrix-bridges.discord.port;
           database = {
             type = "postgres";
-            uri = "postgresql:///mautrix-discord?host=/run/postgresql";
+            uri = "postgresql:///mautrix-whatsapp?host=/run/postgresql";
+          };
+          bridge = {
+            permissions = {
+              "*" = "relay";
+              ${config.services.mautrix-bridges.homeserverDomain} = "user";
+              "@t0psh31f:${config.services.mautrix-bridges.homeserverDomain}" = "admin";
+            };
           };
         };
-        bridge = {
-          permissions = {
-            "*" = "relay";
-            ${config.services.mautrix-bridges.homeserverDomain} = "user";
-            "@t0psh31f:${config.services.mautrix-bridges.homeserverDomain}" = "admin";
+      };
+
+      # Mautrix-Signal (Native)
+      mautrix-signal = mkIf config.services.mautrix-bridges.signal.enable {
+        enable = true;
+        serviceDependencies = [ "postgresql.service" ];
+        settings = {
+          homeserver = {
+            address = config.services.mautrix-bridges.homeserverUrl;
+            domain = config.services.mautrix-bridges.homeserverDomain;
+          };
+          appservice = {
+            address = "http://localhost:${toString config.services.mautrix-bridges.signal.port}";
+            port = config.services.mautrix-bridges.signal.port;
+          };
+          database = {
+            type = "postgres";
+            uri = "postgresql:///mautrix-signal?host=/run/postgresql";
+          };
+          bridge = {
+            permissions = {
+              "*" = "relay";
+              ${config.services.mautrix-bridges.homeserverDomain} = "user";
+              "@t0psh31f:${config.services.mautrix-bridges.homeserverDomain}" = "admin";
+            };
+          };
+        };
+      };
+
+      # Mautrix-Discord (Native)
+      mautrix-discord = mkIf config.services.mautrix-bridges.discord.enable {
+        enable = true;
+        settings = {
+          homeserver = {
+            address = config.services.mautrix-bridges.homeserverUrl;
+            domain = config.services.mautrix-bridges.homeserverDomain;
+          };
+          appservice = {
+            address = "http://localhost:${toString config.services.mautrix-bridges.discord.port}";
+            port = config.services.mautrix-bridges.discord.port;
+            database = {
+              type = "postgres";
+              uri = "postgresql:///mautrix-discord?host=/run/postgresql";
+            };
+          };
+          bridge = {
+            permissions = {
+              "*" = "relay";
+              ${config.services.mautrix-bridges.homeserverDomain} = "user";
+              "@t0psh31f:${config.services.mautrix-bridges.homeserverDomain}" = "admin";
+            };
           };
         };
       };
@@ -306,85 +308,107 @@ with lib;
     # CONTAINER-BASED SERVICES (No native NixOS modules yet)
     # ============================================================================
 
-    virtualisation.oci-containers.containers = mkMerge [
-      (mkIf config.services.mautrix-bridges.slack.enable {
-        mautrix-slack = {
-          image = "dock.mau.dev/mautrix/slack:latest";
-          ports = [ "${toString config.services.mautrix-bridges.slack.port}:29335" ];
-          volumes = [
-            "/var/lib/mautrix-slack:/data"
-          ];
-          environment = {
-            TZ = "America/Los_Angeles";
-          };
-        };
-      })
+    virtualisation = {
+      podman.enable = mkIf (
+        config.services.mautrix-bridges.slack.enable
+        || config.services.mautrix-bridges.googlechat.enable
+        || config.services.mautrix-bridges.twitter.enable
+        || config.services.mautrix-bridges.gmessages.enable
+        || config.services.mautrix-bridges.gvoice.enable
+        || config.services.mautrix-bridges.linkedin.enable
+      ) true;
 
-      (mkIf config.services.mautrix-bridges.googlechat.enable {
-        mautrix-googlechat = {
-          image = "dock.mau.dev/mautrix/googlechat:latest";
-          ports = [ "${toString config.services.mautrix-bridges.googlechat.port}:29320" ];
-          volumes = [
-            "/var/lib/mautrix-googlechat:/data"
-          ];
-          environment = {
-            TZ = "America/Los_Angeles";
-          };
-        };
-      })
+      oci-containers = {
+        backend = mkIf (
+          config.services.mautrix-bridges.slack.enable
+          || config.services.mautrix-bridges.googlechat.enable
+          || config.services.mautrix-bridges.twitter.enable
+          || config.services.mautrix-bridges.gmessages.enable
+          || config.services.mautrix-bridges.gvoice.enable
+          || config.services.mautrix-bridges.linkedin.enable
+        ) "podman";
 
-      (mkIf config.services.mautrix-bridges.twitter.enable {
-        mautrix-twitter = {
-          image = "dock.mau.dev/mautrix/twitter:latest";
-          ports = [ "${toString config.services.mautrix-bridges.twitter.port}:8080" ];
-          volumes = [
-            "/var/lib/mautrix-twitter:/data"
-          ];
-          environment = {
-            TZ = "America/Los_Angeles";
-          };
-        };
-      })
+        containers = mkMerge [
+          (mkIf config.services.mautrix-bridges.slack.enable {
+            mautrix-slack = {
+              image = "dock.mau.dev/mautrix/slack:latest";
+              ports = [ "${toString config.services.mautrix-bridges.slack.port}:29335" ];
+              volumes = [
+                "/var/lib/mautrix-slack:/data"
+              ];
+              environment = {
+                TZ = "America/Los_Angeles";
+              };
+            };
+          })
 
-      (mkIf config.services.mautrix-bridges.gmessages.enable {
-        mautrix-gmessages = {
-          image = "dock.mau.dev/mautrix/gmessages:latest";
-          ports = [ "${toString config.services.mautrix-bridges.gmessages.port}:29336" ];
-          volumes = [
-            "/var/lib/mautrix-gmessages:/data"
-          ];
-          environment = {
-            TZ = "America/Los_Angeles";
-          };
-        };
-      })
+          (mkIf config.services.mautrix-bridges.googlechat.enable {
+            mautrix-googlechat = {
+              image = "dock.mau.dev/mautrix/googlechat:latest";
+              ports = [ "${toString config.services.mautrix-bridges.googlechat.port}:29320" ];
+              volumes = [
+                "/var/lib/mautrix-googlechat:/data"
+              ];
+              environment = {
+                TZ = "America/Los_Angeles";
+              };
+            };
+          })
 
-      (mkIf config.services.mautrix-bridges.gvoice.enable {
-        mautrix-gvoice = {
-          image = "dock.mau.dev/mautrix/gvoice:latest";
-          ports = [ "${toString config.services.mautrix-bridges.gvoice.port}:29337" ];
-          volumes = [
-            "/var/lib/mautrix-gvoice:/data"
-          ];
-          environment = {
-            TZ = "America/Los_Angeles";
-          };
-        };
-      })
+          (mkIf config.services.mautrix-bridges.twitter.enable {
+            mautrix-twitter = {
+              image = "dock.mau.dev/mautrix/twitter:latest";
+              ports = [ "${toString config.services.mautrix-bridges.twitter.port}:8080" ];
+              volumes = [
+                "/var/lib/mautrix-twitter:/data"
+              ];
+              environment = {
+                TZ = "America/Los_Angeles";
+              };
+            };
+          })
 
-      (mkIf config.services.mautrix-bridges.linkedin.enable {
-        mautrix-linkedin = {
-          image = "dock.mau.dev/mautrix/linkedin:latest";
-          ports = [ "${toString config.services.mautrix-bridges.linkedin.port}:29338" ];
-          volumes = [
-            "/var/lib/mautrix-linkedin:/data"
-          ];
-          environment = {
-            TZ = "America/Los_Angeles";
-          };
-        };
-      })
-    ];
+          (mkIf config.services.mautrix-bridges.gmessages.enable {
+            mautrix-gmessages = {
+              image = "dock.mau.dev/mautrix/gmessages:latest";
+              ports = [ "${toString config.services.mautrix-bridges.gmessages.port}:29336" ];
+              volumes = [
+                "/var/lib/mautrix-gmessages:/data"
+              ];
+              environment = {
+                TZ = "America/Los_Angeles";
+              };
+            };
+          })
+
+          (mkIf config.services.mautrix-bridges.gvoice.enable {
+            mautrix-gvoice = {
+              image = "dock.mau.dev/mautrix/gvoice:latest";
+              ports = [ "${toString config.services.mautrix-bridges.gvoice.port}:29337" ];
+              volumes = [
+                "/var/lib/mautrix-gvoice:/data"
+              ];
+              environment = {
+                TZ = "America/Los_Angeles";
+              };
+            };
+          })
+
+          (mkIf config.services.mautrix-bridges.linkedin.enable {
+            mautrix-linkedin = {
+              image = "dock.mau.dev/mautrix/linkedin:latest";
+              ports = [ "${toString config.services.mautrix-bridges.linkedin.port}:29338" ];
+              volumes = [
+                "/var/lib/mautrix-linkedin:/data"
+              ];
+              environment = {
+                TZ = "America/Los_Angeles";
+              };
+            };
+          })
+        ];
+      };
+    };
 
     # ============================================================================
     # POSTGRESQL DATABASES
@@ -435,25 +459,6 @@ with lib;
       ++ (optional config.services.mautrix-bridges.gmessages.enable "d /var/lib/mautrix-gmessages 0755 root root -")
       ++ (optional config.services.mautrix-bridges.gvoice.enable "d /var/lib/mautrix-gvoice 0755 root root -")
       ++ (optional config.services.mautrix-bridges.linkedin.enable "d /var/lib/mautrix-linkedin 0755 root root -");
-
-    # Enable Podman only for container-based bridges
-    virtualisation.podman.enable = mkIf (
-      config.services.mautrix-bridges.slack.enable
-      || config.services.mautrix-bridges.googlechat.enable
-      || config.services.mautrix-bridges.twitter.enable
-      || config.services.mautrix-bridges.gmessages.enable
-      || config.services.mautrix-bridges.gvoice.enable
-      || config.services.mautrix-bridges.linkedin.enable
-    ) true;
-
-    virtualisation.oci-containers.backend = mkIf (
-      config.services.mautrix-bridges.slack.enable
-      || config.services.mautrix-bridges.googlechat.enable
-      || config.services.mautrix-bridges.twitter.enable
-      || config.services.mautrix-bridges.gmessages.enable
-      || config.services.mautrix-bridges.gvoice.enable
-      || config.services.mautrix-bridges.linkedin.enable
-    ) "podman";
 
     # Ensure Matrix bridges data is persisted
     environment.persistence."/persist" =

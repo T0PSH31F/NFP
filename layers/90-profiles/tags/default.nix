@@ -20,6 +20,7 @@ let
     "gpu-compute"
     "homelab"
     "intel-12th-gen"
+    "intel-13th-gen"
     "intel-9th-gen"
     "laptop"
     "media"

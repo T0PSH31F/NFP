@@ -1,4 +1,4 @@
-{ lib }:
+{ lib, ... }:
 /*
   Wrapper for dendritic multi-class modules.
   Handles both multi-class (nixos/home/options) and standard modules.
@@ -13,7 +13,7 @@ let
     {
       config,
       lib,
-      pkgs,
+      pkgs ? null,
       ...
     }@args:
     let

@@ -6,9 +6,9 @@ let
 
   mockModule =
     {
-      config,
+      _config ? { },
       lib,
-      pkgs,
+      _pkgs ? null,
       ...
     }:
     {

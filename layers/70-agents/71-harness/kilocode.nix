@@ -3,7 +3,7 @@
 # Purpose: Kilo Code terminal AI agent & IDE extension harness integration (Roo/Cline lineage).
 # Provider endpoints (Kong path multiplexer + ExtremeRouter backup):
 #   kong-er:       http://luffy:8090/v1 (ExtremeRouter)
-#   kong-omni:     http://luffy:8090/omni/v1 (OmniRoute - TODO: when merged)
+#   kong-omni:     http://luffy:8090/omni/v1 (OmniRoute)
 #   kong-free:     http://luffy:8090/llm/free/v1 (FreeLLMPool)
 #   kong-frontier: http://luffy:8090/llm/frontier/v1 (Manifest)
 #   extreme-direct: http://127.0.0.1:20128/v1 (ER direct backup)
@@ -83,7 +83,7 @@ in
             };
             kong-omni = {
               baseUrl = "http://luffy.nfp.nix:8090/omni/v1";
-              name = "Kong OmniRoute (TODO: when merged)";
+              name = "Kong OmniRoute";
             };
             kong-free = {
               baseUrl = "http://luffy.nfp.nix:8090/llm/free/v1";

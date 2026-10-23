@@ -326,11 +326,8 @@
           sopsFile = ../../../layers/00-cyberia/03-treasure/secrets/external_services.yaml;
         };
 
-        # TODO: Add rclone_config key to external_services.yaml before enabling
-        # sops.secrets.rclone_config = {
-        #   sopsFile = ../../../layers/00-cyberia/03-treasure/secrets/external_services.yaml;
-        #   path = "${config.home.homeDirectory}/.config/rclone/rclone.conf";
-        # };
+        # Note: rclone.conf is persisted dynamically via impermanence
+        # (/persist/home/t0psh31f/.config/rclone/rclone.conf) to support interactive OAuth token refreshes.
 
         sops.templates."git-config".content = ''
           [user]

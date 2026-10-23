@@ -9,9 +9,15 @@ let
 in
 {
   config = lib.mkIf cfg.enable {
-    services.udisks2.enable = true;
-    services.devmon.enable = true;
-    services.gvfs.enable = true;
+    services = {
+      udisks2.enable = true;
+      devmon.enable = true;
+      gvfs.enable = true;
+      udev.extraRules = ''
+        # Poll removable block devices (USB hubs/readers) every 2s for partition changes
+        SUBSYSTEM=="block", ATTRS{removable}=="1", ATTR{events_poll_msecs}="2000"
+      '';
+    };
 
     environment.systemPackages = with pkgs; [
       udisks

@@ -49,58 +49,60 @@ with lib;
       '';
     };
 
-    services.nextcloud = {
-      enable = true;
-      package = pkgs.nextcloud33;
-      hostName = config.services.nextcloud-server.hostName;
+    services = {
+      nextcloud = {
+        enable = true;
+        package = pkgs.nextcloud33;
+        hostName = config.services.nextcloud-server.hostName;
 
-      config = {
-        adminuser = config.services.nextcloud-server.adminUser;
-        adminpassFile =
-          if config.services.nextcloud-server.adminPasswordFile != null then
-            config.services.nextcloud-server.adminPasswordFile
-          else
-            config.clan.core.vars.generators.nextcloud.files."admin-password".path;
+        config = {
+          adminuser = config.services.nextcloud-server.adminUser;
+          adminpassFile =
+            if config.services.nextcloud-server.adminPasswordFile != null then
+              config.services.nextcloud-server.adminPasswordFile
+            else
+              config.clan.core.vars.generators.nextcloud.files."admin-password".path;
 
-        dbtype = "pgsql";
-        dbhost = "/run/postgresql";
-        dbname = "nextcloud";
-        dbuser = "nextcloud";
+          dbtype = "pgsql";
+          dbhost = "/run/postgresql";
+          dbname = "nextcloud";
+          dbuser = "nextcloud";
+        };
+
+        database.createLocally = true;
+
+        configureRedis = true;
+
+        maxUploadSize = "16G";
+
+        https = false;
+
+        phpOptions = {
+          "opcache.interned_strings_buffer" = "16";
+        };
+
+        settings = {
+          overwriteprotocol = "https";
+        };
       };
 
-      database.createLocally = true;
-
-      configureRedis = true;
-
-      maxUploadSize = "16G";
-
-      https = false;
-
-      phpOptions = {
-        "opcache.interned_strings_buffer" = "16";
+      # PostgreSQL for Nextcloud
+      postgresql = {
+        enable = true;
+        ensureDatabases = [ "nextcloud" ];
+        ensureUsers = [
+          {
+            name = "nextcloud";
+            ensureDBOwnership = true;
+          }
+        ];
       };
 
-      settings = {
-        overwriteprotocol = "https";
+      # Redis for caching
+      redis.servers.nextcloud = {
+        enable = true;
+        port = 6380;
       };
-    };
-
-    # PostgreSQL for Nextcloud
-    services.postgresql = {
-      enable = true;
-      ensureDatabases = [ "nextcloud" ];
-      ensureUsers = [
-        {
-          name = "nextcloud";
-          ensureDBOwnership = true;
-        }
-      ];
-    };
-
-    # Redis for caching
-    services.redis.servers.nextcloud = {
-      enable = true;
-      port = 6380;
     };
 
     # Firewall

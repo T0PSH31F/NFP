@@ -42,6 +42,8 @@
     "workstation"
     "laptop"
     "development"
+    "intel-13th-gen"
+    "gpu-compute"
     "ai-router"
     "ai-inference"
     "agent-orchestrator"

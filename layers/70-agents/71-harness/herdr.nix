@@ -125,6 +125,17 @@ in
     environment.etc."herdr/config.toml".source = configFile;
     environment.etc."xdg/herdr/config.toml".source = configFile;
 
+    # Auto-restore agent workspaces on user session start
+    systemd.user.services.herdr-workspaces = mkIf (cfg.package != null) {
+      description = "Herdr agent workspaces initializer";
+      wantedBy = [ "default.target" ];
+      serviceConfig = {
+        Type = "oneshot";
+        ExecStart = "${herdr-setup-workspaces}/bin/herdr-setup-workspaces";
+        RemainAfterExit = true;
+      };
+    };
+
     # Impermanence persistence
     environment.persistence."/persist" =
       mkIf (osConfig.layers.layer-10.system.config.impermanence.enable or false)

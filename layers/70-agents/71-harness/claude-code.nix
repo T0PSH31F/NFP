@@ -3,7 +3,7 @@
 # Purpose: Anthropic Claude Code terminal agent harness wrapper.
 # Provider endpoints (Kong path multiplexer + ExtremeRouter backup):
 #   kong-er:       http://luffy:8090/v1 (ExtremeRouter)
-#   kong-omni:     http://luffy:8090/omni/v1 (OmniRoute - TODO: when merged)
+#   kong-omni:     http://luffy:8090/omni/v1 (OmniRoute)
 #   kong-free:     http://luffy:8090/llm/free/v1 (FreeLLMPool)
 #   kong-frontier: http://luffy:8090/llm/frontier/v1 (Manifest)
 #   extreme-direct: http://127.0.0.1:20128/v1 (ER direct backup)

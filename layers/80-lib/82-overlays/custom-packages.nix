@@ -291,7 +291,7 @@ final: prev: {
   #       zlib
   #       linuxHeaders
   #     ]
-  #     ++ final.lib.optionals final.stdenv.isLinux [
+  #     ++ final.lib.optionals final.stdenv.hostPlatform.isLinux [
   #       # For PDF rendering (poppler)
   #       poppler
   #       poppler_gi

@@ -171,5 +171,7 @@ in
       cfg.port
       cfg.vncPort
     ];
+
+    # Note: /var/lib/camofox is persisted centrally in layers/10-system/15-filesystem/impermanence.nix
   };
 }

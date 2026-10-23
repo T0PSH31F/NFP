@@ -56,36 +56,48 @@ with lib;
           _name: svc: svc.healthcheck.enable && svc.healthcheck.skipReason == null
         ) enabledServices;
 
-        contractBlackboxScrapeConfigs = mapAttrsToList (name: svc: {
-          job_name = "blackbox-${name}";
-          metrics_path = "/probe";
-          params.module = [ "http_2xx" ];
-          static_configs = [
-            {
-              targets = [
-                "http://${svc.host}.${baseDomain}:${toString svc.port}${svc.healthcheck.path}"
-              ];
-              labels = {
-                service = name;
-                machine = svc.host;
-              };
-            }
-          ];
-          relabel_configs = [
-            {
-              source_labels = [ "__address__" ];
-              target_label = "__param_target";
-            }
-            {
-              source_labels = [ "__param_target" ];
-              target_label = "instance";
-            }
-            {
-              replacement = "127.0.0.1:9115";
-              target_label = "__address__";
-            }
-          ];
-        }) httpServices;
+        localHost = config.networking.hostName;
+        contractBlackboxScrapeConfigs = mapAttrsToList (
+          name: svc:
+          let
+            isLocal = svc.host == localHost;
+            targetUrl =
+              if isLocal then
+                "http://${svc.bind}:${toString svc.port}${svc.healthcheck.path}"
+              else if svc.tls != "none" then
+                "http://${svc.tailnetName}.${baseDomain}${svc.healthcheck.path}"
+              else
+                "http://${svc.host}.${baseDomain}:${toString svc.port}${svc.healthcheck.path}";
+          in
+          {
+            job_name = "blackbox-${name}";
+            metrics_path = "/probe";
+            params.module = [ "http_2xx" ];
+            static_configs = [
+              {
+                targets = [ targetUrl ];
+                labels = {
+                  service = name;
+                  machine = svc.host;
+                };
+              }
+            ];
+            relabel_configs = [
+              {
+                source_labels = [ "__address__" ];
+                target_label = "__param_target";
+              }
+              {
+                source_labels = [ "__param_target" ];
+                target_label = "instance";
+              }
+              {
+                replacement = "127.0.0.1:9115";
+                target_label = "__address__";
+              }
+            ];
+          }
+        ) httpServices;
       in
       {
         nfp.services.prometheus = {
@@ -621,7 +633,6 @@ with lib;
               ring = {
                 instance_interface_names = [
                   "lo"
-                  "wlp0s20f3"
                   "tailscale0"
                 ];
                 kvstore.store = "inmemory";

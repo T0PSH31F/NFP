@@ -64,12 +64,13 @@ in
         "dir_mode=0775"
         # Buffalo LinkStation requires SMB 1.0 (NT1)
         "vers=1.0"
+        "soft"
         # Systemd automount — only mount on first access, unmount after idle
         "x-systemd.automount"
         "noauto"
-        "x-systemd.idle-timeout=120"
+        "x-systemd.idle-timeout=60"
         "x-systemd.device-timeout=10s"
-        "x-systemd.mount-timeout=30s"
+        "x-systemd.mount-timeout=15s"
         # Correctly mark as network-dependent so it waits for the network
         "_netdev"
         # Ensure clean unmount during shutdown (avoids stale mount on next boot)

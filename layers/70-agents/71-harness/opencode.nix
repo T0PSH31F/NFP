@@ -652,7 +652,7 @@
 
             kong-omni = {
               baseUrl = "http://luffy.nfp.nix:8090/omni/v1";
-              name = "Kong OmniRoute (TODO: when merged)";
+              name = "Kong OmniRoute";
             };
 
             kong-free = {
