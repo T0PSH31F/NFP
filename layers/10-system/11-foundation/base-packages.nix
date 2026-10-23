@@ -1,5 +1,10 @@
 # flake-parts/features/nixos/packages/base.nix
-{ pkgs, inputs, ... }:
+{
+  lib,
+  pkgs,
+  inputs,
+  ...
+}:
 {
   environment.systemPackages = with pkgs; [
     # Archive tools
@@ -30,7 +35,8 @@
     bun
 
     # Development basics
-    git # (Installed via gitFull in dev-packages or other suites)
+    # hiPrio: beats clan-core's gitMinimal with no collision warning (interactive shell git comes from Home-Manager)
+    (lib.hiPrio git) # (Installed via gitFull in dev-packages or other suites)
 
     # Disk management
     btrfs-assistant

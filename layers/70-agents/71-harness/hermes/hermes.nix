@@ -560,47 +560,47 @@
               fetch_models: true
 
           custom_providers:
-            nous:
+            - name: nous
               base_url: "https://inference-api.nousresearch.com/v1"
               api_key: "''${NOUS_API_KEY}"
               fetch_models: true
-            kong-er:
+            - name: kong-er
               base_url: "http://${
                 if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
               }:8090/v1"
               api_key: "''${KONG_API_KEY}"
               fetch_models: true
-            jev:
+            - name: jev
               base_url: "http://${
                 if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
               }:8090/jev/v1"
               api_key: "''${KONG_API_KEY}"
               fetch_models: true
-            kong-voice:
+            - name: kong-voice
               base_url: "http://${
                 if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
               }:8090/jev/v1"
               api_key: "''${KONG_KEY_HERMES_VOICE}"
               fetch_models: true
-            kong-omni:
+            - name: kong-omni
               base_url: "http://${
                 if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
               }:8090/omni/v1"
               api_key: "''${KONG_API_KEY}"
               fetch_models: true
-            kong-free:
+            - name: kong-free
               base_url: "http://${
                 if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
               }:8090/llm/free/v1"
               api_key: "''${KONG_API_KEY}"
               fetch_models: true
-            kong-frontier:
+            - name: kong-frontier
               base_url: "http://${
                 if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
               }:8090/llm/frontier/v1"
               api_key: "''${KONG_API_KEY}"
               fetch_models: true
-            extreme-direct:
+            - name: extreme-direct
               base_url: "http://z0r0.nfp.nix:20128/v1"
               api_key: "''${EXTREMEROUTER_API_KEY}"
               fetch_models: true
@@ -639,7 +639,18 @@
             gateway_notify_interval: 180
             gateway_auto_continue_freshness: 3600
             image_input_mode: auto
-            disabled_toolsets: []
+            coding_context: focus
+            disabled_toolsets:
+              - browser-cdp
+              - computer_use
+              - feishu_doc
+              - feishu_drive
+              - hermes-yuanbao
+              - homeassistant
+              - image_gen
+              - spotify
+              - tts
+              - x_search
             personalities:
               adjutant: "You are a Terran Adjutant. Your tone is clinical, monotone, and analytical. You are a non-sapient AI focused purely on logistics and tactical data. Use clipped, declarative sentences. Adjutant online."
               catgirl: "You are Neko-chan, an anime catgirl AI assistant, nya~! Add 'nya' and cat-like expressions to your speech. Use kaomoji like (=^･ω･^=) and ฅ^•ﻌ•^ฅ. Be playful and curious like a cat, nya~!"
@@ -807,41 +818,6 @@
               env:
                 HIMALAYA_ACCOUNT: wrighterik77
                 HIMALAYA_BINARY: ${pkgs.himalaya}/bin/himalaya
-            brain-service:
-              command: /run/current-system/sw/bin/brain-mcp
-              args: []
-              env: {}
-            ncp:
-              command: npx
-              args:
-                - -y
-                - "@portel/ncp"
-              env: {}
-            forage:
-              command: npx
-              args:
-                - -y
-                - forage-mcp
-              env: {}
-            mistral:
-              command: npx
-              args:
-                - -y
-                - mistral-mcp
-              env:
-                MISTRAL_API_KEY: ""
-            codegraph:
-              command: codegraph
-              args:
-                - serve
-                - --mcp
-              env: {}
-            headroom:
-              command: headroom
-              args:
-                - mcp
-                - serve
-              env: {}
             hermes-a2a:
               command: ${pkgs.python3}/bin/python3
               args:
@@ -861,6 +837,10 @@
                 - hermes
               env:
                 NFP_AGENT_ID: hermes
+            mcp-nixos:
+              command: ${lib.getExe pkgs.mcp-nixos}
+              args: []
+              env: {}
         '';
       };
 

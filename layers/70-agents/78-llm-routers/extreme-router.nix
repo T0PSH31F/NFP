@@ -207,7 +207,6 @@ with lib;
           ];
           environmentFiles = [ effectiveEnvFile ];
           extraOptions = [
-            "--user=1000:1000"
             "--health-cmd=node -e \"fetch('http://127.0.0.1:20128/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""
             "--health-interval=30s"
             "--health-timeout=5s"

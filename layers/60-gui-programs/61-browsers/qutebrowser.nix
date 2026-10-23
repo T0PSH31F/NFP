@@ -14,7 +14,7 @@ in
 
     dashboardUrl = lib.mkOption {
       type = lib.types.str;
-      default = "http://100.64.0.3:3007/";
+      default = "http://luffy.nfp.nix:3007/";
       description = "Default dashboard and start page URL";
     };
   };

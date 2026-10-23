@@ -92,7 +92,17 @@ in
 
   nixos = lib.mkIf cfg.enable {
     programs = {
-      hyprland.enable = true;
+      hyprland = {
+        enable = true;
+        # Strip the competing hyprland-uwsm.desktop so the uwsm-module package wins cleanly
+        package = lib.mkDefault (
+          pkgs.hyprland.overrideAttrs (old: {
+            postInstall = (old.postInstall or "") + ''
+              rm -f $out/share/wayland-sessions/hyprland-uwsm.desktop
+            '';
+          })
+        );
+      };
       hyprlock.enable = true;
 
       uwsm = {

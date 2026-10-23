@@ -66,7 +66,6 @@ in
         antimicrox
         bottles
         gamemode
-        gamescope
         goverlay
         mangohud
         vintagestory

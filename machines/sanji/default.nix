@@ -109,7 +109,7 @@
         routers = {
           extreme-router.host = "100.64.0.1";
           freellmapi.port = lib.mkForce 3001;
-          freellmpool.port = lib.mkForce 8080;
+          freellmpool.port = lib.mkForce 8083;
         };
       };
       omniroute = {

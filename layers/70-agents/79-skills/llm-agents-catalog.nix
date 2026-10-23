@@ -50,7 +50,6 @@ let
       "agent-deck"
       "agentdesk"
       "gascity"
-      "gastown"
       #"gnhf"
       "herdr"
       #"kandev"

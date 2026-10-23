@@ -14,6 +14,7 @@
   config,
   lib,
   pkgs,
+  inputs,
   ...
 }:
 {
@@ -36,9 +37,11 @@
           "http://127.0.0.1:${toString (config.services.ai-services.kong-gateway.proxyPort or 8090)}"
         else
           "http://sanji.nfp.nix:8090";
+      llmPkgs = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system} or { };
+      claudePkg = llmPkgs.claude-code or pkgs.claude-code or null;
     in
     lib.mkIf cfg.enable {
-      environment.systemPackages = lib.optional (pkgs ? claude-code) pkgs.claude-code;
+      environment.systemPackages = lib.optional (claudePkg != null) claudePkg;
       environment.sessionVariables = {
         ANTHROPIC_BASE_URL = kongBase;
         CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY = "1";

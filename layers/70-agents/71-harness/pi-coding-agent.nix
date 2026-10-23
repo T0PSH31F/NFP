@@ -88,7 +88,7 @@ in
     enableMcp = mkOption {
       type = types.bool;
       default = true;
-      description = "Enable Model Context Protocol (MCP) integrations with Hermes, ContextForge, and NixOS MCP";
+      description = "Enable Model Context Protocol (MCP) integrations with MCP-NixOS, Jev Decision Engine, and Shared Todo";
     };
 
     autoCommit = mkOption {
@@ -413,13 +413,10 @@ in
 
         piMcp = {
           mcpServers = optionalAttrs cfg.enableMcp {
-            hermes-a2a = {
-              url = "http://127.0.0.1:8085/mcp";
-              description = "Hermes Autonomous Worker A2A Gateway";
-            };
-            context-forge = {
-              url = osConfig.layers.layer-20.endpoints.context-forge.baseUrl or "http://127.0.0.1:8000";
-              description = "ContextForge Universal MCP/A2A Gateway";
+            mcp-nixos = {
+              command = "${lib.getExe pkgs.mcp-nixos}";
+              args = [ ];
+              description = "NixOS package and option query";
             };
             jev-decision = {
               command = "${pkgs.python3}/bin/python3";

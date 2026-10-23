@@ -60,14 +60,6 @@ with lib;
           # Kiro CLI MCP & A2A Inter-Agent Gateway Configuration
           xdg.configFile."kiro/mcp.json".text = builtins.toJSON {
             mcpServers = optionalAttrs cfg.enableA2A {
-              hermes-a2a = {
-                url = "http://127.0.0.1:8085/mcp";
-                description = "Hermes Autonomous Worker A2A Gateway";
-              };
-              context-forge = {
-                url = osConfig.layers.layer-20.endpoints.context-forge.baseUrl;
-                description = "ContextForge Universal MCP/A2A Gateway";
-              };
               mcp-nixos = {
                 command = "${lib.getExe pkgs.mcp-nixos}";
                 args = [ ];

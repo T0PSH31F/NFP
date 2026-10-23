@@ -42,7 +42,8 @@ in
         ];
 
         # Ensure netcat-openbsd is available for SSH SOCKS5 ProxyCommand
-        environment.systemPackages = [ pkgs.netcat-openbsd ];
+        # (hiPrio: beats nixpkgs' netcat so the openbsd variant silently wins)
+        environment.systemPackages = [ (lib.hiPrio pkgs.netcat-openbsd) ];
 
         systemd.services.${cfg.serviceName} = {
           description = "Tailscale client daemon for friend tailnet (userspace proxy)";

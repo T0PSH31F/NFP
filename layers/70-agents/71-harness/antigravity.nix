@@ -87,14 +87,6 @@
       # Antigravity MCP & A2A Inter-Agent Gateway Configuration
       xdg.configFile."antigravity/mcp_config.json".text = builtins.toJSON {
         mcpServers = lib.optionalAttrs cfg.enableA2A {
-          hermes-a2a = {
-            url = "${osConfig.layers.layer-20.endpoints.hermes-gateway.baseUrl}/mcp";
-            description = "Hermes Autonomous Worker A2A Gateway";
-          };
-          context-forge = {
-            url = osConfig.layers.layer-20.endpoints.context-forge.baseUrl;
-            description = "ContextForge Universal MCP/A2A Gateway";
-          };
           brain-service = {
             command = "/run/current-system/sw/bin/brain-mcp";
             args = [ ];

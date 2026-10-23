@@ -24,6 +24,14 @@ in
     programs.firefox = {
       enable = true;
       configPath = ".mozilla/firefox";
+      policies = {
+        Homepage = {
+          URL = "http://luffy.nfp.nix:3007/";
+          Locked = false;
+          StartPage = "homepage";
+        };
+        NewTabPage = true;
+      };
     };
   };
 }

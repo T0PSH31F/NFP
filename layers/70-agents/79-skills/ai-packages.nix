@@ -64,7 +64,6 @@ in
             librechat
             nextjs-ollama-llm-ui
             skills
-            beads
             openshell
             # gemini-cli removed from nixpkgs — superseded by Antigravity CLI
             # jan
@@ -76,7 +75,6 @@ in
           ++ optionals cfg.enableCodingAgents (
             filter (p: p != null) [
               (pkgs.agentsploit or null)
-              (llmPkgs.claude-code or pkgs.claude-code or null)
               (llmPkgs.goose-cli or null)
               (llmPkgs.opencode or pkgs.opencode or null)
               (inputs.pi.packages.${pkgs.stdenv.hostPlatform.system}.default or null)

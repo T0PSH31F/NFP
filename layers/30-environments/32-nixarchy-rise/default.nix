@@ -283,6 +283,9 @@ in
             unbind = $mod, period
             bind = $mod, period, exec, rofi-todo
             bind = $mod SHIFT, period, exec, rofi-todo --quick-add
+
+            # Ensure Nixarchy Rise status bar and Omarchy shell launch even if session manager is bypassed
+            exec-once = systemctl --user start --no-block nixarchy-state-init.service omarchy-shell.service quickshell-rise.service
           '';
 
           "hypr/experiences/active-experience.conf".text = ''

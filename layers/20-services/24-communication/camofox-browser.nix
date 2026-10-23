@@ -65,7 +65,8 @@ in
     environment.systemPackages = [
       camofoxPkg
       camoufoxBin
-      pkgs.xvfb
+      # lowPriority: xwayland wins the shared man/doc paths; Xvfb bin has no name collision
+      (lib.lowPrio pkgs.xvfb)
       pkgs.x11vnc
       pkgs.novnc
     ];
