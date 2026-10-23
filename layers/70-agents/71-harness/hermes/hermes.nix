@@ -450,6 +450,13 @@
               ${pkgs.jq}/bin/jq --arg token "$TOKEN" '.remoteApiKey = $token' "${config.services.hermes-agent.stateDir}/.hermes/desktop.json" > "${config.services.hermes-agent.stateDir}/.hermes/desktop.json.tmp" && mv "${config.services.hermes-agent.stateDir}/.hermes/desktop.json.tmp" "${config.services.hermes-agent.stateDir}/.hermes/desktop.json" || true
             fi
           fi
+          # Upgrade any legacy claude-3-7-sonnet / claude-3-5-sonnet default in mutable config.yaml to Nous Portal's most intelligent free model
+          if [ -f "${config.services.hermes-agent.stateDir}/.hermes/config.yaml" ]; then
+            ${pkgs.gnused}/bin/sed -i \
+              -e 's|default:.*claude-3-7-sonnet.*|default: reflection/beam-1.0-501b-a23b:free|g' \
+              -e 's|fallback:.*claude-3-5-sonnet.*|fallback: jev/free-first|g' \
+              "${config.services.hermes-agent.stateDir}/.hermes/config.yaml" || true
+          fi
         '';
       };
 
@@ -484,11 +491,18 @@
           # Mutable runtime prefs live in ~/.hermes/config.yaml (user-owned).
 
           model:
-            default: "jev/free-first"
-            fallback: "kong-er/Coding"
+            provider: nous
+            base_url: "https://inference-api.nousresearch.com/v1"
+            default: "reflection/beam-1.0-501b-a23b:free"
+            fallback: "jev/free-first"
             api_mode: chat_completions
 
           providers:
+            nous:
+              base_url: "https://inference-api.nousresearch.com/v1"
+              api_key: "''${NOUS_API_KEY}"
+              request_timeout_seconds: 180
+              fetch_models: true
             kong-er:
               base_url: "http://${
                 if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
@@ -545,6 +559,10 @@
               fetch_models: true
 
           custom_providers:
+            nous:
+              base_url: "https://inference-api.nousresearch.com/v1"
+              api_key: "''${NOUS_API_KEY}"
+              fetch_models: true
             kong-er:
               base_url: "http://${
                 if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
@@ -587,6 +605,7 @@
               fetch_models: true
 
           fallback_providers:
+            - nous
             - jev
             - kong-er
             - kong-free
