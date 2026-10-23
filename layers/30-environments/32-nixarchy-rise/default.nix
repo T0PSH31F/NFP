@@ -163,6 +163,14 @@ in
       pkgs.xdg-terminal-exec
       pkgs.mako
       pkgs.matugen # Material You color token generator
+      # Compatibility wrapper for Omarchy scripts expecting GNOME Nautilus
+      (pkgs.writeShellScriptBin "nautilus" ''
+        if command -v dolphin >/dev/null 2>&1; then
+          exec dolphin "$@"
+        else
+          exec xdg-open "$@"
+        fi
+      '')
     ];
 
     environment.sessionVariables = {
