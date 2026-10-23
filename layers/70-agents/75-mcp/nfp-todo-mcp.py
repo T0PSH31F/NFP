@@ -456,6 +456,69 @@ def format_rofi_lines(todo_path: str, section_filter: Optional[str] = None) -> s
     return "\n".join(lines)
 
 
+def op_write_report(
+    todo_path: str,
+    target_query: str,
+    caller_agent: str,
+    title: str,
+    report_markdown: str,
+    gate_status: str = "completed",
+) -> Dict[str, Any]:
+    """Write a structured Markdown report in ~/Notes/EverOS/reports/ and link it to the task in todo.md."""
+    caller = normalize_section_slug(caller_agent) or "pi"
+    base_dir = os.path.dirname(os.path.abspath(todo_path))
+    reports_dir = os.path.join(base_dir, "reports")
+    os.makedirs(reports_dir, exist_ok=True)
+
+    date_str = datetime.now().strftime("%Y-%m-%d")
+    slug = re.sub(r"[^a-z0-9]+", "-", title.lower()).strip("-")[:48] or "task"
+    filename = f"{date_str}-{caller}-{slug}.md"
+    report_path = os.path.join(reports_dir, filename)
+
+    header = (
+        f"# NFP Autonomous Agent Report: {title}\n\n"
+        f"- **Agent:** `{CANONICAL_SECTIONS.get(caller, caller)}`\n"
+        f"- **Date:** `{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}`\n"
+        f"- **Gate Status:** `{gate_status.upper()}`\n\n---\n\n"
+    )
+    with open(report_path, "w", encoding="utf-8") as rf:
+        rf.write(header + report_markdown.strip() + "\n")
+
+    # Link the report on the task in todo.md inside caller's section
+    with FileLock():
+        ensure_todo_file(todo_path)
+        with open(todo_path, "r", encoding="utf-8") as f:
+            content = f.read()
+        preamble, sec_map = parse_document(content)
+        target_lines = sec_map.get(caller, [])
+        q_low = target_query.strip().lower()
+        updated_task = None
+        for idx, line in enumerate(target_lines):
+            m = TASK_RE.match(line)
+            if not m:
+                continue
+            indent, status_ch, item_text = m.group(1), m.group(2), m.group(3)
+            if q_low and q_low in item_text.lower():
+                clean_text = re.sub(r"\s*\(\[Report\]\([^)]+\)\)", "", item_text).strip()
+                clean_text = re.sub(r"\s*\[⏳ AWAITING-APPROVAL\]", "", clean_text).strip()
+                new_status = "x" if gate_status.lower() == "completed" else ">"
+                suffix = f" [⏳ AWAITING-APPROVAL] ([Report](reports/{filename}))" if gate_status.lower() != "completed" else f" ([Report](reports/{filename}))"
+                target_lines[idx] = f"{indent}- [{new_status}] {clean_text}{suffix}"
+                updated_task = target_lines[idx]
+                break
+        sec_map[caller] = target_lines
+        atomic_write(todo_path, serialize_document(preamble, sec_map))
+
+    return {
+        "status": "ok",
+        "agent": caller,
+        "gate_status": gate_status,
+        "report_path": report_path,
+        "relative_link": f"reports/{filename}",
+        "updated_task": updated_task,
+    }
+
+
 # ── MCP Stdio JSON-RPC 2.0 Server ─────────────────────────────────────────
 def detect_default_agent() -> str:
     for env_k in ("NFP_AGENT_ID", "AGENT_NAME", "MCP_CLIENT_NAME"):
@@ -536,6 +599,31 @@ def run_mcp_stdio(todo_path: str, default_agent: str) -> None:
                 "required": ["query", "agent"],
             },
         },
+        {
+            "name": "todo_write_report",
+            "description": "Write a Markdown completion or approval-gate readiness report in ~/Notes/EverOS/reports/ and link it to your task in todo.md.",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "query": {"type": "string", "description": "Task text substring in your ## <Agent> section"},
+                    "title": {"type": "string", "description": "Report title"},
+                    "report_markdown": {
+                        "type": "string",
+                        "description": "Detailed Markdown report (sub-steps completed, verification evidence, remaining approval-gate actions)",
+                    },
+                    "gate_status": {
+                        "type": "string",
+                        "enum": ["completed", "awaiting_approval"],
+                        "description": "Whether the task is fully completed or paused at an Erik approval gate",
+                    },
+                    "agent": {
+                        "type": "string",
+                        "description": "Your agent identity (hermes, pi, opencode, claude, gemini)",
+                    },
+                },
+                "required": ["query", "title", "report_markdown"],
+            },
+        },
     ]
 
     for raw_line in sys.stdin:
@@ -602,6 +690,15 @@ def run_mcp_stdio(todo_path: str, default_agent: str) -> None:
                     target_query=str(args.get("query", "")),
                     caller_agent=caller,
                 )
+            elif tname == "todo_write_report":
+                res = op_write_report(
+                    todo_path,
+                    target_query=str(args.get("query", "")),
+                    caller_agent=caller,
+                    title=str(args.get("title", "Task Report")),
+                    report_markdown=str(args.get("report_markdown", "")),
+                    gate_status=str(args.get("gate_status", "completed")),
+                )
             else:
                 res = {"status": "error", "error": f"Unknown tool: {tname}"}
 
@@ -653,6 +750,12 @@ def main() -> None:
     p_claim = subparsers.add_parser("claim", help="Claim an open task from ## Erik into an agent section")
     p_claim.add_argument("query", nargs="+", help="Task text substring in ## Erik")
 
+    p_report = subparsers.add_parser("report", help="Write a completion or approval-gate report and link it in todo.md")
+    p_report.add_argument("--query", required=True, help="Task substring in your section")
+    p_report.add_argument("--title", required=True, help="Report title")
+    p_report.add_argument("--status", choices=["completed", "awaiting_approval"], default="completed")
+    p_report.add_argument("--body", required=True, help="Markdown body content")
+
     args = parser.parse_args()
     todo_path = os.path.expanduser(args.file) if args.file else resolve_todo_path()
 
@@ -702,6 +805,18 @@ def main() -> None:
     if args.subcommand == "claim":
         q = " ".join(args.query)
         res = op_claim(todo_path, target_query=q, caller_agent=caller)
+        print(json.dumps(res))
+        sys.exit(0 if res.get("status") == "ok" else 1)
+
+    if args.subcommand == "report":
+        res = op_write_report(
+            todo_path,
+            target_query=args.query,
+            caller_agent=caller,
+            title=args.title,
+            report_markdown=args.body,
+            gate_status=args.status,
+        )
         print(json.dumps(res))
         sys.exit(0 if res.get("status") == "ok" else 1)
 

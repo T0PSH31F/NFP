@@ -230,6 +230,14 @@ else
   fi
 fi
 
+# ── 6. Pi Durable 24/7 Daemon (:8089) ──────────────────────────────────
+PI_DAEMON_HEALTH="$(curl -sf --max-time 3 "http://127.0.0.1:8089/healthz" 2>/dev/null || true)"
+if [[ -n $PI_DAEMON_HEALTH ]] && echo "$PI_DAEMON_HEALTH" | grep -q '"status": "ok"'; then
+  pass "pi-durable-daemon" "http://127.0.0.1:8089/healthz active (${PI_DAEMON_HEALTH})"
+else
+  fail "pi-durable-daemon" "http://127.0.0.1:8089/healthz unreachable"
+fi
+
 echo "------------------------------------------------------------------------"
 echo " Summary: ${PASSES} passed, ${FAILURES} failed"
 echo "========================================================================"

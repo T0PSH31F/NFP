@@ -126,6 +126,10 @@ in
               if ! curl -sf --max-time 3 "${kongBaseUrl}/health" >/dev/null 2>&1; then
                 FAILURES+=("kong-gateway:${kongBaseUrl}")
               fi
+              if ! curl -sf --max-time 3 "http://127.0.0.1:8089/healthz" >/dev/null 2>&1; then
+                FAILURES+=("pi-durable-daemon:8089")
+                systemctl restart pi-durable-daemon.service >/dev/null 2>&1 || true
+              fi
 
               TS="$(date -Iseconds)"
               if [ "''${#FAILURES[@]}" -eq 0 ]; then

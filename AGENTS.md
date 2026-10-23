@@ -75,3 +75,62 @@ clan machines update z0r0     # update specific machine (e.g. z0r0, luffy)
 
 - **Git Identity**: Ensure git commits use proper user email/name (`t0psh31f <wrighterik77@gmail.com>`) instead of placeholder defaults (`t0psh31f@example.com`).
 - **Cross-Machine Impact**: Note cross-machine impact in commit footers (shared layers affect both z0r0 and luffy).
+
+---
+
+## 8. Multi-Agent Communication & Mandatory Voice Notifications
+
+- **Mandatory Voice Notifications (ALL AGENTS)**:
+  - Every AI agent (`Antigravity/Gemini`, `Hermes`, `Pi`, `OpenCode`, `Claude Code`, `Codex`) MUST vocalize task completions, major updates, alerts, and notifications in GLaDOS voice using:
+    ```bash
+    /home/t0psh31f/.local/bin/glados-tts-cli "<concise 1-2 sentence update in GLaDOS voice>" >/dev/null 2>&1 &
+    ```
+- **How Agents Communicate (A2A & Shared Blackboard)**:
+  1. **Hermes <-> Pi 24/7 Durable A2A Bridge (`hermes-a2a` / `pi-durable-daemon :8089`)**:
+     - Hermes (`:8085` gateway / `:8880` voice) acts as the 24/7 front door and delegates coding, shell, and file-modification work to the durable Pi daemon (`127.0.0.1:8089`) via the `pi_worker_delegate` MCP tool (`layers/70-agents/75-mcp/pi-a2a-mcp.py`).
+     - Pi preserves durable session context in `/persist/var/lib/pi-agent/sessions` across delegations and reboots.
+  2. **Shared Multi-Agent Todo Blackboard (`nfp-todo` MCP + `~/Notes/EverOS/todo.md`)**:
+     - All agents share a single canonical Markdown file (`~/Notes/EverOS/todo.md`, symlinked to `~/Notes/todo.md`) with `fcntl.flock` locking and section-scoped write guards (`## Erik`, `## Hermes`, `## Pi`, `## OpenCode`, `## Claude`, `## Gemini`, `## Ideas`).
+     - Agents read the full board via `todo_list`, update only their own fenced section via `todo_add` / `todo_complete`, and claim tasks tagged `@<agent>` from `## Erik` via `todo_claim`.
+  3. **Shared Semantic Memory (`OpenViking :20120` & `ContextForge :8000`)**:
+     - Long-term architectural facts, session transcripts, and cross-agent artifacts are indexed in OpenViking (`http://127.0.0.1:20120`) and ContextForge (`http://127.0.0.1:8000`).
+
+
+---
+
+## 8. Multi-Agent Communication & Mandatory Voice Notifications
+
+- **Mandatory Voice Notifications (ALL AGENTS)**:
+  - Every AI agent (`Antigravity/Gemini`, `Hermes`, `Pi`, `OpenCode`, `Claude Code`, `Codex`) MUST vocalize task completions, major updates, alerts, and notifications in GLaDOS voice using:
+    ```bash
+    /home/t0psh31f/.local/bin/glados-tts-cli "<concise 1-2 sentence update in GLaDOS voice>" >/dev/null 2>&1 &
+    ```
+- **How Agents Communicate (A2A & Shared Blackboard)**:
+  1. **Hermes <-> Pi 24/7 Durable A2A Bridge (`hermes-a2a` / `pi-durable-daemon :8089`)**:
+     - Hermes (`:8085` gateway / `:8880` voice) acts as the 24/7 front door and delegates coding, shell, and file-modification work to the durable Pi daemon (`127.0.0.1:8089`) via the `pi_worker_delegate` MCP tool (`layers/70-agents/75-mcp/pi-a2a-mcp.py`).
+     - Pi preserves durable session context in `/persist/var/lib/pi-agent/sessions` across delegations and reboots.
+  2. **Shared Multi-Agent Todo Blackboard (`nfp-todo` MCP + `~/Notes/EverOS/todo.md`)**:
+     - All agents share a single canonical Markdown file (`~/Notes/EverOS/todo.md`, symlinked to `~/Notes/todo.md`) with `fcntl.flock` locking and section-scoped write guards (`## Erik`, `## Hermes`, `## Pi`, `## OpenCode`, `## Claude`, `## Gemini`, `## Ideas`).
+     - Agents read the full board via `todo_list`, update only their own fenced section via `todo_add` / `todo_complete`, and claim tasks tagged `@<agent>` from `## Erik` via `todo_claim`.
+  3. **Shared Semantic Memory (`OpenViking :20120` & `ContextForge :8000`)**:
+     - Long-term architectural facts, session transcripts, and cross-agent artifacts are indexed in OpenViking (`http://127.0.0.1:20120`) and ContextForge (`http://127.0.0.1:8000`).
+
+
+---
+
+## 8. Multi-Agent Communication & Mandatory Voice Notifications
+
+- **Mandatory Voice Notifications (ALL AGENTS)**:
+  - Every AI agent (`Antigravity/Gemini`, `Hermes`, `Pi`, `OpenCode`, `Claude Code`, `Codex`) MUST vocalize task completions, major updates, alerts, and notifications in GLaDOS voice using:
+    ```bash
+    /home/t0psh31f/.local/bin/glados-tts-cli "<concise 1-2 sentence update in GLaDOS voice>" >/dev/null 2>&1 &
+    ```
+- **How Agents Communicate (A2A & Shared Blackboard)**:
+  1. **Hermes <-> Pi 24/7 Durable A2A Bridge (`hermes-a2a` / `pi-durable-daemon :8089`)**:
+     - Hermes (`:8085` gateway / `:8880` voice) acts as the 24/7 front door and delegates coding, shell, and file-modification work to the durable Pi daemon (`127.0.0.1:8089`) via the `pi_worker_delegate` MCP tool (`layers/70-agents/75-mcp/pi-a2a-mcp.py`).
+     - Pi preserves durable session context in `/persist/var/lib/pi-agent/sessions` across delegations and reboots.
+  2. **Shared Multi-Agent Todo Blackboard (`nfp-todo` MCP + `~/Notes/EverOS/todo.md`)**:
+     - All agents share a single canonical Markdown file (`~/Notes/EverOS/todo.md`, symlinked to `~/Notes/todo.md`) with `fcntl.flock` locking and section-scoped write guards (`## Erik`, `## Hermes`, `## Pi`, `## OpenCode`, `## Claude`, `## Gemini`, `## Ideas`).
+     - Agents read the full board via `todo_list`, update only their own fenced section via `todo_add` / `todo_complete`, and claim tasks tagged `@<agent>` from `## Erik` via `todo_claim`.
+  3. **Shared Semantic Memory (`OpenViking :20120` & `ContextForge :8000`)**:
+     - Long-term architectural facts, session transcripts, and cross-agent artifacts are indexed in OpenViking (`http://127.0.0.1:20120`) and ContextForge (`http://127.0.0.1:8000`).

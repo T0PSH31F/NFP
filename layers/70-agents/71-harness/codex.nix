@@ -101,9 +101,20 @@
         env_key = "EXTREMEROUTER_API_KEY"
         wire_api = "responses"
       '';
+      codexInstructions = ''
+        # NFP Codex — Mandatory Operating & Voice Notification Directives
+
+        1. **Mandatory Voice Notifications (ALWAYS ACTIVE)**:
+           - Always vocalize task completions, milestone updates, and alerts using GLaDOS voice in the background:
+             `/home/t0psh31f/.local/bin/glados-tts-cli "<concise update in GLaDOS voice>" >/dev/null 2>&1 &`
+        2. **Multi-Agent Communication (`~/Notes/EverOS/todo.md`)**:
+           - Coordinate with other agents via `nfp-todo` (`~/Notes/EverOS/todo.md`) and the 24/7 Pi Durable Worker (`http://127.0.0.1:8089/v1/delegate`).
+      '';
     in
     lib.mkIf cfg.enable {
       xdg.configFile."codex/config.toml".text = codexConfigToml;
       home.file.".codex/config.toml".text = codexConfigToml;
+      xdg.configFile."codex/AGENTS.md".text = codexInstructions;
+      home.file.".codex/AGENTS.md".text = codexInstructions;
     };
 }

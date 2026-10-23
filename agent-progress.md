@@ -290,3 +290,21 @@ Append one entry per session, newest at the bottom. Never edit past entries.
   - `./init.sh --worktree` passed 5/5 across `luffy`, `z0r0`, and `sanji`.
 - **State change:** passing (evidence recorded in feature_list.json)
 - **Next action:** Commit changes (`git commit --no-verify`).
+
+- **Date / Agent:** 2026-10-23 / antigravity
+- **Feature:** shared-agent-todo-mcp-and-infomarchy-desktop (Durable Pi + Hermes Autonomous Decomposition, Reports, Token Optimization & Voice Rule)
+- **Work done:**
+  1. Universal Voice Notification Rule (`glados-tts-cli`):
+     - Added Mandatory Acoustic Vocalization Directive and Multi-Agent Communication protocol to `GEMINI.md`, `AGENTS.md`, `CLAUDE.md`, `pi-coding-agent.nix` (`~/.pi/agent/AGENTS.md`), `hermes.nix` (`agent.system_prompt`), `opencode.nix` (`~/.config/opencode/AGENTS.md`), `claude-code.nix` (`~/.claude/CLAUDE.md`), and `codex.nix` (`~/.codex/AGENTS.md`).
+  2. Durable 24/7 Pi Daemon & Autonomous Task Decomposition + Report Generation (`layers/70-agents/71-harness/pi-durable-daemon.py`, `layers/70-agents/75-mcp/nfp-todo-mcp.py`, `layers/70-agents/75-mcp/pi-a2a-mcp.py`):
+     - Added `systemd.services.pi-durable-daemon` (`127.0.0.1:8089`, `Restart = "always"`, `/persist/var/lib/pi-agent/sessions`, monitored by `hermes-voice-watchdog`).
+     - Added `todo_write_report` (`nfp-todo report`) writing structured Markdown reports to `~/Notes/EverOS/reports/<YYYY-MM-DD>-<agent>-<slug>.md` and linking `([Report](reports/...))` directly in `~/Notes/EverOS/todo.md`.
+     - Upgraded `pi-durable-daemon.py` (`poll_shared_todo_loop` + `/v1/decompose`) and `pi-a2a-mcp.py` (`pi_decompose_and_advance`) so both `Pi` and `Hermes` break tasks into `[SAFE-AUTO]` vs `[APPROVAL-GATE]` steps, execute 100% of `[SAFE-AUTO]` preparation/refinement using `jev/free-first` and `jev/cascade-balanced` (free & subscription quota models), pause cleanly at approval gates (`[⏳ AWAITING-APPROVAL]`), and write completion/readiness reports.
+  3. Hermes Token & Context Hygiene Optimization (`layers/70-agents/71-harness/hermes/hermes.nix`):
+     - Set `model.default = "jev/free-first"` with `fallback = "kong-er/Coding"` so routine turns use zero-cost models and coding/tool turns cascade through included quota before touching frontier models.
+     - Reduced `file_read_max_chars` (`100000` -> `32000`), `tool_output.max_bytes` (`50000` -> `16384`), `max_lines` (`2000` -> `400`), `max_turns` (`130` -> `50`), enabled `tool_loop_guardrails.hard_stop_enabled = true`, and tightened `compression` (`threshold: 0.60`, `protect_last_n: 10`, `hygiene_hard_message_limit: 120`).
+- **Verification:**
+  - `curl -sf http://127.0.0.1:8089/healthz` verified active with `free-first`, `cascade-balanced`, and `frontier` tiers.
+  - `./init.sh --worktree` passed 5/5.
+- **State change:** passing
+- **Next action:** Commit and run `clan machines update sanji`.

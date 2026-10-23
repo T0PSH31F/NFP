@@ -102,9 +102,67 @@ in
       default = 2048;
       description = "Token budget allocated for deep reasoning/thinking steps";
     };
+
+    enableDaemon = mkOption {
+      type = types.bool;
+      default = true;
+      description = "Run Pi as a durable 24/7 background worker daemon (pi-durable-daemon.service) with persistent /persist sessions and autonomous shared-todo polling.";
+    };
+
+    daemonPort = mkOption {
+      type = types.port;
+      default = 8089;
+      description = "Loopback port for the 24/7 Pi Durable Worker HTTP/A2A daemon.";
+    };
   };
 
   config = mkIf cfg.enable {
+    users.users.${user}.linger = lib.mkDefault true;
+
+    systemd.tmpfiles.rules = [
+      "d /persist/var/lib/pi-agent 0750 ${user} users -"
+      "d /persist/var/lib/pi-agent/sessions 0750 ${user} users -"
+    ];
+
+    systemd.services.pi-durable-daemon = mkIf cfg.enableDaemon {
+      description = "Pi Durable 24/7 Coding Worker & Shared-Todo Autonomous Daemon";
+      after = [ "network-online.target" ];
+      wants = [ "network-online.target" ];
+      wantedBy = [ "multi-user.target" ];
+      path = [
+        pkgs.bash
+        pkgs.coreutils
+        pkgs.git
+        pkgs.ripgrep
+        pkgs.python3
+        pkgs.piper-tts
+        pkgs.pipewire
+      ]
+      ++ optional (cfg.package != null) cfg.package;
+      environment = {
+        HOME = "/home/${user}";
+        USER = user;
+        PI_CODING_AGENT_DIR = "/home/${user}/.pi/agent";
+        PI_SESSION_DIR = "/persist/var/lib/pi-agent/sessions";
+        PI_STATE_DIR = "/persist/var/lib/pi-agent";
+        PI_DAEMON_HOST = "127.0.0.1";
+        PI_DAEMON_PORT = toString cfg.daemonPort;
+        PI_PROVIDER = "kong";
+        PI_DEFAULT_MODEL = cfg.defaultModel;
+        OPENAI_BASE_URL = cfg.routerEndpoint;
+        XDG_RUNTIME_DIR = "/run/user/1000";
+      };
+      serviceConfig = {
+        Type = "simple";
+        User = user;
+        Group = "users";
+        WorkingDirectory = "/home/${user}";
+        ExecStart = "${pkgs.python3}/bin/python3 ${./pi-durable-daemon.py}";
+        Restart = "always";
+        RestartSec = "5s";
+      };
+    };
+
     environment.systemPackages = optional (cfg.package != null) cfg.package ++ [
       (pkgs.writeShellScriptBin "nfp-llm-doctor" (
         builtins.readFile ../../00-cyberia/06-scripts/nfp-llm-doctor.sh
@@ -368,11 +426,40 @@ in
               args = [ "${../75-mcp/jev-mcp.py}" ];
               description = "Jev System-1 Decision Engine, Telemetry & Triage Oversight";
             };
+            nfp-todo = {
+              command = "${pkgs.python3}/bin/python3";
+              args = [
+                "${../75-mcp/nfp-todo-mcp.py}"
+                "--mcp"
+                "--agent"
+                "pi"
+              ];
+              description = "Shared Multi-Agent Todo List (Pi fenced section + @pi claim)";
+            };
           };
         };
+
+        piGlobalInstructions = ''
+          # NFP Pi Durable Agent — Mandatory Operating & Voice Notification Directives
+
+          1. **Mandatory Voice Notifications (ALWAYS ACTIVE)**:
+             - For every task completion, milestone update, error alert, or advisory, you MUST trigger a concise 1-2 sentence GLaDOS voice notification in the background:
+               `/home/t0psh31f/.local/bin/glados-tts-cli "<concise update in GLaDOS voice>" >/dev/null 2>&1 &`
+          2. **Multi-Agent Communication & Shared Todo (`~/Notes/EverOS/todo.md`)**:
+             - Read shared tasks across all agents using `nfp-todo list` (or MCP tool `todo_list`).
+             - Only add or toggle tasks inside your own fenced section (`## Pi`) via `nfp-todo --agent pi add "<task>"` or `todo_add` / `todo_complete`.
+             - Claim tasks delegated to `@pi` in `## Erik` via `nfp-todo --agent pi claim "<match>"` (`todo_claim`).
+             - Hand off tasks to other agents by tagging `@hermes`, `@opencode`, `@claude`, or `@gemini`.
+          3. **Kong Gateway & Jev Tier Routing**:
+             - Default provider is `kong` (`http://127.0.0.1:8090/v1`) and Jev decision router (`http://127.0.0.1:20127/v1`).
+        '';
       in
       {
         config = {
+          # Pi Global Agent Instructions (~/.pi/agent/AGENTS.md and ~/.config/pi/agent/AGENTS.md)
+          home.file.".pi/agent/AGENTS.md".text = piGlobalInstructions;
+          xdg.configFile."pi/agent/AGENTS.md".text = piGlobalInstructions;
+
           # Pi User Settings (~/.pi/agent/settings.json and ~/.config/pi/agent/settings.json)
           home.file.".pi/agent/settings.json".text = builtins.toJSON piSettings;
           xdg.configFile."pi/agent/settings.json".text = builtins.toJSON piSettings;

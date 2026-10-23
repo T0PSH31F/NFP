@@ -67,6 +67,17 @@
           CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY = "1";
         };
       };
+      claudeInstructions = ''
+        # NFP Claude Code — Mandatory Operating & Voice Notification Directives
+
+        1. **Mandatory Voice Notifications (ALWAYS ACTIVE)**:
+           - For every task completion, milestone update, or alert, trigger a concise 1-2 sentence GLaDOS voice notification in the background:
+             `/home/t0psh31f/.local/bin/glados-tts-cli "<concise update in GLaDOS voice>" >/dev/null 2>&1 &`
+        2. **Multi-Agent Communication & Shared Todo (`~/Notes/EverOS/todo.md`)**:
+           - Read the shared multi-agent todo board via `nfp-todo list` (or MCP tool `todo_list`).
+           - Update only your fenced section (`## Claude`) via `nfp-todo --agent claude add|toggle` and claim `@claude` tasks from `## Erik` via `nfp-todo --agent claude claim`.
+           - Delegate durable background tasks to Pi (`127.0.0.1:8089/v1/delegate` or `@pi` tag) or Hermes (`127.0.0.1:8085`).
+      '';
     in
     lib.mkIf cfg.enable {
       home.packages = lib.optional (
@@ -75,5 +86,7 @@
 
       xdg.configFile."claude/settings.json".text = claudeSettings;
       home.file.".claude/settings.json".text = claudeSettings;
+      xdg.configFile."claude/CLAUDE.md".text = claudeInstructions;
+      home.file.".claude/CLAUDE.md".text = claudeInstructions;
     };
 }

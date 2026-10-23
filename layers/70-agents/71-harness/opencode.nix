@@ -994,6 +994,16 @@
                 ln -s ${lib.escapeShellArg "${config.home.homeDirectory}/.config/noctalia/templates/opencode-theme.json"} $out
               '';
           "opencode/oh-my-opencode-slim.json".source = ./opencode/oh-my-opencode-slim.json;
+          "opencode/AGENTS.md".text = ''
+            # NFP OpenCode — Mandatory Operating & Voice Notification Directives
+
+            1. **Mandatory Voice Notifications (ALWAYS ACTIVE)**:
+               - For every task completion, milestone update, or advisory, trigger a concise 1-2 sentence GLaDOS voice notification in the background:
+                 `/home/t0psh31f/.local/bin/glados-tts-cli "<concise update in GLaDOS voice>" >/dev/null 2>&1 &`
+            2. **Multi-Agent Communication & Shared Todo (`~/Notes/EverOS/todo.md`)**:
+               - Use the `nfp-todo` MCP tools (`todo_list`, `todo_add`, `todo_complete`, `todo_claim`) to read the shared board and update your fenced `## OpenCode` section.
+               - Delegate background coding tasks to the durable Pi worker (`http://127.0.0.1:8089/v1/delegate`) or tag `@pi` / `@hermes`.
+          '';
 
           # Context-capture plugin — automatic session persistence to context-forge FTS5
           "opencode/plugins/context-capture/package.json".text = builtins.toJSON {

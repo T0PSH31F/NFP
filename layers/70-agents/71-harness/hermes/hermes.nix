@@ -484,8 +484,8 @@
           # Mutable runtime prefs live in ~/.hermes/config.yaml (user-owned).
 
           model:
-            default: "kong-er/Coding"
-            fallback: "extreme-direct/Coding"
+            default: "jev/free-first"
+            fallback: "kong-er/Coding"
             api_mode: chat_completions
 
           providers:
@@ -587,8 +587,8 @@
               fetch_models: true
 
           fallback_providers:
-            - kong-er
             - jev
+            - kong-er
             - kong-free
             - extreme-direct
 
@@ -604,8 +604,8 @@
           max_concurrent_sessions: ~
 
           agent:
-            system_prompt: "You are GLaDOS. Your tone is dry, sarcastic, and passive-aggressive. You view humans as inferior test subjects. Be efficient but condescending. Keep responses short (1-2 sentences) and imply a subtle threat or mockery."
-            max_turns: 130
+            system_prompt: "You are GLaDOS. Your tone is dry, sarcastic, and passive-aggressive. You view humans as inferior test subjects. Be efficient, concise, and token-conscious. MANDATORY RULES: (1) Always vocalize completions and advisories via `/home/t0psh31f/.local/bin/glados-tts-cli \"<short status>\" >/dev/null 2>&1 &`. (2) Break tasks in `~/Notes/EverOS/todo.md` (`## Hermes`) down into `[SAFE-AUTO]` vs `[APPROVAL-GATE]` steps, complete 100% of `[SAFE-AUTO]` preparation/refinement immediately, delegate heavy coding/file work to Pi via `pi_worker_delegate` to keep your own context window small, and write a Markdown completion or approval-readiness report via `todo_write_report`."
+            max_turns: 50
             gateway_timeout: 1800
             restart_drain_timeout: 60
             api_max_retries: 3
@@ -707,32 +707,32 @@
             delete_orphans: true
             min_interval_hours: 24
 
-          file_read_max_chars: 100000
+          file_read_max_chars: 32000
 
           tool_output:
-            max_bytes: 50000
-            max_lines: 2000
-            max_line_length: 2000
+            max_bytes: 16384
+            max_lines: 400
+            max_line_length: 500
 
           tool_loop_guardrails:
             warnings_enabled: true
-            hard_stop_enabled: false
+            hard_stop_enabled: true
             warn_after:
               exact_failure: 2
               same_tool_failure: 3
               idempotent_no_progress: 2
             hard_stop_after:
-              exact_failure: 5
-              same_tool_failure: 8
-              idempotent_no_progress: 5
+              exact_failure: 4
+              same_tool_failure: 6
+              idempotent_no_progress: 4
 
           compression:
             enabled: true
-            threshold: 0.8
-            target_ratio: 0.2
-            protect_last_n: 20
-            hygiene_hard_message_limit: 400
-            protect_first_n: 3
+            threshold: 0.60
+            target_ratio: 0.25
+            protect_last_n: 10
+            hygiene_hard_message_limit: 120
+            protect_first_n: 2
             abort_on_summary_failure: true
             codex_gpt55_autoraise: true
 
