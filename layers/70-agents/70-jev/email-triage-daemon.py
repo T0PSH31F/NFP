@@ -411,6 +411,17 @@ def run_triage(args):
                 history.append(record)
                 total_triaged += 1
 
+                if is_escalation:
+                    glados_alert = "/home/t0psh31f/.local/bin/glados-alert.sh"
+                    if os.path.exists(glados_alert):
+                        sender_short = parsed["from"][:25]
+                        subj_short = parsed["subject"][:40]
+                        alert_msg = f"Attention. Urgent email requiring triage from {sender_short}. Subject: {subj_short}."
+                        try:
+                            subprocess.Popen([glados_alert, alert_msg])
+                        except Exception:
+                            pass
+
                 send_langfuse_trace(
                     name="jev-email-triage-maildir",
                     input_data={"subject": parsed["subject"], "from": parsed["from"]},

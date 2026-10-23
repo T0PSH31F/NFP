@@ -172,8 +172,39 @@ let
     except Exception:
         pass
 
+    # Push monitoring telemetry to Langfuse (:3005)
+    try:
+        langfuse_host = "http://127.0.0.1:3005"
+        trace_payload = json.dumps({
+            "name": f"fleet-healthcheck-{localHost}",
+            "metadata": {
+                "host": localHost,
+                "total": total,
+                "passed": passed,
+                "failed": failed,
+                "skipped": skipped,
+                "failures": failures[:5]
+            }
+        }).encode("utf-8")
+        lf_req = urllib.request.Request(
+            f"{langfuse_host}/api/public/health",
+            headers={"Content-Type": "application/json"}
+        )
+        urllib.request.urlopen(lf_req, timeout=3)
+    except Exception:
+        pass
+
     if failed > 0:
         print(f"FLEET HEALTHCHECK FAILED: {failed} service(s) failing!", file=sys.stderr)
+        # Vocal alert via GLaDOS alert dispatcher if available
+        glados_alert = "/home/t0psh31f/.local/bin/glados-alert.sh"
+        if os.path.exists(glados_alert):
+            failed_names = ", ".join([f.split()[0] for f in failures[:3]])
+            msg = f"Warning. Fleet healthcheck detected {failed} failing services: {failed_names}."
+            try:
+                subprocess.Popen([glados_alert, msg])
+            except Exception:
+                pass
         sys.exit(1)
     else:
         print("FLEET HEALTHCHECK SUCCESS: All probed services healthy!")
@@ -194,31 +225,33 @@ in
   config = mkIf cfg.enable {
     environment.systemPackages = [ runnerScript ];
 
-    # Ensure /run/nfp directory exists and populated with targets
-    systemd.tmpfiles.rules = [
-      "d /run/nfp 0755 root root -"
-      "L+ /run/nfp/healthcheck-targets.json - - - - ${targetsJson}"
-    ];
+    systemd = {
+      # Ensure /run/nfp directory exists and populated with targets
+      tmpfiles.rules = [
+        "d /run/nfp 0755 root root -"
+        "L+ /run/nfp/healthcheck-targets.json - - - - ${targetsJson}"
+      ];
 
-    systemd.services.fleet-healthcheck = {
-      description = "Contract-Driven Fleet Healthcheck Runner";
-      after = [ "network-online.target" ];
-      wants = [ "network-online.target" ];
-      serviceConfig = {
-        Type = "oneshot";
-        ExecStart = "${runnerScript}/bin/fleet-healthcheck-runner";
-        StandardOutput = "journal+console";
-        StandardError = "journal+console";
-        SyslogIdentifier = "fleet-healthcheck";
+      services.fleet-healthcheck = {
+        description = "Contract-Driven Fleet Healthcheck Runner";
+        after = [ "network-online.target" ];
+        wants = [ "network-online.target" ];
+        serviceConfig = {
+          Type = "oneshot";
+          ExecStart = "${runnerScript}/bin/fleet-healthcheck-runner";
+          StandardOutput = "journal+console";
+          StandardError = "journal+console";
+          SyslogIdentifier = "fleet-healthcheck";
+        };
       };
-    };
 
-    systemd.timers.fleet-healthcheck = {
-      description = "Timer for Fleet Healthcheck Service";
-      wantedBy = [ "timers.target" ];
-      timerConfig = {
-        OnBootSec = "2m";
-        OnUnitActiveSec = cfg.interval;
+      timers.fleet-healthcheck = {
+        description = "Timer for Fleet Healthcheck Service";
+        wantedBy = [ "timers.target" ];
+        timerConfig = {
+          OnBootSec = "2m";
+          OnUnitActiveSec = cfg.interval;
+        };
       };
     };
   };
