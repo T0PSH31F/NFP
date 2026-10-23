@@ -411,6 +411,7 @@
         "L+ /var/lib/hermes/.hermes/skills/harness-session-protocol - hermes hermes - ${../opencode/skills/harness-session-protocol}"
         "L+ /var/lib/hermes/.hermes/skills/nfp-module-authoring - hermes hermes - ${../opencode/skills/nfp-module-authoring}"
         "L+ /var/lib/hermes/.hermes/skills/persistence-audit - hermes hermes - ${../opencode/skills/persistence-audit}"
+        "L+ /var/lib/hermes/.hermes/skills/desktop-customization - hermes hermes - ${../../79-skills/desktop-customization}"
         # Harness HERMES.md workspace pointer file
         "L+ /var/lib/hermes/.hermes/HERMES.md - hermes hermes - ${pkgs.writeText "HERMES.md" ''
           # NFP Repo Instructions for Hermes

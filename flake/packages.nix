@@ -47,6 +47,33 @@
               ../layers/00-cyberia/08-iso/noctalia-installer.nix
             ];
           }).config.system.build.isoImage;
+
+        noctalia-vm =
+          (inputs.nixpkgs.lib.nixosSystem {
+            inherit system;
+            specialArgs = {
+              inherit inputs;
+              modulesPath = "${inputs.nixpkgs}/nixos/modules";
+              inherit (import ../layers/80-lib/81-helpers/mkDendriticModule.nix { inherit (inputs.nixpkgs) lib; })
+                mkDendriticModule
+                ;
+              inherit (import ../layers/80-lib/81-helpers/mkDendriticTree.nix { inherit (inputs.nixpkgs) lib; })
+                mkDendriticTree
+                ;
+            };
+            modules = [
+              ../layers/00-cyberia/04-templates/vm/noctalia-umbriel-vm.nix
+            ];
+          }).config.system.build.vm;
+      };
+
+      apps.noctalia-vm = {
+        type = "app";
+        program = "${
+          inputs.nixpkgs.legacyPackages.${system}.writeShellScriptBin "run-noctalia-vm" ''
+            exec nix run .#packages.${system}.noctalia-vm "$@"
+          ''
+        }/bin/run-noctalia-vm";
       };
 
       apps.deploy = {

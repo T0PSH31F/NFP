@@ -1,0 +1,236 @@
+"""Tests for install/resolver.py — package resolution and sudo escalation."""
+from __future__ import annotations
+
+import subprocess
+import unittest
+from unittest.mock import MagicMock, patch
+
+
+class InstallPackagesTests(unittest.TestCase):
+    def _ok(self):
+        m = MagicMock()
+        m.returncode = 0
+        return m
+
+    def _fail(self):
+        m = MagicMock()
+        m.returncode = 1
+        return m
+
+    def test_with_password_passes_stdin_to_sudo_S(self):
+        from workflow.nodes.install.resolver import install_packages
+
+        errors = []
+        with patch("workflow.nodes.install.resolver._package_installed", return_value=False), \
+             patch("workflow.nodes.install.resolver.subprocess.run", return_value=self._ok()) as mock_run:
+            install_packages(["some-pkg"], errors, sudo_password="secret")
+
+        self.assertEqual(errors, [])
+        call_args = mock_run.call_args
+        cmd = call_args.args[0]
+        self.assertIn("-S", cmd)
+        self.assertIn("-p", cmd)
+        self.assertIn("-k", cmd)
+        self.assertIn("pacman", cmd)
+        self.assertEqual(call_args.kwargs.get("input"), "secret\n")
+
+    def test_without_password_falls_through_to_sudo_n(self):
+        from workflow.nodes.install.resolver import install_packages
+
+        errors = []
+        calls = []
+
+        def side_effect(cmd, **kwargs):
+            calls.append(cmd)
+            m = MagicMock()
+            m.returncode = 0
+            return m
+
+        with patch("workflow.nodes.install.resolver._package_installed", return_value=False), \
+             patch("workflow.nodes.install.resolver.subprocess.run", side_effect=side_effect):
+            install_packages(["some-pkg"], errors, sudo_password="")
+
+        self.assertEqual(errors, [])
+        # The call should use sudo -n, not sudo -S (stdin password)
+        matching = [cmd for cmd in calls if "-n" in cmd]
+        self.assertTrue(matching, f"Expected a sudo -n call; got calls: {calls}")
+        # No call should have both 'sudo' and '-S' adjacent (the stdin password flag)
+        for cmd in calls:
+            if "sudo" in cmd:
+                sudo_idx = cmd.index("sudo")
+                # sudo -S would appear right after 'sudo'; -n should be there instead
+                if sudo_idx + 1 < len(cmd):
+                    self.assertNotEqual(cmd[sudo_idx + 1], "-S")
+
+    def test_pacman_failure_falls_through_to_yay(self):
+        from workflow.nodes.install.resolver import install_packages
+
+        errors = []
+
+        def side_effect(cmd, **kwargs):
+            m = MagicMock()
+            m.returncode = 1 if "pacman" in cmd else 0
+            return m
+
+        with patch("workflow.nodes.install.resolver.subprocess.run", side_effect=side_effect):
+            install_packages(["aur-pkg"], errors, sudo_password="")
+
+        self.assertEqual(errors, [])
+
+    def test_all_fail_appends_to_errors(self):
+        from workflow.nodes.install.resolver import install_packages
+
+        errors = []
+        with patch("workflow.nodes.install.resolver.subprocess.run", return_value=self._fail()):
+            install_packages(["missing-pkg"], errors, sudo_password="")
+
+        self.assertIn("missing-pkg", errors)
+
+    def test_pacman_timeout_appends_to_errors(self):
+        from workflow.nodes.install.resolver import install_packages
+
+        errors = []
+        with patch("workflow.nodes.install.resolver.subprocess.run",
+                   side_effect=subprocess.TimeoutExpired(cmd=[], timeout=300)):
+            install_packages(["slow-pkg"], errors, sudo_password="secret")
+
+        self.assertIn("slow-pkg", errors)
+
+    def test_yay_timeout_appends_to_errors(self):
+        from workflow.nodes.install.resolver import install_packages
+
+        errors = []
+
+        def side_effect(cmd, **kwargs):
+            if "pacman" in cmd:
+                m = MagicMock()
+                m.returncode = 1
+                return m
+            raise subprocess.TimeoutExpired(cmd=[], timeout=300)
+
+        with patch("workflow.nodes.install.resolver.subprocess.run", side_effect=side_effect):
+            install_packages(["aur-pkg"], errors, sudo_password="")
+
+        self.assertIn("aur-pkg", errors)
+
+    def test_multiple_packages_each_attempted(self):
+        from workflow.nodes.install.resolver import install_packages
+
+        errors = []
+        ok = MagicMock()
+        ok.returncode = 0
+
+        with patch("workflow.nodes.install.resolver.subprocess.run", return_value=ok) as mock_run:
+            install_packages(["pkg-a", "pkg-b", "pkg-c"], errors, sudo_password="")
+
+        self.assertEqual(errors, [])
+        self.assertGreaterEqual(mock_run.call_count, 3)
+
+    def test_already_installed_package_is_not_reported_failed(self):
+        from workflow.nodes.install.resolver import install_packages
+
+        errors = []
+        with patch("workflow.nodes.install.resolver._package_installed", return_value=True), \
+             patch("workflow.nodes.install.resolver._try_install_pkg") as try_install:
+            install_packages(["breeze"], errors, sudo_password="")
+
+        self.assertEqual(errors, [])
+        try_install.assert_not_called()
+
+    def test_resolve_packages_adds_eww_for_kde_widget_layout(self):
+        from workflow.nodes.install.resolver import resolve_packages
+
+        design = {"widget_layout": [{"name": "clock"}]}
+        with patch("workflow.nodes.install.resolver.shutil.which", return_value=False):
+            pkgs = resolve_packages(design, {"desktop_recipe": "kde"})
+
+        self.assertIn("eww", pkgs)
+
+    def test_resolve_packages_adds_eww_for_custom_chrome_strategy(self):
+        from workflow.nodes.install.resolver import resolve_packages
+
+        design = {"chrome_strategy": {"method": "eww_frame", "implementation_targets": ["window border"]}}
+        with patch("workflow.nodes.install.resolver.shutil.which", return_value=False):
+            pkgs = resolve_packages(design, {"desktop_recipe": "kde"})
+
+        self.assertIn("eww", pkgs)
+
+
+class CanSudoNoninteractiveTests(unittest.TestCase):
+    def test_returns_true_when_sudo_n_succeeds(self):
+        from workflow.nodes.install.resolver import can_sudo_noninteractive
+
+        ok = MagicMock()
+        ok.returncode = 0
+        with patch("workflow.nodes.install.resolver.subprocess.run", return_value=ok):
+            self.assertTrue(can_sudo_noninteractive())
+
+    def test_returns_false_when_sudo_n_fails(self):
+        from workflow.nodes.install.resolver import can_sudo_noninteractive
+
+        fail = MagicMock()
+        fail.returncode = 1
+        with patch("workflow.nodes.install.resolver.subprocess.run", return_value=fail):
+            self.assertFalse(can_sudo_noninteractive())
+
+
+class VerifyInstalledTests(unittest.TestCase):
+    def test_returns_empty_when_all_installed(self):
+        from workflow.nodes.install.resolver import verify_installed
+
+        ok = MagicMock()
+        ok.returncode = 0
+        with patch("workflow.nodes.install.resolver.subprocess.run", return_value=ok):
+            missing = verify_installed(["pkg-a", "pkg-b"])
+
+        self.assertEqual(missing, [])
+
+    def test_returns_missing_packages(self):
+        from workflow.nodes.install.resolver import verify_installed
+
+        def side_effect(cmd, **kwargs):
+            m = MagicMock()
+            m.returncode = 1 if "pkg-b" in cmd else 0
+            return m
+
+        with patch("workflow.nodes.install.resolver.subprocess.run", side_effect=side_effect):
+            missing = verify_installed(["pkg-a", "pkg-b"])
+
+        self.assertEqual(missing, ["pkg-b"])
+
+
+class InstallNodeMilestoneTests(unittest.TestCase):
+    """Verify install_node stamps session.md when key transitions occur."""
+
+    def _state(self):
+        return {
+            "design": {"name": "x", "palette": {}, "mood_tags": []},
+            "device_profile": {},
+            "session_dir": "/tmp/rice-session-test",
+        }
+
+    def test_no_packages_records_milestone(self):
+        from workflow.nodes import install as install_pkg
+        with patch.object(install_pkg, "resolve_packages", return_value=[]), \
+             patch.object(install_pkg, "append_step") as step:
+            install_pkg.install_node(self._state())
+        step.assert_called_once()
+        args = step.call_args.args
+        self.assertEqual(args[1], 5)
+
+    def test_successful_install_records_milestone(self):
+        from workflow.nodes import install as install_pkg
+        with patch.object(install_pkg, "resolve_packages", return_value=["pkg-a"]), \
+             patch.object(install_pkg, "interrupt", return_value="install"), \
+             patch.object(install_pkg, "can_sudo_noninteractive", return_value=True), \
+             patch.object(install_pkg, "install_packages"), \
+             patch.object(install_pkg, "append_step") as step:
+            install_pkg.install_node(self._state())
+        step.assert_called_once()
+        # Note text should mention package count.
+        note = step.call_args.args[2] if len(step.call_args.args) > 2 else step.call_args.kwargs.get("note", "")
+        self.assertIn("1", note)
+
+
+if __name__ == "__main__":
+    unittest.main()

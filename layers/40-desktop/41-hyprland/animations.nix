@@ -35,15 +35,14 @@ in
           input_methods_ignorealpha = 0.8;
         };
 
-        # ── Lightsaber Aura Shadow ──
+        # ── Window Shadow (Subtle Neutral Shadow by Default) ──
         shadow = {
-          enabled = true;
-          range = 50;
-          offset = "0 4";
-          render_power = 10;
-          # color = "$shadow_color";
-          color = lib.mkForce "$primary";
-          color_inactive = "0x00000000";
+          enabled = lib.mkDefault false;
+          range = lib.mkDefault 20;
+          offset = lib.mkDefault "0 2";
+          render_power = lib.mkDefault 3;
+          color = lib.mkDefault "rgba(00000044)";
+          color_inactive = lib.mkDefault "0x00000000";
         };
 
       };

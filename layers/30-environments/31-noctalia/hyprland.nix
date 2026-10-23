@@ -67,6 +67,18 @@ in
           # Noctalia Hyprland Experience Configuration
           $ipc = noctalia msg
 
+          # Decoration — Noctalia Lightsaber Aura Shadow
+          decoration {
+            shadow {
+              enabled = true
+              range = 50
+              offset = 0 4
+              render_power = 10
+              color = $primary
+              color_inactive = 0x00000000
+            }
+          }
+
           # Layer rules
           layerrule = blur 1, match:namespace ^noctalia-(bar-.+|notification|dock|panel|attached-panel|osd)$
           layerrule = blur_popups 1, match:namespace ^noctalia-(bar-.+|notification|dock|panel|attached-panel|osd)$

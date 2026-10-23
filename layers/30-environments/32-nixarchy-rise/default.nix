@@ -163,6 +163,52 @@ in
       pkgs.xdg-terminal-exec
       pkgs.mako
       pkgs.matugen # Material You color token generator
+      pkgs.mpvpaper # Live video wallpaper for Wayland
+      pkgs.jq
+      # Universal wallpaper switcher for image & mp4/video backgrounds
+      (pkgs.writeShellScriptBin "nfp-wallpaper" ''
+        set -euo pipefail
+        TARGET="''${1:-}"
+        if [[ -z "$TARGET" ]]; then
+          echo "Usage: nfp-wallpaper <path-to-image-or-video>" >&2
+          exit 1
+        fi
+        TARGET="$(realpath "$TARGET")"
+        if [[ ! -f "$TARGET" ]]; then
+          echo "File does not exist: $TARGET" >&2
+          exit 1
+        fi
+        EXT="''${TARGET##*.}"
+        EXT="''${EXT,,}"
+        mkdir -p "$HOME/.local/state/omarchy/current"
+        ln -nsf "$TARGET" "$HOME/.local/state/omarchy/current/background"
+        if [[ "$EXT" =~ ^(mp4|webm|mkv|mov|avi)$ ]]; then
+          pkill -x mpvpaper 2>/dev/null || true
+          MONITORS=$(hyprctl monitors -j 2>/dev/null | ${pkgs.jq}/bin/jq -r '.[].name' 2>/dev/null || echo "*")
+          for MON in $MONITORS; do
+            ${pkgs.mpvpaper}/bin/mpvpaper -p -o "no-audio loop" "$MON" "$TARGET" &
+          done
+        else
+          pkill -x mpvpaper 2>/dev/null || true
+          if command -v awww >/dev/null 2>&1; then
+            awww img "$TARGET" 2>/dev/null || true
+          fi
+          if command -v swww >/dev/null 2>&1; then
+            swww img "$TARGET" 2>/dev/null || true
+          fi
+        fi
+        if command -v omarchy >/dev/null 2>&1; then
+          omarchy theme bg set "$TARGET" >/dev/null 2>&1 || true
+        fi
+      '')
+      # Compatibility wrapper for Omarchy scripts expecting GNOME Nautilus
+      (pkgs.writeShellScriptBin "nautilus" ''
+        if command -v dolphin >/dev/null 2>&1; then
+          exec dolphin "$@"
+        else
+          exec xdg-open "$@"
+        fi
+      '')
     ];
 
     environment.sessionVariables = {
@@ -416,6 +462,46 @@ in
               Type = "oneshot";
               RemainAfterExit = true;
               ExecStart = "${pkgs.bash}/bin/bash -c 'mkdir -p %h/.config/matugen && [ -f %h/.local/share/current-wallpaper ] && ${pkgs.matugen}/bin/matugen image %h/.local/share/current-wallpaper || true'";
+            };
+          };
+
+          # Video wallpaper daemon — auto-play mpvpaper when background is an MP4/video
+          nfp-video-wallpaper = {
+            Unit = {
+              Description = "NFP Live Video Wallpaper Manager";
+              After = [ "graphical-session.target" ];
+              PartOf = [ "graphical-session.target" ];
+            };
+            Install = {
+              WantedBy = [ "graphical-session.target" ];
+            };
+            Service = {
+              Restart = "always";
+              RestartSec = "3s";
+              ExecStart = pkgs.writeShellScript "nfp-video-wallpaper-daemon" ''
+                BG_LINK="$HOME/.local/state/omarchy/current/background"
+                LAST_BG=""
+                while true; do
+                  if [ -L "$BG_LINK" ] || [ -f "$BG_LINK" ]; then
+                    CURR_BG="$(readlink -f "$BG_LINK" 2>/dev/null || true)"
+                    if [ "$CURR_BG" != "$LAST_BG" ]; then
+                      LAST_BG="$CURR_BG"
+                      EXT="''${CURR_BG##*.}"
+                      EXT="''${EXT,,}"
+                      if [[ "$EXT" =~ ^(mp4|webm|mkv|mov|avi)$ ]] && [ -f "$CURR_BG" ]; then
+                        ${pkgs.procps}/bin/pkill -x mpvpaper 2>/dev/null || true
+                        MONITORS=$(${pkgs.hyprland}/bin/hyprctl monitors -j 2>/dev/null | ${pkgs.jq}/bin/jq -r '.[].name' 2>/dev/null || echo "*")
+                        for MON in $MONITORS; do
+                          ${pkgs.mpvpaper}/bin/mpvpaper -p -o "no-audio loop" "$MON" "$CURR_BG" &
+                        done
+                      else
+                        ${pkgs.procps}/bin/pkill -x mpvpaper 2>/dev/null || true
+                      fi
+                    fi
+                  fi
+                  sleep 2
+                done
+              '';
             };
           };
         };
