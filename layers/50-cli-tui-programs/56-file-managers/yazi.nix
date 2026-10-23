@@ -64,12 +64,56 @@ in
         };
         open = {
           rules = [
-            { name = "*/"; use = [ "edit" "helix" "open" "reveal" ]; }
-            { mime = "text/*"; use = [ "edit" "helix" "reveal" ]; }
-            { mime = "application/json"; use = [ "edit" "helix" "reveal" ]; }
-            { mime = "application/javascript"; use = [ "edit" "helix" "reveal" ]; }
-            { mime = "application/x-sh"; use = [ "edit" "helix" "reveal" ]; }
-            { mime = "*"; use = [ "edit" "helix" "open" "reveal" ]; }
+            {
+              name = "*/";
+              use = [
+                "edit"
+                "helix"
+                "open"
+                "reveal"
+              ];
+            }
+            {
+              mime = "text/*";
+              use = [
+                "edit"
+                "helix"
+                "reveal"
+              ];
+            }
+            {
+              mime = "application/json";
+              use = [
+                "edit"
+                "helix"
+                "reveal"
+              ];
+            }
+            {
+              mime = "application/javascript";
+              use = [
+                "edit"
+                "helix"
+                "reveal"
+              ];
+            }
+            {
+              mime = "application/x-sh";
+              use = [
+                "edit"
+                "helix"
+                "reveal"
+              ];
+            }
+            {
+              mime = "*";
+              use = [
+                "edit"
+                "helix"
+                "open"
+                "reveal"
+              ];
+            }
           ];
         };
       };

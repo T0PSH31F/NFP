@@ -32,13 +32,15 @@
   };
 
   # ── Boot & kernel ────────────────────────────────────────────────────────
-  boot.kernelPackages = pkgs.linuxPackages_latest;
-  boot.zfs.forceImportRoot = false;
-  boot.supportedFilesystems = [
-    "btrfs"
-    "vfat"
-    "ext4"
-  ];
+  boot = {
+    kernelPackages = pkgs.linuxPackages_latest;
+    zfs.forceImportRoot = false;
+    supportedFilesystems = [
+      "btrfs"
+      "vfat"
+      "ext4"
+    ];
+  };
 
   # ── Network ──────────────────────────────────────────────────────────────
   networking = {

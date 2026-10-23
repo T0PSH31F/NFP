@@ -71,14 +71,16 @@ in
       openwakeword.enable = cfg.openwakeword.enable;
     };
 
-    systemd.services.wyoming-faster-whisper-local = mkIf cfg.faster-whisper.enable {
-      serviceConfig.Restart = mkForce "always";
-    };
-    systemd.services.wyoming-piper-local = mkIf cfg.piper.enable {
-      serviceConfig.Restart = mkForce "always";
-    };
-    systemd.services.wyoming-openwakeword = mkIf cfg.openwakeword.enable {
-      serviceConfig.Restart = mkForce "always";
+    systemd.services = {
+      wyoming-faster-whisper-local = mkIf cfg.faster-whisper.enable {
+        serviceConfig.Restart = mkForce "always";
+      };
+      wyoming-piper-local = mkIf cfg.piper.enable {
+        serviceConfig.Restart = mkForce "always";
+      };
+      wyoming-openwakeword = mkIf cfg.openwakeword.enable {
+        serviceConfig.Restart = mkForce "always";
+      };
     };
 
     networking.firewall = {

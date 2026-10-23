@@ -11,8 +11,12 @@
       infrastructure.langfuse.enable = lib.mkDefault true;
     };
     # Monitoring (temp-intensive RAG workloads)
-    layers.layer-20.services.config.monitoring.enable = lib.mkDefault true;
-    layers.layer-20.services.config.syncthing.enable = lib.mkDefault true;
-    layers.layer-20.services.backups.restic.enable = lib.mkDefault true;
+    layers.layer-20.services = {
+      config = {
+        monitoring.enable = lib.mkDefault true;
+        syncthing.enable = lib.mkDefault true;
+      };
+      backups.restic.enable = lib.mkDefault true;
+    };
   };
 }

@@ -19,36 +19,38 @@ in
   };
 
   home = lib.mkIf cfg.enable {
-    programs.nushell = {
-      enable = true;
-      package = pkgs.nushell;
-      configFile.text = ''
-        $env.config = {
-          show_banner: false
-          edit_mode: "vi"
-          ls: {
-            use_ls_colors: true
-            clickable_links: true
+    programs = {
+      nushell = {
+        enable = true;
+        package = pkgs.nushell;
+        configFile.text = ''
+          $env.config = {
+            show_banner: false
+            edit_mode: "vi"
+            ls: {
+              use_ls_colors: true
+              clickable_links: true
+            }
+            rm: {
+              always_trash: false
+            }
+            table: {
+              mode: rounded
+              index_mode: always
+            }
           }
-          rm: {
-            always_trash: false
-          }
-          table: {
-            mode: rounded
-            index_mode: always
-          }
-        }
-      '';
-    };
+        '';
+      };
 
-    programs.zoxide = {
-      enable = true;
-      enableNushellIntegration = true;
-    };
+      zoxide = {
+        enable = true;
+        enableNushellIntegration = true;
+      };
 
-    programs.direnv = {
-      enable = true;
-      enableNushellIntegration = true;
+      direnv = {
+        enable = true;
+        enableNushellIntegration = true;
+      };
     };
 
     home.persistence."/persist/home/${config.home.username}" = {

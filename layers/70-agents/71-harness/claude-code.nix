@@ -80,13 +80,20 @@
       '';
     in
     lib.mkIf cfg.enable {
-      home.packages = lib.optional (
-        pkgs ? vscode-extension-anthropic-claude-code
-      ) pkgs.vscode-extension-anthropic-claude-code;
+      home = {
+        packages = lib.optional (
+          pkgs ? vscode-extension-anthropic-claude-code
+        ) pkgs.vscode-extension-anthropic-claude-code;
 
-      xdg.configFile."claude/settings.json".text = claudeSettings;
-      home.file.".claude/settings.json".text = claudeSettings;
-      xdg.configFile."claude/CLAUDE.md".text = claudeInstructions;
-      home.file.".claude/CLAUDE.md".text = claudeInstructions;
+        file = {
+          ".claude/settings.json".text = claudeSettings;
+          ".claude/CLAUDE.md".text = claudeInstructions;
+        };
+      };
+
+      xdg.configFile = {
+        "claude/settings.json".text = claudeSettings;
+        "claude/CLAUDE.md".text = claudeInstructions;
+      };
     };
 }

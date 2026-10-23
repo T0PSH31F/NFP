@@ -45,9 +45,11 @@ in
       ];
 
       # Modern power management for hybrid architectures
-      services.power-profiles-daemon.enable = lib.mkDefault true;
-      services.thermald.enable = lib.mkForce false; # Often fails on 12th gen laptops
-      services.hardware.bolt.enable = true;
+      services = {
+        power-profiles-daemon.enable = lib.mkDefault true;
+        thermald.enable = lib.mkForce false; # Often fails on 12th gen laptops
+        hardware.bolt.enable = true;
+      };
     })
 
     # i7-13850HX (13th gen Raptor Lake) - sanji
@@ -62,9 +64,11 @@ in
       ];
 
       # Modern power management for hybrid architectures
-      services.power-profiles-daemon.enable = lib.mkDefault true;
-      services.thermald.enable = lib.mkForce false;
-      services.hardware.bolt.enable = true;
+      services = {
+        power-profiles-daemon.enable = lib.mkDefault true;
+        thermald.enable = lib.mkForce false;
+        hardware.bolt.enable = true;
+      };
     })
   ];
 }

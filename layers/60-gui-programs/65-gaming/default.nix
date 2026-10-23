@@ -35,28 +35,31 @@ in
   };
 
   nixos = mkIf config.layers.layer-60.gui.gaming.enable {
-    programs.steam = mkIf config.layers.layer-60.gui.gaming.enableSteam {
-      enable = true;
-      remotePlay.openFirewall = true;
-      dedicatedServer.openFirewall = true;
-      gamescopeSession.enable = true;
-      extraCompatPackages = with pkgs; [ proton-ge-bin ];
-      extraPackages = with pkgs; [ util-linux ];
-    };
+    programs = {
+      steam = mkIf config.layers.layer-60.gui.gaming.enableSteam {
+        enable = true;
+        remotePlay.openFirewall = true;
+        dedicatedServer.openFirewall = true;
+        gamescopeSession.enable = true;
+        extraCompatPackages = with pkgs; [ proton-ge-bin ];
+        extraPackages = with pkgs; [ util-linux ];
+      };
 
-    programs.gamemode = mkIf config.layers.layer-60.gui.gaming.enableGamemode {
-      enable = true;
-      enableRenice = true;
-      settings = {
-        general.renice = 10;
-        custom = {
-          start = "${pkgs.libnotify}/bin/notify-send 'GameMode started'";
-          end = "${pkgs.libnotify}/bin/notify-send 'GameMode ended'";
+      gamemode = mkIf config.layers.layer-60.gui.gaming.enableGamemode {
+        enable = true;
+        enableRenice = true;
+        settings = {
+          general.renice = 10;
+          custom = {
+            start = "${pkgs.libnotify}/bin/notify-send 'GameMode started'";
+            end = "${pkgs.libnotify}/bin/notify-send 'GameMode ended'";
+          };
         };
       };
+
+      fuse.enable = true;
     };
 
-    programs.fuse.enable = true;
     environment.systemPackages =
       with pkgs;
       [
@@ -100,12 +103,14 @@ in
         usb-modeswitch-data
       ]);
 
-    hardware.graphics = {
-      enable = true;
-      enable32Bit = true;
+    hardware = {
+      graphics = {
+        enable = true;
+        enable32Bit = true;
+      };
+      xone.enable = mkDefault true;
+      xpadneo.enable = mkDefault true;
     };
-    hardware.xone.enable = mkDefault true;
-    hardware.xpadneo.enable = mkDefault true;
     services = {
       input-remapper.enable = true;
       system76-scheduler.enable = true;

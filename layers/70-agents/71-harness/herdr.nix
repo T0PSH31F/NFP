@@ -116,14 +116,28 @@ in
       };
     };
 
-    environment.systemPackages = mkIf (cfg.package != null) [
-      cfg.package
-      herdr-setup-workspaces
-    ];
+    environment = {
+      systemPackages = mkIf (cfg.package != null) [
+        cfg.package
+        herdr-setup-workspaces
+      ];
 
-    # Write global configuration file
-    environment.etc."herdr/config.toml".source = configFile;
-    environment.etc."xdg/herdr/config.toml".source = configFile;
+      # Write global configuration file
+      etc = {
+        "herdr/config.toml".source = configFile;
+        "xdg/herdr/config.toml".source = configFile;
+      };
+
+      # Impermanence persistence
+      persistence."/persist" =
+        mkIf (osConfig.layers.layer-10.system.config.impermanence.enable or false)
+          {
+            users.${primaryUser}.directories = [
+              ".config/herdr"
+              ".local/share/herdr"
+            ];
+          };
+    };
 
     # Auto-restore agent workspaces on user session start
     systemd.user.services.herdr-workspaces = mkIf (cfg.package != null) {
@@ -135,15 +149,5 @@ in
         RemainAfterExit = true;
       };
     };
-
-    # Impermanence persistence
-    environment.persistence."/persist" =
-      mkIf (osConfig.layers.layer-10.system.config.impermanence.enable or false)
-        {
-          users.${primaryUser}.directories = [
-            ".config/herdr"
-            ".local/share/herdr"
-          ];
-        };
   };
 }

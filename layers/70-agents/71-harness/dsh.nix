@@ -85,25 +85,27 @@ in
   };
 
   nixos = mkIf (cfg.enable or false) {
-    environment.systemPackages = mkIf (cfg.package != null) [ cfg.package ];
+    environment = {
+      systemPackages = mkIf (cfg.package != null) [ cfg.package ];
 
-    environment.sessionVariables = {
-      OPENAI_BASE_URL = "http://luffy.nfp.nix:8090/v1";
-      OPENAI_BASE_URL_KONG_ER = "http://luffy.nfp.nix:8090/v1";
-      OPENAI_BASE_URL_KONG_OMNI = "http://luffy.nfp.nix:8090/omni/v1";
-      OPENAI_BASE_URL_KONG_FREE = "http://luffy.nfp.nix:8090/llm/free/v1";
-      OPENAI_BASE_URL_KONG_FRONTIER = "http://luffy.nfp.nix:8090/llm/frontier/v1";
-      OPENAI_BASE_URL_EXTREME_DIRECT = "http://127.0.0.1:20128/v1";
+      sessionVariables = {
+        OPENAI_BASE_URL = "http://luffy.nfp.nix:8090/v1";
+        OPENAI_BASE_URL_KONG_ER = "http://luffy.nfp.nix:8090/v1";
+        OPENAI_BASE_URL_KONG_OMNI = "http://luffy.nfp.nix:8090/omni/v1";
+        OPENAI_BASE_URL_KONG_FREE = "http://luffy.nfp.nix:8090/llm/free/v1";
+        OPENAI_BASE_URL_KONG_FRONTIER = "http://luffy.nfp.nix:8090/llm/frontier/v1";
+        OPENAI_BASE_URL_EXTREME_DIRECT = "http://127.0.0.1:20128/v1";
+      };
+
+      # Impermanence: Store manages profile composition (via dsh-nix); ~/.dsh persists runtime state and config
+      persistence."/persist" =
+        mkIf (osConfig.layers.layer-10.system.config.impermanence.enable or false)
+          {
+            users.${primaryUser}.directories = [
+              ".dsh"
+            ];
+          };
     };
-
-    # Impermanence: Store manages profile composition (via dsh-nix); ~/.dsh persists runtime state and config
-    environment.persistence."/persist" =
-      mkIf (osConfig.layers.layer-10.system.config.impermanence.enable or false)
-        {
-          users.${primaryUser}.directories = [
-            ".dsh"
-          ];
-        };
   };
 
   home =

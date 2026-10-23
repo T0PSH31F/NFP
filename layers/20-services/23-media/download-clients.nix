@@ -51,84 +51,101 @@ in
       '';
     };
 
-    # Deluge
-    services.deluge = mkIf cfg.deluge.enable {
-      enable = true;
-      web.enable = true;
-      web.port = cfg.deluge.port;
-      declarative = true;
-      authFile = config.clan.core.vars.generators.deluge.files."authFile".path;
-      config = {
-        download_location = "${mediaCfg.downloadsDir}/torrents";
-        max_active_downloading = 5;
-        max_active_seeding = 10;
-        max_active_limit = 15;
-        random_port = false;
-        listen_ports = [
-          6881
-          6889
-        ];
-        enc_prefer_rc4 = true;
-        enc_level = 1;
+    # Download services
+    services = {
+      # Deluge
+      deluge = mkIf cfg.deluge.enable {
+        enable = true;
+        web.enable = true;
+        web.port = cfg.deluge.port;
+        declarative = true;
+        authFile = config.clan.core.vars.generators.deluge.files."authFile".path;
+        config = {
+          download_location = "${mediaCfg.downloadsDir}/torrents";
+          max_active_downloading = 5;
+          max_active_seeding = 10;
+          max_active_limit = 15;
+          random_port = false;
+          listen_ports = [
+            6881
+            6889
+          ];
+          enc_prefer_rc4 = true;
+          enc_level = 1;
+        };
+        inherit (mediaCfg) user;
+        inherit (mediaCfg) group;
       };
-      inherit (mediaCfg) user;
-      inherit (mediaCfg) group;
-    };
 
-    systemd.services.deluged = mkIf cfg.deluge.enable {
-      serviceConfig.ExecStartPre = [
-        "+${pkgs.writeShellScript "deluged-perms" ''
-          mkdir -p /var/lib/deluge/.config/deluge
-          chown -R ${mediaCfg.user}:${mediaCfg.group} /var/lib/deluge
-          chmod -R u+rwX,g+rX,o= /var/lib/deluge
-        ''}"
-      ];
-    };
+      # Transmission
+      transmission = mkIf cfg.transmission.enable {
+        enable = true;
+        package = pkgs.transmission_4;
+        inherit (mediaCfg) user;
+        inherit (mediaCfg) group;
+        settings = {
+          rpc-bind-address = "0.0.0.0";
+          rpc-port = cfg.transmission.port;
+          rpc-whitelist-enabled = false;
+          download-dir = "${mediaCfg.downloadsDir}/transmission";
+        };
+      };
 
-    # Transmission
-    services.transmission = mkIf cfg.transmission.enable {
-      enable = true;
-      package = pkgs.transmission_4;
-      inherit (mediaCfg) user;
-      inherit (mediaCfg) group;
-      settings = {
-        rpc-bind-address = "0.0.0.0";
-        rpc-port = cfg.transmission.port;
-        rpc-whitelist-enabled = false;
-        download-dir = "${mediaCfg.downloadsDir}/transmission";
+      # Aria2
+      aria2 = mkIf cfg.aria2.enable {
+        enable = true;
+        openPorts = true;
+        rpcSecretFile = config.clan.core.vars.generators.aria2.files."rpc_secret".path;
+        settings = {
+          dir = "${mediaCfg.downloadsDir}/aria2";
+          enable-rpc = true;
+          rpc-listen-port = cfg.aria2.port;
+          rpc-listen-all = true;
+          max-concurrent-downloads = 5;
+          continue = true;
+          save-session = "/var/lib/aria2/session.gz";
+          input-file = "/var/lib/aria2/session.gz";
+          save-session-interval = 60;
+        };
       };
     };
 
-    # Aria2
+    # Aria2 CLI tools
     environment.systemPackages = mkIf cfg.aria2.enable [
       pkgs.aria2
       pkgs.python3Packages.aria2p
     ];
 
-    services.aria2 = mkIf cfg.aria2.enable {
-      enable = true;
-      openPorts = true;
-      rpcSecretFile = config.clan.core.vars.generators.aria2.files."rpc_secret".path;
-      settings = {
-        dir = "${mediaCfg.downloadsDir}/aria2";
-        enable-rpc = true;
-        rpc-listen-port = cfg.aria2.port;
-        rpc-listen-all = true;
-        max-concurrent-downloads = 5;
-        continue = true;
-        save-session = "/var/lib/aria2/session.gz";
-        input-file = "/var/lib/aria2/session.gz";
-        save-session-interval = 60;
-      };
-    };
+    systemd = {
+      services = {
+        deluged = mkIf cfg.deluge.enable {
+          serviceConfig.ExecStartPre = [
+            "+${pkgs.writeShellScript "deluged-perms" ''
+              mkdir -p /var/lib/deluge/.config/deluge
+              chown -R ${mediaCfg.user}:${mediaCfg.group} /var/lib/deluge
+              chmod -R u+rwX,g+rX,o= /var/lib/deluge
+            ''}"
+          ];
+        };
 
-    systemd.services.aria2 = mkIf cfg.aria2.enable {
-      after = [ "network-online.target" ];
-      wants = [ "network-online.target" ];
-      serviceConfig = {
-        User = mkForce mediaCfg.user;
-        Group = mkForce mediaCfg.group;
+        aria2 = mkIf cfg.aria2.enable {
+          after = [ "network-online.target" ];
+          wants = [ "network-online.target" ];
+          serviceConfig = {
+            User = mkForce mediaCfg.user;
+            Group = mkForce mediaCfg.group;
+          };
+        };
       };
+
+      # Directories
+      tmpfiles.rules =
+        (optional cfg.transmission.enable "d /var/lib/transmission 0750 ${mediaCfg.user} ${mediaCfg.group} -")
+        ++ (optionals cfg.aria2.enable [
+          "d ${mediaCfg.downloadsDir}/aria2 0755 ${mediaCfg.user} ${mediaCfg.group} -"
+          "d /var/lib/aria2 0750 ${mediaCfg.user} ${mediaCfg.group} -"
+          "f /var/lib/aria2/session.gz 0644 ${mediaCfg.user} ${mediaCfg.group} -"
+        ]);
     };
 
     clan.core.vars.generators.aria2 = mkIf cfg.aria2.enable {
@@ -149,15 +166,6 @@ in
         fi
       '';
     };
-
-    # Directories
-    systemd.tmpfiles.rules =
-      (optional cfg.transmission.enable "d /var/lib/transmission 0750 ${mediaCfg.user} ${mediaCfg.group} -")
-      ++ (optionals cfg.aria2.enable [
-        "d ${mediaCfg.downloadsDir}/aria2 0755 ${mediaCfg.user} ${mediaCfg.group} -"
-        "d /var/lib/aria2 0750 ${mediaCfg.user} ${mediaCfg.group} -"
-        "f /var/lib/aria2/session.gz 0644 ${mediaCfg.user} ${mediaCfg.group} -"
-      ]);
 
     # Firewall
     networking.firewall.allowedTCPPorts =

@@ -98,51 +98,55 @@ in
     }
     (mkIf config.services.polyfloor.enable {
       # ── NFP defaults for the upstream module ────────────────────────
-      services.polyfloor = {
-        # Full daemon (backend + bundled static SPA frontend) built from flake input.
-        package = polyfloorFullPkg;
-        host = lib.mkForce "0.0.0.0"; # Tailnet-reachable (firewall restricts to tailscale0/loopback via trustedInterfaces) — healthcheck probes luffy.nfp.nix:7777
-        dataDir = "/var/lib/polyfloor";
+      services = {
+        polyfloor = {
+          # Full daemon (backend + bundled static SPA frontend) built from flake input.
+          package = polyfloorFullPkg;
+          host = lib.mkForce "0.0.0.0"; # Tailnet-reachable (firewall restricts to tailscale0/loopback via trustedInterfaces) — healthcheck probes luffy.nfp.nix:7777
+          dataDir = "/var/lib/polyfloor";
 
-        # Polyfloor talks to any OpenAI-compatible router. It enumerates models
-        # via:
-        #     GET  {routerEndpoint}/models          → grouped free|fast|reasoning|frontier
-        # and runs agent inference via:
-        #     POST {routerEndpoint}/chat/completions
-        #
-        # Kong path multiplexer endpoints available (port 8090):
-        #   - kong-er:       http://127.0.0.1:8090/v1 (ExtremeRouter)
-        #   - kong-omni:     http://127.0.0.1:8090/omni/v1 (OmniRoute)
-        #   - kong-free:     http://127.0.0.1:8090/llm/free/v1 (FreeLLMPool)
-        #   - kong-frontier: http://127.0.0.1:8090/llm/frontier/v1 (Manifest)
-        #   - extreme-direct: http://127.0.0.1:20128/v1 (ER direct backup)
-        routerEndpoint = "http://127.0.0.1:8090/v1";
+          # Polyfloor talks to any OpenAI-compatible router. It enumerates models
+          # via:
+          #     GET  {routerEndpoint}/models          → grouped free|fast|reasoning|frontier
+          # and runs agent inference via:
+          #     POST {routerEndpoint}/chat/completions
+          #
+          # Kong path multiplexer endpoints available (port 8090):
+          #   - kong-er:       http://127.0.0.1:8090/v1 (ExtremeRouter)
+          #   - kong-omni:     http://127.0.0.1:8090/omni/v1 (OmniRoute)
+          #   - kong-free:     http://127.0.0.1:8090/llm/free/v1 (FreeLLMPool)
+          #   - kong-frontier: http://127.0.0.1:8090/llm/frontier/v1 (Manifest)
+          #   - extreme-direct: http://127.0.0.1:20128/v1 (ER direct backup)
+          routerEndpoint = "http://127.0.0.1:8090/v1";
 
-        # Health: GET http://127.0.0.1:7777/healthz -> {"status":"ok"} (also /metrics Prometheus)
-        # Tailnet: polyfloor.lovelain.duckdns.org is intentionally NOT exposed via public Caddy 80/443.
-        # It is reachable only via Tailscale: http://luffy.nfp.nix:7777 or via Caddy on tailscale0 when proxied.
-        # Headscale ACL: tag:control-plane (includes polyfloor) is group:admin-only, so only t0psh31f@nfp.nix can reach 7777 via tailnet. http://127.0.0.1:7777/healthz -> {"status":"ok"}  (also /metrics Prometheus)
+          # Health: GET http://127.0.0.1:7777/healthz -> {"status":"ok"} (also /metrics Prometheus)
+          # Tailnet: polyfloor.lovelain.duckdns.org is intentionally NOT exposed via public Caddy 80/443.
+          # It is reachable only via Tailscale: http://luffy.nfp.nix:7777 or via Caddy on tailscale0 when proxied.
+          # Headscale ACL: tag:control-plane (includes polyfloor) is group:admin-only, so only t0psh31f@nfp.nix can reach 7777 via tailnet. http://127.0.0.1:7777/healthz -> {"status":"ok"}  (also /metrics Prometheus)
 
-        # Default HR orchestrator model: Xiaomi MiMo-V2.5 Pro.
-        defaultHrModel = "mimo-v2.5-pro";
+          # Default HR orchestrator model: Xiaomi MiMo-V2.5 Pro.
+          defaultHrModel = "mimo-v2.5-pro";
 
-        # sops-rendered environment file (see polyfloor-secrets.nix, template
-        # "polyfloor-env"). Secrets are read from *_FILE paths, never raw values.
-        # When Kong consumer auth is enabled, add POLYFLOOR_ROUTER_API_KEY_FILE
-        # to that env file pointing at a Kong consumer key (sops file secret).
-        environmentFile = config.sops.templates."polyfloor-env".path;
+          # sops-rendered environment file (see polyfloor-secrets.nix, template
+          # "polyfloor-env"). Secrets are read from *_FILE paths, never raw values.
+          # When Kong consumer auth is enabled, add POLYFLOOR_ROUTER_API_KEY_FILE
+          # to that env file pointing at a Kong consumer key (sops file secret).
+          environmentFile = config.sops.templates."polyfloor-env".path;
 
-        # Serve the built frontend SPA. Set this to the built frontend package
-        # path once `inputs.polyfloor.packages.${system}.frontend` builds
-        # (its npmDepsHash is currently a placeholder upstream). Left unset so
-        # the backend runs API-only by default.
-        # staticDir = polyfloorFlake.packages.${pkgs.stdenv.hostPlatform.system}.frontend;
+          # Serve the built frontend SPA. Set this to the built frontend package
+          # path once `inputs.polyfloor.packages.${system}.frontend` builds
+          # (its npmDepsHash is currently a placeholder upstream). Left unset so
+          # the backend runs API-only by default.
+          # staticDir = polyfloorFlake.packages.${pkgs.stdenv.hostPlatform.system}.frontend;
+        };
+
+        # Mirror the upstream enable/port into the legacy option path so the
+        # sibling modules above keep evaluating.
+        ai-services.polyfloor = {
+          enable = config.services.polyfloor.enable;
+          port = config.services.polyfloor.port;
+        };
       };
-
-      # Mirror the upstream enable/port into the legacy option path so the
-      # sibling modules above keep evaluating.
-      services.ai-services.polyfloor.enable = config.services.polyfloor.enable;
-      services.ai-services.polyfloor.port = config.services.polyfloor.port;
 
       # Persist per-company state across reboots when impermanence is enabled
       # (matches the previous vendored module's behaviour).

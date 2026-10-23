@@ -125,15 +125,39 @@ with lib;
       };
       users.groups.langgraph = { };
 
-      # Persist data
-      environment.persistence."/persist" =
-        mkIf (config.layers.layer-10.system.config.impermanence.enable or false)
-          {
-            directories = [ cfg.dataDir ];
-          };
+      environment = {
+        # Persist data
+        persistence."/persist" = mkIf (config.layers.layer-10.system.config.impermanence.enable or false) {
+          directories = [ cfg.dataDir ];
+        };
 
-      # Budget config file
-      environment.etc."langgraph/budgets.json".source = budgetConfig;
+        # Budget config file
+        etc."langgraph/budgets.json".source = budgetConfig;
+
+        # CLI helper for budget/status checks
+        systemPackages = [
+          (pkgs.writeShellScriptBin "langgraph-ctl" ''
+            BASE="http://127.0.0.1:${toString cfg.port}"
+            case "''${1:-help}" in
+              status)
+                curl -s "$BASE/health" | ${pkgs.jq}/bin/jq .
+                ;;
+              budgets)
+                curl -s "$BASE/budgets" | ${pkgs.jq}/bin/jq .
+                ;;
+              metrics)
+                curl -s "$BASE/metrics"
+                ;;
+              workflows)
+                curl -s "$BASE/workflows" | ${pkgs.jq}/bin/jq .
+                ;;
+              *)
+                echo "Usage: langgraph-ctl {status|budgets|metrics|workflows}"
+                ;;
+            esac
+          '')
+        ];
+      };
 
       # LangGraph service — runs as a persistent Python process
       systemd.services.langgraph = {
@@ -172,29 +196,5 @@ with lib;
           ReadWritePaths = [ cfg.dataDir ];
         };
       };
-
-      # CLI helper for budget/status checks
-      environment.systemPackages = [
-        (pkgs.writeShellScriptBin "langgraph-ctl" ''
-          BASE="http://127.0.0.1:${toString cfg.port}"
-          case "''${1:-help}" in
-            status)
-              curl -s "$BASE/health" | ${pkgs.jq}/bin/jq .
-              ;;
-            budgets)
-              curl -s "$BASE/budgets" | ${pkgs.jq}/bin/jq .
-              ;;
-            metrics)
-              curl -s "$BASE/metrics"
-              ;;
-            workflows)
-              curl -s "$BASE/workflows" | ${pkgs.jq}/bin/jq .
-              ;;
-            *)
-              echo "Usage: langgraph-ctl {status|budgets|metrics|workflows}"
-              ;;
-          esac
-        '')
-      ];
     };
 }
