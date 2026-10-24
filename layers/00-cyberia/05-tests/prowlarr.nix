@@ -17,23 +17,26 @@
     {
       # Mock options required by the media-stack modules in isolation
       options = {
-        layers.layer-10.system.config.impermanence.enable = lib.mkEnableOption "impermanence";
         environment.persistence = lib.mkOption {
           type = lib.types.attrs;
           default = { };
         };
-        layers.meta.primaryUser = lib.mkOption {
-          type = lib.types.str;
-          default = "t0psh31f";
-        };
-        layers.layer-20.services.config.media-stack = {
-          user = lib.mkOption {
+
+        layers = {
+          layer-10.system.config.impermanence.enable = lib.mkEnableOption "impermanence";
+          meta.primaryUser = lib.mkOption {
             type = lib.types.str;
-            default = "media";
+            default = "t0psh31f";
           };
-          group = lib.mkOption {
-            type = lib.types.str;
-            default = "media";
+          layer-20.services.config.media-stack = {
+            user = lib.mkOption {
+              type = lib.types.str;
+              default = "media";
+            };
+            group = lib.mkOption {
+              type = lib.types.str;
+              default = "media";
+            };
           };
         };
       };

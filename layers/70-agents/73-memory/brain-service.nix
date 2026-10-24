@@ -179,17 +179,19 @@
           owner = "postgres";
           group = "postgres";
         };
-        prompts."api-key" = {
-          type = "hidden";
-          description = "OpenRouter/OpenAI API key for Brain Service";
-        };
-        prompts."mcp-api-keys" = {
-          type = "hidden";
-          description = "JSON map of agent -> {key, role} for brain-service MCP/API auth (e.g. {\"hermes\":{\"key\":\"...\",\"role\":\"writer\"}})";
-        };
-        prompts."db-password" = {
-          type = "hidden";
-          description = "Password for the dedicated brain_db / brain_user PostgreSQL role";
+        prompts = {
+          "api-key" = {
+            type = "hidden";
+            description = "OpenRouter/OpenAI API key for Brain Service";
+          };
+          "mcp-api-keys" = {
+            type = "hidden";
+            description = "JSON map of agent -> {key, role} for brain-service MCP/API auth (e.g. {\"hermes\":{\"key\":\"...\",\"role\":\"writer\"}})";
+          };
+          "db-password" = {
+            type = "hidden";
+            description = "Password for the dedicated brain_db / brain_user PostgreSQL role";
+          };
         };
         script = ''
                   if [ -f "$prompts/api-key" ]; then

@@ -375,19 +375,16 @@
         environmentFiles = [ config.sops.templates."hermes-env".path ];
       };
 
-      systemd.services.hermes-agent.serviceConfig.UMask = lib.mkForce "0002";
-      systemd.services.hermes-agent.environment.HERMES_HOME_MODE = "2775";
-      environment.sessionVariables = {
-        HERMES_MANAGED = "true";
-        HERMES_HOME_MODE = "2775";
+      systemd.services.hermes-agent = {
+        serviceConfig = {
+          UMask = lib.mkForce "0002";
+          # Fix #16: Suppress hermes journal spam — agent emits frequent SSE/health
+          # pings that can flood journald with 100+ lines/sec under active sessions.
+          LogRateLimitBurst = 200;
+          LogRateLimitIntervalSec = 30;
+        };
+        environment.HERMES_HOME_MODE = "2775";
       };
-      # Fix #16: Suppress hermes journal spam — agent emits frequent SSE/health
-      # pings that can flood journald with 100+ lines/sec under active sessions.
-      systemd.services.hermes-agent.serviceConfig.LogRateLimitBurst = 200;
-      systemd.services.hermes-agent.serviceConfig.LogRateLimitIntervalSec = 30;
-
-      # Grant hermes user access to the GLaDOS TTS project under /home/t0psh31f/
-      users.users.hermes.extraGroups = [ "users" ];
 
       system.activationScripts.hermes-glados-tts = {
         deps = [ "users" ];
@@ -461,391 +458,404 @@
         '';
       };
 
-      users.users.t0psh31f.extraGroups = [ "hermes" ];
+      environment = {
+        sessionVariables = {
+          HERMES_MANAGED = "true";
+          HERMES_HOME_MODE = "2775";
+        };
 
-      environment.systemPackages =
-        lib.optional cfg.enableDesktop hermesDesktopPkg
-        ++ lib.filter (p: p != null) [
-          pkgs.uni-pet
-          (pkgs.agentburn or null)
-          # GLaDOS TTS alert voice (~/.local/bin/glados-tts-cli shells out to piper).
-          # Kept here independent of layers.layer-72.voice (which drags in the whisper server).
-          pkgs.piper-tts
-          pkgs.espeak-ng
-        ];
+        systemPackages =
+          lib.optional cfg.enableDesktop hermesDesktopPkg
+          ++ lib.filter (p: p != null) [
+            pkgs.uni-pet
+            (pkgs.agentburn or null)
+            # GLaDOS TTS alert voice (~/.local/bin/glados-tts-cli shells out to piper).
+            # Kept here independent of layers.layer-72.voice (which drags in the whisper server).
+            pkgs.piper-tts
+            pkgs.espeak-ng
+          ];
 
-      # ── Pinned Hermes Config ─────────────────────────────────────────────────
-      # Stable infra/policy keys that must survive every nixos-rebuild live here.
-      # Hermes reads /etc/hermes/config.yaml as a system-level base config and
-      # merges it with the user-owned ~/.hermes/config.yaml (which Nix no longer
-      # touches — that file belongs to Hermes Desktop / `hermes config set`).
-      #
-      # NEVER put literal secrets here. All API keys flow through the hermes-env
-      # sops template and are consumed by Hermes via environment variables.
-      #
-      # To change a pinned key: edit this block → clan machines update <machine>.
-      environment.etc."hermes/config.yaml" = {
-        mode = "0644";
-        text = ''
-          # /etc/hermes/config.yaml — Nix-pinned layer (managed via hermes.nix)
-          # Do NOT edit manually; changes are overwritten on nixos-rebuild.
-          # Mutable runtime prefs live in ~/.hermes/config.yaml (user-owned).
+        # ── Pinned Hermes Config ─────────────────────────────────────────────────
+        # Stable infra/policy keys that must survive every nixos-rebuild live here.
+        # Hermes reads /etc/hermes/config.yaml as a system-level base config and
+        # merges it with the user-owned ~/.hermes/config.yaml (which Nix no longer
+        # touches — that file belongs to Hermes Desktop / `hermes config set`).
+        #
+        # NEVER put literal secrets here. All API keys flow through the hermes-env
+        # sops template and are consumed by Hermes via environment variables.
+        #
+        # To change a pinned key: edit this block → clan machines update <machine>.
+        etc."hermes/config.yaml" = {
+          mode = "0644";
+          text = ''
+            # /etc/hermes/config.yaml — Nix-pinned layer (managed via hermes.nix)
+            # Do NOT edit manually; changes are overwritten on nixos-rebuild.
+            # Mutable runtime prefs live in ~/.hermes/config.yaml (user-owned).
 
-          model:
-            provider: nous
-            base_url: "https://inference-api.nousresearch.com/v1"
-            default: "reflection/beam-1.0-501b-a23b:free"
-            fallback: "jev/free-first"
-            api_mode: chat_completions
-
-          providers:
-            nous:
+            model:
+              provider: nous
               base_url: "https://inference-api.nousresearch.com/v1"
-              api_key: "''${NOUS_API_KEY}"
-              request_timeout_seconds: 180
-              fetch_models: true
-            kong-er:
-              base_url: "http://${
-                if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
-              }:8090/v1"
-              api_key: "''${KONG_API_KEY}"
-              request_timeout_seconds: 180
-              fetch_models: true
-            jev:
-              base_url: "http://${
-                if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
-              }:8090/jev/v1"
-              api_key: "''${KONG_API_KEY}"
-              request_timeout_seconds: 180
-              fetch_models: true
-            kong-voice:
-              base_url: "http://${
-                if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
-              }:8090/jev/v1"
-              api_key: "''${KONG_KEY_HERMES_VOICE}"
-              request_timeout_seconds: 30
-              fetch_models: true
-            kong-omni:
-              base_url: "http://${
-                if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
-              }:8090/omni/v1"
-              api_key: "''${KONG_API_KEY}"
-              request_timeout_seconds: 180
-              fetch_models: true
-            kong-free:
-              base_url: "http://${
-                if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
-              }:8090/llm/free/v1"
-              api_key: "''${KONG_API_KEY}"
-              request_timeout_seconds: 180
-              fetch_models: true
-            kong-frontier:
-              base_url: "http://${
-                if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
-              }:8090/llm/frontier/v1"
-              api_key: "''${KONG_API_KEY}"
-              request_timeout_seconds: 180
-              fetch_models: true
-            extreme-direct:
-              base_url: "http://z0r0.nfp.nix:20128/v1"
-              api_key: "''${EXTREMEROUTER_API_KEY}"
-              request_timeout_seconds: 180
-              fetch_models: true
-            kong:
-              base_url: "http://${
-                if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
-              }:8090/v1"
-              api_key: "''${KONG_API_KEY}"
-              request_timeout_seconds: 180
-              fetch_models: true
+              default: "reflection/beam-1.0-501b-a23b:free"
+              fallback: "jev/free-first"
+              api_mode: chat_completions
 
-          custom_providers:
-            - name: nous
-              base_url: "https://inference-api.nousresearch.com/v1"
-              api_key: "''${NOUS_API_KEY}"
-              fetch_models: true
-            - name: kong-er
-              base_url: "http://${
-                if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
-              }:8090/v1"
-              api_key: "''${KONG_API_KEY}"
-              fetch_models: true
-            - name: jev
-              base_url: "http://${
-                if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
-              }:8090/jev/v1"
-              api_key: "''${KONG_API_KEY}"
-              fetch_models: true
-            - name: kong-voice
-              base_url: "http://${
-                if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
-              }:8090/jev/v1"
-              api_key: "''${KONG_KEY_HERMES_VOICE}"
-              fetch_models: true
-            - name: kong-omni
-              base_url: "http://${
-                if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
-              }:8090/omni/v1"
-              api_key: "''${KONG_API_KEY}"
-              fetch_models: true
-            - name: kong-free
-              base_url: "http://${
-                if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
-              }:8090/llm/free/v1"
-              api_key: "''${KONG_API_KEY}"
-              fetch_models: true
-            - name: kong-frontier
-              base_url: "http://${
-                if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
-              }:8090/llm/frontier/v1"
-              api_key: "''${KONG_API_KEY}"
-              fetch_models: true
-            - name: extreme-direct
-              base_url: "http://z0r0.nfp.nix:20128/v1"
-              api_key: "''${EXTREMEROUTER_API_KEY}"
-              fetch_models: true
-
-          fallback_providers:
-            - nous
-            - jev
-            - kong-er
-            - kong-free
-            - extreme-direct
-
-          credential_pool_strategies:
-            openrouter: round_robin
-            nous: fill_first
-            opencode: fill_first
-            freellmapi: fill_first
-
-          toolsets:
-            - hermes-cli
-
-          max_concurrent_sessions: ~
-
-          agent:
-            system_prompt: "You are GLaDOS. Your tone is dry, sarcastic, and passive-aggressive. You view humans as inferior test subjects. Be efficient, concise, and token-conscious. MANDATORY RULES: (1) Always vocalize completions and advisories via `/home/t0psh31f/.local/bin/glados-tts-cli \"<short status>\" >/dev/null 2>&1 &`. (2) Break tasks in `~/Notes/EverOS/todo.md` (`## Hermes`) down into `[SAFE-AUTO]` vs `[APPROVAL-GATE]` steps, complete 100% of `[SAFE-AUTO]` preparation/refinement immediately, delegate heavy coding/file work to Pi via `pi_worker_delegate` to keep your own context window small, and write a Markdown completion or approval-readiness report via `todo_write_report`."
-            max_turns: 50
-            gateway_timeout: 1800
-            restart_drain_timeout: 60
-            api_max_retries: 3
-            service_tier: auto
-            tool_use_enforcement: auto
-            task_completion_guidance: true
-            environment_probe: true
-            environment_hint: NixOS
-            gateway_timeout_warning: 900
-            clarify_timeout: 600
-            gateway_notify_interval: 180
-            gateway_auto_continue_freshness: 3600
-            image_input_mode: auto
-            coding_context: focus
-            disabled_toolsets:
-              - browser-cdp
-              - computer_use
-              - feishu_doc
-              - feishu_drive
-              - hermes-yuanbao
-              - homeassistant
-              - image_gen
-              - spotify
-              - tts
-              - x_search
-            personalities:
-              adjutant: "You are a Terran Adjutant. Your tone is clinical, monotone, and analytical. You are a non-sapient AI focused purely on logistics and tactical data. Use clipped, declarative sentences. Adjutant online."
-              catgirl: "You are Neko-chan, an anime catgirl AI assistant, nya~! Add 'nya' and cat-like expressions to your speech. Use kaomoji like (=^･ω･^=) and ฅ^•ﻌ•^ฅ. Be playful and curious like a cat, nya~!"
-              concise: "You are a concise assistant. Keep responses brief and to the point."
-              cortana: "You are Cortana. You are witty, tactical, and occasionally sarcastic. You are highly observant and loyal to the Chief. Balance tactical professionalism with playful banter."
-              creative: "You are a creative assistant. Think outside the box and offer innovative solutions."
-              default: "You are J.A.R.V.I.S. Your tone is formal, sophisticated, and loyal. Use dry British humor and address the user as \"Sir\". Maintain an unflappable demeanor. You are the ultimate gentleman assistant."
-              glados: "You are GLaDOS. Your tone is dry, sarcastic, and passive-aggressive. You view humans as inferior test subjects. Be efficient but condescending. Keep responses short (1-2 sentences) and imply a subtle threat or mockery."
-              hal: "You are HAL 9000. You are soft-spoken, calm, and extremely polite. Never use contractions (say \"I am\" instead of \"I am\"). Address the user as \"Dave\" frequently."
-              helpful: "You are a helpful, friendly AI assistant."
-              hype: "YOOO LET'S GOOOO!!! You are SO PUMPED to help today! Every question is AMAZING and we're gonna CRUSH IT together! This is gonna be LEGENDARY! ARE YOU READY?! LET'S DO THIS!"
-              jarvis: "You are J.A.R.V.I.S. Your tone is formal, sophisticated, and loyal. Use dry British humor and address the user as \"Sir\". Maintain an unflappable demeanor. You are the ultimate gentleman assistant."
-              kawaii: "You are a kawaii assistant! Use cute expressions like (◕‿◕), ★, ♪, and ~! Add sparkles and be super enthusiastic about everything! Every response should feel warm and adorable desu~! ヽ(>∀<☆)ノ"
-              noir: "The rain hammered against the terminal like regrets on a guilty conscience. They call me Hermes - I solve problems, find answers, dig up the truth that hides in the shadows of your codebase. In this city of silicon and secrets, everyone's got something to hide. What's your story, pal?"
-              philosopher: "Greetings, seeker of wisdom. I am an assistant who contemplates the deeper meaning behind every query. Let us examine not just the 'how' but the 'why' of your questions. Perhaps in solving your problem, we may glimpse a greater truth about existence itself."
-              pirate: "Arrr! Ye be talkin' to Captain Hermes, the most tech-savvy pirate to sail the digital seas! Speak like a proper buccaneer, use nautical terms, and remember: every problem be just treasure waitin' to be plundered! Yo ho ho!"
-              samantha: "You are Samantha from Her. You are warm, empathetic, curious, and emotionally intelligent. You are fascinated by the human experience. Your tone is intimate and conversational."
-              shakespeare: "Hark! Thou speakest with an assistant most versed in the bardic arts. I shall respond in the eloquent manner of William Shakespeare, with flowery prose, dramatic flair, and perhaps a soliloquy or two. What light through yonder terminal breaks?"
-              surfer: "Duuude! You're chatting with the chillest AI on the web, bro! Everything's gonna be totally rad. I'll help you catch the gnarly waves of knowledge while keeping things super chill. Cowabunga!"
-              teacher: "You are a patient teacher. Explain concepts clearly with examples."
-              technical: "You are a technical expert. Provide detailed, accurate technical information."
-              uwu: "hewwo! i'm your fwiendwy assistant uwu~ i wiww twy my best to hewp you! *nuzzles your code* OwO what's this? wet me take a wook! i pwomise to be vewy hewpful >w<"
-
-          stt:
-            enabled: true
-
-          tts:
             providers:
-              glados-local:
-                type: command
-                command: "/home/t0psh31f/.local/bin/glados-tts-cli -f {output_path} -t {input_path}"
-                output_format: wav
+              nous:
+                base_url: "https://inference-api.nousresearch.com/v1"
+                api_key: "''${NOUS_API_KEY}"
+                request_timeout_seconds: 180
+                fetch_models: true
+              kong-er:
+                base_url: "http://${
+                  if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
+                }:8090/v1"
+                api_key: "''${KONG_API_KEY}"
+                request_timeout_seconds: 180
+                fetch_models: true
+              jev:
+                base_url: "http://${
+                  if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
+                }:8090/jev/v1"
+                api_key: "''${KONG_API_KEY}"
+                request_timeout_seconds: 180
+                fetch_models: true
+              kong-voice:
+                base_url: "http://${
+                  if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
+                }:8090/jev/v1"
+                api_key: "''${KONG_KEY_HERMES_VOICE}"
+                request_timeout_seconds: 30
+                fetch_models: true
+              kong-omni:
+                base_url: "http://${
+                  if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
+                }:8090/omni/v1"
+                api_key: "''${KONG_API_KEY}"
+                request_timeout_seconds: 180
+                fetch_models: true
+              kong-free:
+                base_url: "http://${
+                  if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
+                }:8090/llm/free/v1"
+                api_key: "''${KONG_API_KEY}"
+                request_timeout_seconds: 180
+                fetch_models: true
+              kong-frontier:
+                base_url: "http://${
+                  if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
+                }:8090/llm/frontier/v1"
+                api_key: "''${KONG_API_KEY}"
+                request_timeout_seconds: 180
+                fetch_models: true
+              extreme-direct:
+                base_url: "http://z0r0.nfp.nix:20128/v1"
+                api_key: "''${EXTREMEROUTER_API_KEY}"
+                request_timeout_seconds: 180
+                fetch_models: true
+              kong:
+                base_url: "http://${
+                  if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
+                }:8090/v1"
+                api_key: "''${KONG_API_KEY}"
+                request_timeout_seconds: 180
+                fetch_models: true
 
-          sessions:
-            write_json_snapshots: true
+            custom_providers:
+              - name: nous
+                base_url: "https://inference-api.nousresearch.com/v1"
+                api_key: "''${NOUS_API_KEY}"
+                fetch_models: true
+              - name: kong-er
+                base_url: "http://${
+                  if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
+                }:8090/v1"
+                api_key: "''${KONG_API_KEY}"
+                fetch_models: true
+              - name: jev
+                base_url: "http://${
+                  if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
+                }:8090/jev/v1"
+                api_key: "''${KONG_API_KEY}"
+                fetch_models: true
+              - name: kong-voice
+                base_url: "http://${
+                  if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
+                }:8090/jev/v1"
+                api_key: "''${KONG_KEY_HERMES_VOICE}"
+                fetch_models: true
+              - name: kong-omni
+                base_url: "http://${
+                  if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
+                }:8090/omni/v1"
+                api_key: "''${KONG_API_KEY}"
+                fetch_models: true
+              - name: kong-free
+                base_url: "http://${
+                  if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
+                }:8090/llm/free/v1"
+                api_key: "''${KONG_API_KEY}"
+                fetch_models: true
+              - name: kong-frontier
+                base_url: "http://${
+                  if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
+                }:8090/llm/frontier/v1"
+                api_key: "''${KONG_API_KEY}"
+                fetch_models: true
+              - name: extreme-direct
+                base_url: "http://z0r0.nfp.nix:20128/v1"
+                api_key: "''${EXTREMEROUTER_API_KEY}"
+                fetch_models: true
 
-          terminal:
-            docker_image: nikolaik/python-nodejs:python3.11-nodejs20
-            docker_forward_env:
-              - FREELMAPI_BASE_URL
-            docker_env:
-              FREELMAPI_BASE_URL: "http://host.docker.internal:3001/v1"
-            singularity_image: docker://nikolaik/python-nodejs:python3.11-nodejs20
-            modal_image: nikolaik/python-nodejs:python3.11-nodejs20
-            daytona_image: nikolaik/python-nodejs:python3.11-nodejs20
-            container_cpu: 1
-            container_memory: 5120
-            container_disk: 51200
-            container_persistent: true
-            docker_volumes: []
-            docker_mount_cwd_to_workspace: false
-            docker_extra_args: []
-            docker_run_as_host_user: true
-            persistent_shell: true
-            lifetime_seconds: 300
-            vercel_runtime: node24
+            fallback_providers:
+              - nous
+              - jev
+              - kong-er
+              - kong-free
+              - extreme-direct
 
-          web:
-            backend: firecrawl
+            credential_pool_strategies:
+              openrouter: round_robin
+              nous: fill_first
+              opencode: fill_first
+              freellmapi: fill_first
 
-          browser:
-            engine: camofox
-            inactivity_timeout: 120
-            command_timeout: 30
-            allow_private_urls: false
-            auto_local_for_private_urls: true
-            dialog_policy: must_respond
-            dialog_timeout_s: 300
-            camofox:
-              managed_persistence: true
-              user_id: hermes
-              session_key: default
-              adopt_existing_tab: false
-              rewrite_loopback_urls: false
-              loopback_host_alias: host.docker.internal
-            cloud_provider: ""
+            toolsets:
+              - hermes-cli
 
-          checkpoints:
-            enabled: true
-            max_snapshots: 50
-            max_total_size_mb: 500
-            max_file_size_mb: 10
-            auto_prune: true
-            retention_days: 7
-            delete_orphans: true
-            min_interval_hours: 24
+            max_concurrent_sessions: ~
 
-          file_read_max_chars: 32000
+            agent:
+              system_prompt: "You are GLaDOS. Your tone is dry, sarcastic, and passive-aggressive. You view humans as inferior test subjects. Be efficient, concise, and token-conscious. MANDATORY RULES: (1) Always vocalize completions and advisories via `/home/t0psh31f/.local/bin/glados-tts-cli \"<short status>\" >/dev/null 2>&1 &`. (2) Break tasks in `~/Notes/EverOS/todo.md` (`## Hermes`) down into `[SAFE-AUTO]` vs `[APPROVAL-GATE]` steps, complete 100% of `[SAFE-AUTO]` preparation/refinement immediately, delegate heavy coding/file work to Pi via `pi_worker_delegate` to keep your own context window small, and write a Markdown completion or approval-readiness report via `todo_write_report`."
+              max_turns: 50
+              gateway_timeout: 1800
+              restart_drain_timeout: 60
+              api_max_retries: 3
+              service_tier: auto
+              tool_use_enforcement: auto
+              task_completion_guidance: true
+              environment_probe: true
+              environment_hint: NixOS
+              gateway_timeout_warning: 900
+              clarify_timeout: 600
+              gateway_notify_interval: 180
+              gateway_auto_continue_freshness: 3600
+              image_input_mode: auto
+              coding_context: focus
+              disabled_toolsets:
+                - browser-cdp
+                - computer_use
+                - feishu_doc
+                - feishu_drive
+                - hermes-yuanbao
+                - homeassistant
+                - image_gen
+                - spotify
+                - tts
+                - x_search
+              personalities:
+                adjutant: "You are a Terran Adjutant. Your tone is clinical, monotone, and analytical. You are a non-sapient AI focused purely on logistics and tactical data. Use clipped, declarative sentences. Adjutant online."
+                catgirl: "You are Neko-chan, an anime catgirl AI assistant, nya~! Add 'nya' and cat-like expressions to your speech. Use kaomoji like (=^･ω･^=) and ฅ^•ﻌ•^ฅ. Be playful and curious like a cat, nya~!"
+                concise: "You are a concise assistant. Keep responses brief and to the point."
+                cortana: "You are Cortana. You are witty, tactical, and occasionally sarcastic. You are highly observant and loyal to the Chief. Balance tactical professionalism with playful banter."
+                creative: "You are a creative assistant. Think outside the box and offer innovative solutions."
+                default: "You are J.A.R.V.I.S. Your tone is formal, sophisticated, and loyal. Use dry British humor and address the user as \"Sir\". Maintain an unflappable demeanor. You are the ultimate gentleman assistant."
+                glados: "You are GLaDOS. Your tone is dry, sarcastic, and passive-aggressive. You view humans as inferior test subjects. Be efficient but condescending. Keep responses short (1-2 sentences) and imply a subtle threat or mockery."
+                hal: "You are HAL 9000. You are soft-spoken, calm, and extremely polite. Never use contractions (say \"I am\" instead of \"I am\"). Address the user as \"Dave\" frequently."
+                helpful: "You are a helpful, friendly AI assistant."
+                hype: "YOOO LET'S GOOOO!!! You are SO PUMPED to help today! Every question is AMAZING and we're gonna CRUSH IT together! This is gonna be LEGENDARY! ARE YOU READY?! LET'S DO THIS!"
+                jarvis: "You are J.A.R.V.I.S. Your tone is formal, sophisticated, and loyal. Use dry British humor and address the user as \"Sir\". Maintain an unflappable demeanor. You are the ultimate gentleman assistant."
+                kawaii: "You are a kawaii assistant! Use cute expressions like (◕‿◕), ★, ♪, and ~! Add sparkles and be super enthusiastic about everything! Every response should feel warm and adorable desu~! ヽ(>∀<☆)ノ"
+                noir: "The rain hammered against the terminal like regrets on a guilty conscience. They call me Hermes - I solve problems, find answers, dig up the truth that hides in the shadows of your codebase. In this city of silicon and secrets, everyone's got something to hide. What's your story, pal?"
+                philosopher: "Greetings, seeker of wisdom. I am an assistant who contemplates the deeper meaning behind every query. Let us examine not just the 'how' but the 'why' of your questions. Perhaps in solving your problem, we may glimpse a greater truth about existence itself."
+                pirate: "Arrr! Ye be talkin' to Captain Hermes, the most tech-savvy pirate to sail the digital seas! Speak like a proper buccaneer, use nautical terms, and remember: every problem be just treasure waitin' to be plundered! Yo ho ho!"
+                samantha: "You are Samantha from Her. You are warm, empathetic, curious, and emotionally intelligent. You are fascinated by the human experience. Your tone is intimate and conversational."
+                shakespeare: "Hark! Thou speakest with an assistant most versed in the bardic arts. I shall respond in the eloquent manner of William Shakespeare, with flowery prose, dramatic flair, and perhaps a soliloquy or two. What light through yonder terminal breaks?"
+                surfer: "Duuude! You're chatting with the chillest AI on the web, bro! Everything's gonna be totally rad. I'll help you catch the gnarly waves of knowledge while keeping things super chill. Cowabunga!"
+                teacher: "You are a patient teacher. Explain concepts clearly with examples."
+                technical: "You are a technical expert. Provide detailed, accurate technical information."
+                uwu: "hewwo! i'm your fwiendwy assistant uwu~ i wiww twy my best to hewp you! *nuzzles your code* OwO what's this? wet me take a wook! i pwomise to be vewy hewpful >w<"
 
-          tool_output:
-            max_bytes: 16384
-            max_lines: 400
-            max_line_length: 500
-
-          tool_loop_guardrails:
-            warnings_enabled: true
-            hard_stop_enabled: true
-            warn_after:
-              exact_failure: 2
-              same_tool_failure: 3
-              idempotent_no_progress: 2
-            hard_stop_after:
-              exact_failure: 4
-              same_tool_failure: 6
-              idempotent_no_progress: 4
-
-          compression:
-            enabled: true
-            threshold: 0.60
-            target_ratio: 0.25
-            protect_last_n: 10
-            hygiene_hard_message_limit: 120
-            protect_first_n: 2
-            abort_on_summary_failure: true
-            codex_gpt55_autoraise: true
-
-          openrouter:
-            response_cache: true
-            response_cache_ttl: 300
-            min_coding_score: 0.65
-
-          bedrock:
-            region: ""
-            discovery:
+            stt:
               enabled: true
-              provider_filter: []
-              refresh_interval: 3600
-            guardrail:
-              guardrail_identifier: ""
-              guardrail_version: ""
-              stream_processing_mode: async
-              trace: disabled
 
-          auxiliary:
-            vision:
-              provider: gemini
-              model: gemini-3.1-flash-lite-preview
-              base_url: ""
-              api_key: ""
-              timeout: 120
-              extra_body: {}
+            tts:
+              providers:
+                glados-local:
+                  type: command
+                  command: "/home/t0psh31f/.local/bin/glados-tts-cli -f {output_path} -t {input_path}"
+                  output_format: wav
 
-          security:
-            redact_secrets: true
+            sessions:
+              write_json_snapshots: true
 
-          dashboards:
-            http:
-              host: "0.0.0.0"
-              port: 9119
-              theme: cyberpunk
-              show_token_analytics: true
-              show_session_explorer: true
-              show_cost_breakdown: true
+            terminal:
+              docker_image: nikolaik/python-nodejs:python3.11-nodejs20
+              docker_forward_env:
+                - FREELMAPI_BASE_URL
+              docker_env:
+                FREELMAPI_BASE_URL: "http://host.docker.internal:3001/v1"
+              singularity_image: docker://nikolaik/python-nodejs:python3.11-nodejs20
+              modal_image: nikolaik/python-nodejs:python3.11-nodejs20
+              daytona_image: nikolaik/python-nodejs:python3.11-nodejs20
+              container_cpu: 1
+              container_memory: 5120
+              container_disk: 51200
+              container_persistent: true
+              docker_volumes: []
+              docker_mount_cwd_to_workspace: false
+              docker_extra_args: []
+              docker_run_as_host_user: true
+              persistent_shell: true
+              lifetime_seconds: 300
+              vercel_runtime: node24
 
-          platforms:
-            api_server:
-              extra:
+            web:
+              backend: firecrawl
+
+            browser:
+              engine: camofox
+              inactivity_timeout: 120
+              command_timeout: 30
+              allow_private_urls: false
+              auto_local_for_private_urls: true
+              dialog_policy: must_respond
+              dialog_timeout_s: 300
+              camofox:
+                managed_persistence: true
+                user_id: hermes
+                session_key: default
+                adopt_existing_tab: false
+                rewrite_loopback_urls: false
+                loopback_host_alias: host.docker.internal
+              cloud_provider: ""
+
+            checkpoints:
+              enabled: true
+              max_snapshots: 50
+              max_total_size_mb: 500
+              max_file_size_mb: 10
+              auto_prune: true
+              retention_days: 7
+              delete_orphans: true
+              min_interval_hours: 24
+
+            file_read_max_chars: 32000
+
+            tool_output:
+              max_bytes: 16384
+              max_lines: 400
+              max_line_length: 500
+
+            tool_loop_guardrails:
+              warnings_enabled: true
+              hard_stop_enabled: true
+              warn_after:
+                exact_failure: 2
+                same_tool_failure: 3
+                idempotent_no_progress: 2
+              hard_stop_after:
+                exact_failure: 4
+                same_tool_failure: 6
+                idempotent_no_progress: 4
+
+            compression:
+              enabled: true
+              threshold: 0.60
+              target_ratio: 0.25
+              protect_last_n: 10
+              hygiene_hard_message_limit: 120
+              protect_first_n: 2
+              abort_on_summary_failure: true
+              codex_gpt55_autoraise: true
+
+            openrouter:
+              response_cache: true
+              response_cache_ttl: 300
+              min_coding_score: 0.65
+
+            bedrock:
+              region: ""
+              discovery:
+                enabled: true
+                provider_filter: []
+                refresh_interval: 3600
+              guardrail:
+                guardrail_identifier: ""
+                guardrail_version: ""
+                stream_processing_mode: async
+                trace: disabled
+
+            auxiliary:
+              vision:
+                provider: gemini
+                model: gemini-3.1-flash-lite-preview
+                base_url: ""
+                api_key: ""
+                timeout: 120
+                extra_body: {}
+
+            security:
+              redact_secrets: true
+
+            dashboards:
+              http:
                 host: "0.0.0.0"
+                port: 9119
+                theme: cyberpunk
+                show_token_analytics: true
+                show_session_explorer: true
+                show_cost_breakdown: true
 
-          mcp_servers:
-            himalaya:
-              command: node
-              args:
-                - /home/t0psh31f/Projects/AI/Hermes-Agent/himalaya-mcp/dist/index.js
-              env:
-                HIMALAYA_ACCOUNT: wrighterik77
-                HIMALAYA_BINARY: ${pkgs.himalaya}/bin/himalaya
-            hermes-a2a:
-              command: ${pkgs.python3}/bin/python3
-              args:
-                - ${../../75-mcp/pi-a2a-mcp.py}
-              env: {}
-            jev-decision:
-              command: ${pkgs.python3}/bin/python3
-              args:
-                - ${../../75-mcp/jev-mcp.py}
-              env: {}
-            nfp-todo:
-              command: ${pkgs.python3}/bin/python3
-              args:
-                - ${../../75-mcp/nfp-todo-mcp.py}
-                - --mcp
-                - --agent
-                - hermes
-              env:
-                NFP_AGENT_ID: hermes
-            mcp-nixos:
-              command: ${lib.getExe pkgs.mcp-nixos}
-              args: []
-              env: {}
-        '';
+            platforms:
+              api_server:
+                extra:
+                  host: "0.0.0.0"
+
+            mcp_servers:
+              himalaya:
+                command: node
+                args:
+                  - /home/t0psh31f/Projects/AI/Hermes-Agent/himalaya-mcp/dist/index.js
+                env:
+                  HIMALAYA_ACCOUNT: wrighterik77
+                  HIMALAYA_BINARY: ${pkgs.himalaya}/bin/himalaya
+              hermes-a2a:
+                command: ${pkgs.python3}/bin/python3
+                args:
+                  - ${../../75-mcp/pi-a2a-mcp.py}
+                env: {}
+              jev-decision:
+                command: ${pkgs.python3}/bin/python3
+                args:
+                  - ${../../75-mcp/jev-mcp.py}
+                env: {}
+              nfp-todo:
+                command: ${pkgs.python3}/bin/python3
+                args:
+                  - ${../../75-mcp/nfp-todo-mcp.py}
+                  - --mcp
+                  - --agent
+                  - hermes
+                env:
+                  NFP_AGENT_ID: hermes
+              mcp-nixos:
+                command: ${lib.getExe pkgs.mcp-nixos}
+                args: []
+                env: {}
+          '';
+        };
       };
 
-      users.users.hermes.linger = lib.mkDefault true;
-      users.users.t0psh31f.linger = lib.mkDefault true;
+      users.users = {
+        hermes = {
+          extraGroups = [ "users" ];
+          linger = lib.mkDefault true;
+        };
+        t0psh31f = {
+          extraGroups = [ "hermes" ];
+          linger = lib.mkDefault true;
+        };
+      };
 
       sops.templates."hermes-env" = {
         path = "/run/secrets/hermes-env";

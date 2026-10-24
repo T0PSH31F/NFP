@@ -64,14 +64,21 @@ in
       description = "Auto-connect Bluetooth devices";
       after = [ "bluetooth.service" ];
       partOf = [ "bluetooth.service" ];
+      unitConfig = {
+        ConditionPathExists = "/sys/class/bluetooth";
+      };
       serviceConfig = {
         Type = "oneshot";
+        TimeoutStartSec = 15;
         ExecStart =
           let
             autoConnectScript = pkgs.writeShellScript "bluetooth-auto-connect" ''
               set -euo pipefail
+              if [ ! -d /sys/class/bluetooth ]; then
+                exit 0
+              fi
               # Get all trusted Bluetooth devices and connect each
-              ${pkgs.bluez}/bin/bluetoothctl devices Trusted | while read -r _ mac name; do
+              ${pkgs.bluez}/bin/bluetoothctl --timeout 5 devices Trusted 2>/dev/null | while read -r _ mac name; do
                 echo "Connecting to $name ($mac)..."
                 ${pkgs.coreutils}/bin/timeout 10 ${pkgs.bluez}/bin/bluetoothctl connect "$mac" 2>/dev/null || true
               done

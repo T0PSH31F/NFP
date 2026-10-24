@@ -30,27 +30,30 @@
 
       config = {
         _module.args.inputs = { };
-        layers.layer-10.system.config.impermanence.enable = false;
-
         users.users.t0psh31f = {
           isNormalUser = true;
           home = "/home/t0psh31f";
           group = "users";
         };
 
-        layers.layer-78.llm-routers.extreme-router = {
-          enable = true;
-          port = 20128;
-        };
+        layers = {
+          layer-10.system.config.impermanence.enable = false;
 
-        layers.layer-76.orchestrators.aionui = {
-          enable = true;
-          port = 3006;
-        };
+          layer-76.orchestrators = {
+            aionui = {
+              enable = true;
+              port = 3006;
+            };
+            mission-control = {
+              enable = true;
+              port = 3099;
+            };
+          };
 
-        layers.layer-76.orchestrators.mission-control = {
-          enable = true;
-          port = 3099;
+          layer-78.llm-routers.extreme-router = {
+            enable = true;
+            port = 20128;
+          };
         };
 
         system.stateVersion = "25.05";

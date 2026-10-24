@@ -104,13 +104,19 @@ in
   };
 
   config = {
-    layers.desktop.compositor = lib.mkDefault derivedCompositor;
-    layers.desktop.derivedGreeter = lib.mkDefault derivedGreeter;
+    layers = {
+      desktop = {
+        compositor = lib.mkDefault derivedCompositor;
+        derivedGreeter = lib.mkDefault derivedGreeter;
+        compositors.umbriel.enable = lib.mkDefault (derivedCompositor == "umbriel");
+      };
 
-    # Dynamically enable the derived compositor substrate
-    layers.layer-40.desktop.hyprland.enable = lib.mkDefault (derivedCompositor == "hyprland");
-    layers.layer-40.desktop.niri.enable = lib.mkDefault (derivedCompositor == "niri");
-    layers.desktop.compositors.umbriel.enable = lib.mkDefault (derivedCompositor == "umbriel");
+      # Dynamically enable the derived compositor substrate
+      layer-40.desktop = {
+        hyprland.enable = lib.mkDefault (derivedCompositor == "hyprland");
+        niri.enable = lib.mkDefault (derivedCompositor == "niri");
+      };
+    };
 
     services.displayManager.defaultSession = lib.mkIf (
       exp == "noctalia" || lib.hasPrefix "noctalia-" exp

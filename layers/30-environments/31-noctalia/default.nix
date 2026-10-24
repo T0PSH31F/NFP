@@ -628,36 +628,34 @@ in
             # ── Hot Corners ──────────────────────────────────────────
             hot_corners = {
               enabled = true;
-            };
-            hot_corners.top_left = {
-              action = "launcher";
-            };
-            hot_corners.top_right = {
-              action = "control_center";
-            };
-            hot_corners.bottom_left = {
-              action = "window_switcher";
+              top_left.action = "launcher";
+              top_right.action = "control_center";
+              bottom_left.action = "window_switcher";
             };
 
             # ── Idle ─────────────────────────────────────────────────
             # DISABLED: noctalia's native idle system causes Wayland
             # "Broken pipe" crashes on Intel Iris Xe when the display
             # wakes from DPMS screen-off. hypridle handles this instead.
-            idle.behavior_order = [ ];
-            idle.behavior.lock = {
-              action = "lock";
-              enabled = false;
-              timeout = 600.0;
-            };
-            idle.behavior.screen-off = {
-              action = "screen_off";
-              enabled = false;
-              timeout = 660.0;
-            };
-            idle.behavior.lock-and-suspend = {
-              action = "lock_and_suspend";
-              enabled = false;
-              timeout = 900.0;
+            idle = {
+              behavior_order = [ ];
+              behavior = {
+                lock = {
+                  action = "lock";
+                  enabled = false;
+                  timeout = 600.0;
+                };
+                screen-off = {
+                  action = "screen_off";
+                  enabled = false;
+                  timeout = 660.0;
+                };
+                lock-and-suspend = {
+                  action = "lock_and_suspend";
+                  enabled = false;
+                  timeout = 900.0;
+                };
+              };
             };
 
             # ── Keybinds ─────────────────────────────────────────────
@@ -974,55 +972,57 @@ in
           };
         };
 
-        # Noctalia v5 is statically linked and dlopen's libEGL.so at runtime.
-        # Two vars are required for eglGetDisplay to succeed:
-        #   1. LD_LIBRARY_PATH — so dlopen("libEGL.so") finds the GLVND dispatcher
-        #      (/run/opengl-driver/lib only has libEGL_mesa.so, not the dispatcher)
-        #   2. __EGL_VENDOR_LIBRARY_DIRS — so GLVND can locate the Mesa ICD
-        #      vendor JSON (50_mesa.json) and back the dispatcher with a real driver.
-        # Without both, eglGetDisplay returns NULL and noctalia crashes on startup.
-        systemd.user.services.noctalia = {
-          Service = {
-            Environment = [
-              "LD_LIBRARY_PATH=${pkgs.libglvnd}/lib:/run/opengl-driver/lib"
-              "__EGL_VENDOR_LIBRARY_DIRS=/run/opengl-driver/share/glvnd/egl_vendor.d"
-            ];
+        systemd.user.services = {
+          # Noctalia v5 is statically linked and dlopen's libEGL.so at runtime.
+          # Two vars are required for eglGetDisplay to succeed:
+          #   1. LD_LIBRARY_PATH — so dlopen("libEGL.so") finds the GLVND dispatcher
+          #      (/run/opengl-driver/lib only has libEGL_mesa.so, not the dispatcher)
+          #   2. __EGL_VENDOR_LIBRARY_DIRS — so GLVND can locate the Mesa ICD
+          #      vendor JSON (50_mesa.json) and back the dispatcher with a real driver.
+          # Without both, eglGetDisplay returns NULL and noctalia crashes on startup.
+          noctalia = {
+            Service = {
+              Environment = [
+                "LD_LIBRARY_PATH=${pkgs.libglvnd}/lib:/run/opengl-driver/lib"
+                "__EGL_VENDOR_LIBRARY_DIRS=/run/opengl-driver/share/glvnd/egl_vendor.d"
+              ];
+            };
           };
-        };
 
-        systemd.user.services.noctalia-experience-dirs = {
-          Unit = {
-            Description = "Ensure Noctalia HVE cache and experience directories exist";
-            Before = [ "graphical-session-pre.target" ];
+          noctalia-experience-dirs = {
+            Unit = {
+              Description = "Ensure Noctalia HVE cache and experience directories exist";
+              Before = [ "graphical-session-pre.target" ];
+            };
+            Install = {
+              WantedBy = [ "graphical-session-pre.target" ];
+            };
+            Service = {
+              Type = "oneshot";
+              RemainAfterExit = true;
+              ExecStart = "${pkgs.bash}/bin/bash -c 'mkdir -p %h/.config/hypr/experiences %h/.cache/noctalia/HVE'";
+            };
           };
-          Install = {
-            WantedBy = [ "graphical-session-pre.target" ];
-          };
-          Service = {
-            Type = "oneshot";
-            RemainAfterExit = true;
-            ExecStart = "${pkgs.bash}/bin/bash -c 'mkdir -p %h/.config/hypr/experiences %h/.cache/noctalia/HVE'";
-          };
-        };
 
-        # Sync Noctalia colors → Hyprland borders + Zellij on login.
-        # Runs noctalia-hypr-reload which regenerates noctalia-colors.conf
-        # from the current wallpaper and reloads the compositor.
-        systemd.user.services.noctalia-colors-sync = {
-          Unit = {
-            Description = "Sync Noctalia colors to Hyprland and Zellij";
-            After = [
-              "graphical-session.target"
-              "noctalia.service"
-            ];
-            Requires = [ "noctalia.service" ];
-          };
-          Service = {
-            Type = "oneshot";
-            ExecStart = "${pkgs.bash}/bin/bash -c 'sleep 3 && noctalia-hypr-reload'";
-          };
-          Install = {
-            WantedBy = [ "graphical-session.target" ];
+          # Sync Noctalia colors → Hyprland borders + Zellij on login.
+          # Runs noctalia-hypr-reload which regenerates noctalia-colors.conf
+          # from the current wallpaper and reloads the compositor.
+          noctalia-colors-sync = {
+            Unit = {
+              Description = "Sync Noctalia colors to Hyprland and Zellij";
+              After = [
+                "graphical-session.target"
+                "noctalia.service"
+              ];
+              Requires = [ "noctalia.service" ];
+            };
+            Service = {
+              Type = "oneshot";
+              ExecStart = "${pkgs.bash}/bin/bash -c 'sleep 3 && noctalia-hypr-reload'";
+            };
+            Install = {
+              WantedBy = [ "graphical-session.target" ];
+            };
           };
         };
 

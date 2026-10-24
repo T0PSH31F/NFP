@@ -43,13 +43,15 @@
     experience = "noctalia-umbriel";
   };
 
-  services.qemuGuest.enable = true;
-  services.spice-vdagentd.enable = true;
   hardware.graphics.enable = true;
 
-  services.displayManager.autoLogin = {
-    enable = true;
-    user = "t0psh31f";
+  services = {
+    qemuGuest.enable = true;
+    spice-vdagentd.enable = true;
+    displayManager.autoLogin = {
+      enable = true;
+      user = "t0psh31f";
+    };
   };
 
   users.users.t0psh31f = {

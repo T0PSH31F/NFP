@@ -488,17 +488,18 @@ in
       in
       {
         config = {
-          # Pi Global Agent Instructions (~/.pi/agent/AGENTS.md and ~/.config/pi/agent/AGENTS.md)
-          home.file.".pi/agent/AGENTS.md".text = piGlobalInstructions;
-          xdg.configFile."pi/agent/AGENTS.md".text = piGlobalInstructions;
+          # Pi Global Agent files (~/.pi/agent and ~/.config/pi/agent)
+          home.file = {
+            ".pi/agent/AGENTS.md".text = piGlobalInstructions;
+            ".pi/agent/settings.json".text = builtins.toJSON piSettings;
+            ".pi/agent/mcp.json".text = builtins.toJSON piMcp;
+          };
 
-          # Pi User Settings (~/.pi/agent/settings.json and ~/.config/pi/agent/settings.json)
-          home.file.".pi/agent/settings.json".text = builtins.toJSON piSettings;
-          xdg.configFile."pi/agent/settings.json".text = builtins.toJSON piSettings;
-
-          # Pi MCP Servers (~/.pi/agent/mcp.json and ~/.config/pi/agent/mcp.json)
-          home.file.".pi/agent/mcp.json".text = builtins.toJSON piMcp;
-          xdg.configFile."pi/agent/mcp.json".text = builtins.toJSON piMcp;
+          xdg.configFile = {
+            "pi/agent/AGENTS.md".text = piGlobalInstructions;
+            "pi/agent/settings.json".text = builtins.toJSON piSettings;
+            "pi/agent/mcp.json".text = builtins.toJSON piMcp;
+          };
 
           # Generate ~/.pi/agent/models.json and ~/.config/pi/agent/models.json at activation time,
           # pulling explicit model IDs from Kong /v1/models when reachable and merging with baseline.

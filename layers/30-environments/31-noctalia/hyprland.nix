@@ -62,49 +62,50 @@ in
         # bindings in keybinds.nix use "noctalia msg".
         wayland.windowManager.hyprland.settings."$ipc" = lib.mkForce "noctalia msg";
 
-        # ── Noctalia layer rules & keybindings ───────────────────────────
-        xdg.configFile."hypr/experiences/noctalia.conf".text = ''
-          # Noctalia Hyprland Experience Configuration
-          $ipc = noctalia msg
+        xdg.configFile = {
+          "hypr/experiences/noctalia.conf".text = ''
+            # Noctalia Hyprland Experience Configuration
+            $ipc = noctalia msg
 
-          # Decoration — Noctalia Lightsaber Aura Shadow
-          decoration {
-            shadow {
-              enabled = true
-              range = 50
-              offset = 0 4
-              render_power = 10
-              color = $primary
-              color_inactive = 0x00000000
+            # Decoration — Noctalia Lightsaber Aura Shadow
+            decoration {
+              shadow {
+                enabled = true
+                range = 50
+                offset = 0 4
+                render_power = 10
+                color = $primary
+                color_inactive = 0x00000000
+              }
             }
-          }
 
-          # Layer rules
-          layerrule = blur 1, match:namespace ^noctalia-(bar-.+|notification|dock|panel|attached-panel|osd)$
-          layerrule = blur_popups 1, match:namespace ^noctalia-(bar-.+|notification|dock|panel|attached-panel|osd)$
-          layerrule = no_anim 1, match:namespace ^noctalia-(bar-.+|notification|dock|panel|attached-panel|osd)$
-          layerrule = ignore_alpha 0.1, match:namespace ^noctalia-(notification|dock|osd)$
+            # Layer rules
+            layerrule = blur 1, match:namespace ^noctalia-(bar-.+|notification|dock|panel|attached-panel|osd)$
+            layerrule = blur_popups 1, match:namespace ^noctalia-(bar-.+|notification|dock|panel|attached-panel|osd)$
+            layerrule = no_anim 1, match:namespace ^noctalia-(bar-.+|notification|dock|panel|attached-panel|osd)$
+            layerrule = ignore_alpha 0.1, match:namespace ^noctalia-(notification|dock|osd)$
 
-          # Keybindings — Noctalia shell actions
-          bind = $mod, comma, exec, $ipc settings-toggle
-          bind = $mod, A, exec, $ipc panel-toggle launcher
-          bind = $mod, X, exec, $ipc panel-toggle control-center
-          bind = $mod, Tab, exec, $ipc window-switcher
-          bind = $mod SHIFT, L, exec, $ipc session lock
-          bind = CTRL ALT, Delete, exec, $ipc panel-toggle session
-          bind = $mod SHIFT, N, exec, $ipc notification-dnd-toggle
-        '';
-
-        xdg.configFile."hypr/experiences/active-experience.conf".text = ''
-          source = ${config.home.homeDirectory}/.config/hypr/experiences/noctalia.conf
-        '';
-
-        xdg.configFile."hypr/experiences/wallpaper-hook.sh" = {
-          executable = true;
-          text = ''
-            #!/usr/bin/env bash
-            noctalia msg wallpaper-set "$1" 2>/dev/null || true
+            # Keybindings — Noctalia shell actions
+            bind = $mod, comma, exec, $ipc settings-toggle
+            bind = $mod, A, exec, $ipc panel-toggle launcher
+            bind = $mod, X, exec, $ipc panel-toggle control-center
+            bind = $mod, Tab, exec, $ipc window-switcher
+            bind = $mod SHIFT, L, exec, $ipc session lock
+            bind = CTRL ALT, Delete, exec, $ipc panel-toggle session
+            bind = $mod SHIFT, N, exec, $ipc notification-dnd-toggle
           '';
+
+          "hypr/experiences/active-experience.conf".text = ''
+            source = ${config.home.homeDirectory}/.config/hypr/experiences/noctalia.conf
+          '';
+
+          "hypr/experiences/wallpaper-hook.sh" = {
+            executable = true;
+            text = ''
+              #!/usr/bin/env bash
+              noctalia msg wallpaper-set "$1" 2>/dev/null || true
+            '';
+          };
         };
       };
     };

@@ -57,11 +57,14 @@
   # ============================================================================
   # THEMES
   # ============================================================================
-  layers.layer-30.theming.themes.greeter.type = "sddm";
-  layers.layer-30.theming.themes.plymouth-hellonavi.enable = true;
-  layers.layer-40.desktop.hyprland.enable = true;
+  layers = {
+    layer-30.theming.themes = {
+      greeter.type = "sddm";
+      plymouth-hellonavi.enable = true;
+    };
+    layer-40.desktop.hyprland.enable = true;
+  };
 
-  # THEMES
   # ESSENTIAL INSTALLATION TOOLS
   # ============================================================================
   environment.systemPackages = with pkgs; [
@@ -84,9 +87,6 @@
   # ============================================================================
   # NETWORKING
   # ============================================================================
-  # ============================================================================
-  # NETWORKING
-  # ============================================================================
   networking.networkmanager.enable = true;
   # networking.wireless.enable = lib.mkForce false; # Disabled by default in installation-cd-minimal
 
@@ -96,25 +96,25 @@
   environment.etc."Grandlix-Gang".source = inputs.self;
 
   # ============================================================================
-  # SSH FOR REMOTE INSTALLATION
+  # SSH & DISPLAY SERVICES
   # ============================================================================
-  services.openssh = {
-    enable = true;
-    settings.PermitRootLogin = "yes";
+  services = {
+    openssh = {
+      enable = true;
+      settings.PermitRootLogin = "yes";
+    };
+    displayManager = {
+      autoLogin.user = "t0psh31f";
+      defaultSession = lib.mkForce "hyprland-uwsm";
+    };
   };
 
   # ============================================================================
   # LIVE USER CONFIGURATION
   # ============================================================================
-  # Enable auto-login for t0psh31f so the user lands in their custom environment
-  services.displayManager.autoLogin.user = "t0psh31f";
-  services.displayManager.defaultSession = lib.mkForce "hyprland-uwsm";
-
-  users.users.nixos = {
-    initialHashedPassword = lib.mkForce "$6$o5YE7K.oDW2Ow8iK$xxFnhKRYuM1EOaoQoyaV6VjsqkkVMf1hX/g9snl4nW1SjFFtREwmZljaOuU7H1IDsTueQIqcicGksJ34AO3Mj0";
-  };
-  users.users.root = {
-    initialHashedPassword = lib.mkForce "$6$o5YE7K.oDW2Ow8iK$xxFnhKRYuM1EOaoQoyaV6VjsqkkVMf1hX/g9snl4nW1SjFFtREwmZljaOuU7H1IDsTueQIqcicGksJ34AO3Mj0";
+  users.users = {
+    nixos.initialHashedPassword = lib.mkForce "$6$o5YE7K.oDW2Ow8iK$xxFnhKRYuM1EOaoQoyaV6VjsqkkVMf1hX/g9snl4nW1SjFFtREwmZljaOuU7H1IDsTueQIqcicGksJ34AO3Mj0";
+    root.initialHashedPassword = lib.mkForce "$6$o5YE7K.oDW2Ow8iK$xxFnhKRYuM1EOaoQoyaV6VjsqkkVMf1hX/g9snl4nW1SjFFtREwmZljaOuU7H1IDsTueQIqcicGksJ34AO3Mj0";
   };
 
   # Ensure t0psh31f has sudo access without password in live ISO

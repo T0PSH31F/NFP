@@ -114,7 +114,8 @@ let
 
     guiApps = [
       "agentdesk"
-      "antigravity-ide"
+      # antigravity-ide: owned by layers/70-agents/71-harness/antigravity.nix as
+      # pkgs.antigravity-ide-fhs (FHS-wrapped). Catalog's plain build collides on bin/.
       "claude-desktop"
       "hermes-desktop"
       "hermes-hud"
@@ -279,7 +280,7 @@ in
       guiCatalogPackages = [
         "agentdesk"
         # "aionui"
-        "antigravity-ide"
+        # antigravity-ide: owned by antigravity.nix (FHS variant), not the catalog
         # "aperant"
         # "claude-code-router"
         "claude-desktop"

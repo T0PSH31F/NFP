@@ -187,6 +187,35 @@ in
           "hypr/hyprviz.conf".text = lib.mkDefault ''
             # Auto-generated fallback for hyprviz.conf
           '';
+
+          "hypr/hyprland.conf".force = true;
+          "hypr/pyprland.toml".text = ''
+            [pyprland]
+            plugins = ["scratchpads"]
+
+            [scratchpads.term]
+            animation = "fromTop"
+            command = "ghostty --class=ghostty-dropdown"
+            class = "ghostty-dropdown"
+            size = "100% 50%"
+            lazy = true
+
+            [scratchpads.gedit]
+            animation = "fromRight"
+            command = "gedit"
+            class = "gedit"
+            size = "75% 60%"
+            position = "center"
+            lazy = true
+
+            [scratchpads.nwglook]
+            animation = "fromBottom"
+            command = "nwg-look"
+            class = "nwg-look"
+            size = "60% 60%"
+            position = "center"
+            lazy = true
+          '';
         };
 
         # Ensure screenshots directory exists
@@ -285,35 +314,6 @@ in
             # };
           };
         };
-
-        xdg.configFile."hypr/hyprland.conf".force = true;
-        xdg.configFile."hypr/pyprland.toml".text = ''
-          [pyprland]
-          plugins = ["scratchpads"]
-
-          [scratchpads.term]
-          animation = "fromTop"
-          command = "ghostty --class=ghostty-dropdown"
-          class = "ghostty-dropdown"
-          size = "100% 50%"
-          lazy = true
-
-          [scratchpads.gedit]
-          animation = "fromRight"
-          command = "gedit"
-          class = "gedit"
-          size = "75% 60%"
-          position = "center"
-          lazy = true
-
-          [scratchpads.nwglook]
-          animation = "fromBottom"
-          command = "nwg-look"
-          class = "nwg-look"
-          size = "60% 60%"
-          position = "center"
-          lazy = true
-        '';
 
         systemd.user.services.hyprland-init-files = {
           Unit = {

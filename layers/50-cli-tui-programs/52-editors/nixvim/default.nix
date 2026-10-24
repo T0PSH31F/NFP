@@ -322,551 +322,550 @@ in
             }
           ];
 
-          # ── Plugins ─────────────────────────────────────────────────
-
-          # Telescope — fuzzy find files, grep, buffers, help.
-          # The #1 plugin for mouse-free navigation.
-          plugins.telescope = {
-            enable = true;
-
-            extensions.fzf-native.enable = true;
-
-            keymaps = {
-              "<leader>ff" = {
-                action = "find_files";
-                options.desc = "Find files";
-              };
-              "<leader>fg" = {
-                action = "live_grep";
-                options.desc = "Live grep";
-              };
-              "<leader>fb" = {
-                action = "buffers";
-                options.desc = "Find buffers";
-              };
-              "<leader>fh" = {
-                action = "help_tags";
-                options.desc = "Help tags";
-              };
-              "<leader>fr" = {
-                action = "oldfiles";
-                options.desc = "Recent files";
-              };
-              "<leader>f." = {
-                action = "resume";
-                options.desc = "Resume last picker";
-              };
-            };
-          };
-
-          # Neo-tree — file explorer sidebar, toggled with <leader>e
-          plugins.neo-tree = lib.mkIf cfg.plugins.neo-tree {
-            enable = true;
-
-            settings = {
-              close_if_last_window = true;
-              popup_border_style = "rounded";
-              enable_git_status = true;
-              enable_diagnostics = true;
-
-              window = {
-                position = "left";
-                width = 35;
-                mappings."<space>" = "none";
-              };
-
-              filesystem = {
-                filtered_items = {
-                  hide_dotfiles = false;
-                  hide_gitignored = false;
-                };
-                follow_current_file.enable = true;
-              };
-            };
-            # keymap in main keymaps list
-          };
-
-          # Flash — jump to any visible character with 2 keystrokes.
-          # s + two chars → teleport cursor. Essential mouse-free tool.
-          plugins.flash = {
-            enable = true;
-
-            settings = {
-              labels = "asdfghjklqwertyuiopzxcvbnm";
-              pattern = "\\f\\f";
-              highlight = {
-                backdrop = true;
-                matches = true;
-                priority = 5000;
-                groups = {
-                  match = "FlashMatch";
-                  current = "FlashCurrent";
-                  backdrop = "FlashBackdrop";
-                  label = "FlashLabel";
-                };
-              };
-            };
-          };
-
-          # Which-key — shows available keybindings when you press <leader>
-          plugins.which-key = lib.mkIf cfg.plugins.which-key {
-            enable = true;
-
-            settings.spec = [
-              {
-                __unkeyed-1 = "<leader>f";
-                group = "  Find";
-              }
-              {
-                __unkeyed-1 = "<leader>g";
-                group = "  Git";
-              }
-              {
-                __unkeyed-1 = "<leader>l";
-                group = "  LSP";
-              }
-            ];
-          };
-
-          # LSP — language servers for all your languages
-          plugins.lsp = {
-            enable = true;
-
-            servers = {
-              nil_ls.enable = true;
-              nixd.enable = true;
-              # nixvim builds its own pkgs from `nixpkgs.source = inputs.nixpkgs`
-              # (see above), which BYPASSES our overlays — so its default
-              # typescript-language-server still carries nixpkgs' stale pnpmDeps
-              # pin and aborts the whole build on a hash mismatch (cascading into
-              # neovim → nixvim → home-manager → toplevel on both machines).
-              # Point ts_ls at our overlaid copy, fixed in custom-packages.nix.
-              ts_ls = {
-                enable = true;
-                package = pkgs.typescript-language-server;
-              };
-              eslint.enable = true;
-              html.enable = true;
-              cssls.enable = true;
-              jsonls.enable = true;
-              yamlls.enable = true;
-              basedpyright.enable = true;
-              ruff.enable = true;
-              rust_analyzer = {
-                enable = true;
-                installCargo = true;
-                installRustc = true;
-              };
-              gopls.enable = true;
-              lua_ls.enable = true;
-              marksman.enable = true;
-              tinymist.enable = true;
-            };
-
-            onAttach = ''
-              local map = vim.keymap.set
-              local opts = { buffer = bufnr, silent = true }
-              map("n", "gd", vim.lsp.buf.definition, vim.tbl_extend("force", opts, { desc = "Go to definition" }))
-              map("n", "gr", vim.lsp.buf.references, vim.tbl_extend("force", opts, { desc = "Find references" }))
-              map("n", "K", vim.lsp.buf.hover, vim.tbl_extend("force", opts, { desc = "Hover documentation" }))
-              map("n", "<leader>ca", vim.lsp.buf.code_action, vim.tbl_extend("force", opts, { desc = "Code action" }))
-              map("n", "<leader>rn", vim.lsp.buf.rename, vim.tbl_extend("force", opts, { desc = "Rename symbol" }))
-              map("n", "[d", vim.diagnostic.goto_prev, vim.tbl_extend("force", opts, { desc = "Previous diagnostic" }))
-              map("n", "]d", vim.diagnostic.goto_next, vim.tbl_extend("force", opts, { desc = "Next diagnostic" }))
-            '';
-          };
-
-          # blink.cmp — modern auto-completion (Rust backend)
-          plugins.blink-cmp = lib.mkIf cfg.plugins.blink-cmp {
-            enable = true;
-
-            settings = {
-              completion = {
-                list.selection = {
-                  preselect = false;
-                  auto_insert = true;
-                };
-                menu = {
-                  border = "rounded";
-                  draw.columns = [
-                    { __unkeyed-1 = "label"; }
-                    { __unkeyed-1 = "kind_icon"; }
-                  ];
-                };
-                documentation.auto_show = true;
-              };
-
-              sources.default = [
-                "lsp"
-                "path"
-                "snippets"
-                "buffer"
-                "markdown"
-              ];
-
-              keymap = {
-                preset = "enter";
-                "<Tab>" = [
-                  "select_next"
-                  "fallback"
-                ];
-                "<S-Tab>" = [
-                  "select_prev"
-                  "fallback"
-                ];
-                "<C-e>" = [ "hide" ];
-                "<C-space>" = [ "show" ];
-              };
-            };
-          };
-
-          # LuaSnip + friendly snippets — code snippet engine
-          plugins.luasnip = {
-            enable = true;
-            settings = {
-              enable_autosnippets = true;
-              store_selection_keys = "<Tab>";
-            };
-          };
-          plugins.friendly-snippets.enable = true;
-
-          # Treesitter — AST-based syntax highlighting and navigation
-          plugins.treesitter = {
-            enable = true;
-
-            settings = {
-              indent.enable = true;
-              highlight.enable = true;
-              incremental_selection.enable = true;
-            };
-
-            grammarPackages = with pkgs.vimPlugins.nvim-treesitter.builtGrammars; [
-              nix
-              lua
-              rust
-              go
-              python
-              javascript
-              typescript
-              tsx
-              html
-              css
-              json
-              yaml
-              toml
-              markdown
-              markdown-inline
-              bash
-              diff
-              gitignore
-              hcl
-              dockerfile
-              sql
-              vim
-              vimdoc
-              typst
-            ];
-          };
-
-          # Lualine — informative status line
-          plugins.lualine = {
-            enable = true;
-            settings.options = {
-              theme = "auto";
-              component_separators = {
-                left = "|";
-                right = "|";
-              };
-              section_separators = {
-                left = "";
-                right = "";
-              };
-            };
-            settings.sections = {
-              lualine_a = [ "mode" ];
-              lualine_b = [
-                "branch"
-                "diff"
-                "diagnostics"
-              ];
-              lualine_c = [ "filename" ];
-              lualine_x = [
-                "filetype"
-                "encoding"
-              ];
-              lualine_y = [ "progress" ];
-              lualine_z = [ "location" ];
-            };
-          };
-
-          # Bufferline — tab bar at top
-          plugins.bufferline = {
-            enable = true;
-            settings.options = {
-              numbers = "ordinal";
-              close_command = "bdelete! %d";
-              right_mouse_command = "bdelete! %d";
-              indicator.style = "underline";
-              buffer_close_icon = "×";
-              modified_icon = "●";
-              separator_style = "thin";
-              always_show_bufferline = true;
-            };
-          };
-
-          # Noice — modern command line UI
-          plugins.noice = lib.mkIf cfg.plugins.noice {
-            enable = true;
-            settings = {
-              cmdline.view = "cmdline_popup";
-              messages.view = "mini";
-              popupmenu.backend = "nui";
-            };
-          };
-
-          # Neoscroll — smooth scrolling animations
-          # Replaces jerky C-d/C-u/j/k/gg/G jumps with smooth animated scroll
-          plugins.neoscroll = lib.mkIf cfg.plugins.neoscroll {
-            enable = true;
-            settings = {
-              hide_cursor = false;
-              stop_eof = true;
-              respect_scrolloff = true;
-              cursor_scrolls_alone = true;
-              easing_function = "quadratic";
-              pre_horizontal_scrolloff = 0;
-            };
-          };
-
-          # Smear-cursor — cursor trailing/smear effect
-          # Creates a visual "trail" after the cursor when moving fast.
-          # Installed manually since nixvim has no built-in module for it.
+          # ── Extra Plugins (manual / unmapped) ───────────────────────
           extraPlugins = [
             pkgs.vimPlugins.base16-nvim
           ]
           ++ lib.optional cfg.plugins.smear-cursor pkgs.vimPlugins.smear-cursor-nvim;
 
-          # Dressing — better vim.ui dialogs (telescope-style)
-          plugins.dressing.enable = true;
+          # ── Plugins ─────────────────────────────────────────────────
+          plugins = {
+            # Telescope — fuzzy find files, grep, buffers, help.
+            # The #1 plugin for mouse-free navigation.
+            telescope = {
+              enable = true;
 
-          # Trouble — diagnostics sidebar
-          plugins.trouble = lib.mkIf cfg.plugins.trouble {
-            enable = true;
-          };
+              extensions.fzf-native.enable = true;
 
-          # Gitsigns — git signs in gutter + inline blame
-          plugins.gitsigns = {
-            enable = true;
-            settings = {
-              signs = {
-                add.text = "+";
-                change.text = "~";
-                delete.text = "_";
-                topdelete.text = "‾";
-                changedelete.text = "~";
-              };
-              current_line_blame = true;
-              current_line_blame_opts.delay = 500;
-            };
-          };
-
-          # LazyGit — git GUI in a floating terminal
-          plugins.lazygit = lib.mkIf cfg.plugins.lazygit {
-            enable = true;
-          };
-
-          # Conform — auto-format on save
-          plugins.conform-nvim = {
-            enable = true;
-            settings = {
-              format_on_save = {
-                timeout_ms = 500;
-                lsp_fallback = true;
-              };
-              formatters_by_ft = {
-                nix = [ "nixfmt" ];
-                lua = [ "stylua" ];
-                python = [ "ruff_format" ];
-                rust = [ "rustfmt" ];
-                go = [ "gofmt" ];
-                javascript = [
-                  "prettierd"
-                  "prettier"
-                ];
-                typescript = [
-                  "prettierd"
-                  "prettier"
-                ];
-                html = [
-                  "prettierd"
-                  "prettier"
-                ];
-                css = [
-                  "prettierd"
-                  "prettier"
-                ];
-                json = [
-                  "prettierd"
-                  "prettier"
-                ];
-                yaml = [ "yamlfmt" ];
-                markdown = [
-                  "prettierd"
-                  "prettier"
-                ];
-                "*" = [ "trim_whitespace" ];
+              keymaps = {
+                "<leader>ff" = {
+                  action = "find_files";
+                  options.desc = "Find files";
+                };
+                "<leader>fg" = {
+                  action = "live_grep";
+                  options.desc = "Live grep";
+                };
+                "<leader>fb" = {
+                  action = "buffers";
+                  options.desc = "Find buffers";
+                };
+                "<leader>fh" = {
+                  action = "help_tags";
+                  options.desc = "Help tags";
+                };
+                "<leader>fr" = {
+                  action = "oldfiles";
+                  options.desc = "Recent files";
+                };
+                "<leader>f." = {
+                  action = "resume";
+                  options.desc = "Resume last picker";
+                };
               };
             };
-          };
 
-          # Autopairs — auto-close brackets
-          plugins.nvim-autopairs.enable = true;
+            # Neo-tree — file explorer sidebar, toggled with <leader>e
+            neo-tree = lib.mkIf cfg.plugins.neo-tree {
+              enable = true;
 
-          # Surround — edit surround characters without mouse
-          plugins.nvim-surround.enable = true;
+              settings = {
+                close_if_last_window = true;
+                popup_border_style = "rounded";
+                enable_git_status = true;
+                enable_diagnostics = true;
 
-          # Todo-comments — highlight TODO/FIXME/HACK
-          plugins.todo-comments.enable = true;
+                window = {
+                  position = "left";
+                  width = 35;
+                  mappings."<space>" = "none";
+                };
 
-          # Illuminate — auto-highlight word under cursor
-          plugins.illuminate.enable = true;
-
-          # Indent-blankline — vertical indent guides
-          plugins.indent-blankline = {
-            enable = true;
-            settings = {
-              indent = {
-                char = "│";
-                smart_indent_cap = true;
+                filesystem = {
+                  filtered_items = {
+                    hide_dotfiles = false;
+                    hide_gitignored = false;
+                  };
+                  follow_current_file.enable = true;
+                };
               };
-              scope = {
-                enabled = true;
-                show_start = true;
-                show_end = false;
-              };
+              # keymap in main keymaps list
             };
-          };
 
-          # Rainbow-delimiters — colored bracket nesting
-          plugins.rainbow-delimiters.enable = true;
+            # Flash — jump to any visible character with 2 keystrokes.
+            # s + two chars → teleport cursor. Essential mouse-free tool.
+            flash = {
+              enable = true;
 
-          # Render-markdown — live Markdown preview
-          plugins.render-markdown.enable = true;
-
-          # Web-devicons — file-type icons everywhere
-          plugins.web-devicons.enable = true;
-
-          # Comment — easy commenting with gc
-          plugins.comment.enable = true;
-
-          # Yazi — file manager integration in-editor
-          plugins.yazi.enable = true;
-
-          # Zellij-nav — seamless Zellij/Neovim pane movement
-          plugins.zellij-nav.enable = true;
-
-          # Multicursors — VS Code-style multi-cursor editing
-          # Within multicursor mode (both normal and insert):
-          #   Ctrl+Shift+Up/Down    → add cursor above/below
-          #   Ctrl+Shift+Left/Right → skip/subtract current cursor
-          #   j/k  → add cursor below/above (defaults, also work)
-          #   q    → skip current selection (default)
-          #   ,    → keep only the main cursor (default)
-          plugins.multicursors = lib.mkIf cfg.plugins.multicursors {
-            enable = true;
-            settings = {
-              normal_keys = {
-                "<C-S-Up>" = {
-                  # method.__raw is a raw Lua function, not a nix value
-                  method.__raw = ''
-                    function() require("multicursors.normal_mode").add_cursor_above() end
-                  '';
-                  opts = {
-                    desc = "Add cursor above";
-                  };
-                };
-                "<C-S-Down>" = {
-                  method.__raw = ''
-                    function() require("multicursors.normal_mode").add_cursor_below() end
-                  '';
-                  opts = {
-                    desc = "Add cursor below";
-                  };
-                };
-                "<C-S-Left>" = {
-                  method.__raw = ''
-                    function() require("multicursors.normal_mode").skip() end
-                  '';
-                  opts = {
-                    desc = "Skip/subtract cursor";
-                  };
-                };
-                "<C-S-Right>" = {
-                  method.__raw = ''
-                    function() require("multicursors.normal_mode").skip() end
-                  '';
-                  opts = {
-                    desc = "Skip/subtract cursor";
-                  };
-                };
-              };
-              insert_keys = {
-                "<C-S-Up>" = {
-                  method.__raw = ''
-                    function() require("multicursors.normal_mode").add_cursor_above() end
-                  '';
-                  opts = {
-                    desc = "Add cursor above";
-                  };
-                };
-                "<C-S-Down>" = {
-                  method.__raw = ''
-                    function() require("multicursors.normal_mode").add_cursor_below() end
-                  '';
-                  opts = {
-                    desc = "Add cursor below";
-                  };
-                };
-                "<C-S-Left>" = {
-                  method.__raw = ''
-                    function() require("multicursors.normal_mode").skip() end
-                  '';
-                  opts = {
-                    desc = "Skip/subtract cursor";
-                  };
-                };
-                "<C-S-Right>" = {
-                  method.__raw = ''
-                    function() require("multicursors.normal_mode").skip() end
-                  '';
-                  opts = {
-                    desc = "Skip/subtract cursor";
+              settings = {
+                labels = "asdfghjklqwertyuiopzxcvbnm";
+                pattern = "\\f\\f";
+                highlight = {
+                  backdrop = true;
+                  matches = true;
+                  priority = 5000;
+                  groups = {
+                    match = "FlashMatch";
+                    current = "FlashCurrent";
+                    backdrop = "FlashBackdrop";
+                    label = "FlashLabel";
                   };
                 };
               };
             };
-          };
 
-          # Snacks — QoL collection (required by opencode)
-          plugins.snacks = lib.mkIf cfg.plugins.opencode {
-            enable = true;
-            settings.input.enabled = true;
-          };
+            # Which-key — shows available keybindings when you press <leader>
+            which-key = lib.mkIf cfg.plugins.which-key {
+              enable = true;
 
-          # OpenCode — Claude Code AI assistant in-editor
-          plugins.opencode = lib.mkIf cfg.plugins.opencode {
-            enable = true;
-            settings = {
-              auto_reload = true;
+              settings.spec = [
+                {
+                  __unkeyed-1 = "<leader>f";
+                  group = "  Find";
+                }
+                {
+                  __unkeyed-1 = "<leader>g";
+                  group = "  Git";
+                }
+                {
+                  __unkeyed-1 = "<leader>l";
+                  group = "  LSP";
+                }
+              ];
             };
-          };
 
-          # Ollama — local LLM integration
-          plugins.ollama = lib.mkIf cfg.plugins.ollama {
-            enable = true;
-            settings = {
-              model = "llama3.2";
-              url = "http://127.0.0.1:11434";
+            # LSP — language servers for all your languages
+            lsp = {
+              enable = true;
+
+              servers = {
+                nil_ls.enable = true;
+                nixd.enable = true;
+                # nixvim builds its own pkgs from `nixpkgs.source = inputs.nixpkgs`
+                # (see above), which BYPASSES our overlays — so its default
+                # typescript-language-server still carries nixpkgs' stale pnpmDeps
+                # pin and aborts the whole build on a hash mismatch (cascading into
+                # neovim → nixvim → home-manager → toplevel on both machines).
+                # Point ts_ls at our overlaid copy, fixed in custom-packages.nix.
+                ts_ls = {
+                  enable = true;
+                  package = pkgs.typescript-language-server;
+                };
+                eslint.enable = true;
+                html.enable = true;
+                cssls.enable = true;
+                jsonls.enable = true;
+                yamlls.enable = true;
+                basedpyright.enable = true;
+                ruff.enable = true;
+                rust_analyzer = {
+                  enable = true;
+                  installCargo = true;
+                  installRustc = true;
+                };
+                gopls.enable = true;
+                lua_ls.enable = true;
+                marksman.enable = true;
+                tinymist.enable = true;
+              };
+
+              onAttach = ''
+                local map = vim.keymap.set
+                local opts = { buffer = bufnr, silent = true }
+                map("n", "gd", vim.lsp.buf.definition, vim.tbl_extend("force", opts, { desc = "Go to definition" }))
+                map("n", "gr", vim.lsp.buf.references, vim.tbl_extend("force", opts, { desc = "Find references" }))
+                map("n", "K", vim.lsp.buf.hover, vim.tbl_extend("force", opts, { desc = "Hover documentation" }))
+                map("n", "<leader>ca", vim.lsp.buf.code_action, vim.tbl_extend("force", opts, { desc = "Code action" }))
+                map("n", "<leader>rn", vim.lsp.buf.rename, vim.tbl_extend("force", opts, { desc = "Rename symbol" }))
+                map("n", "[d", vim.diagnostic.goto_prev, vim.tbl_extend("force", opts, { desc = "Previous diagnostic" }))
+                map("n", "]d", vim.diagnostic.goto_next, vim.tbl_extend("force", opts, { desc = "Next diagnostic" }))
+              '';
+            };
+
+            # blink.cmp — modern auto-completion (Rust backend)
+            blink-cmp = lib.mkIf cfg.plugins.blink-cmp {
+              enable = true;
+
+              settings = {
+                completion = {
+                  list.selection = {
+                    preselect = false;
+                    auto_insert = true;
+                  };
+                  menu = {
+                    border = "rounded";
+                    draw.columns = [
+                      { __unkeyed-1 = "label"; }
+                      { __unkeyed-1 = "kind_icon"; }
+                    ];
+                  };
+                  documentation.auto_show = true;
+                };
+
+                sources.default = [
+                  "lsp"
+                  "path"
+                  "snippets"
+                  "buffer"
+                  "markdown"
+                ];
+
+                keymap = {
+                  preset = "enter";
+                  "<Tab>" = [
+                    "select_next"
+                    "fallback"
+                  ];
+                  "<S-Tab>" = [
+                    "select_prev"
+                    "fallback"
+                  ];
+                  "<C-e>" = [ "hide" ];
+                  "<C-space>" = [ "show" ];
+                };
+              };
+            };
+
+            # LuaSnip + friendly snippets — code snippet engine
+            luasnip = {
+              enable = true;
+              settings = {
+                enable_autosnippets = true;
+                store_selection_keys = "<Tab>";
+              };
+            };
+            friendly-snippets.enable = true;
+
+            # Treesitter — AST-based syntax highlighting and navigation
+            treesitter = {
+              enable = true;
+
+              settings = {
+                indent.enable = true;
+                highlight.enable = true;
+                incremental_selection.enable = true;
+              };
+
+              grammarPackages = with pkgs.vimPlugins.nvim-treesitter.builtGrammars; [
+                nix
+                lua
+                rust
+                go
+                python
+                javascript
+                typescript
+                tsx
+                html
+                css
+                json
+                yaml
+                toml
+                markdown
+                markdown-inline
+                bash
+                diff
+                gitignore
+                hcl
+                dockerfile
+                sql
+                vim
+                vimdoc
+                typst
+              ];
+            };
+
+            # Lualine — informative status line
+            lualine = {
+              enable = true;
+              settings.options = {
+                theme = "auto";
+                component_separators = {
+                  left = "|";
+                  right = "|";
+                };
+                section_separators = {
+                  left = "";
+                  right = "";
+                };
+              };
+              settings.sections = {
+                lualine_a = [ "mode" ];
+                lualine_b = [
+                  "branch"
+                  "diff"
+                  "diagnostics"
+                ];
+                lualine_c = [ "filename" ];
+                lualine_x = [
+                  "filetype"
+                  "encoding"
+                ];
+                lualine_y = [ "progress" ];
+                lualine_z = [ "location" ];
+              };
+            };
+
+            # Bufferline — tab bar at top
+            bufferline = {
+              enable = true;
+              settings.options = {
+                numbers = "ordinal";
+                close_command = "bdelete! %d";
+                right_mouse_command = "bdelete! %d";
+                indicator.style = "underline";
+                buffer_close_icon = "×";
+                modified_icon = "●";
+                separator_style = "thin";
+                always_show_bufferline = true;
+              };
+            };
+
+            # Noice — modern command line UI
+            noice = lib.mkIf cfg.plugins.noice {
+              enable = true;
+              settings = {
+                cmdline.view = "cmdline_popup";
+                messages.view = "mini";
+                popupmenu.backend = "nui";
+              };
+            };
+
+            # Neoscroll — smooth scrolling animations
+            # Replaces jerky C-d/C-u/j/k/gg/G jumps with smooth animated scroll
+            neoscroll = lib.mkIf cfg.plugins.neoscroll {
+              enable = true;
+              settings = {
+                hide_cursor = false;
+                stop_eof = true;
+                respect_scrolloff = true;
+                cursor_scrolls_alone = true;
+                easing_function = "quadratic";
+                pre_horizontal_scrolloff = 0;
+              };
+            };
+
+            # Dressing — better vim.ui dialogs (telescope-style)
+            dressing.enable = true;
+
+            # Trouble — diagnostics sidebar
+            trouble = lib.mkIf cfg.plugins.trouble {
+              enable = true;
+            };
+
+            # Gitsigns — git signs in gutter + inline blame
+            gitsigns = {
+              enable = true;
+              settings = {
+                signs = {
+                  add.text = "+";
+                  change.text = "~";
+                  delete.text = "_";
+                  topdelete.text = "‾";
+                  changedelete.text = "~";
+                };
+                current_line_blame = true;
+                current_line_blame_opts.delay = 500;
+              };
+            };
+
+            # LazyGit — git GUI in a floating terminal
+            lazygit = lib.mkIf cfg.plugins.lazygit {
+              enable = true;
+            };
+
+            # Conform — auto-format on save
+            conform-nvim = {
+              enable = true;
+              settings = {
+                format_on_save = {
+                  timeout_ms = 500;
+                  lsp_fallback = true;
+                };
+                formatters_by_ft = {
+                  nix = [ "nixfmt" ];
+                  lua = [ "stylua" ];
+                  python = [ "ruff_format" ];
+                  rust = [ "rustfmt" ];
+                  go = [ "gofmt" ];
+                  javascript = [
+                    "prettierd"
+                    "prettier"
+                  ];
+                  typescript = [
+                    "prettierd"
+                    "prettier"
+                  ];
+                  html = [
+                    "prettierd"
+                    "prettier"
+                  ];
+                  css = [
+                    "prettierd"
+                    "prettier"
+                  ];
+                  json = [
+                    "prettierd"
+                    "prettier"
+                  ];
+                  yaml = [ "yamlfmt" ];
+                  markdown = [
+                    "prettierd"
+                    "prettier"
+                  ];
+                  "*" = [ "trim_whitespace" ];
+                };
+              };
+            };
+
+            # Autopairs — auto-close brackets
+            nvim-autopairs.enable = true;
+
+            # Surround — edit surround characters without mouse
+            nvim-surround.enable = true;
+
+            # Todo-comments — highlight TODO/FIXME/HACK
+            todo-comments.enable = true;
+
+            # Illuminate — auto-highlight word under cursor
+            illuminate.enable = true;
+
+            # Indent-blankline — vertical indent guides
+            indent-blankline = {
+              enable = true;
+              settings = {
+                indent = {
+                  char = "│";
+                  smart_indent_cap = true;
+                };
+                scope = {
+                  enabled = true;
+                  show_start = true;
+                  show_end = false;
+                };
+              };
+            };
+
+            # Rainbow-delimiters — colored bracket nesting
+            rainbow-delimiters.enable = true;
+
+            # Render-markdown — live Markdown preview
+            render-markdown.enable = true;
+
+            # Web-devicons — file-type icons everywhere
+            web-devicons.enable = true;
+
+            # Comment — easy commenting with gc
+            comment.enable = true;
+
+            # Yazi — file manager integration in-editor
+            yazi.enable = true;
+
+            # Zellij-nav — seamless Zellij/Neovim pane movement
+            zellij-nav.enable = true;
+
+            # Multicursors — VS Code-style multi-cursor editing
+            # Within multicursor mode (both normal and insert):
+            #   Ctrl+Shift+Up/Down    → add cursor above/below
+            #   Ctrl+Shift+Left/Right → skip/subtract current cursor
+            #   j/k  → add cursor below/above (defaults, also work)
+            #   q    → skip current selection (default)
+            #   ,    → keep only the main cursor (default)
+            multicursors = lib.mkIf cfg.plugins.multicursors {
+              enable = true;
+              settings = {
+                normal_keys = {
+                  "<C-S-Up>" = {
+                    # method.__raw is a raw Lua function, not a nix value
+                    method.__raw = ''
+                      function() require("multicursors.normal_mode").add_cursor_above() end
+                    '';
+                    opts = {
+                      desc = "Add cursor above";
+                    };
+                  };
+                  "<C-S-Down>" = {
+                    method.__raw = ''
+                      function() require("multicursors.normal_mode").add_cursor_below() end
+                    '';
+                    opts = {
+                      desc = "Add cursor below";
+                    };
+                  };
+                  "<C-S-Left>" = {
+                    method.__raw = ''
+                      function() require("multicursors.normal_mode").skip() end
+                    '';
+                    opts = {
+                      desc = "Skip/subtract cursor";
+                    };
+                  };
+                  "<C-S-Right>" = {
+                    method.__raw = ''
+                      function() require("multicursors.normal_mode").skip() end
+                    '';
+                    opts = {
+                      desc = "Skip/subtract cursor";
+                    };
+                  };
+                };
+                insert_keys = {
+                  "<C-S-Up>" = {
+                    method.__raw = ''
+                      function() require("multicursors.normal_mode").add_cursor_above() end
+                    '';
+                    opts = {
+                      desc = "Add cursor above";
+                    };
+                  };
+                  "<C-S-Down>" = {
+                    method.__raw = ''
+                      function() require("multicursors.normal_mode").add_cursor_below() end
+                    '';
+                    opts = {
+                      desc = "Add cursor below";
+                    };
+                  };
+                  "<C-S-Left>" = {
+                    method.__raw = ''
+                      function() require("multicursors.normal_mode").skip() end
+                    '';
+                    opts = {
+                      desc = "Skip/subtract cursor";
+                    };
+                  };
+                  "<C-S-Right>" = {
+                    method.__raw = ''
+                      function() require("multicursors.normal_mode").skip() end
+                    '';
+                    opts = {
+                      desc = "Skip/subtract cursor";
+                    };
+                  };
+                };
+              };
+            };
+
+            # Snacks — QoL collection (required by opencode)
+            snacks = lib.mkIf cfg.plugins.opencode {
+              enable = true;
+              settings.input.enabled = true;
+            };
+
+            # OpenCode — Claude Code AI assistant in-editor
+            opencode = lib.mkIf cfg.plugins.opencode {
+              enable = true;
+              settings = {
+                auto_reload = true;
+              };
+            };
+
+            # Ollama — local LLM integration
+            ollama = lib.mkIf cfg.plugins.ollama {
+              enable = true;
+              settings = {
+                model = "llama3.2";
+                url = "http://127.0.0.1:11434";
+              };
             };
           };
 

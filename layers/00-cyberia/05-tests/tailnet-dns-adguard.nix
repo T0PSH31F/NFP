@@ -14,60 +14,69 @@
         ...
       }:
       {
-        networking.hostName = "luffy";
-        networking.extraHosts = "127.0.0.1 luffy.nfp.nix 100.64.0.3 luffy.nfp.nix";
-        services.headscale = {
-          enable = true;
-          address = "0.0.0.0";
-          port = 8086;
-          settings = {
-            server_url = "http://luffy.nfp.nix:8086";
-            dns = {
-              magic_dns = true;
-              base_domain = "nfp.nix";
-              nameservers.global = [ "100.64.0.3" ];
-              override_local_dns = true;
-            };
-            derp.server.enabled = false;
-            derp.auto_update_enabled = false;
-            derp.urls = [ ];
-          };
+        networking = {
+          hostName = "luffy";
+          extraHosts = "127.0.0.1 luffy.nfp.nix 100.64.0.3 luffy.nfp.nix";
+          firewall.allowedTCPPorts = [
+            8086
+            3007
+          ];
         };
-        services.adguardhome = {
-          enable = true;
-          openFirewall = false;
-          settings = {
-            dns = {
-              # VM: bind only loopback + 0.0.0.0 to avoid tailscale0 race (100.64.0.3 not yet assigned at AdGuard start)
-              bind_hosts = [
-                "127.0.0.1"
-                "0.0.0.0"
-              ];
-              port = 53;
-              bootstrap_dns = [
-                "9.9.9.9"
-                "1.1.1.1"
-              ];
-              upstream_dns = [
-                "https://dns.quad9.net/dns-query"
-                "tls://dns.quad9.net"
+
+        services = {
+          headscale = {
+            enable = true;
+            address = "0.0.0.0";
+            port = 8086;
+            settings = {
+              server_url = "http://luffy.nfp.nix:8086";
+              dns = {
+                magic_dns = true;
+                base_domain = "nfp.nix";
+                nameservers.global = [ "100.64.0.3" ];
+                override_local_dns = true;
+              };
+              derp = {
+                server.enabled = false;
+                auto_update_enabled = false;
+                urls = [ ];
+              };
+            };
+          };
+
+          adguardhome = {
+            enable = true;
+            openFirewall = false;
+            settings = {
+              dns = {
+                # VM: bind only loopback + 0.0.0.0 to avoid tailscale0 race (100.64.0.3 not yet assigned at AdGuard start)
+                bind_hosts = [
+                  "127.0.0.1"
+                  "0.0.0.0"
+                ];
+                port = 53;
+                bootstrap_dns = [
+                  "9.9.9.9"
+                  "1.1.1.1"
+                ];
+                upstream_dns = [
+                  "https://dns.quad9.net/dns-query"
+                  "tls://dns.quad9.net"
+                ];
+              };
+              filtering.rewrites = [ ];
+              filters = [
+                {
+                  enabled = true;
+                  url = "https://adguardteam.github.io/HostlistsRegistry/assets/filter_1.txt";
+                  name = "AdGuard Base";
+                }
               ];
             };
-            filtering.rewrites = [ ];
-            filters = [
-              {
-                enabled = true;
-                url = "https://adguardteam.github.io/HostlistsRegistry/assets/filter_1.txt";
-                name = "AdGuard Base";
-              }
-            ];
           };
+
+          tailscale.enable = true;
         };
-        services.tailscale.enable = true;
-        networking.firewall.allowedTCPPorts = [
-          8086
-          3007
-        ];
         environment.systemPackages = [
           pkgs.dig
           pkgs.curl

@@ -12,24 +12,23 @@
   users.mutableUsers = false;
 
   # Workaround for nixpkgs unstable broken symlinks in util-linux.bin
-  security.wrappers.mount.source = lib.mkForce "${pkgs.util-linuxMinimal}/bin/mount";
-  security.wrappers.umount.source = lib.mkForce "${pkgs.util-linuxMinimal}/bin/umount";
+  security.wrappers = {
+    mount.source = lib.mkForce "${pkgs.util-linuxMinimal}/bin/mount";
+    umount.source = lib.mkForce "${pkgs.util-linuxMinimal}/bin/umount";
+  };
 
-  # Enable experimental features
-  nix.settings.experimental-features = [
-    "nix-command"
-    "flakes"
-  ];
-
-  # XDG Base Directory support for the Nix CLI (nix-env etc.).
-  # With this, nix uses $XDG_STATE_HOME/nix/{profile,defexpr} instead of
-  # $HOME/.nix-profile and $HOME/.nix-defexpr.
-  nix.settings.use-xdg-base-directories = true;
-
-  # Local cache nami.nfp.nix:5000 is unreliable (frequent timeouts). Without
-  # fallback=true, substituter failures abort builds fatally (attempt 5/5);
-  # with it, nix falls back to building locally after retries.
-  nix.settings.fallback = true;
+  # Nix configuration
+  nix.settings = {
+    experimental-features = [
+      "nix-command"
+      "flakes"
+    ];
+    use-xdg-base-directories = true;
+    # Local cache nami.nfp.nix:5000 is unreliable (frequent timeouts). Without
+    # fallback=true, substituter failures abort builds fatally (attempt 5/5);
+    # with it, nix falls back to building locally after retries.
+    fallback = true;
+  };
 
   imports = [
     inputs.home-manager.nixosModules.home-manager
@@ -38,13 +37,14 @@
 
   sops.age.sshKeyPaths = lib.mkDefault [ "/etc/ssh/ssh_host_ed25519_key" ];
 
-  _module.args.osConfig = config;
-
-  _module.args.lib = lib.extend (
-    _final: _prev: {
-      hm = inputs.home-manager.lib.hm;
-    }
-  );
+  _module.args = {
+    osConfig = config;
+    lib = lib.extend (
+      _final: _prev: {
+        hm = inputs.home-manager.lib.hm;
+      }
+    );
+  };
 
   home-manager = {
     useGlobalPkgs = true;

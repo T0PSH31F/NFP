@@ -26,9 +26,19 @@
   # Hardware acceleration in VM (optional)
   hardware.graphics.enable = true;
 
-  # Virtualization guest tools
-  services.qemuGuest.enable = true;
-  services.spice-vdagentd.enable = true;
+  # Virtualization guest tools and display
+  services = {
+    qemuGuest.enable = true;
+    spice-vdagentd.enable = true;
+    # Auto-login for easy testing
+    displayManager = {
+      autoLogin = {
+        enable = true;
+        user = "t0psh31f";
+      };
+      defaultSession = "hyprland";
+    };
+  };
 
   # Display Manager for testing GUI features
   # (Enable 'desktop' tag in clan.nix or set options below)
@@ -48,13 +58,6 @@
       "msize=104857600"
     ];
   };
-
-  # Auto-login for easy testing
-  services.displayManager.autoLogin = {
-    enable = true;
-    user = "t0psh31f";
-  };
-  services.displayManager.defaultSession = "hyprland";
 
   # Faster boot settings
   boot.loader.timeout = 1;
