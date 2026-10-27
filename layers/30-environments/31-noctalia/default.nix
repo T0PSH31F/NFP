@@ -425,9 +425,15 @@ in
               "HDMI-A-1" = {
                 directory = "$HOME/.background/4k Background";
               };
+              "HDMI-A-2" = {
+                directory = "$HOME/.background/4k Background";
+              };
             };
             wallpaper.monitors = {
               "eDP-1" = {
+                path = "/home/t0psh31f/.background/4k Background/blue-one-piece-zoro-4k-82429jb4apj2vznp.jpg";
+              };
+              "HDMI-A-2" = {
                 path = "/home/t0psh31f/.background/4k Background/blue-one-piece-zoro-4k-82429jb4apj2vznp.jpg";
               };
               "DP-2" = {

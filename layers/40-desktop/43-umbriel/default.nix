@@ -113,6 +113,10 @@ in
       [input.focus]
       follows_mouse = true
 
+      [input.cursor]
+      size = 24
+      hardware_cursor = false
+
       # ==============================================================================
       # Keybinds
       # ==============================================================================
@@ -311,6 +315,24 @@ in
       [[layer_rule]]
       match.namespace = "^noctalia-(notification|dock|panel|attached-panel|osd)$"
       blur_optimized = false
+
+      # ==============================================================================
+      # Outputs
+      # ==============================================================================
+      [output.eDP-1]
+      enabled = true
+      mode = "1920x1200@60"
+      scale = 1.0
+      position = [0, 0]
+      vrr = "fullscreen"
+
+      [output.HDMI-A-2]
+      enabled = true
+      mode = "1920x1080@60"
+      scale = 1.0
+      position = [1920, 0]
+      transform = "normal"
+      direct_scanout = false
 
       # ==============================================================================
       # EXTENSIONS & SHADERS REFERENCE (https://github.com/noctalia-dev/community-umbriel-shaders)
