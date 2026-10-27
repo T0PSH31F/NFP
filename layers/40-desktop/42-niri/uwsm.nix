@@ -8,7 +8,7 @@ let
   cfg = osConfig.layers.layer-40.desktop.noctalia;
 in
 {
-  config = lib.mkIf (cfg.enable && (cfg.backend == "niri" || cfg.backend == "both")) {
+  config = lib.mkIf (cfg.enable && (cfg.backend == "niri" || cfg.backend == "both" || cfg.backend == "all")) {
     # uwsm environment variables for Niri (compositor-specific)
     xdg.configFile."uwsm/env-niri".text = ''
       export XDG_CURRENT_DESKTOP=niri

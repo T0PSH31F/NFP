@@ -13,6 +13,7 @@
   config,
   lib,
   pkgs,
+  inputs,
   osConfig ? config,
   ...
 }:

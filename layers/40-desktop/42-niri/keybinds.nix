@@ -8,7 +8,7 @@ let
   cfg = osConfig.layers.layer-40.desktop.noctalia;
 in
 {
-  config = lib.mkIf (cfg.enable && (cfg.backend == "niri" || cfg.backend == "both")) {
+  config = lib.mkIf (cfg.enable && (cfg.backend == "niri" || cfg.backend == "both" || cfg.backend == "all")) {
     programs.niri.settings.binds = with config.lib.niri.actions; {
       "Mod+T" = {
         action = spawn "uwsm" "app" "--" "ghostty";

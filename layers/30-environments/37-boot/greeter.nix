@@ -58,7 +58,16 @@ in
     noctalia-greeter = {
       session = lib.mkOption {
         type = lib.types.str;
-        default = "Hyprland (UWSM)";
+        default =
+          let
+            comp = config.layers.desktop.noctalia.defaultCompositor or "hyprland";
+          in
+          if comp == "hyprland" then
+            "Hyprland (UWSM)"
+          else if comp == "niri" then
+            "Niri (UWSM)"
+          else
+            "Noctalia (Umbriel)";
         description = "Default session to launch (hyprland-uwsm, niri-uwsm, umbriel-uwsm, etc.)";
       };
     };

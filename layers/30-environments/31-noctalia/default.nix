@@ -7,9 +7,16 @@
   ...
 }:
 let
+  inherit ((import ../../80-lib/81-helpers/mkDendriticModule.nix { inherit lib; })) mkDendriticModule;
   cfg = osConfig.layers.layer-40.desktop.noctalia;
 in
 {
+  imports = [
+    (mkDendriticModule "noctalia-hyprland" ./hyprland.nix)
+    (mkDendriticModule "noctalia-niri" ./niri.nix)
+    (mkDendriticModule "noctalia-umbriel" ./umbriel.nix)
+  ];
+
   options.layers.layer-40.desktop.noctalia = {
     enable = lib.mkOption {
       type = lib.types.bool;

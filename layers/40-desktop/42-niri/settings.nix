@@ -8,7 +8,7 @@ let
   cfg = osConfig.layers.layer-40.desktop.noctalia;
 in
 {
-  config = lib.mkIf (cfg.enable && (cfg.backend == "niri" || cfg.backend == "both")) {
+  config = lib.mkIf (cfg.enable && (cfg.backend == "niri" || cfg.backend == "both" || cfg.backend == "all")) {
     programs.niri = {
       settings = {
         # Layout settings based on Niri defaults

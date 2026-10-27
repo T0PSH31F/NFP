@@ -108,19 +108,19 @@ in
       desktop = {
         compositor = lib.mkDefault derivedCompositor;
         derivedGreeter = lib.mkDefault derivedGreeter;
-        compositors.umbriel.enable = lib.mkDefault (derivedCompositor == "umbriel");
+        compositors.umbriel.enable = lib.mkDefault (derivedCompositor == "umbriel" || exp == "noctalia");
       };
 
       # Dynamically enable the derived compositor substrate
       layer-40.desktop = {
-        hyprland.enable = lib.mkDefault (derivedCompositor == "hyprland");
-        niri.enable = lib.mkDefault (derivedCompositor == "niri");
+        hyprland.enable = lib.mkDefault (derivedCompositor == "hyprland" || exp == "noctalia");
+        niri.enable = lib.mkDefault (derivedCompositor == "niri" || exp == "noctalia");
       };
     };
 
     services.displayManager.defaultSession = lib.mkIf (
       exp == "noctalia" || lib.hasPrefix "noctalia-" exp
-    ) (if derivedCompositor == "hyprland" then "hyprland-uwsm" else derivedCompositor);
+    ) (if derivedCompositor == "hyprland" then "hyprland-uwsm" else if derivedCompositor == "niri" then "niri-uwsm" else "umbriel");
 
     assertions = [
       {
