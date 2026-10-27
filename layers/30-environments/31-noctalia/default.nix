@@ -318,6 +318,7 @@ in
               screen_time_enabled = true;
               avatar_path = "/home/t0psh31f/Clan/NFP/layers/00-cyberia/02-assets/png-ico/Zoro.png";
               external_ip_enabled = true;
+              app_icon_colorize = false;
             };
             shell.animation = {
               speed = 0.75;
@@ -327,6 +328,7 @@ in
             };
             shell.launcher = {
               categories = true;
+              default_view = "all";
               show_icons = true;
               sort_by_usage = true;
               app_grid = true;
@@ -396,14 +398,14 @@ in
               directory = "$HOME/.background/4k Background";
               directory_dark = "$HOME/.background/4k Background";
               transition = [
-                "random"
                 "honeycomb"
+                "fade"
               ];
               transition_duration = 17600;
               transition_on_startup = true;
             };
             wallpaper.automation = {
-              enabled = true;
+              enabled = false;
               interval_seconds = 900;
               order = "random";
             };
@@ -444,8 +446,6 @@ in
             audio = {
               enable_overdrive = true;
               enable_sounds = true;
-              notification_sound = "/home/t0psh31f/Clan/NFP/layers/00-cyberia/02-assets/SFX/Navi(Extra)/446.wav";
-              volume_change_sound = "/home/t0psh31f/Clan/NFP/layers/00-cyberia/02-assets/SFX/volume-feedback.wav";
             };
 
             # ── Bar ──────────────────────────────────────────────────
@@ -622,10 +622,6 @@ in
               launcher_position = "start";
               launcher_custom_image = "/home/t0psh31f/.icons/Anime/1P/one-piece-jolly-roger-icons-by-crountch/png/256x256/Zoro.png";
               margin_edge = 2;
-              monitors = [
-                "eDP-1"
-                "DP-2"
-              ];
               pinned = [ "Brave" ];
               radius = 23;
               reserve_space = false;
@@ -901,7 +897,6 @@ in
               capsule_opacity = 0.93;
               color = "primary";
               hide_when_no_media = true;
-              accent_color = "primary";
               min_length = 116;
               title_scroll = "always";
             };
