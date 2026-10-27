@@ -362,14 +362,32 @@ in
     services.displayManager.sessionPackages = [
       (
         (pkgs.writeTextFile {
+          name = "umbriel-uwsm-wayland-session";
+          destination = "/share/wayland-sessions/umbriel-uwsm.desktop";
+          passthru.providedSessions = [ "umbriel-uwsm" ];
+          text = ''
+            [Desktop Entry]
+            Name=Umbriel (UWSM)
+            Comment=Umbriel Wayland compositor managed by UWSM
+            Exec=${pkgs.uwsm}/bin/uwsm start -F -N "Umbriel" -D Umbriel -C "Umbriel Wayland compositor managed by UWSM" -- /run/current-system/sw/bin/umbriel
+            Type=Application
+            DesktopNames=Umbriel
+          '';
+        })
+        // {
+          providedSessions = [ "umbriel-uwsm" ];
+        }
+      )
+      (
+        (pkgs.writeTextFile {
           name = "umbriel-wayland-session";
           destination = "/share/wayland-sessions/umbriel.desktop";
           passthru.providedSessions = [ "umbriel" ];
           text = ''
             [Desktop Entry]
             Name=Umbriel
-            Comment=Umbriel Wayland Compositor
-            Exec=umbriel
+            Comment=Umbriel Wayland Compositor (Native systemd)
+            Exec=${cfg.package}/bin/start-umbriel
             Type=Application
             DesktopNames=Umbriel
           '';
@@ -380,15 +398,19 @@ in
       )
     ];
 
-    # ── UWSM integration (same pattern as Hyprland) ───────────────────
-    programs.uwsm = {
-      enable = lib.mkDefault true;
-      waylandCompositors.umbriel = {
-        prettyName = "Umbriel";
-        comment = "Umbriel Wayland compositor managed by UWSM";
-        binPath = "/run/current-system/sw/bin/umbriel";
-      };
-    };
+    # ── UWSM integration ───────────────────────────────────────────────
+    programs.uwsm.enable = lib.mkDefault true;
+
+    # ── System-wide UWSM environment overrides for Umbriel ────────────
+    environment.etc."xdg/uwsm/env-umbriel".text = ''
+      export XDG_CURRENT_DESKTOP=Umbriel
+      export XDG_SESSION_TYPE=wayland
+      export XDG_SESSION_DESKTOP=Umbriel
+      export WLR_DRM_NO_ATOMIC=1
+      export WLR_RENDER_NO_EXPLICIT_SYNC=1
+      export WLR_NO_HARDWARE_CURSORS=1
+      export WLR_DRM_DEVICES=/dev/dri/card1:/dev/dri/card0
+    '';
 
     # ── Systemd service environment overrides (wlroots hybrid GPU fix) ───
     systemd.user.services.umbriel = {

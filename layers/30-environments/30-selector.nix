@@ -118,9 +118,16 @@ in
       };
     };
 
-    services.displayManager.defaultSession = lib.mkIf (
-      exp == "noctalia" || lib.hasPrefix "noctalia-" exp
-    ) (if derivedCompositor == "hyprland" then "hyprland-uwsm" else if derivedCompositor == "niri" then "niri-uwsm" else "umbriel");
+    services.displayManager.defaultSession =
+      lib.mkIf (exp == "noctalia" || lib.hasPrefix "noctalia-" exp)
+        (
+          if derivedCompositor == "hyprland" then
+            "hyprland-uwsm"
+          else if derivedCompositor == "niri" then
+            "niri-uwsm"
+          else
+            "umbriel-uwsm"
+        );
 
     assertions = [
       {

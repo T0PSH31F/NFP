@@ -30,7 +30,7 @@ in
             [Desktop Entry]
             Name=Noctalia (Niri)
             Comment=Native Noctalia Shell v5 on Niri
-            Exec=uwsm start niri-uwsm.desktop
+            Exec=${pkgs.uwsm}/bin/uwsm start -F -N "Noctalia (Niri)" -D Niri:Noctalia -C "Native Noctalia Shell v5 on Niri" -- /run/current-system/sw/bin/niri --session
             Type=Application
             DesktopNames=Niri
           '';

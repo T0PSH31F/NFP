@@ -33,7 +33,7 @@ in
             [Desktop Entry]
             Name=Vibe Quickshell Lab
             Comment=Live QML hot-reload workspace on Hyprland
-            Exec=uwsm start hyprland-uwsm.desktop
+            Exec=${pkgs.uwsm}/bin/uwsm start -F -N "Vibe Quickshell Lab" -D Hyprland -C "Live QML hot-reload workspace on Hyprland" -- /run/current-system/sw/bin/Hyprland
             Type=Application
             DesktopNames=Hyprland
           '';

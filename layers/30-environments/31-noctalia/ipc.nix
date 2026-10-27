@@ -55,13 +55,13 @@ in
 
         case "$COMPOSITOR" in
           hyprland)
-            exec uwsm start hyprland-uwsm.desktop
+            exec uwsm start -F -N "Noctalia (Hyprland)" -D Hyprland:Noctalia -C "Native Noctalia Shell v5 on Hyprland" -- /run/current-system/sw/bin/Hyprland
             ;;
           niri)
-            exec uwsm start niri-uwsm.desktop
+            exec uwsm start -F -N "Noctalia (Niri)" -D Niri:Noctalia -C "Native Noctalia Shell v5 on Niri" -- /run/current-system/sw/bin/niri --session
             ;;
           umbriel)
-            exec uwsm start umbriel-uwsm.desktop
+            exec uwsm start -F -N "Noctalia (Umbriel)" -D Umbriel:Noctalia -C "Noctalia Shell v5 on Umbriel compositor" -- /run/current-system/sw/bin/umbriel
             ;;
           *)
             echo "Unknown compositor: $COMPOSITOR (supported: hyprland, niri, umbriel)" >&2

@@ -44,7 +44,7 @@ in
             [Desktop Entry]
             Name=Noctalia (Umbriel)
             Comment=Noctalia Shell v5 on Umbriel compositor
-            Exec=uwsm start umbriel-uwsm.desktop
+            Exec=${pkgs.uwsm}/bin/uwsm start -F -N "Noctalia (Umbriel)" -D Umbriel:Noctalia -C "Noctalia Shell v5 on Umbriel compositor" -- /run/current-system/sw/bin/umbriel
             Type=Application
             DesktopNames=Umbriel
           '';
@@ -59,11 +59,21 @@ in
   home =
     { lib, ... }:
     {
-      config = lib.mkIf (exp == "noctalia-umbriel") {
+      config = lib.mkIf isEnabled {
         # IPC injection — Umbriel uses the same noctalia msg IPC as Hyprland
         wayland.windowManager.hyprland.settings."$ipc" = lib.mkForce "noctalia msg";
 
         xdg.configFile."umbriel/config.toml".text = osConfig.environment.etc."xdg/umbriel/config.toml".text;
+
+        xdg.configFile."uwsm/env-umbriel".text = ''
+          export XDG_CURRENT_DESKTOP=Umbriel
+          export XDG_SESSION_TYPE=wayland
+          export XDG_SESSION_DESKTOP=Umbriel
+          export WLR_DRM_NO_ATOMIC=1
+          export WLR_RENDER_NO_EXPLICIT_SYNC=1
+          export WLR_NO_HARDWARE_CURSORS=1
+          export WLR_DRM_DEVICES=/dev/dri/card1:/dev/dri/card0
+        '';
 
         xdg.configFile."hypr/experiences/wallpaper-hook.sh" = {
           executable = true;

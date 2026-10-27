@@ -1,9 +1,7 @@
 [audio]
 enable_overdrive = true
 enable_sounds = true
-notification_sound = "/home/t0psh31f/Clan/NFP/layers/00-cyberia/02-assets/SFX/Navi(Extra)/446.wav"
 sound_volume = 0.5
-volume_change_sound = "/home/t0psh31f/Clan/NFP/layers/00-cyberia/02-assets/SFX/volume-feedback.wav"
 
 [backdrop]
 blur_intensity = 0.40000000596046448
@@ -161,7 +159,6 @@ magnification_scale = 1.3500000238418579
 main_axis_padding = 16
 margin_edge = 2
 margin_ends = 0
-monitors = [ "eDP-1", "DP-2" ]
 pinned = [ "Brave" ]
 position = "bottom"
 radius = 23

@@ -16,9 +16,6 @@ in
       export QT_QPA_PLATFORM="wayland;xcb"
       export SDL_VIDEODRIVER=wayland
       export CLUTTER_BACKEND=wayland
-      export XDG_CURRENT_DESKTOP=Hyprland
-      export XDG_SESSION_TYPE=wayland
-      export XDG_SESSION_DESKTOP=Hyprland
       export QT_AUTO_SCREEN_SCALE_FACTOR=1
       export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
       export QT_QPA_PLATFORMTHEME_QT6=qt6ct
@@ -38,6 +35,9 @@ in
     '';
 
     xdg.configFile."uwsm/env-hyprland".text = ''
+      export XDG_CURRENT_DESKTOP=Hyprland
+      export XDG_SESSION_TYPE=wayland
+      export XDG_SESSION_DESKTOP=Hyprland
       export HYPRCURSOR_THEME=${osConfig.layers.layer-30.theming.cursor.theme}
       export HYPRCURSOR_SIZE=${toString osConfig.layers.layer-30.theming.cursor.size}
       export XCURSOR_THEME=${osConfig.layers.layer-30.theming.cursor.theme}

@@ -42,7 +42,7 @@ in
             [Desktop Entry]
             Name=Noctalia (Hyprland)
             Comment=Native Noctalia Shell v5 on Hyprland
-            Exec=uwsm start hyprland-uwsm.desktop
+            Exec=${pkgs.uwsm}/bin/uwsm start -F -N "Noctalia (Hyprland)" -D Hyprland:Noctalia -C "Native Noctalia Shell v5 on Hyprland" -- /run/current-system/sw/bin/Hyprland
             Type=Application
             DesktopNames=Hyprland
           '';
