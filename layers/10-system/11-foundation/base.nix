@@ -74,7 +74,9 @@
     "pnpm-10.29.2"
   ];
 
-  # Bootloader
+  # Bootloader & Boot Animation
+  layers.layer-30.theming.themes.plymouth-onepiece.enable = lib.mkDefault true;
+
   boot = {
     loader = {
       systemd-boot = {
