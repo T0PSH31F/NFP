@@ -341,6 +341,18 @@ in
     # ── System packages ────────────────────────────────────────────────
     environment.systemPackages = [
       cfg.package
+      (pkgs.writeTextFile {
+        name = "umbriel-uwsm-wayland-session";
+        destination = "/share/wayland-sessions/umbriel-uwsm.desktop";
+        text = ''
+          [Desktop Entry]
+          Name=Umbriel (UWSM)
+          Comment=Umbriel Wayland compositor managed by UWSM
+          Exec=${pkgs.uwsm}/bin/uwsm start -F -N "Umbriel" -D Umbriel -C "Umbriel Wayland compositor managed by UWSM" -- /run/current-system/sw/bin/umbriel
+          Type=Application
+          DesktopNames=Umbriel
+        '';
+      })
     ];
 
     # ── XDG portal ─────────────────────────────────────────────────────

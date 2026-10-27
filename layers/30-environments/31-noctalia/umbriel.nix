@@ -28,6 +28,18 @@ in
 
     environment.systemPackages = [
       inputs.noctalia.packages.${pkgs.stdenv.hostPlatform.system}.default
+      (pkgs.writeTextFile {
+        name = "noctalia-umbriel-wayland-session";
+        destination = "/share/wayland-sessions/noctalia-umbriel.desktop";
+        text = ''
+          [Desktop Entry]
+          Name=Noctalia (Umbriel)
+          Comment=Noctalia Shell v5 on Umbriel compositor
+          Exec=${pkgs.uwsm}/bin/uwsm start -F -N "Noctalia (Umbriel)" -D Umbriel:Noctalia -C "Noctalia Shell v5 on Umbriel compositor" -- /run/current-system/sw/bin/umbriel
+          Type=Application
+          DesktopNames=Umbriel
+        '';
+      })
     ];
 
     # Enable Umbriel compositor
