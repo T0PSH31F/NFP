@@ -319,20 +319,15 @@ in
       # ==============================================================================
       # Outputs
       # ==============================================================================
-      [output.eDP-1]
-      enabled = true
-      mode = "1920x1200@60"
-      scale = 1.0
-      position = [0, 0]
-      vrr = "fullscreen"
-
       [output.HDMI-A-2]
       enabled = true
-      mode = "1920x1080@60"
+      scale = 1.0
+      position = [0, 0]
+
+      [output.eDP-1]
+      enabled = true
       scale = 1.0
       position = [1920, 0]
-      transform = "normal"
-      direct_scanout = false
 
       # ==============================================================================
       # EXTENSIONS & SHADERS REFERENCE (https://github.com/noctalia-dev/community-umbriel-shaders)
@@ -392,6 +387,16 @@ in
         prettyName = "Umbriel";
         comment = "Umbriel Wayland compositor managed by UWSM";
         binPath = "/run/current-system/sw/bin/umbriel";
+      };
+    };
+
+    # ── Systemd service environment overrides (wlroots hybrid GPU fix) ───
+    systemd.user.services.umbriel = {
+      environment = {
+        WLR_DRM_NO_ATOMIC = "1";
+        WLR_RENDER_NO_EXPLICIT_SYNC = "1";
+        WLR_NO_HARDWARE_CURSORS = "1";
+        WLR_DRM_DEVICES = "/dev/dri/card1:/dev/dri/card0";
       };
     };
 
