@@ -38,9 +38,9 @@ in
     '';
 
     xdg.configFile."uwsm/env-hyprland".text = ''
-      export HYPRCURSOR_THEME=Sonic-Hyprcursor
+      export HYPRCURSOR_THEME=${osConfig.layers.layer-30.theming.cursor.theme}
       export HYPRCURSOR_SIZE=${toString osConfig.layers.layer-30.theming.cursor.size}
-      export XCURSOR_THEME=Sonic-Hyprcursor
+      export XCURSOR_THEME=${osConfig.layers.layer-30.theming.cursor.theme}
       export XCURSOR_SIZE=${toString osConfig.layers.layer-30.theming.cursor.size}
       export _JAVA_AWT_WM_NONREPARENTING=1
     '';

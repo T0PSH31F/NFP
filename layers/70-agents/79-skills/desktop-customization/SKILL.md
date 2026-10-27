@@ -3,7 +3,7 @@ name: linux-ricing
 description: AI-native Linux desktop design system. The agent acts as designer — auditing the user's machine, exploring creative directions, generating mockups, and implementing a fully personalized desktop end-to-end. The user is the art/UX director.
 trigger: User wants to theme/rice their Linux desktop, mentions changing colors/wallpaper/bar/launcher appearance, asks what their desktop could look like, or invokes /rice.
 version: 3.0.0
-tags: [linux, ricing, rice, theming, desktop, hyprland, kde, waybar, rofi, kitty, animated-wallpaper, generative]
+tags: [linux, ricing, rice, theming, desktop, hyprland, noctalia, umbriel, niri, kde, waybar, rofi, kitty, animated-wallpaper, generative]
 ---
 
 # Linux Ricing — AI-Native Desktop Design System
@@ -618,3 +618,6 @@ table live in **`references/kde-post-implementation.md`**.
 | Widget next-step gate: after Quickshell docs ingestion, prove component-model synthesis and same-artifact sandbox visual/function validation before adding live promotion/rollback manifests | `references/widget-next-step-gate.md` |
 | Bonfire Hollow session lessons: Dark Souls in-world desktop, thin ornaments, widget UX, stale visual-image and bridge-gate pitfalls | `references/bonfire-hollow-session-lessons.md` |
 | Cost control + rollback lessons: paid FAL generation discipline, reuse-before-regenerate, and manual post-workflow artifact cleanup after undo | `references/cost-control-and-rollback-lessons.md` |
+| Noctalia Shell v5: Architecture, layer rules, dynamic wallpaper theming, Luau plugins, and IPC reference (docs.noctalia.dev) | `Noctalia/README.md`, `Noctalia/setup.md`, `Noctalia/theming-plugins.md` |
+| Umbriel Wayland Compositor: Scrolling/dwindle layouts, GPU blur/shadows, umbriel.conf, companion plugin | `Umbriel/README.md`, `Umbriel/config.md`, `Umbriel/companion.md` |
+| Aesthetic Archetypes & Animation Physics: Space Dots, YoRHa military UI, Unit-3 Cyber, NieR Design System & Cursors, Persona Quickshell springs, Liquify glass/physics, SekaiPop bouncy widgets | `references/aesthetic-archetypes.md` |

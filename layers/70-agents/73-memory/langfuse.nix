@@ -82,6 +82,25 @@
           databases.langfuse.create.enable = true;
         };
 
+        systemd.services.postgresql-langfuse-setup = {
+          description = "Ensure Postgres permissions for Langfuse";
+          wantedBy = [ "multi-user.target" ];
+          before = [ "podman-langfuse.service" ];
+          after = [ "postgresql.service" ];
+          requires = [ "postgresql.service" ];
+          serviceConfig = {
+            User = "postgres";
+            Type = "oneshot";
+            RemainAfterExit = true;
+            ExecStart = pkgs.writeShellScript "setup-langfuse-db" ''
+              until ${pkgs.postgresql_16}/bin/pg_isready -q; do
+                sleep 1
+              done
+              ${pkgs.postgresql_16}/bin/psql -d langfuse -c "GRANT ALL ON SCHEMA public TO postgres; ALTER SCHEMA public OWNER TO postgres;" || true
+            '';
+          };
+        };
+
         virtualisation.oci-containers.containers.langfuse = {
           image = "ghcr.io/langfuse/langfuse:2";
           ports = [ "${toString cfg.port}:3000" ];

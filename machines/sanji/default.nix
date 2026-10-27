@@ -63,12 +63,15 @@
       virtualization.enable = true;
       sessionResilience.enable = true;
     };
-    layer-30.theming.themes.greeter.type = "tuigreet";
+    layer-30.theming.themes.greeter.type = "noctalia-greeter";
     layer-40.desktop.noctalia.idle = {
       dpmsIgnoreAc = true; # Never shut screen off while plugged in to AC power
       lockIgnoreAc = true; # Never lock screen while plugged in to AC power
     };
-    desktop.experience = "nixarchy-rise";
+    desktop = {
+      experience = "noctalia";
+      noctalia.defaultCompositor = "hyprland";
+    };
   };
 
   # Prevent display power-off / blanking when plugged in

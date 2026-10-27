@@ -11,6 +11,9 @@
     "desktop",
     "theming",
     "hyprland",
+    "noctalia",
+    "umbriel",
+    "niri",
     "kde",
     "waybar",
     "rofi",
@@ -30,8 +33,10 @@
     "shared/": "21 cross-environment guide docs",
     "KDE/": "9 KDE Plasma-specific docs",
     "Hyprland/": "9 Hyprland-specific docs",
+    "Noctalia/": "Comprehensive Noctalia Shell v5 architecture, IPC, and dynamic theming docs (docs.noctalia.dev)",
+    "Umbriel/": "Umbriel compositor layout, rendering, umbriel.conf, and companion plugin docs",
     "examples/": "Sample design_system YAML files (e.g. dragonfable.yaml) for reference and testing — 10 built-in presets: catppuccin-mocha, nord, gruvbox-dark, dracula, tokyo-night, rose-pine, solarized-dark, doom-knight, void-dragon, shiva-temple",
-    "references/": "Internal architecture notes (e.g. color-extractor-architecture.md) — not end-user docs",
+    "references/": "Design system & architecture notes (aesthetic-archetypes.md: YoRHa, Persona, Liquify, SekaiPop; color-extractor, visual contract)",
     "tests/": "pytest suite — palette extractor, bug reproducers, capture",
     "workflow/": "LangGraph StateGraph orchestration layer — maps the 8-step session to graph nodes with SQLite checkpointing for crash recovery (run.py entrypoint, graph.py, nodes/, validators.py, state.py)",
     "skills/": "Nine focused sub-skills: hermes-ricer (legacy orchestrator — superseded by workflow/), hermes-cli-skin, hyprland-rice-from-scratch, ricer-apps, ricer-catalog-capture, ricer-gtk, ricer-kde, ricer-rollback, ricer-wallpaper"
@@ -62,6 +67,9 @@
     "desktop_environments": {
       "KDE Plasma": "full",
       "Hyprland": "full",
+      "Noctalia Shell": "full",
+      "Umbriel": "full",
+      "Niri": "full",
       "Sway/i3": "partial",
       "bspwm": "partial",
       "GNOME": "no doc"

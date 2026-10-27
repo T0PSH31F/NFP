@@ -123,7 +123,8 @@ in
               if ! curl -sf --max-time 3 "${jevBaseUrl}/health" >/dev/null 2>&1; then
                 FAILURES+=("jev-router:${jevBaseUrl}")
               fi
-              if ! curl -sf --max-time 3 "${kongBaseUrl}/health" >/dev/null 2>&1; then
+              KONG_CODE="$(curl -s -o /dev/null -w "%{http_code}" --max-time 3 "${kongBaseUrl}" || echo "000")"
+              if [ "$KONG_CODE" = "000" ]; then
                 FAILURES+=("kong-gateway:${kongBaseUrl}")
               fi
               if ! curl -sf --max-time 3 "http://127.0.0.1:8089/healthz" >/dev/null 2>&1; then

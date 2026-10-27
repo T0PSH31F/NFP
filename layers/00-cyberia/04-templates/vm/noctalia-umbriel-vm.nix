@@ -29,7 +29,8 @@
     };
     qemu.options = [
       "-vga virtio"
-      "-display gtk,gl=on"
+      "-display gtk"
+      "-serial stdio"
     ];
   };
 
@@ -45,12 +46,44 @@
 
   hardware.graphics.enable = true;
 
+  systemd.settings.Manager = {
+    DefaultEnvironment = "WLR_RENDERER_ALLOW_SOFTWARE=1 WLR_NO_HARDWARE_CURSORS=1 LIBGL_ALWAYS_SOFTWARE=1";
+  };
+  systemd.user.settings.Manager = {
+    DefaultEnvironment = "WLR_RENDERER_ALLOW_SOFTWARE=1 WLR_NO_HARDWARE_CURSORS=1 LIBGL_ALWAYS_SOFTWARE=1";
+  };
+
+  systemd.services.greetd.environment = {
+    WLR_RENDERER_ALLOW_SOFTWARE = "1";
+    WLR_NO_HARDWARE_CURSORS = "1";
+    LIBGL_ALWAYS_SOFTWARE = "1";
+  };
+
+  environment.sessionVariables = {
+    WLR_RENDERER_ALLOW_SOFTWARE = "1";
+    WLR_NO_HARDWARE_CURSORS = "1";
+    LIBGL_ALWAYS_SOFTWARE = "1";
+  };
+
   services = {
     qemuGuest.enable = true;
     spice-vdagentd.enable = true;
-    displayManager.autoLogin = {
+    greetd = {
       enable = true;
-      user = "t0psh31f";
+      settings = {
+        initial_session = {
+          command = "${pkgs.writeShellScript "launch-umbriel-session" ''
+            export WLR_RENDERER_ALLOW_SOFTWARE=1
+            export WLR_NO_HARDWARE_CURSORS=1
+            export LIBGL_ALWAYS_SOFTWARE=1
+            export XDG_CURRENT_DESKTOP=Umbriel
+            export XDG_SESSION_DESKTOP=Umbriel
+            export XDG_SESSION_TYPE=wayland
+            exec ${pkgs.dbus}/bin/dbus-run-session ${config.layers.desktop.compositors.umbriel.package}/bin/umbriel
+          ''}";
+          user = "t0psh31f";
+        };
+      };
     };
   };
 
@@ -68,6 +101,7 @@
   security.sudo.wheelNeedsPassword = false;
 
   environment.systemPackages = with pkgs; [
+    inputs.noctalia.packages.${pkgs.stdenv.hostPlatform.system}.default
     ghostty
     kitty
     fastfetch

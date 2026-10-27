@@ -78,10 +78,42 @@ in
       "immediate 1, match:title .*\\.exe"
       "immediate 1, match:title .*minecraft.*"
       "immediate 1, match:class ^(steam_app).*"
+
+      # ── Seven Functional Domain Workspaces ───────────────────────
+      # Workspace 1: Agents (AI pair programming, GLaDOS, Hermes, OpenCode)
+      "workspace 1, match:class ^(opencode|oh-my-opencode|hermes|agy|gemini)$"
+      "workspace 1, match:title ^(.*[Aa]gent.*)$"
+
+      # Workspace 2: Browser
+      "workspace 2, match:class ^([Zz]en.*|[Bb]rave-browser|[Ff]irefox|[Cc]hromium|[Gg]oogle-chrome)$"
+
+      # Workspace 3: IDE
+      "workspace 3, match:class ^(code|code-url-handler|VSCodium|dev\\.zed\\.Zed|cursor|neovim)$"
+
+      # Workspace 4: Media/Games
+      "workspace 4, match:class ^([Ss]potify|steam|steamwebhelper|gamescope|lutris|heroic)$"
+      "workspace 4, match:class ^(mpv)$"
+
+      # Workspace 5: File-Manager
+      "workspace 5, match:class ^([Tt]hunar|org\\.gnome\\.Nautilus|dolphin|org\\.kde\\.dolphin|yazi)$"
+
+      # Workspace 6: E-mail/messaging
+      "workspace 6, match:class ^([Tt]hunderbird|[Dd]iscord|[Vv]esktop|[Ss]lack|org\\.telegram\\.desktop|[Ss]ignal)$"
+
+      # Workspace 7: Overviews (Grafana, Homepage, btop, system vitals)
+      "workspace 7, match:class ^(btop|bottom|glances|nvtop|tmog|grafana)$"
+      "workspace 7, match:title ^(.*[Bb]top.*|.*[Gg]rafana.*|.*[Hh]omepage.*|.*[Tt]mog.*)$"
     ];
 
     # ######## Workspace rules ########
     workspace = [
+      "1, persistent:true, default:true"
+      "2, persistent:true"
+      "3, persistent:true"
+      "4, persistent:true"
+      "5, persistent:true"
+      "6, persistent:true"
+      "7, persistent:true"
       "special:special, gapsout:30"
     ];
 

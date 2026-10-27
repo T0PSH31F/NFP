@@ -58,7 +58,7 @@ in
     noctalia-greeter = {
       session = lib.mkOption {
         type = lib.types.str;
-        default = "hyprland-uwsm";
+        default = "Hyprland (UWSM)";
         description = "Default session to launch (hyprland-uwsm, niri-uwsm, umbriel-uwsm, etc.)";
       };
     };
@@ -135,9 +135,9 @@ in
           greeter-args = "--session ${cfg.noctalia-greeter.session}";
           settings = {
             cursor = {
-              theme = "Bibata-Modern-Ice";
-              size = 24;
-              path = "${pkgs.bibata-cursors}/share/icons";
+              theme = config.layers.layer-30.theming.cursor.theme or "Bibata-Rainbow-Modern";
+              size = config.layers.layer-30.theming.cursor.size or 24;
+              path = "/run/current-system/sw/share/icons";
             };
             keyboard = {
               layout = "us";

@@ -954,7 +954,7 @@ in
               show_labels = true;
               empty_color = "tertiary";
               icon_color = "primary";
-              labels_only_when_occupied = true;
+              labels_only_when_occupied = false;
             };
 
             # ── Hooks ─────────────────────────────────────────────────

@@ -70,21 +70,25 @@ in
           "crazyshot, 0.1, 1.22, 0.68, 0.98"
           "hyprnostretch, 0.05, 0.82, 0.03, 0.94"
           "myBezier, 0.05, 0.9, 0.1, 1.05"
+          # Persona / SekaiPop / Liquify kinetic spring curves
+          "popBouncy, 0.175, 0.885, 0.32, 1.275"
+          "elasticOut, 0.34, 1.56, 0.64, 1"
+          "fluidDecel, 0.05, 0.90, 0.10, 1.05"
         ];
         animation = [
           "border, 1, 8, liner"
           "borderangle, 1, 82, liner, loop"
-          "windows, 1, 7, myBezier"
-          "windowsIn, 1, 3.2, winIn, slide"
-          "windowsOut, 1, 7, easeOutCirc, popin 80%"
-          "windowsMove, 1, 3.0, wind, slide"
-          "fade, 1, 7, md3_decel"
-          "layersIn, 1, 1.8, menu_decel, slide"
-          "layersOut, 1, 1.5, menu_accel"
-          "fadeLayersIn, 1, 1.6, menu_decel"
+          "windows, 1, 4.5, popBouncy"
+          "windowsIn, 1, 3.6, popBouncy, popin 75%"
+          "windowsOut, 1, 3.0, winOut, popin 80%"
+          "windowsMove, 1, 3.4, fluidDecel, slide"
+          "fade, 1, 4.0, md3_decel"
+          "layersIn, 1, 2.5, popBouncy, slide"
+          "layersOut, 1, 1.8, menu_accel"
+          "fadeLayersIn, 1, 2.0, menu_decel"
           "fadeLayersOut, 1, 1.8, menu_accel"
-          "workspaces, 1, 6.0, menu_decel, slide"
-          "specialWorkspace, 1, 2.3, md3_decel, slidefadevert 15%"
+          "workspaces, 1, 5.0, popBouncy, slide"
+          "specialWorkspace, 1, 3.0, elasticOut, slidefadevert 20%"
         ];
       };
 

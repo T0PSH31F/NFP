@@ -30,6 +30,7 @@ in
 
   nixos = lib.mkIf isEnabled {
     layers.layer-40.desktop.noctalia.enable = true;
+    layers.layer-40.desktop.hyprland.enable = true;
 
     services.displayManager.sessionPackages = [
       (

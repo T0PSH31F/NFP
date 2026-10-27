@@ -25,6 +25,10 @@ in
     # Enable the Noctalia shell subsystem
     layers.layer-40.desktop.noctalia.enable = true;
 
+    environment.systemPackages = [
+      inputs.noctalia.packages.${pkgs.stdenv.hostPlatform.system}.default
+    ];
+
     # Enable Umbriel compositor
     layers.desktop.compositors.umbriel.enable = true;
 
@@ -54,9 +58,11 @@ in
   home =
     { lib, ... }:
     {
-      config = lib.mkIf isEnabled {
+      config = lib.mkIf (exp == "noctalia-umbriel") {
         # IPC injection — Umbriel uses the same noctalia msg IPC as Hyprland
         wayland.windowManager.hyprland.settings."$ipc" = lib.mkForce "noctalia msg";
+
+        xdg.configFile."umbriel/config.toml".text = osConfig.environment.etc."xdg/umbriel/config.toml".text;
 
         xdg.configFile."hypr/experiences/wallpaper-hook.sh" = {
           executable = true;

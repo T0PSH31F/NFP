@@ -103,7 +103,7 @@ with lib;
           };
 
           # ── Kong consumers file (real API keys, sops-rendered) ─────────
-          templates."kong-consumers" = {
+          "kong-consumers" = {
             content = builtins.toJSON {
               _format_version = "3.0";
               consumers = map (consumer: {
@@ -130,7 +130,7 @@ with lib;
           # ── ExtremeRouter upstream auth (request-transformer plugin) ────
           # Uses remove + replace + add so the Kong consumer key never leaks
           # or prevents the upstream router Bearer key from being injected.
-          templates."kong-extremerouter-auth" = {
+          "kong-extremerouter-auth" = {
             content = builtins.toJSON {
               _format_version = "3.0";
               plugins = [
@@ -164,7 +164,7 @@ with lib;
           };
 
           # ── Jev Tier Router upstream auth (request-transformer plugin) ──
-          templates."kong-jev-auth" = {
+          "kong-jev-auth" = {
             content = builtins.toJSON {
               _format_version = "3.0";
               plugins = [
@@ -198,7 +198,7 @@ with lib;
           };
 
           # ── OmniRoute upstream auth (request-transformer plugin) ─────────
-          templates."kong-omniroute-auth" = {
+          "kong-omniroute-auth" = {
             content = builtins.toJSON {
               _format_version = "3.0";
               plugins = [
@@ -236,7 +236,7 @@ with lib;
           };
 
           # ── Environment file for ExtremeRouter ──────────────────────────
-          templates."extremerouter-env" = {
+          "extremerouter-env" = {
             content = ''
               # ExtremeRouter persistent signing & API key secrets (managed by sops-nix)
               JWT_SECRET=${config.sops.placeholder.extremerouter_api_key}
@@ -250,7 +250,7 @@ with lib;
           };
 
           # ── Environment file for OmniRoute ─────────────────────────────
-          templates."omniroute-env" = lib.mkIf config.services.ai-services.omniroute.enable {
+          "omniroute-env" = lib.mkIf config.services.ai-services.omniroute.enable {
             content = ''
               # OmniRoute provider keys and transferred ExtremeRouter secrets
               ANTHROPIC_API_KEY=${config.sops.placeholder.anthropic_api_key}
@@ -272,7 +272,7 @@ with lib;
           };
 
           # ── Environment file for FreeLLMAPI ─────────────────────────────
-          templates."freellmapi-env" = lib.mkIf config.services.ai-services.freellmapi.enable {
+          "freellmapi-env" = lib.mkIf config.services.ai-services.freellmapi.enable {
             content = ''
               # FreeLLMAPI provider keys & sops-managed encryption key
               ENCRYPTION_KEY=${config.sops.placeholder.freellmapi_encryption_key}
@@ -289,7 +289,7 @@ with lib;
           };
 
           # ── Environment file for freellmpool ─────────────────────────
-          templates."freellmpool-env" = lib.mkIf config.services.ai-services.freellmpool.enable {
+          "freellmpool-env" = lib.mkIf config.services.ai-services.freellmpool.enable {
             content = ''
               # freellmpool provider keys — extend as needed
               GROQ_API_KEY=${config.sops.placeholder.groq_api_key}
@@ -304,7 +304,7 @@ with lib;
           };
 
           # ── Environment file for LangGraph ───────────────────────────────
-          templates."langgraph-env" =
+          "langgraph-env" =
             lib.mkIf (config.services.ai-services.langgraph.enable && builtins.pathExists /var/lib/langgraph)
               {
                 content = ''
