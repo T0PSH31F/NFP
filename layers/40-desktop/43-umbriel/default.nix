@@ -63,7 +63,7 @@ in
       [effects]
       border = "psychedelic.fractal-flow"
       window = "psychedelic.fractal-veil"
-      cursor = "cursor.rainbow-tunnel"
+      cursor = "cursor.comet"
       screen = "vignette"
       max_fps = 120
 
@@ -92,6 +92,11 @@ in
       [animation.windows_move]
       enabled = true
       effect = "wobbly-move"
+      curve = "easeout"
+      duration_ms = 650
+
+      [animation.windows_drag]
+      physics = true
 
       [animation.dim_unfocused]
       enabled = true
