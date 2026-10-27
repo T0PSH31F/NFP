@@ -58,11 +58,14 @@ in
       ]
 
       # ==============================================================================
-      # Active Shaders — Psychedelic Collection (Community Shaders)
+      # Active Shaders — Psychedelic & Ambient Collection (Community Shaders)
       # ==============================================================================
       [effects]
       border = "psychedelic.fractal-flow"
       window = "psychedelic.fractal-veil"
+      cursor = "cursor.rainbow-tunnel"
+      screen = "vignette"
+      max_fps = 120
 
       [animation]
       enabled = true
@@ -85,6 +88,16 @@ in
       effect = "psychedelic.fractal-bloom"
       duration_ms = 450
       curve = "linear"
+
+      [animation.windows_move]
+      enabled = true
+      effect = "wobbly-move"
+
+      [animation.dim_unfocused]
+      enabled = true
+      dim = 0.85
+      duration_ms = 250
+      curve = "ease-out"
 
       # ==============================================================================
       # Input
