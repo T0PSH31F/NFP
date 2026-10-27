@@ -63,11 +63,11 @@ in
             comp = config.layers.desktop.noctalia.defaultCompositor or "hyprland";
           in
           if comp == "hyprland" then
-            "Hyprland (UWSM)"
+            "hyprland-uwsm"
           else if comp == "niri" then
-            "Niri (UWSM)"
+            "niri-uwsm"
           else
-            "Noctalia (Umbriel)";
+            "umbriel-uwsm";
         description = "Default session to launch (hyprland-uwsm, niri-uwsm, umbriel-uwsm, etc.)";
       };
     };
@@ -123,24 +123,28 @@ in
             "render"
             "input"
             "tty"
+            "seat"
           ];
         };
         users.groups.greeter = { };
 
+        services.seatd = {
+          enable = true;
+          group = "video";
+        };
+
         services.greetd.settings.default_session.user = "greeter";
 
-        programs.noctalia-greeter = {
+        services.displayManager.noctalia-greeter = {
           enable = true;
-          package =
-            inputs.noctalia-greeter.packages.${pkgs.stdenv.hostPlatform.system}.default.overrideAttrs
-              (old: {
-                nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ pkgs.linuxHeaders ];
-                buildInputs = (old.buildInputs or [ ]) ++ [
-                  pkgs.linuxHeaders
-                  pkgs.util-linux.lib
-                  (lib.getLib pkgs.libselinux)
-                ];
-              });
+          package = (pkgs.callPackage "${inputs.noctalia-greeter}/nix/package.nix" { }).overrideAttrs (old: {
+            nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ pkgs.linuxHeaders ];
+            buildInputs = (old.buildInputs or [ ]) ++ [
+              pkgs.linuxHeaders
+              pkgs.util-linux.lib
+              (lib.getLib pkgs.libselinux)
+            ];
+          });
           greeter-args = "--session ${cfg.noctalia-greeter.session}";
           settings = {
             cursor = {
@@ -153,10 +157,9 @@ in
             };
             appearance = {
               password_style = "random";
-              wallpaper = "${../../00-cyberia/02-assets/sddm_background/thousand-sunny-poster.png}";
-            };
-            wallpaper = {
-              path = "${../../00-cyberia/02-assets/sddm_background/thousand-sunny-poster.png}";
+              wallpaper = {
+                path = "${../../00-cyberia/02-assets/sddm_background/thousand-sunny-poster.png}";
+              };
             };
           };
         };
