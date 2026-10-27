@@ -83,6 +83,7 @@
   # Intel 13th Gen Raptor Lake UHD (PCI:0:2:0) + Nvidia RTX 1000 Ada (PCI:1:0:0)
   hardware.nvidia = {
     enable = true;
+    powerManagement.finegrained = false; # Keep dGPU awake so physical HDMI port receives display clock
     prime = {
       offload = {
         enable = true;

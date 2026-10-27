@@ -57,19 +57,19 @@ in
 
       [[profile]]
       name = "big-screen"
-      # Laptop (Left) and Samsung TV (Right)
-      [[profile.output]]
-      search = "0x06EA"
-      enable = true
-      mode = "2560x1600@60"
-      position = "0,0"
-      scale = 1.6
-
+      # Samsung TV (Left) and Laptop (Right)
       [[profile.output]]
       search = "SAMSUNG"
       enable = true
       mode = "1920x1080@60"
-      position = "1600,0"
+      position = "0,0"
+      scale = 1.0
+
+      [[profile.output]]
+      search = "0x1612"
+      enable = true
+      mode = "1920x1200@60"
+      position = "1920,0"
       scale = 1.0
 
       [[profile]]
