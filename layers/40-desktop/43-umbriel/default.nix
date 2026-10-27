@@ -47,6 +47,46 @@ in
       xwayland = true
 
       # ==============================================================================
+      # Includes — Shaders & Effect Presets
+      # ==============================================================================
+      # Includes all 189+ curated GLSL shader effect presets from:
+      # • Community Shaders: https://github.com/noctalia-dev/community-umbriel-shaders
+      # • Prometheaus Shaders: https://github.com/prometheaus/umbriel-shaders
+      [include]
+      files = [
+        "shaders/all-shaders.toml"
+      ]
+
+      # ==============================================================================
+      # Active Shaders — Psychedelic Collection (Community Shaders)
+      # ==============================================================================
+      [effects]
+      border = "psychedelic.fractal-flow"
+      window = "psychedelic.fractal-veil"
+
+      [animation]
+      enabled = true
+
+      [animation.workspaces]
+      enabled = true
+      style = "reveal"
+      effect = "psychedelic.fractal-iris"
+      duration_ms = 1100
+      curve = "linear"
+
+      [animation.windows_in]
+      enabled = true
+      effect = "psychedelic.fractal-bloom"
+      duration_ms = 700
+      curve = "linear"
+
+      [animation.windows_out]
+      enabled = true
+      effect = "psychedelic.fractal-bloom"
+      duration_ms = 450
+      curve = "linear"
+
+      # ==============================================================================
       # Input
       # ==============================================================================
       [input.keyboard]
@@ -65,29 +105,59 @@ in
       "Mod+A" = "spawn:noctalia msg panel-toggle launcher"
       "Mod+X" = "spawn:noctalia msg panel-toggle control-center"
       "Mod+Comma" = "spawn:noctalia msg settings-toggle"
+      "Mod+Shift+Comma" = { action = "spawn:umbriel-config gui", repeat = false }
       "Mod+Tab" = "spawn:noctalia msg window-switcher"
       "Mod+Q" = { action = "window-close", repeat = false }
       "Mod+Escape" = "session-quit"
       "Mod+Shift+Escape" = { action = "shortcuts-inhibit-toggle", allow_when_inhibited = true, repeat = false }
       "Ctrl+Alt+Delete" = "spawn:noctalia msg panel-toggle session"
 
-      # Window navigation & management
+      # Window navigation & focus (Hyprland arrows + Vim keys)
       "Mod+Left" = "window-focus-left"
       "Mod+Down" = "window-focus-down"
       "Mod+Up" = "window-focus-up"
       "Mod+Right" = "window-focus-right"
-      "Mod+Shift+Left" = "column-move-left"
+      "Mod+H" = "window-focus-left"
+      "Mod+J" = "window-focus-down"
+      "Mod+K" = "window-focus-up"
+      "Mod+L" = "window-focus-right"
+      "Alt+Tab" = "window-focus-next"
+      "Alt+Shift+Tab" = "window-focus-previous"
+
+      # Window movement & swapping (Hyprland Shift + arrows / Vim keys)
+      "Mod+Shift+Left" = "window-move-left"
       "Mod+Shift+Down" = "window-move-down"
       "Mod+Shift+Up" = "window-move-up"
-      "Mod+Shift+Right" = "column-move-right"
+      "Mod+Shift+Right" = "window-move-right"
+      "Mod+Shift+H" = "window-move-left"
+      "Mod+Shift+J" = "window-move-down"
+      "Mod+Shift+K" = "window-move-up"
+      "Mod+Shift+L" = "window-move-right"
 
+      # Window states
+      "Mod+V" = { action = "window-toggle-floating", repeat = false }
       "Mod+T" = { action = "window-toggle-floating", repeat = false }
       "Mod+F" = { action = "window-toggle-fullscreen", repeat = false }
       "Mod+M" = { action = "window-toggle-maximize-to-edges", repeat = false }
       "Mod+O" = { action = "overview-toggle", repeat = false }
+      "Mod+Ctrl+L" = "workspace-set-layout:toggle:scrolling,dwindle,master"
 
-      # ── 7 Functional Domain Workspaces ──
-      # 1: Agents, 2: Browser, 3: IDE, 4: Media/Games, 5: File-Manager, 6: E-mail, 7: Overviews
+      # Extent resizing & tab groups
+      "Mod+equal" = "window-modify-primary-extent:0.05"
+      "Mod+minus" = "window-modify-primary-extent:-0.05"
+      "Mod+Shift+equal" = "window-cycle-primary-extent"
+      "Mod+Shift+minus" = "window-cycle-primary-extent-back"
+      "Mod+Ctrl+equal" = "window-modify-secondary-extent:0.05"
+      "Mod+Ctrl+minus" = "window-modify-secondary-extent:-0.05"
+      "Mod+R" = "window-cycle-primary-extent"
+      "Mod+Shift+R" = "window-cycle-primary-extent-back"
+      "Mod+W" = "column-toggle-tabbed"
+
+      # Scratchpad / Special Workspace
+      "Mod+Shift+S" = "scratchpad-toggle"
+      "Mod+Alt+S" = "window-move-to-scratchpad"
+
+      # Workspaces 1-9
       "Mod+1" = "workspace-switch:1"
       "Mod+2" = "workspace-switch:2"
       "Mod+3" = "workspace-switch:3"
@@ -95,7 +165,10 @@ in
       "Mod+5" = "workspace-switch:5"
       "Mod+6" = "workspace-switch:6"
       "Mod+7" = "workspace-switch:7"
+      "Mod+8" = "workspace-switch:8"
+      "Mod+9" = "workspace-switch:9"
 
+      # Move window to workspace
       "Mod+Shift+1" = "window-move-to-workspace:1"
       "Mod+Shift+2" = "window-move-to-workspace:2"
       "Mod+Shift+3" = "window-move-to-workspace:3"
@@ -103,6 +176,40 @@ in
       "Mod+Shift+5" = "window-move-to-workspace:5"
       "Mod+Shift+6" = "window-move-to-workspace:6"
       "Mod+Shift+7" = "window-move-to-workspace:7"
+      "Mod+Shift+8" = "window-move-to-workspace:8"
+      "Mod+Shift+9" = "window-move-to-workspace:9"
+
+      # Move window to workspace (silent)
+      "Mod+Alt+1" = "window-move-to-workspace-silent:1"
+      "Mod+Alt+2" = "window-move-to-workspace-silent:2"
+      "Mod+Alt+3" = "window-move-to-workspace-silent:3"
+      "Mod+Alt+4" = "window-move-to-workspace-silent:4"
+      "Mod+Alt+5" = "window-move-to-workspace-silent:5"
+      "Mod+Alt+6" = "window-move-to-workspace-silent:6"
+      "Mod+Alt+7" = "window-move-to-workspace-silent:7"
+      "Mod+Alt+8" = "window-move-to-workspace-silent:8"
+      "Mod+Alt+9" = "window-move-to-workspace-silent:9"
+
+      # Relative workspace navigation (bracket, page up/down, ctrl+arrows)
+      "Mod+BracketRight" = "workspace-next"
+      "Mod+BracketLeft" = "workspace-previous"
+      "Mod+Ctrl+Right" = "workspace-next"
+      "Mod+Ctrl+Left" = "workspace-previous"
+      "Mod+Page_Down" = "workspace-next"
+      "Mod+Page_Up" = "workspace-previous"
+
+      "Mod+Shift+BracketRight" = "window-move-to-workspace-next"
+      "Mod+Shift+BracketLeft" = "window-move-to-workspace-previous"
+      "Mod+Shift+Page_Down" = "window-move-to-workspace-next"
+      "Mod+Shift+Page_Up" = "window-move-to-workspace-previous"
+      "Mod+Ctrl+Shift+Right" = "window-move-to-workspace-next"
+      "Mod+Ctrl+Shift+Left" = "window-move-to-workspace-previous"
+
+      # Mouse wheel workspace switching
+      "Mod+WheelDown" = "workspace-next"
+      "Mod+WheelUp" = "workspace-previous"
+      "Mod+Shift+WheelDown" = "window-move-to-workspace-next"
+      "Mod+Shift+WheelUp" = "window-move-to-workspace-previous"
 
       # Media & hardware keys
       "XF86AudioRaiseVolume" = { action = "spawn:noctalia msg volume-up", allow_when_locked = true }
@@ -115,13 +222,25 @@ in
       "XF86MonBrightnessDown" = { action = "spawn:noctalia msg brightness-down", allow_when_locked = true }
 
       # ==============================================================================
+      # Overview
+      # ==============================================================================
+      [overview]
+      zoom = 0.5
+      scroll_factor_horizontal = 1.0
+      scroll_factor_vertical = 1.0
+      background_blur = true
+      workspace_wallpaper = true
+      shortcuts = true
+      shortcut_keys = "1234567890"
+
+      # ==============================================================================
       # Layout
       # ==============================================================================
       [layout]
-      extent_presets = [0.333, 0.5, 0.667]
+      extent_presets = [0.333, 0.5, 0.667, 1.0]
 
       [layout.scrolling]
-      default_extent_fraction = 0.5
+      default_extent_fraction = 1.0
 
       # ==============================================================================
       # Window Rules
@@ -174,6 +293,12 @@ in
       [[layer_rule]]
       match.namespace = "^noctalia-(notification|dock|panel|attached-panel|osd)$"
       blur_optimized = false
+
+      # ==============================================================================
+      # EXTENSIONS & SHADERS REFERENCE (https://github.com/noctalia-dev/community-umbriel-shaders)
+      # GUI Configurator: umbriel-config gui (Mod+Shift+,)
+      # Portals: xdg-desktop-portal-umbriel (ScreenCast, Screenshot, InputCapture)
+      # ==============================================================================
 
       ${cfg.extraConfig}
     '';
