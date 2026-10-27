@@ -64,8 +64,8 @@ in
         "CTRL SHIFT, Print, exec, hypr-screenshot copy-full"
         "$mod, Print, exec, hypr-screenshot menu"
         "$mod CTRL, S, exec, hypr-screenshot edit"
-        ", XF86AudioEject, exec, hypr-screenshot edit"
-        "SHIFT, XF86AudioEject, exec, hypr-screenshot edit-full"
+        ", XF86Eject, exec, hypr-screenshot edit"
+        "SHIFT, XF86Eject, exec, hypr-screenshot edit-full"
         "CTRL SHIFT, S, exec, hypr-screenshot edit"
 
         # ── System / Session ───────────────────────────────────────────

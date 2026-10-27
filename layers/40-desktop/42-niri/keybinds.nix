@@ -214,10 +214,10 @@ in
       "Shift+Print" = {
         action = spawn "uwsm" "app" "--" "sh" "-c" "grim - | swappy -f -";
       };
-      "XF86AudioEject" = {
+      "XF86Eject" = {
         action = spawn "uwsm" "app" "--" "sh" "-c" "grim -g \"$(slurp)\" - | swappy -f -";
       };
-      "Shift+XF86AudioEject" = {
+      "Shift+XF86Eject" = {
         action = spawn "uwsm" "app" "--" "sh" "-c" "grim - | swappy -f -";
       };
       "Ctrl+Shift+S" = {
