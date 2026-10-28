@@ -12,7 +12,7 @@
 }:
 {
   options.services.ai-services.freellmapi = {
-    enable = lib.mkEnableOption "FreeLLMAPI — free-tier LLM router with OpenAI-compatible endpoint";
+    enable = lib.mkEnableOption "FreeLLMAPI (DEPRECATED: free endpoints consolidated into ExtremeRouter :20128)";
 
     port = lib.mkOption {
       type = lib.types.port;

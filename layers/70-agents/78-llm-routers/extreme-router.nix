@@ -79,6 +79,18 @@ with lib;
       description = "Web-cookie / ToS-risky providers flagged as tos:avoid (excluded from sensitive prompts)";
     };
 
+    enableRtk = mkOption {
+      type = types.bool;
+      default = true;
+      description = "Enable RTK token saving optimization";
+    };
+
+    enableHeadroom = mkOption {
+      type = types.bool;
+      default = true;
+      description = "Enable Headroom context token compression";
+    };
+
     trustedProviders = mkOption {
       type = types.listOf types.str;
       default = [
@@ -170,20 +182,48 @@ with lib;
           "d ${cfg.dataDir} 0750 1000 1000 -"
         ];
 
-        # Write declarative provider policy metadata (ToS-risky vs trusted providers)
-        environment.etc."extreme-router/provider-policy.json".text = builtins.toJSON {
-          inherit (cfg) requireApiKey;
-          inherit (cfg) tosAvoidProviders;
-          inherit (cfg) trustedProviders;
-          labels = builtins.listToAttrs (
-            map (p: {
-              name = p;
-              value = [
-                "web-cookie"
-                "tos:avoid"
+        # Declarative provider policy metadata & ExtremeRouter cascade combo definition
+        environment.etc = {
+          "extreme-router/provider-policy.json".text = builtins.toJSON {
+            inherit (cfg) requireApiKey;
+            inherit (cfg) tosAvoidProviders;
+            inherit (cfg) trustedProviders;
+            labels = builtins.listToAttrs (
+              map (p: {
+                name = p;
+                value = [
+                  "web-cookie"
+                  "tos:avoid"
+                ];
+              }) cfg.tosAvoidProviders
+            );
+          };
+
+          "extreme-router/combos.json".text = builtins.toJSON {
+            "cascade/agent" = {
+              kind = "cascade";
+              tiers = {
+                "0" = [ "ollama/qwen3.5:9b" ];
+                "1" = [
+                  "opencode/deepseek-v4"
+                  "google/gemini-2.5-flash"
+                  "openrouter/free"
+                ];
+                "2" = [
+                  "hermes/claude-sonnet-4.5"
+                  "google/gemini-2.5-pro"
+                ];
+              };
+              models = [
+                "ollama/qwen3.5:9b"
+                "opencode/deepseek-v4"
+                "google/gemini-2.5-flash"
+                "openrouter/free"
+                "hermes/claude-sonnet-4.5"
+                "google/gemini-2.5-pro"
               ];
-            }) cfg.tosAvoidProviders
-          );
+            };
+          };
         };
 
         # OCI container via podman (non-root UID 1000:1000)
@@ -200,6 +240,9 @@ with lib;
             NEXT_PUBLIC_BASE_URL = "http://localhost:${toString cfg.port}";
             REQUIRE_API_KEY = boolToString cfg.requireApiKey;
             TOS_AVOID_PROVIDERS = concatStringsSep "," cfg.tosAvoidProviders;
+            ENABLE_RTK = boolToString cfg.enableRtk;
+            ENABLE_HEADROOM = boolToString cfg.enableHeadroom;
+            CASCADE_AGENT_MODELS = "ollama/qwen3.5:9b,opencode/deepseek-v4,google/gemini-2.5-flash,openrouter/free,hermes/claude-sonnet-4.5,google/gemini-2.5-pro";
           }
           // cfg.extraEnvironment;
           volumes = [

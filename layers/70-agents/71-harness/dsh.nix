@@ -89,7 +89,9 @@ in
       systemPackages = mkIf (cfg.package != null) [ cfg.package ];
 
       sessionVariables = {
-        OPENAI_BASE_URL = "http://luffy.nfp.nix:8090/v1";
+        OPENAI_BASE_URL = lib.mkDefault "http://127.0.0.1:20128/v1";
+        ANTHROPIC_BASE_URL = lib.mkDefault "http://127.0.0.1:20128/v1";
+        OPENAI_BASE_URL_EXTREME_ROUTER = lib.mkDefault "http://127.0.0.1:20128/v1";
         OPENAI_BASE_URL_KONG_ER = "http://luffy.nfp.nix:8090/v1";
         OPENAI_BASE_URL_KONG_OMNI = "http://luffy.nfp.nix:8090/omni/v1";
         OPENAI_BASE_URL_KONG_FREE = "http://luffy.nfp.nix:8090/llm/free/v1";

@@ -13,7 +13,7 @@
 with lib;
 {
   options.services.ai-services.freellmpool = {
-    enable = mkEnableOption "freellmpool — free-tier LLM pool";
+    enable = mkEnableOption "freellmpool (DEPRECATED: free endpoints consolidated into ExtremeRouter :20128)";
 
     port = mkOption {
       type = types.port;

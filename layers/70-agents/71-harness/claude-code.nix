@@ -36,14 +36,14 @@
         if (config.services.ai-services.kong-gateway.enable or false) then
           "http://127.0.0.1:${toString (config.services.ai-services.kong-gateway.proxyPort or 8090)}"
         else
-          "http://sanji.nfp.nix:8090";
+          "http://127.0.0.1:20128";
       llmPkgs = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system} or { };
       claudePkg = llmPkgs.claude-code or pkgs.claude-code or null;
     in
     lib.mkIf cfg.enable {
       environment.systemPackages = lib.optional (claudePkg != null) claudePkg;
       environment.sessionVariables = {
-        ANTHROPIC_BASE_URL = kongBase;
+        ANTHROPIC_BASE_URL = lib.mkDefault "${kongBase}/v1";
         CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY = "1";
         ANTHROPIC_BASE_URL_KONG_ER = "${kongBase}/v1";
         ANTHROPIC_BASE_URL_KONG_OMNI = "${kongBase}/omni/v1";
@@ -61,12 +61,12 @@
         if (osConfig.services.ai-services.kong-gateway.enable or false) then
           "http://127.0.0.1:${toString (osConfig.services.ai-services.kong-gateway.proxyPort or 8090)}"
         else
-          "http://sanji.nfp.nix:8090";
+          "http://127.0.0.1:20128";
       claudeSettings = builtins.toJSON {
         hasCompletedOnboarding = true;
         apiKeyHelper = "cat /home/t0psh31f/.config/sops-nix/secrets/kong_key_claude_code 2>/dev/null || cat /run/secrets/kong_key_claude_code 2>/dev/null || printf '%s' \"$ANTHROPIC_AUTH_TOKEN\"";
         env = {
-          ANTHROPIC_BASE_URL = kongBase;
+          ANTHROPIC_BASE_URL = "${kongBase}/v1";
           CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY = "1";
         };
       };

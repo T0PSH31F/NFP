@@ -59,6 +59,9 @@
       ++ lib.optional cfg.enableIde pkgs.antigravity-ide-fhs;
 
       environment.sessionVariables = {
+        OPENAI_BASE_URL = lib.mkDefault "http://127.0.0.1:20128/v1";
+        ANTHROPIC_BASE_URL = lib.mkDefault "http://127.0.0.1:20128/v1";
+        OPENAI_BASE_URL_EXTREME_ROUTER = lib.mkDefault "http://127.0.0.1:20128/v1";
         # Kong AI Gateway endpoints — use Tailnet MagicDNS hostnames for stability
         OPENAI_BASE_URL_KONG_ER = "http://luffy.nfp.nix:8090/v1";
         OPENAI_BASE_URL_KONG_OMNI = "http://luffy.nfp.nix:8090/omni/v1";

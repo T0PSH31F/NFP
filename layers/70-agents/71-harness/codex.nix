@@ -35,7 +35,7 @@
         if (config.services.ai-services.kong-gateway.enable or false) then
           "http://127.0.0.1:${toString (config.services.ai-services.kong-gateway.proxyPort or 8090)}"
         else
-          "http://sanji.nfp.nix:8090";
+          "http://127.0.0.1:20128";
     in
     lib.mkIf cfg.enable {
       environment.systemPackages = lib.optional (pkgs ? codex) pkgs.codex;
@@ -56,7 +56,7 @@
         if (osConfig.services.ai-services.kong-gateway.enable or false) then
           "http://127.0.0.1:${toString (osConfig.services.ai-services.kong-gateway.proxyPort or 8090)}"
         else
-          "http://sanji.nfp.nix:8090";
+          "http://127.0.0.1:20128";
       codexConfigToml = ''
         model_provider = "kong"
         model = "cx/gpt-5.3-codex"

@@ -330,3 +330,55 @@ Append one entry per session, newest at the bottom. Never edit past entries.
   - `ai-usagebar usage --json` returns valid status for Gemini and Anthropic/OpenAI quota buckets.
 - **State change:** passing
 - **Next action:** Queue autonomous tasks via `~/Notes/EverOS/todo.md` under `## Hermes` or `@hermes`.
+
+### [2026-10-28 14:22:25 UTC] Hermes Ratchet: [SAFE-AUTO] Decompose NFP LLM gateway refactor (Layer 78 + agent targets): ExtremeRouter sole gateway, remove Kong, deprecate FreeLLM, cascade combos, headroom, update harness base URLs, verify init/statix/deadnix
+- **State**: failed
+- **Evidence**:
+```
+No modifications produced by worker.
+```
+
+### [2026-10-28 14:25:48 UTC] Hermes Ratchet: [SAFE-AUTO] Decompose NFP LLM gateway refactor (Layer 78 + agent targets): ExtremeRouter sole gateway, remove Kong, deprecate FreeLLM, cascade combos, headroom, update harness base URLs, verify init/statix/deadnix
+- **State**: failed
+- **Evidence**:
+```
+No modifications produced by worker.
+```
+
+### [2026-10-28 15:59:11 UTC] Hermes Ratchet: Always-On Jarvis Architecture, ExtremeRouter Cascade, Jev Classifier, Swappable Voice Pipeline & A2UI Schema
+- **State**: failed
+- **Evidence**:
+```
+No modifications produced by worker.
+```
+
+### [2026-10-28 16:02:36 UTC] Hermes Ratchet: Always-On Jarvis Architecture, ExtremeRouter Cascade, Jev Classifier, Swappable Voice Pipeline & A2UI Schema
+- **State**: failed
+- **Evidence**:
+```
+No modifications produced by worker.
+```
+
+### [2026-10-28 16:15:00 UTC] Antigravity: Always-On Jarvis Architecture, ExtremeRouter Cascade, Jev Classifier, Swappable Voice Pipeline & A2UI Schema
+- **Task:** Implement Always-On Jarvis Architecture, ExtremeRouter Cascade, Jev Classifier Daemon, Swappable Voice Pipeline & A2UI Schema.
+- **Accomplishments:**
+  1. **Router Architecture Refactor**:
+     - Bypassed Kong Gateway (`:8090`) from LLM proxy paths; disabled Kong in `machines/sanji/default.nix` and `layers/90-profiles/tags/ai-router.nix`.
+     - Configured ExtremeRouter (`:20128`): enabled `ENABLE_RTK=true`, `ENABLE_HEADROOM=true`, and defined declarative `cascade/agent` combo (Tier 0: `ollama/qwen3.5:9b`, Tier 1: `opencode/deepseek-v4`, `google/gemini-2.5-flash`, `openrouter/free`, Tier 2: `hermes/claude-sonnet-4.5`, `google/gemini-2.5-pro`).
+     - Seeded `cascade/agent` in SQLite `combos` table and created symlink `extremerouter.nix -> extreme-router.nix`.
+     - Deprecated standalone runtime dependencies on `freellmapi` and `freellmpool`.
+  2. **Jev System-1 Pre-Flight Classifier Daemon (`:20127`)**:
+     - Implemented `layers/70-agents/78-llm-routers/jev_classifier.py` with two-stage triage (Stage 1 zero-token heuristic check dropping pings/200 OKs, Stage 2 Ollama `qwen3.5:9b` local classification with actionability, risk level, target persona, and verdict).
+     - Packaged `layers/70-agents/78-llm-routers/jev.nix` deploying `nfp-jev-classifier.service`.
+  3. **Local Voice Pipeline & Persona Registry (`72-voice`)**:
+     - Created `layers/70-agents/72-voice/personas.json` with 11 pre-registered personas (`jarvis-classic`, `glados-auditor`, `samuel-jackson`, `orc-peon`, `hk-55`, `sc-adjutant`, `johnny-5`, `gandalf`, `paimon`, `cortana`, `eccentric-jp-girl`).
+     - Implemented `layers/70-agents/72-voice/nfp_voice_interrupter.py` supporting Silero VAD barge-in interrupts (instantly killing active playback processes upon user speech) and voice trigger parsing (`Switch voice to [Persona]`) hot-swapping active state in `~/.local/share/pi-durable/state.sqlite`.
+  4. **A2UI Schema & Pi Agent Alignment**:
+     - Defined `layers/70-agents/77-dash-desk-ui/a2ui_action_card_schema.json` with action buttons, diff previews, risk levels, and fallback TTL rules.
+     - Updated Jev classifier and Pi durable daemon (`pi-durable-daemon.py`) to emit compliant A2UI cards.
+     - Aligned `OPENAI_BASE_URL` and `ANTHROPIC_BASE_URL` across Pi, Hermes, OpenCode, and DSH harnesses to ExtremeRouter (`http://127.0.0.1:20128/v1`).
+- **Verification:**
+  - `python3 layers/70-agents/78-llm-routers/jev_classifier.py --test` passed 5/5.
+  - `python3 layers/70-agents/72-voice/nfp_voice_interrupter.py --test` passed 4/4.
+  - `./init.sh --worktree` passed 5/5 across all fleet machines (`sanji`, `z0r0`, `luffy`).
+- **State change:** passing

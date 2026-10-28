@@ -462,6 +462,8 @@
         sessionVariables = {
           HERMES_MANAGED = "true";
           HERMES_HOME_MODE = "2775";
+          OPENAI_BASE_URL = lib.mkDefault "http://127.0.0.1:20128/v1";
+          ANTHROPIC_BASE_URL = lib.mkDefault "http://127.0.0.1:20128/v1";
         };
 
         systemPackages =
@@ -899,6 +901,7 @@
           EXTREMEROUTER_API_KEY=${config.sops.placeholder.extremerouter_api_key}
           EXTREMEROUTER_BASE_URL=http://127.0.0.1:20128/v1
           OPENAI_BASE_URL=http://127.0.0.1:20128/v1
+          ANTHROPIC_BASE_URL=http://127.0.0.1:20128/v1
 
           # Kong AI Gateway — unified LLM routing (routes to ExtremeRouter, FreeLLMAPI, etc.)
           KONG_API_KEY=${config.sops.placeholder.kong_key_hermes}

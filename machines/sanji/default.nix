@@ -1,7 +1,5 @@
 {
   config,
-  lib,
-  pkgs,
   ...
 }:
 {
@@ -109,19 +107,14 @@
         acceleration = "cuda";
       };
       kong-gateway = {
-        enable = true;
-        routers = {
-          extreme-router.host = "100.64.0.1";
-          freellmapi.port = lib.mkForce 3001;
-          freellmpool.port = lib.mkForce 8083;
-        };
+        enable = false;
       };
       omniroute = {
         enable = false;
         environmentFile = config.sops.templates."omniroute-env".path;
       };
-      freellmapi.enable = true;
-      freellmpool.enable = true;
+      freellmapi.enable = false;
+      freellmpool.enable = false;
     };
 
     jev-engine = {

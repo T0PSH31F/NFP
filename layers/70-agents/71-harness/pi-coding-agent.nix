@@ -77,12 +77,8 @@ in
 
     routerEndpoint = mkOption {
       type = types.str;
-      default =
-        if (osConfig.services.ai-services.kong-gateway.enable or false) then
-          "http://127.0.0.1:${toString (osConfig.services.ai-services.kong-gateway.proxyPort or 8090)}/v1"
-        else
-          "http://sanji.nfp.nix:8090/v1";
-      description = "NFP LLM router OpenAI-compatible gateway endpoint";
+      default = "http://127.0.0.1:20128/v1";
+      description = "NFP LLM router OpenAI-compatible gateway endpoint (ExtremeRouter)";
     };
 
     enableMcp = mkOption {
@@ -171,13 +167,15 @@ in
 
     environment.sessionVariables = {
       PI_CODING_AGENT_DIR = "$HOME/.pi/agent";
-      OPENAI_BASE_URL = lib.mkDefault cfg.routerEndpoint;
+      OPENAI_BASE_URL = lib.mkDefault "http://127.0.0.1:20128/v1";
+      ANTHROPIC_BASE_URL = lib.mkDefault "http://127.0.0.1:20128/v1";
+      OPENAI_BASE_URL_EXTREME_ROUTER = lib.mkDefault "http://127.0.0.1:20128/v1";
       OPENAI_BASE_URL_KONG_ER = lib.mkDefault cfg.routerEndpoint;
       OPENAI_BASE_URL_KONG_OMNI = lib.mkDefault "http://sanji.nfp.nix:8090/omni/v1";
       OPENAI_BASE_URL_KONG_FREE = lib.mkDefault "http://sanji.nfp.nix:8090/llm/free/v1";
       OPENAI_BASE_URL_KONG_FRONTIER = lib.mkDefault "http://sanji.nfp.nix:8090/llm/frontier/v1";
       OPENAI_BASE_URL_JEV_PREFLIGHT = lib.mkDefault "http://127.0.0.1:20127/v1";
-      OPENAI_BASE_URL_EXTREME_DIRECT = lib.mkDefault "http://z0r0.nfp.nix:20128/v1";
+      OPENAI_BASE_URL_EXTREME_DIRECT = lib.mkDefault "http://127.0.0.1:20128/v1";
     };
 
     home-manager.users.${user} =

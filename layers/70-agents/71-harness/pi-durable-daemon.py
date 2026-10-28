@@ -25,6 +25,8 @@ import re
 import subprocess
 import sys
 import time
+import uuid
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Set
 
@@ -168,6 +170,67 @@ async def run_pi_task(
         ACTIVE_JOBS = max(0, ACTIVE_JOBS - 1)
 
 
+def build_a2ui_card(agent_slug: str, task_text: str, gate_status: str, diff_text: str | None = None) -> Dict[str, Any]:
+    """Generates an A2UI Action Card compliant with a2ui_action_card_schema.json."""
+    card_id = f"card-{uuid.uuid4().hex[:12]}"
+    now_iso = datetime.now(timezone.utc).isoformat()
+    is_gate = (gate_status == "awaiting_approval")
+    risk = "high" if ("rm " in task_text or "destructive" in task_text or "nix-collect" in task_text) else ("medium" if is_gate else "low")
+    
+    actions = [
+        {
+            "id": "act-dismiss",
+            "label": "Dismiss",
+            "style": "outline",
+            "action_type": "dismiss",
+            "payload": {"card_id": card_id}
+        }
+    ]
+    if is_gate:
+        actions.insert(0, {
+            "id": "act-approve",
+            "label": "Approve Step",
+            "style": "primary",
+            "action_type": "approve",
+            "payload": {"card_id": card_id, "task": task_text}
+        })
+        actions.insert(1, {
+            "id": "act-reject",
+            "label": "Reject / Halt",
+            "style": "danger",
+            "action_type": "reject",
+            "payload": {"card_id": card_id, "task": task_text}
+        })
+
+    diff_preview = None
+    if diff_text:
+        diff_preview = {
+            "file_path": "workspace",
+            "old_content": "",
+            "new_content": "",
+            "unified_diff": diff_text
+        }
+
+    return {
+        "card_id": card_id,
+        "timestamp": now_iso,
+        "source_agent": f"pi-{agent_slug}",
+        "target_persona": "glados-auditor",
+        "title": f"[{agent_slug.upper()}] {'Action Required' if is_gate else 'Task Completed'}",
+        "summary": task_text[:160],
+        "risk_level": risk,
+        "verdict": "DISPATCH_AGENT" if is_gate else "NOTIFY",
+        "actionability": is_gate,
+        "diff_preview": diff_preview,
+        "actions": actions,
+        "ttl_rule": {
+            "timeout_seconds": 600,
+            "default_action_id": "act-dismiss",
+            "on_expire": "auto_dismiss"
+        }
+    }
+
+
 async def decompose_and_advance_task(agent_slug: str, task_text: str) -> Dict[str, Any]:
     """
     1. Uses Free Tier (`jev/free-first`) to break the task into actionable `[SAFE-AUTO]` vs `[APPROVAL-GATE]` steps.
@@ -250,10 +313,13 @@ async def decompose_and_advance_task(agent_slug: str, task_text: str) -> Dict[st
             f"{agent_slug.capitalize()} has completed your task and filed the verification report."
         )
 
+    card = build_a2ui_card(agent_slug, clean_task, gate_status)
     try:
-        return json.loads(stdout_b.decode("utf-8", errors="replace"))
+        ret = json.loads(stdout_b.decode("utf-8", errors="replace"))
+        ret["a2ui_card"] = card
+        return ret
     except Exception:
-        return {"status": "ok", "gate_status": gate_status}
+        return {"status": "ok", "gate_status": gate_status, "a2ui_card": card}
 
 
 async def poll_shared_todo_loop() -> None:

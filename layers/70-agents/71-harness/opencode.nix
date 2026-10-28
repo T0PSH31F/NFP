@@ -35,6 +35,36 @@
     in
     {
       config = lib.mkIf osConfig.layers.layer-71.harness.opencode.enable {
+        home = {
+          sessionVariables = {
+            OPENAI_BASE_URL = lib.mkDefault "http://127.0.0.1:20128/v1";
+            ANTHROPIC_BASE_URL = lib.mkDefault "http://127.0.0.1:20128/v1";
+          };
+
+          activation.initOpenCodeSkills = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+            SKILLS_DIR="/persist/home/t0psh31f/.config/opencode/skills"
+            if [ ! -d "$SKILLS_DIR" ]; then
+              $DRY_RUN_CMD mkdir -p "$SKILLS_DIR"
+              $DRY_RUN_CMD cp -r ${./opencode/skills}/* "$SKILLS_DIR"/ 2>/dev/null || true
+              $DRY_RUN_CMD chmod -R u+w "$SKILLS_DIR"
+            fi
+          '';
+
+          packages = lib.optional osConfig.layers.layer-71.harness.opencode.desktop pkgs.opencode-desktop ++ [
+            pkgs.libcanberra-gtk3 # canberra-gtk-play for warcraft-notifications fallback
+            pkgs.alsa-utils # aplay for warcraft-notifications wav playback
+            pkgs.pulseaudio # paplay (silent playback, preferred by warcraft-notifications)
+
+            # oh-my-opencode-slim CLI + companion binary
+            (pkgs.writeShellScriptBin "omos" ''
+              exec ${pkgs.nodejs}/bin/npx oh-my-opencode-slim "$@"
+            '')
+            (pkgs.writeShellScriptBin "oh-my-opencode-slim" ''
+              exec ${pkgs.nodejs}/bin/npx oh-my-opencode-slim "$@"
+            '')
+          ];
+        };
+
         programs.opencode = {
           enable = true;
           enableMcpIntegration = true;
@@ -52,19 +82,6 @@
             theme = lib.mkForce "noctalia";
             keybinds.command_list = "ctrl+shift+p";
           };
-        };
-
-        home.activation.initOpenCodeSkills = {
-          data = ''
-            SKILLS_DIR="/persist/home/t0psh31f/.config/opencode/skills"
-            if [ ! -d "$SKILLS_DIR" ]; then
-              $DRY_RUN_CMD mkdir -p "$SKILLS_DIR"
-              $DRY_RUN_CMD cp -r ${./opencode/skills}/* "$SKILLS_DIR"/ 2>/dev/null || true
-              $DRY_RUN_CMD chmod -R u+w "$SKILLS_DIR"
-            fi
-          '';
-          before = [ ];
-          after = [ "writeBoundary" ];
         };
 
         programs.opencode.settings = {
@@ -503,7 +520,7 @@
                   if (osConfig.services.ai-services.kong-gateway.enable or false) then
                     "http://127.0.0.1:${toString (osConfig.services.ai-services.kong-gateway.proxyPort or 8090)}/v1"
                   else
-                    "http://sanji.nfp.nix:8090/v1";
+                    "http://127.0.0.1:20128/v1";
               in
               {
                 npm = "@ai-sdk/openai-compatible";
@@ -1018,22 +1035,6 @@
           "opencode/plugins/context-capture/context-capture.js".source =
             ./opencode/plugins/context-capture.js;
         };
-
-        home.packages =
-          lib.optional osConfig.layers.layer-71.harness.opencode.desktop pkgs.opencode-desktop
-          ++ [
-            pkgs.libcanberra-gtk3 # canberra-gtk-play for warcraft-notifications fallback
-            pkgs.alsa-utils # aplay for warcraft-notifications wav playback
-            pkgs.pulseaudio # paplay (silent playback, preferred by warcraft-notifications)
-
-            # oh-my-opencode-slim CLI + companion binary
-            (pkgs.writeShellScriptBin "omos" ''
-              exec ${pkgs.nodejs}/bin/npx oh-my-opencode-slim "$@"
-            '')
-            (pkgs.writeShellScriptBin "oh-my-opencode-slim" ''
-              exec ${pkgs.nodejs}/bin/npx oh-my-opencode-slim "$@"
-            '')
-          ];
       };
     };
 }

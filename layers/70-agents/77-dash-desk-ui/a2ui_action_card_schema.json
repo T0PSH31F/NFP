@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nfp.internal/schemas/a2ui_action_card_schema.json",
+  "title": "A2UI Action Card Schema",
+  "description": "Agent-to-UI Action Card specification for interactive notifications, approvals, and autonomous task triage in NFP",
+  "type": "object",
+  "required": [
+    "card_id",
+    "timestamp",
+    "source_agent",
+    "title",
+    "summary",
+    "risk_level",
+    "verdict",
+    "actions"
+  ],
+  "properties": {
+    "card_id": {
+      "type": "string",
+      "description": "Unique identifier for the action card (e.g. card-0a1b2c3d4e5f)"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO-8601 UTC timestamp of card issuance"
+    },
+    "source_agent": {
+      "type": "string",
+      "description": "Issuing agent daemon (e.g. jev-classifier, pi-durable, hermes, antigravity)"
+    },
+    "target_persona": {
+      "type": "string",
+      "description": "Voice/UI persona intended to present the card (e.g. jarvis-classic, glados-auditor)"
+    },
+    "title": {
+      "type": "string",
+      "description": "Short headline for desktop notification / card banner"
+    },
+    "summary": {
+      "type": "string",
+      "description": "Clear 1-3 sentence explanation of the situation and recommendation"
+    },
+    "risk_level": {
+      "type": "string",
+      "enum": ["low", "medium", "high", "critical"],
+      "description": "Severity assessment of the associated operation"
+    },
+    "verdict": {
+      "type": "string",
+      "enum": ["IGNORE", "NOTIFY", "DISPATCH_AGENT"],
+      "description": "Autonomous triage decision"
+    },
+    "actionability": {
+      "type": "boolean",
+      "description": "Whether user action or confirmation is recommended"
+    },
+    "diff_preview": {
+      "type": ["object", "null"],
+      "description": "Optional file diff preview for code or configuration modifications",
+      "properties": {
+        "file_path": {
+          "type": "string",
+          "description": "Path to file being modified"
+        },
+        "old_content": {
+          "type": "string",
+          "description": "Original file contents before modification"
+        },
+        "new_content": {
+          "type": "string",
+          "description": "Proposed file contents"
+        },
+        "unified_diff": {
+          "type": "string",
+          "description": "Unified diff representation (diff -u format)"
+        }
+      }
+    },
+    "actions": {
+      "type": "array",
+      "description": "Interactive action buttons rendered on the card",
+      "items": {
+        "type": "object",
+        "required": ["id", "label", "action_type"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique action identifier within this card"
+          },
+          "label": {
+            "type": "string",
+            "description": "Button label displayed to the user"
+          },
+          "style": {
+            "type": "string",
+            "enum": ["primary", "secondary", "danger", "success", "outline"],
+            "default": "primary"
+          },
+          "action_type": {
+            "type": "string",
+            "enum": ["approve", "reject", "execute_command", "open_url", "dismiss", "custom"]
+          },
+          "payload": {
+            "type": "object",
+            "description": "Parameters delivered to the agent upon button activation"
+          }
+        }
+      }
+    },
+    "ttl_rule": {
+      "type": ["object", "null"],
+      "description": "Fallback timeout behavior if the user does not interact with the card",
+      "properties": {
+        "timeout_seconds": {
+          "type": "integer",
+          "minimum": 5,
+          "default": 300,
+          "description": "Time to live before fallback execution"
+        },
+        "default_action_id": {
+          "type": "string",
+          "description": "Action ID executed upon expiration"
+        },
+        "on_expire": {
+          "type": "string",
+          "enum": ["auto_approve", "auto_dismiss", "escalate"],
+          "default": "auto_dismiss"
+        }
+      }
+    }
+  }
+}
