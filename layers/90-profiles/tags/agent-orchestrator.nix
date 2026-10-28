@@ -18,6 +18,7 @@
           mission-control.enable = lib.mkDefault true;
           paperclip.enable = lib.mkDefault true;
           polyfloor.enable = lib.mkDefault true;
+          hermes-ratchet.enable = lib.mkDefault true;
         };
       };
     };
