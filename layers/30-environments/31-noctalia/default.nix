@@ -44,13 +44,22 @@ in
     plugins = lib.mkOption {
       type = lib.types.listOf lib.types.str;
       default = [
-        "assistant-panel"
         "ip-monitor"
         "tailscale"
-        "workspace-overview"
         "screen-toolkit"
         "todo"
-        "model-usage"
+        "agentik"
+        "ai-usagebar"
+        "mini-docker"
+        "omniroute-quota"
+        "9router-control"
+        "phone-connect"
+        "thunderbird-companion"
+        "w-engine"
+        "wallhaven"
+        "bongocat"
+        "notes"
+        "umbriel-companion"
       ];
       description = "List of Noctalia plugins to declaratively fetch and link into ~/.config/noctalia/plugins";
     };
@@ -580,129 +589,210 @@ in
               enable_sounds = true;
             };
 
-            # ── Bar ──────────────────────────────────────────────────
+            # ── Four-Bar Cockpit Geometry & Theming ─────────────────
             bar = {
-              position = "top";
-              density = "comfortable";
-              show_outline = true;
-              show_capsule = true;
-              background_opacity = 0.89;
-              display_mode = "always_visible";
-              frame_thickness = 7;
-              frame_radius = 16;
-              outer_corners = true;
-              mouse_wheel_action = "workspace";
-              right_click_action = "control_center";
+              order = [
+                "default"
+                "bottom-bar"
+                "left-bar"
+                "right-bar"
+              ];
             };
+
+            # 1. Top Bar: Always visible primary system cockpit
             bar.default = {
-              background_opacity = 0.58;
+              enabled = true;
+              position = "top";
+              layer = "overlay";
+              thickness = 44;
+              scale = 1.15;
+              padding = 14;
+              panel_overlap = -2;
+              margin_edge = 0;
+              margin_ends = 36;
+              margin_opposite_edge = 0;
+              reserve_space = true;
+              background_opacity = 0.82;
               border = "primary";
-              border_width = 2.0;
+              border_width = 1.5;
               capsule = true;
-              capsule_border = "primary";
-              capsule_opacity = 0.0;
+              capsule_border = "secondary";
+              capsule_border_width = 1.5;
+              capsule_opacity = 0.85;
+              capsule_padding = 9.0;
+              concave_edge_corners = true;
+              radius = 28;
+              radius_top_left = 0;
+              radius_top_right = 0;
+              radius_bottom_left = 28;
+              radius_bottom_right = 28;
+              font_family = "Symbols Nerd Font Mono";
+              widget_spacing = 4;
+              color = "primary";
+              icon_color = "secondary";
+              start = [
+                "launcher"
+                "workspaces"
+              ];
               center = [
                 "media"
                 "cat"
               ];
-              color = "primary";
-              contact_shadow = true;
               end = [
-                "tray"
-                "notifications"
-                "clipboard"
                 "network"
-                "bluetooth"
                 "volume"
                 "brightness"
                 "battery"
                 "clock"
-                "session"
                 "control-center"
               ];
-              icon_color = "secondary";
-              margin_edge = 0;
-              margin_ends = 30;
-              padding = 13;
-              panel_overlap = 2;
-              radius_bottom_left = 25;
-              radius_bottom_right = 0;
-              radius_top_left = 26;
-              radius_top_right = 9;
-              scale = 1.15;
-              shadow = false;
-              thickness = 44;
-              widget_spacing = 3;
             };
-            bar.left = [
-              {
-                id = "Launcher";
-                icon = "rocket";
-                enable_colorization = true;
-                colorize_system_icon = "secondary";
-                use_distro_logo = true;
-              }
-              {
-                id = "SystemMonitor";
-                compact_mode = false;
-                show_cpu_usage = true;
-                show_cpu_cores = true;
-                show_cpu_freq = true;
-                show_cpu_temp = true;
-                show_memory_usage = true;
-                show_memory_as_percent = true;
-                show_disk_usage = true;
-                show_disk_usage_as_percent = true;
-                show_network_stats = true;
-                show_swap_usage = true;
-                use_monospace_font = true;
-              }
-              { id = "plugin:ip-monitor"; }
-              { id = "plugin:tailscale"; }
-            ];
-            bar.center = [
-              {
-                id = "MediaMini";
-                compact_mode = false;
-                show_album_art = true;
-                show_progress_ring = true;
-                show_visualizer = true;
-                visualizer_type = "wave";
-                scrolling_mode = "always";
-                hide_when_idle = true;
-                hide_mode = "transparent";
-              }
-              { id = "plugin:workspace-overview"; }
-            ];
-            bar.right = [
-              { id = "plugin:screen-toolkit"; }
-              { id = "plugin:todo"; }
-              { id = "plugin:model-usage"; }
-              {
-                id = "Battery";
-                display_mode = "graphic";
-                show_power_profiles = true;
-                hide_if_idle = true;
-                hide_if_not_detected = true;
-              }
-              {
-                id = "Volume";
-                display_mode = "onhover";
-                middle_click_command = "pwvucontrol || pavucontrol";
-              }
-              {
-                id = "Clock";
-                format_horizontal = "HH:mm ddd, MMM dd";
-                format_vertical = "HH mm - dd MM";
-                tooltip_format = "HH:mm ddd, MMM dd";
-              }
-              {
-                id = "ControlCenter";
-                icon = "bomb";
-                enable_colorization = true;
-                colorize_system_icon = "secondary";
-              }
-            ];
+
+            # 2. Bottom Bar: Always visible dock & taskbar hybrid
+            bar.bottom-bar = {
+              enabled = true;
+              position = "bottom";
+              layer = "overlay";
+              thickness = 44;
+              scale = 1.15;
+              padding = 14;
+              panel_overlap = -2;
+              margin_edge = 0;
+              margin_ends = 36;
+              margin_opposite_edge = 0;
+              reserve_space = true;
+              background_opacity = 0.82;
+              border = "primary";
+              border_width = 1.5;
+              capsule = true;
+              capsule_border = "secondary";
+              capsule_border_width = 1.5;
+              capsule_opacity = 0.85;
+              capsule_padding = 9.0;
+              concave_edge_corners = true;
+              radius = 28;
+              radius_bottom_left = 0;
+              radius_bottom_right = 0;
+              radius_top_left = 28;
+              radius_top_right = 28;
+              font_family = "Symbols Nerd Font Mono";
+              widget_spacing = 4;
+              color = "primary";
+              icon_color = "secondary";
+              start = [
+                "session"
+                "notes"
+              ];
+              center = [
+                "taskbar"
+              ];
+              end = [
+                "clipboard"
+                "tray"
+                "notifications"
+              ];
+            };
+
+            # 3. Left Bar: Auto-hiding AI fleet, containers & telemetry
+            bar.left-bar = {
+              enabled = true;
+              position = "left";
+              layer = "overlay";
+              thickness = 44;
+              scale = 1.15;
+              padding = 14;
+              panel_overlap = -2;
+              margin_edge = 0;
+              margin_ends = 36;
+              margin_opposite_edge = 0;
+              reserve_space = false;
+              auto_hide = true;
+              smart_auto_hide = true;
+              auto_hide_delay_ms = 250;
+              show_on_workspace_switch = true;
+              background_opacity = 0.82;
+              border = "hover";
+              border_width = 1.5;
+              capsule = true;
+              capsule_border = "secondary";
+              capsule_border_width = 1.5;
+              capsule_opacity = 0.85;
+              capsule_padding = 9.0;
+              concave_edge_corners = true;
+              radius = 28;
+              radius_top_left = 0;
+              radius_bottom_left = 0;
+              radius_top_right = 28;
+              radius_bottom_right = 28;
+              font_family = "Symbols Nerd Font Mono";
+              widget_spacing = 4;
+              color = "primary";
+              icon_color = "primary";
+              start = [
+                "agents"
+                "herdr"
+              ];
+              center = [
+                "containers"
+                "ai-usage"
+                "router"
+              ];
+              end = [
+                "neuralwatt"
+                "ai-triage"
+              ];
+            };
+
+            # 4. Right Bar: Auto-hiding quick tools & productivity
+            bar.right-bar = {
+              enabled = true;
+              position = "right";
+              layer = "overlay";
+              thickness = 44;
+              scale = 1.15;
+              padding = 14;
+              panel_overlap = -2;
+              margin_edge = 0;
+              margin_ends = 36;
+              margin_opposite_edge = 0;
+              reserve_space = false;
+              auto_hide = true;
+              smart_auto_hide = true;
+              auto_hide_delay_ms = 250;
+              show_on_workspace_switch = true;
+              background_opacity = 0.82;
+              border = "hover";
+              border_width = 1.5;
+              capsule = true;
+              capsule_border = "secondary";
+              capsule_border_width = 1.5;
+              capsule_opacity = 0.85;
+              capsule_padding = 9.0;
+              concave_edge_corners = true;
+              radius = 28;
+              radius_top_right = 0;
+              radius_bottom_right = 0;
+              radius_top_left = 28;
+              radius_bottom_left = 28;
+              font_family = "Symbols Nerd Font Mono";
+              widget_spacing = 4;
+              color = "primary";
+              icon_color = "primary";
+              start = [
+                "screen-toolkit"
+                "screen_recorder"
+              ];
+              center = [
+                "todo"
+                "phone"
+                "mail"
+              ];
+              end = [
+                "wallhaven"
+                "theme-switcher"
+                "w-engine"
+              ];
+            };
 
             # ── Brightness ────────────────────────────────────────────
             brightness = {
@@ -955,9 +1045,13 @@ in
               }
             ];
 
-            # ── System Monitor ───────────────────────────────────────
+            # ── System Monitor (Low-Overhead Polling) ────────────────
             system.monitor = {
-              gpu_poll_seconds = 60;
+              cpu_poll_seconds = 5;
+              gpu_poll_seconds = 30;
+              memory_poll_seconds = 5;
+              network_poll_seconds = 5;
+              disk_poll_seconds = 60;
             };
 
             # ── Weather ──────────────────────────────────────────────
@@ -970,7 +1064,7 @@ in
               warning_threshold = 10;
             };
 
-            # ── Widget Styling ───────────────────────────────────────
+            # ── Widget Definitions & Styling ─────────────────────────
             widget.battery = {
               capsule = true;
               capsule_border = "primary";
@@ -981,11 +1075,21 @@ in
               scale = 1.1;
             };
             widget.bluetooth = {
-              enabled = false;
+              enabled = true;
+              capsule = true;
+              capsule_border = "primary";
+              capsule_fill = "on_primary";
+              capsule_foreground = "on_primary";
+              capsule_opacity = 0.90;
             };
             widget.brightness = {
-              enabled = false;
+              enabled = true;
               show_label = false;
+              capsule = true;
+              capsule_border = "primary";
+              capsule_fill = "on_primary";
+              capsule_foreground = "on_primary";
+              capsule_opacity = 0.90;
             };
             widget.clipboard = {
               capsule = true;
@@ -1047,7 +1151,12 @@ in
               hide_when_no_unread = true;
             };
             widget.session = {
-              enabled = false;
+              enabled = true;
+              capsule = true;
+              capsule_border = "primary";
+              capsule_fill = "on_primary";
+              capsule_foreground = "secondary";
+              capsule_opacity = 0.90;
             };
             widget.tray = {
               capsule = true;
@@ -1089,6 +1198,62 @@ in
               empty_color = "tertiary";
               icon_color = "primary";
               labels_only_when_occupied = false;
+            };
+            widget.taskbar = {
+              capsule = true;
+              capsule_border = "primary";
+              capsule_fill = "on_primary";
+              capsule_foreground = "secondary";
+              capsule_opacity = 0.90;
+              show_running = true;
+            };
+            widget.cat = {
+              type = "noctalia/bongocat:cat";
+            };
+            widget.notes = {
+              type = "noctalia/notes:notes";
+            };
+            widget.agents = {
+              type = "notfinaldev/agentik:agents";
+            };
+            widget.herdr = {
+              type = "hy4ri/herdr:bar";
+            };
+            widget.containers = {
+              type = "davinci13/containers:bar";
+            };
+            widget.ai-usage = {
+              type = "felipeartur/ai-usagebar:bar";
+            };
+            widget.router = {
+              type = "weinguyen/9router-control:widget";
+            };
+            widget.neuralwatt = {
+              type = "omertahaoztop/neuralwatt:bar";
+            };
+            widget.ai-triage = {
+              type = "miguelfm/ai-triage:bar";
+            };
+            widget.screen-toolkit = {
+              type = "alexander/screen-toolkit:widget";
+            };
+            widget.todo = {
+              type = "nightwatch75/todo:todo";
+            };
+            widget.phone = {
+              type = "icefish/phone-connect:bar";
+            };
+            widget.mail = {
+              type = "mdj2812/thunderbird-companion:mail";
+            };
+            widget.wallhaven = {
+              type = "noctalia/wallhaven:wallhaven";
+            };
+            widget.theme-switcher = {
+              type = "theblackdon/theme-switcher:theme-switcher";
+            };
+            widget.w-engine = {
+              type = "tadomika_ari/w-engine:w-engine-widget";
             };
 
             # ── Hooks ─────────────────────────────────────────────────
