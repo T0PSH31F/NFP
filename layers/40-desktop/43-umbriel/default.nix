@@ -418,8 +418,6 @@ in
       export XDG_CURRENT_DESKTOP=Umbriel
       export XDG_SESSION_TYPE=wayland
       export XDG_SESSION_DESKTOP=Umbriel
-      export WLR_DRM_NO_ATOMIC=1
-      export WLR_RENDER_NO_EXPLICIT_SYNC=1
       export WLR_NO_HARDWARE_CURSORS=1
       export WLR_DRM_DEVICES=/dev/dri/card1:/dev/dri/card0
     '';
@@ -427,8 +425,6 @@ in
     # ── Systemd service environment overrides (wlroots hybrid GPU fix) ───
     systemd.user.services.umbriel = {
       environment = {
-        WLR_DRM_NO_ATOMIC = "1";
-        WLR_RENDER_NO_EXPLICIT_SYNC = "1";
         WLR_NO_HARDWARE_CURSORS = "1";
         WLR_DRM_DEVICES = "/dev/dri/card1:/dev/dri/card0";
       };

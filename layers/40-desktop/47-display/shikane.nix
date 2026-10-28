@@ -61,7 +61,7 @@ in
       [[profile.output]]
       search = "SAMSUNG"
       enable = true
-      mode = "1920x1080@60"
+      mode = "1920x1080@59.939"
       position = "0,0"
       scale = 1.0
 
