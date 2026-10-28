@@ -46,6 +46,7 @@ in
       default = [
         "ip-monitor"
         "tailscale"
+        "tailnet"
         "screen-toolkit"
         "todo"
         "agentik"
@@ -642,13 +643,16 @@ in
                 "cat"
               ];
               end = [
-                "network"
-                "volume"
-                "brightness"
+                "tailnet"
                 "battery"
                 "clock"
                 "control-center"
               ];
+              dead_zone.actions = {
+                scroll_up = "volume-up";
+                scroll_down = "volume-down";
+                middle = "volume-mute";
+              };
             };
 
             # 2. Bottom Bar: Always visible dock & taskbar hybrid
@@ -682,6 +686,11 @@ in
               widget_spacing = 4;
               color = "primary";
               icon_color = "secondary";
+              dead_zone.actions = {
+                scroll_up = "volume-up";
+                scroll_down = "volume-down";
+                middle = "volume-mute";
+              };
               start = [
                 "session"
                 "notes"
@@ -746,11 +755,6 @@ in
                 "router"
               ];
               end = [
-                "cpu"
-                "gpu"
-                "ram"
-                "swap"
-                "disk"
                 "neuralwatt"
                 "ai-triage"
               ];
@@ -1039,6 +1043,7 @@ in
               "community/spotify-lyrics"
               "community/ssh-launcher"
               "community/tailscale"
+              "community/tailnet"
               "community/todo"
               "community/topgrade-wrapper"
               "community/udiskie"
@@ -1117,8 +1122,16 @@ in
               capsule_fill = "on_primary";
               capsule_foreground = "on_primary";
               capsule_opacity = 0.90;
-              format = "{:%H:%M:%S}";
+              format = "{:%a, %b %d %H:%M:%S}";
               scale = 1.1;
+            };
+            widget.tailnet = {
+              type = "rylos/tailnet:bar";
+              capsule = true;
+              capsule_border = "primary";
+              capsule_fill = "on_primary";
+              capsule_foreground = "secondary";
+              capsule_opacity = 0.90;
             };
             widget.control-center = {
               capsule = true;

@@ -145,7 +145,7 @@ in
       # ==============================================================================
       [keybinds]
       "Mod+Return" = { action = "spawn:ghostty", repeat = false }
-      "Mod" = "spawn:noctalia msg panel-toggle launcher"
+      "Mod" = { action = "overview-toggle", repeat = false }
       "Mod+Space" = "spawn:noctalia msg panel-toggle launcher"
       "Mod+A" = "spawn:noctalia msg panel-toggle launcher"
       "Mod+X" = "spawn:noctalia msg panel-toggle control-center"
