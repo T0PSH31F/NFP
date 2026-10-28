@@ -64,6 +64,7 @@
           aionui.enable = lib.mkDefault false; # Disabled: better-sqlite3 build failure against electron 43 headers
           paperclip.enable = lib.mkDefault true;
           polyfloor.enable = lib.mkDefault true;
+          hermes-ratchet.enable = lib.mkDefault true;
         };
       };
 
