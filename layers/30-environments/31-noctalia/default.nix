@@ -226,6 +226,9 @@ in
           noctaliaPluginDoctor
           gst_all_1.gst-plugins-base
           gst_all_1.gst-plugins-good
+          evtest
+          gpu-screen-recorder
+          mpvpaper
 
           # Color generation helper — extracts colors from noctalia theme JSON
           (pkgs.writeShellScriptBin "noctalia-regen-colors" ''
@@ -682,11 +685,16 @@ in
               start = [
                 "session"
                 "notes"
+                "herdr"
               ];
               center = [
                 "taskbar"
               ];
               end = [
+                "cpu"
+                "gpu"
+                "ram"
+                "disk"
                 "clipboard"
                 "tray"
                 "notifications"
@@ -738,6 +746,11 @@ in
                 "router"
               ];
               end = [
+                "cpu"
+                "gpu"
+                "ram"
+                "swap"
+                "disk"
                 "neuralwatt"
                 "ai-triage"
               ];
@@ -1254,6 +1267,67 @@ in
             };
             widget.w-engine = {
               type = "tadomika_ari/w-engine:w-engine-widget";
+            };
+            widget.cpu = {
+              type = "sysmon";
+              stat = "cpu_usage";
+              show_value = true;
+              show_glyph = true;
+              visualization = "gauge";
+              capsule = true;
+              capsule_border = "primary";
+              capsule_fill = "on_primary";
+              capsule_foreground = "primary";
+              capsule_opacity = 0.85;
+            };
+            widget.gpu = {
+              type = "sysmon";
+              stat = "gpu_usage";
+              show_value = true;
+              show_glyph = true;
+              visualization = "gauge";
+              capsule = true;
+              capsule_border = "primary";
+              capsule_fill = "on_primary";
+              capsule_foreground = "primary";
+              capsule_opacity = 0.85;
+            };
+            widget.ram = {
+              type = "sysmon";
+              stat = "ram_pct";
+              show_value = true;
+              show_glyph = true;
+              visualization = "gauge";
+              capsule = true;
+              capsule_border = "primary";
+              capsule_fill = "on_primary";
+              capsule_foreground = "primary";
+              capsule_opacity = 0.85;
+            };
+            widget.swap = {
+              type = "sysmon";
+              stat = "swap_pct";
+              show_value = true;
+              show_glyph = true;
+              visualization = "gauge";
+              capsule = true;
+              capsule_border = "primary";
+              capsule_fill = "on_primary";
+              capsule_foreground = "primary";
+              capsule_opacity = 0.85;
+            };
+            widget.disk = {
+              type = "sysmon";
+              stat = "disk_free_pct";
+              path = "/";
+              show_value = true;
+              show_glyph = true;
+              visualization = "gauge";
+              capsule = true;
+              capsule_border = "primary";
+              capsule_fill = "on_primary";
+              capsule_foreground = "primary";
+              capsule_opacity = 0.85;
             };
 
             # ── Hooks ─────────────────────────────────────────────────
