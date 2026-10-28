@@ -3,6 +3,8 @@
   stdenv,
   fetchurl,
   autoPatchelfHook,
+  makeWrapper,
+  libsecret,
   gcc-unwrapped,
   glibc,
 }:
@@ -16,7 +18,10 @@ stdenv.mkDerivation rec {
     hash = "sha256-iiYamK5TtNPUNxeW662WqhRyhLoNsRtmuK+I78uK6wE=";
   };
 
-  nativeBuildInputs = [ autoPatchelfHook ];
+  nativeBuildInputs = [
+    autoPatchelfHook
+    makeWrapper
+  ];
   buildInputs = [
     gcc-unwrapped.lib
     glibc
@@ -27,8 +32,14 @@ stdenv.mkDerivation rec {
 
   installPhase = ''
     runHook preInstall
-    install -Dm755 ai-usagebar $out/bin/ai-usagebar
-    install -Dm755 ai-usagebar-tui $out/bin/ai-usagebar-tui
+    install -Dm755 ai-usagebar $out/bin/.ai-usagebar-wrapped
+    install -Dm755 ai-usagebar-tui $out/bin/.ai-usagebar-tui-wrapped
+
+    makeWrapper $out/bin/.ai-usagebar-wrapped $out/bin/ai-usagebar \
+      --prefix PATH : ${lib.makeBinPath [ libsecret ]}
+
+    makeWrapper $out/bin/.ai-usagebar-tui-wrapped $out/bin/ai-usagebar-tui \
+      --prefix PATH : ${lib.makeBinPath [ libsecret ]}
     runHook postInstall
   '';
 

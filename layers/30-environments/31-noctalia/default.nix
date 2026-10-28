@@ -230,6 +230,8 @@ in
           evtest
           gpu-screen-recorder
           mpvpaper
+          libsecret
+          python3
           ai-usagebar
 
           # Color generation helper — extracts colors from noctalia theme JSON

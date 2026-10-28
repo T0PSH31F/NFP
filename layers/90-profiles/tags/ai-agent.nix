@@ -44,6 +44,7 @@
         enable = lib.mkDefault true;
         lxconnect.enable = lib.mkDefault true;
         jev.enable = lib.mkDefault true;
+        headroom.enable = lib.mkDefault true;
       };
 
       layer-76 = {

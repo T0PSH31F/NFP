@@ -494,4 +494,5 @@ final: prev: {
 
   wl_shimeji = final.callPackage ../83-packages/wl_shimeji/default.nix { };
   ai-usagebar = final.callPackage ../83-packages/ai-usagebar/default.nix { };
+  headroom = final.headroom-ai;
 }

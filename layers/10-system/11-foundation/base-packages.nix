@@ -37,6 +37,7 @@
     # Development basics
     # hiPrio: beats clan-core's gitMinimal with no collision warning (interactive shell git comes from Home-Manager)
     (lib.hiPrio git) # (Installed via gitFull in dev-packages or other suites)
+    python3
 
     # Disk management
     btrfs-assistant
