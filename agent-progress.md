@@ -382,3 +382,19 @@ No modifications produced by worker.
   - `python3 layers/70-agents/72-voice/nfp_voice_interrupter.py --test` passed 4/4.
   - `./init.sh --worktree` passed 5/5 across all fleet machines (`sanji`, `z0r0`, `luffy`).
 - **State change:** passing
+
+### [2026-10-28 17:20:00 UTC] Antigravity: Network NAS Backup & SQLite State Replication Pipeline
+- **Task:** Implement Network NAS Automount & Litestream SQLite State Replication on `sanji`.
+- **Accomplishments:**
+  1. **NAS Mount Layer (`layers/10-system/nas-mounts.nix`)**:
+     - Configured CIFS/SMB and NFS network filesystem declaration targeting `/mnt/nas` and backup path `/mnt/nas/backups/nfp-durable/` with automount, 60s idle timeouts, soft error handling, and `_netdev`.
+     - Created symlinks between `/mnt/NAS` and `/mnt/nas` and exposed user mount point `~/NAS`.
+     - Enabled `layers.layer-10.system.config.nas-mounts.enable = true;` in `machines/sanji/default.nix`.
+  2. **Litestream Live Replication (`nfp-pi-durable-litestream.service`)**:
+     - Configured Litestream to continuously stream SQLite WAL frames from `~/.local/share/pi-durable/state.sqlite` directly to `/mnt/nas/backups/nfp-durable/state.db`.
+     - Implemented startup recovery auto-pull (`litestream restore -if-replica-exists`) to automatically reconstruct the local database if missing.
+     - Added periodic snapshot sync service and timer (`nfp-pi-durable-nas-snapshot.service`) with graceful offline/lid-closure skip.
+- **Verification:**
+  - `./init.sh --worktree` passed 5/5 evaluating `sanji`, `z0r0`, and `luffy` cleanly.
+  - Tested `litestream replicate -once` and `litestream restore` cycles with verified zero data loss.
+- **State change:** passing

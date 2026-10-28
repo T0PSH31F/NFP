@@ -58,6 +58,7 @@
       mobile.android.enable = true;
       config.impermanence.enable = true;
       config.nas-mount.enable = false;
+      config.nas-mounts.enable = true;
       virtualization.enable = true;
       sessionResilience.enable = true;
     };

@@ -11,5 +11,6 @@
     ./17-app-runtimes
     ./18-peripherals
     ./19-optimizations
+    ./nas-mounts.nix
   ];
 }
