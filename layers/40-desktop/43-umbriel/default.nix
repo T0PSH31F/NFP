@@ -186,6 +186,8 @@ in
       # Window states
       "Mod+V" = { action = "window-toggle-floating", repeat = false }
       "Mod+T" = { action = "scratchpad-toggle:terminal", repeat = false }
+      "Mod+Y" = { action = "scratchpad-toggle:yazelix", repeat = false }
+      "Mod+Shift+Y" = { action = "scratchpad-toggle:yazelix", repeat = false }
       "Mod+F" = { action = "window-toggle-fullscreen", repeat = false }
       "Mod+M" = { action = "window-toggle-maximize-to-edges", repeat = false }
       "Mod+O" = { action = "overview-toggle", repeat = false }
@@ -292,11 +294,15 @@ in
       default_extent_fraction = 1.0
 
       # ==============================================================================
-      # Scratchpads (Drop-Down Quake Terminal)
+      # Scratchpads (Drop-Down Quake Terminal & Leftside Yazelix)
       # ==============================================================================
       [[scratchpad]]
       name = "terminal"
       spawn_when_empty = "ghostty --title='Dropdown Terminal'"
+
+      [[scratchpad]]
+      name = "yazelix"
+      spawn_when_empty = "ghostty --title='Yazelix Workspace' -e yazelix-workspace"
 
       # ==============================================================================
       # Window Rules
@@ -312,6 +318,13 @@ in
       default_floating = true
       default_floating_size_px = { width = 1600, height = 550 }
       default_position = { anchor = "top", x = 0, y = 54 }
+
+      [[window_rule]]
+      match.title = "^Yazelix Workspace$"
+      default_scratchpad = "yazelix"
+      default_floating = true
+      default_floating_size_px = { width = 860, height = 1026 }
+      default_position = { anchor = "left", x = 0, y = 54 }
 
       [[window_rule]]
       match.app_id = "^dev.noctalia.Noctalia$"

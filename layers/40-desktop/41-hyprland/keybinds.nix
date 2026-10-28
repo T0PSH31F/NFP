@@ -27,7 +27,7 @@ in
         "$mod, T, exec, uwsm app -- ghostty"
         "$mod, E, exec, uwsm app -- dolphin"
         "$mod, Y, exec, uwsm app -- ghostty -e yazi"
-        "$mod SHIFT, Y, exec, ghostty -e nu ~/.config/yazelix/nushell/scripts/core/start_yazelix.nu launch"
+        "$mod SHIFT, Y, exec, ghostty --title='Yazelix Sidebar' -e yazelix-workspace"
         "$mod, M, exec, uwsm app -- spotify"
 
         "$mod CTRL, E, exec, uwsm app -- ghostty -e sf"

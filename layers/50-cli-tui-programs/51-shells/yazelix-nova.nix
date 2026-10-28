@@ -10,17 +10,50 @@
   inputs ? { },
   ...
 }:
+let
+  yazelixPkg =
+    if
+      inputs ? yazelix
+      && inputs.yazelix ? packages
+      && inputs.yazelix.packages ? ${pkgs.stdenv.hostPlatform.system}
+    then
+      inputs.yazelix.packages.${pkgs.stdenv.hostPlatform.system}.yazelix-no-rio
+        or inputs.yazelix.packages.${pkgs.stdenv.hostPlatform.system}.default
+    else
+      null;
 
+  # Wrapper script to launch Yazelix smoothly inside a designated terminal
+  yazelix-launcher = pkgs.writeShellScriptBin "yazelix-workspace" ''
+    if command -v yzx >/dev/null 2>&1; then
+      exec yzx enter --session yazelix "$@"
+    elif [ -n "${yazelixPkg}" ] && [ -x "${yazelixPkg}/bin/yzx" ]; then
+      exec ${yazelixPkg}/bin/yzx enter --session yazelix "$@"
+    else
+      echo "Yazelix Nova (yzx) binary not found." >&2
+      exit 1
+    fi
+  '';
+in
 {
   options.layers.layer-50.cli.yazelix-nova = {
     enable = lib.mkEnableOption "Yazelix Nova shell & workspace manager";
   };
 
-  # Imperative profile installation — flake module import removed per user preference.
-  # Keybinds in hyprland/niri target ~/.config/yazelix/nushell/scripts/core/start_yazelix.nu.
+  config = lib.mkIf config.layers.layer-50.cli.yazelix-nova.enable {
+    environment.systemPackages = lib.optionals (yazelixPkg != null) [
+      yazelixPkg
+      yazelix-launcher
+    ];
+  };
+
   home =
-    { config, osConfig, ... }:
+    { osConfig, ... }:
     {
-      config = lib.mkIf osConfig.layers.layer-50.cli.yazelix-nova.enable { };
+      config = lib.mkIf (osConfig.layers.layer-50.cli.yazelix-nova.enable or false) {
+        home.packages = lib.optionals (yazelixPkg != null) [
+          yazelixPkg
+          yazelix-launcher
+        ];
+      };
     };
 }

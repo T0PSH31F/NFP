@@ -40,9 +40,7 @@ in
             action = spawn "uwsm" "app" "--" "spotify";
           };
           "Mod+SHIFT+Y" = {
-            action =
-              spawn "ghostty" "-e" "nu" "/home/t0psh31f/.config/yazelix/nushell/scripts/core/start_yazelix.nu"
-                "launch";
+            action = spawn "ghostty" "--title=Yazelix Sidebar" "-e" "yazelix-workspace";
           };
           "Mod+SHIFT+P" = {
             action = spawn "theme-switch" "--pick";
