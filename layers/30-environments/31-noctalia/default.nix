@@ -395,8 +395,8 @@ in
               enabled = true;
               fill_mode = "crop";
               fill_color = "surface";
-              directory = "$HOME/.background/4k Background";
-              directory_dark = "$HOME/.background/4k Background";
+              directory = "/home/t0psh31f/Pictures";
+              directory_dark = "/home/t0psh31f/Pictures";
               transition = [
                 "honeycomb"
                 "fade"
@@ -410,34 +410,34 @@ in
               order = "random";
             };
             wallpaper.default = {
-              path = "/home/t0psh31f/.background/4k Background/blue-one-piece-zoro-4k-82429jb4apj2vznp.jpg";
+              path = "/home/t0psh31f/Pictures/one-piece-season-15-3840x2160-22127.jpg";
             };
             wallpaper.last = {
-              path = "/home/t0psh31f/.background/4k Background/blue-one-piece-zoro-4k-82429jb4apj2vznp.jpg";
+              path = "/home/t0psh31f/Pictures/one-piece-season-15-3840x2160-22127.jpg";
             };
             wallpaper.monitor = {
               "eDP-1" = {
-                directory = "$HOME/.background/4k Background";
+                directory = "/home/t0psh31f/Pictures";
               };
               "DP-1" = {
-                directory = "$HOME/.background/4k Background";
+                directory = "/home/t0psh31f/Pictures";
               };
               "HDMI-A-1" = {
-                directory = "$HOME/.background/4k Background";
+                directory = "/home/t0psh31f/Pictures";
               };
               "HDMI-A-2" = {
-                directory = "$HOME/.background/4k Background";
+                directory = "/home/t0psh31f/Pictures";
               };
             };
             wallpaper.monitors = {
               "eDP-1" = {
-                path = "/home/t0psh31f/.background/4k Background/blue-one-piece-zoro-4k-82429jb4apj2vznp.jpg";
+                path = "/home/t0psh31f/Pictures/one-piece-season-15-3840x2160-22127.jpg";
               };
               "HDMI-A-2" = {
-                path = "/home/t0psh31f/.background/4k Background/blue-one-piece-zoro-4k-82429jb4apj2vznp.jpg";
+                path = "/home/t0psh31f/Pictures/one-piece-season-15-3840x2160-22127.jpg";
               };
               "DP-2" = {
-                path = "/home/t0psh31f/.background/4k Background/blue-one-piece-zoro-4k-82429jb4apj2vznp.jpg";
+                path = "/home/t0psh31f/Pictures/one-piece-season-15-3840x2160-22127.jpg";
               };
             };
 
@@ -624,9 +624,9 @@ in
               magnification = true;
               magnification_scale = 1.35;
               background_opacity = 0.81;
-              launcher_icon = "yin-yang-filled";
+              launcher_icon = "brand-nixos";
               launcher_position = "start";
-              launcher_custom_image = "/home/t0psh31f/.icons/Anime/1P/one-piece-jolly-roger-icons-by-crountch/png/256x256/Zoro.png";
+              launcher_custom_image = "/home/t0psh31f/.icons/nixos-logo.png";
               margin_edge = 2;
               pinned = [ "Brave" ];
               radius = 23;
@@ -891,8 +891,8 @@ in
               capsule_fill = "on_primary";
               capsule_foreground = "secondary";
               capsule_opacity = 0.89;
-              custom_image = "/home/t0psh31f/Pictures/png_ico/logo.png";
-              glyph = "brand-xbox";
+              custom_image = "/home/t0psh31f/.icons/nixos-logo.png";
+              glyph = "brand-nixos";
               scale = 1.25;
             };
             widget.media = {
