@@ -143,6 +143,8 @@ in
       "Mod+Space" = "spawn:noctalia msg panel-toggle launcher"
       "Mod+A" = "spawn:noctalia msg panel-toggle launcher"
       "Mod+X" = "spawn:noctalia msg panel-toggle control-center"
+      "Mod+N" = { action = "spawn:noctalia msg panel-toggle noctalia/notes:panel", repeat = false }
+      "Mod+Shift+N" = { action = "spawn:noctalia msg panel-toggle noctalia/notes:panel", repeat = false }
       "Mod+Comma" = "spawn:noctalia msg settings-toggle"
       "Mod+Shift+Comma" = { action = "spawn:umbriel-config gui", repeat = false }
       "Mod+Tab" = "spawn:noctalia msg window-switcher"
@@ -175,7 +177,7 @@ in
 
       # Window states
       "Mod+V" = { action = "window-toggle-floating", repeat = false }
-      "Mod+T" = { action = "window-toggle-floating", repeat = false }
+      "Mod+T" = { action = "scratchpad-toggle:terminal", repeat = false }
       "Mod+F" = { action = "window-toggle-fullscreen", repeat = false }
       "Mod+M" = { action = "window-toggle-maximize-to-edges", repeat = false }
       "Mod+O" = { action = "overview-toggle", repeat = false }
@@ -193,8 +195,8 @@ in
       "Mod+W" = "column-toggle-tabbed"
 
       # Scratchpad / Special Workspace
-      "Mod+Shift+S" = "scratchpad-toggle"
-      "Mod+Alt+S" = "window-move-to-scratchpad"
+      "Mod+Shift+S" = "scratchpad-toggle:terminal"
+      "Mod+Alt+S" = "window-move-to-scratchpad:terminal"
 
       # Workspaces 1-9
       "Mod+1" = "workspace-switch:1"
@@ -282,12 +284,26 @@ in
       default_extent_fraction = 1.0
 
       # ==============================================================================
+      # Scratchpads (Drop-Down Quake Terminal)
+      # ==============================================================================
+      [[scratchpad]]
+      name = "terminal"
+      spawn_when_empty = "ghostty --title='Dropdown Terminal'"
+
+      # ==============================================================================
       # Window Rules
       # ==============================================================================
       [[window_rule]]
       blur = true
       opacity = 0.94
       border_width = 5
+
+      [[window_rule]]
+      match.title = "^Dropdown Terminal$"
+      default_scratchpad = "terminal"
+      default_floating = true
+      default_floating_size_px = { width = 1600, height = 550 }
+      default_position = { anchor = "top", x = 0, y = 54 }
 
       [[window_rule]]
       match.app_id = "^dev.noctalia.Noctalia$"
