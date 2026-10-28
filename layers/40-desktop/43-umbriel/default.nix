@@ -58,11 +58,11 @@ in
       ]
 
       # ==============================================================================
-      # Active Shaders — Psychedelic & Glass Collection (Community Shaders)
+      # Active Shaders — Psychedelic Collection (Community Shaders)
       # ==============================================================================
       [effects]
       border = "psychedelic.fractal-flow"
-      window = "window.liquid-glass"
+      window = "psychedelic.fractal-veil"
       cursor = "cursor.comet"
       screen = "vignette"
       max_fps = 120
