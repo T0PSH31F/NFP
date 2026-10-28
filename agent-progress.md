@@ -308,3 +308,25 @@ Append one entry per session, newest at the bottom. Never edit past entries.
   - `./init.sh --worktree` passed 5/5.
 - **State change:** passing
 - **Next action:** Commit and run `clan machines update sanji`.
+
+- **Date / Agent:** 2026-10-28 / antigravity (GLaDOS)
+- **Feature:** hermes-karpathy-ratchet-harness-and-desktop-refinement
+- **Work done:**
+  1. Noctalia & Hyprland Desktop Refinements:
+     - Configured clock formatting with weekday, month, day, time (`{:%a, %b %d %H:%M:%S}`).
+     - Wired bar empty space volume scrolling (up/down) and middle-click mute.
+     - Rebound single `Mod` key to Hyprland overview, rebound launcher to `Mod+A` / `Mod+Space`.
+     - Disabled dock, removed redundant top bar widgets (network, volume, brightness) and left bar sysmon metrics, added `rylos/tailnet:bar`.
+  2. `ai-usagebar` & Thunderbird Companion Packaging:
+     - Packaged `akitaonrails/ai-usagebar` v1.45.0 wrapped with `libsecret` to resolve `agy` CSRF token errors.
+     - Fixed Noctalia Thunderbird native messaging bridge by adding `pkgs.python3` to system environment and packaging `thunderbird-companion.xpi`.
+  3. Autonomous Karpathy Ratchet Harness for Hermes (`layers/70-agents/76-orchestrators/`):
+     - Implemented `hermes-ratchet.py` task loop: task claiming from `~/Notes/EverOS/todo.md` and `feature_list.json`, ephemeral isolated git worktrees in `/tmp/hermes-scratch/<slug>`, Pi A2A worker delegation (`127.0.0.1:8089`), deterministic test verification (`nfp-check.sh` / Nix eval), and ratchet mechanism (fast-forward merge on PASS, reset/prune on FAIL).
+     - Packaged `hermes-ratchet.nix` systemd service, integrated with `agent-orchestrator` tag profile.
+- **Verification:**
+  - Deployed to `sanji` via `clan machines update sanji`.
+  - `systemctl status hermes-ratchet.service` verified active (PID 1558006).
+  - `hermes-ratchet --once` tested cleanly with zero errors.
+  - `ai-usagebar usage --json` returns valid status for Gemini and Anthropic/OpenAI quota buckets.
+- **State change:** passing
+- **Next action:** Queue autonomous tasks via `~/Notes/EverOS/todo.md` under `## Hermes` or `@hermes`.
