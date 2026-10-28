@@ -98,6 +98,9 @@ in
       session = {
         resume_agents_on_restore = mkDefault true;
       };
+      experimental = {
+        pane_history = mkDefault true;
+      };
       keys = {
         prefix = mkDefault "ctrl+b";
 

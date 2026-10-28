@@ -33,7 +33,9 @@ The `layers/00-cyberia/01-docs/` directory is the canonical knowledge base.
 **ALWAYS use Clan machine updates — never raw nixos-rebuild**
 ```bash
 clan machines update          # update all machines
-clan machines update z0r0     # update specific machine (e.g. z0r0, luffy)
+clan machines update sanji     # update local machine (Dell Precision 7680)
+clan machines update z0r0      # update remote workstation / builder
+clan machines update luffy     # update homelab server
 ```
 *Why*: Clan manages remote deployment, sops secret distribution, and machine inventory.
 
@@ -49,8 +51,9 @@ clan machines update z0r0     # update specific machine (e.g. z0r0, luffy)
 
 ## 4. System Architecture Summary
 
-- **z0r0**: Workstation / AI server (`root@127.0.0.1`)
-- **luffy**: Homelab server / AI control plane (`root@100.80.146.120`)
+- **sanji**: Dell Precision 7680 Workstation (`root@100.64.0.6` / `192.168.1.68`)
+- **z0r0**: Remote Workstation / AI Builder (`root@100.64.0.1`)
+- **luffy**: Homelab server / AI control plane (`root@100.64.0.3` / `192.168.1.54`)
 - **Dendritic Layers**: `10-system`, `20-services`, `30-theming`, `40-desktop`, `50-cli-tui`, `60-gui`, `70-agents`, `80-lib`, `90-profiles/tags`.
 - See `layers/00-cyberia/01-docs/AGENT_ONBOARDING.md` for full architecture.
 

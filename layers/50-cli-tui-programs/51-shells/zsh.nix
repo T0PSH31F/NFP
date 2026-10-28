@@ -52,6 +52,7 @@ in
           *) export PATH="$HOME/bin:$PATH" ;;
         esac
         export PATH="$HOME/.local/bin:$PATH"
+        export STARSHIP_CONFIG="''${XDG_CACHE_HOME:-$HOME/.cache}/starship/starship.toml"
 
         # XDG: npm tmp dir inside the user runtime dir
         export NPM_CONFIG_TMP="''${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/npm"

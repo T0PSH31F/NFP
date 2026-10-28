@@ -294,6 +294,132 @@ in
 
             # Sync Rofi theme/colors
             pkill -USR2 rofi 2>/dev/null || true
+
+            # Sync Starship prompt palette
+            noctalia-starship-sync 2>/dev/null || true
+          '')
+
+          # Starship sync helper — enriches Noctalia starship palette with color_* aliases
+          # and keeps ~/.cache/starship/starship.toml in sync with live Noctalia colors.
+          (pkgs.writeShellScriptBin "noctalia-starship-sync" ''
+            set -euo pipefail
+
+            PALETTE_FILE="''${XDG_CACHE_HOME:-$HOME/.cache}/noctalia/starship-palette.toml"
+            BASE_CONFIG="''${XDG_CONFIG_HOME:-$HOME/.config}/starship.toml"
+            CACHE_DIR="''${XDG_CACHE_HOME:-$HOME/.cache}/starship"
+            TARGET_CONFIG="$CACHE_DIR/starship.toml"
+            MARKER_BEGIN="# >>> NOCTALIA STARSHIP PALETTE >>>"
+            MARKER_END="# <<< NOCTALIA STARSHIP PALETTE <<<"
+
+            mkdir -p "$CACHE_DIR"
+
+            if [ ! -f "$BASE_CONFIG" ]; then
+              exit 0
+            fi
+
+            if [ ! -f "$PALETTE_FILE" ]; then
+              if [ ! -f "$TARGET_CONFIG" ] || [ "$BASE_CONFIG" -nt "$TARGET_CONFIG" ]; then
+                cp "$BASE_CONFIG" "$TARGET_CONFIG"
+              fi
+              exit 0
+            fi
+
+            # 1. Parse Noctalia palette and generate enriched palette definitions
+            ENRICHED_PALETTE=$(awk '
+              BEGIN { FS = "=" }
+              /^[[:space:]]*[a-zA-Z0-9_]+[[:space:]]*=[[:space:]]*"[^"]+"/ {
+                k = $1; v = $2
+                gsub(/^[[:space:]]+|[[:space:]]+$/, "", k)
+                gsub(/^[[:space:]]*"|"[[:space:]]*$/, "", v)
+                c[k] = v
+              }
+              END {
+                fg0 = (c["text"] != "" ? c["text"] : (c["white"] != "" ? c["white"] : "#f3f3f2"))
+                bg1 = (c["base"] != "" ? c["base"] : (c["surface0"] != "" ? c["surface0"] : "#292614"))
+                bg3 = (c["surface1"] != "" ? c["surface1"] : (c["overlay0"] != "" ? c["overlay0"] : "#37331b"))
+                blue = (c["blue"] != "" ? c["blue"] : "#88fe73")
+                aqua = (c["teal"] != "" ? c["teal"] : (c["cyan"] != "" ? c["cyan"] : "#d3fe80"))
+                green = (c["green"] != "" ? c["green"] : "#fee973")
+                orange = (c["peach"] != "" ? c["peach"] : (c["rosewater"] != "" ? c["rosewater"] : "#cefe73"))
+                purple = (c["mauve"] != "" ? c["mauve"] : (c["magenta"] != "" ? c["magenta"] : "#feeb80"))
+                red = (c["red"] != "" ? c["red"] : "#fd4663")
+                yellow = (c["yellow"] != "" ? c["yellow"] : "#cefe73")
+
+                print "[palettes.noctalia]"
+                for (k in c) {
+                  if (k !~ /^color_/) {
+                    print k " = \"" c[k] "\""
+                  }
+                }
+                print "color_fg0 = \"" fg0 "\""
+                print "color_bg1 = \"" bg1 "\""
+                print "color_bg3 = \"" bg3 "\""
+                print "color_blue = \"" blue "\""
+                print "color_aqua = \"" aqua "\""
+                print "color_green = \"" green "\""
+                print "color_orange = \"" orange "\""
+                print "color_purple = \"" purple "\""
+                print "color_red = \"" red "\""
+                print "color_yellow = \"" yellow "\""
+              }
+            ' "$PALETTE_FILE")
+
+            # 2. Enrich PALETTE_FILE itself so if Noctalia builtin hook runs, it preserves color_* aliases
+            TMP_PALETTE=$(mktemp)
+            echo "$ENRICHED_PALETTE" > "$TMP_PALETTE"
+            if ! cmp -s "$PALETTE_FILE" "$TMP_PALETTE"; then
+              cat "$TMP_PALETTE" > "$PALETTE_FILE"
+            fi
+            rm -f "$TMP_PALETTE"
+
+            # 3. Strip old noctalia block and palette = line from BASE_CONFIG
+            TMP_BASE=$(mktemp)
+            FINAL_FILE=$(mktemp)
+            cleanup() {
+              rm -f "$TMP_BASE" "$FINAL_FILE"
+            }
+            trap cleanup EXIT
+
+            awk -v begin="$MARKER_BEGIN" -v end="$MARKER_END" '
+              $0 == begin { in_block = 1; next }
+              in_block {
+                if ($0 == end) {
+                  in_block = 0
+                }
+                next
+              }
+              /^[[:space:]]*palette[[:space:]]*=/ { next }
+              { print }
+            ' "$BASE_CONFIG" > "$TMP_BASE"
+
+            # 4. Assemble merged file with palette = "noctalia"
+            {
+              if grep -qE '^"\$schema"' "$TMP_BASE"; then
+                awk '
+                  /^"\$schema"/ {
+                    print
+                    if (!inserted) {
+                      print "palette = \"noctalia\""
+                      inserted = 1
+                    }
+                    next
+                  }
+                  { print }
+                ' "$TMP_BASE"
+              else
+                echo 'palette = "noctalia"'
+                cat "$TMP_BASE"
+              fi
+              echo ""
+              echo "$MARKER_BEGIN"
+              echo "$ENRICHED_PALETTE"
+              echo "$MARKER_END"
+            } > "$FINAL_FILE"
+
+            # 5. Atomic write if content changed
+            if [ ! -f "$TARGET_CONFIG" ] || ! cmp -s "$TARGET_CONFIG" "$FINAL_FILE"; then
+              mv "$FINAL_FILE" "$TARGET_CONFIG"
+            fi
           '')
         ];
 
@@ -1012,12 +1138,12 @@ in
             };
           };
 
-          # Sync Noctalia colors → Hyprland borders + Zellij on login.
+          # Sync Noctalia colors → Hyprland borders, Zellij, and Starship on login.
           # Runs noctalia-hypr-reload which regenerates noctalia-colors.conf
           # from the current wallpaper and reloads the compositor.
           noctalia-colors-sync = {
             Unit = {
-              Description = "Sync Noctalia colors to Hyprland and Zellij";
+              Description = "Sync Noctalia colors to Hyprland, Zellij, and Starship";
               After = [
                 "graphical-session.target"
                 "noctalia.service"
@@ -1026,7 +1152,7 @@ in
             };
             Service = {
               Type = "oneshot";
-              ExecStart = "${pkgs.bash}/bin/bash -c 'sleep 3 && noctalia-hypr-reload'";
+              ExecStart = "${pkgs.bash}/bin/bash -c 'sleep 3 && noctalia-hypr-reload && noctalia-starship-sync'";
             };
             Install = {
               WantedBy = [ "graphical-session.target" ];
@@ -1050,29 +1176,14 @@ in
         };
         # Encapsulated Noctalia Starship Palette sync
         programs.zsh.initContent = lib.mkAfter ''
-          if command -v starship >/dev/null 2>&1; then
-            local PALETTE_FILE=""
-            if [ -f "$HOME/.cache/noctalia/starship-palette.toml" ]; then
-              PALETTE_FILE="$HOME/.cache/noctalia/starship-palette.toml"
-            elif [ -f "$HOME/.config/noctalia/templates/starship.toml" ]; then
-              PALETTE_FILE="$HOME/.config/noctalia/templates/starship.toml"
-            fi
+          if command -v noctalia-starship-sync >/dev/null 2>&1; then
+            noctalia-starship-sync
+          fi
+        '';
 
-            if [ -n "$PALETTE_FILE" ] && [ -f "$HOME/.config/starship.toml" ]; then
-              if [ ! -f "$HOME/.cache/starship/starship.toml" ] || [ "$HOME/.config/starship.toml" -nt "$HOME/.cache/starship/starship.toml" ] || [ "$(grep -c '# >>> NOCTALIA STARSHIP PALETTE >>>' "$HOME/.cache/starship/starship.toml" 2>/dev/null)" != "1" ]; then
-                mkdir -p "$HOME/.cache/starship"
-                TMP_FILE=$(mktemp)
-                sed '/^# >>> NOCTALIA STARSHIP PALETTE >>>/,/^# <<< NOCTALIA STARSHIP PALETTE <<</d' "$HOME/.config/starship.toml" > "$TMP_FILE"
-                sed -i -E 's/^([[:space:]]*)palette([[:space:]]*)=.*/\1palette\2= "noctalia"/' "$TMP_FILE" 2>/dev/null || sed -i '1i palette = "noctalia"' "$TMP_FILE"
-                {
-                  echo ""
-                  echo "# >>> NOCTALIA STARSHIP PALETTE >>>"
-                  cat "$PALETTE_FILE"
-                  echo "# <<< NOCTALIA STARSHIP PALETTE <<<"
-                } >> "$TMP_FILE"
-                mv "$TMP_FILE" "$HOME/.cache/starship/starship.toml"
-              fi
-            fi
+        programs.bash.initExtra = lib.mkAfter ''
+          if command -v noctalia-starship-sync >/dev/null 2>&1; then
+            noctalia-starship-sync
           fi
         '';
       };

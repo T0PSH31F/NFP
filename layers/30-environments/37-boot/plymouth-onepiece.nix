@@ -59,7 +59,7 @@ let
       message_sprite.SetZ(100);
 
       fun display_password_callback (prompt, bullets) {
-        prompt_image = Image.Text(prompt, 1.0, 0.9, 0.4);
+        prompt_image = Image.Text(prompt, 1.0, 0.9, 0.4, 1.0, "Sans 14", "center");
         prompt_sprite.SetImage(prompt_image);
         prompt_sprite.SetX(Window.GetWidth() / 2 - prompt_image.GetWidth() / 2);
         prompt_sprite.SetY(pos_y + one_piece_image_arr[0].GetHeight() + 20);
@@ -67,10 +67,10 @@ let
 
         bullet_str = "";
         for (i = 0; i < bullets; i++) {
-          bullet_str += "● ";
+          bullet_str += "* ";
         }
         if (bullets > 0) {
-          bullets_image = Image.Text(bullet_str, 0.3, 0.85, 1.0);
+          bullets_image = Image.Text(bullet_str, 0.3, 0.85, 1.0, 1.0, "Sans 16", "center");
           bullets_sprite.SetImage(bullets_image);
           bullets_sprite.SetX(Window.GetWidth() / 2 - bullets_image.GetWidth() / 2);
           bullets_sprite.SetY(prompt_sprite.GetY() + prompt_image.GetHeight() + 10);
@@ -81,14 +81,14 @@ let
       }
 
       fun display_question_callback (prompt, text) {
-        prompt_image = Image.Text(prompt, 1.0, 0.9, 0.4);
+        prompt_image = Image.Text(prompt, 1.0, 0.9, 0.4, 1.0, "Sans 14", "center");
         prompt_sprite.SetImage(prompt_image);
         prompt_sprite.SetX(Window.GetWidth() / 2 - prompt_image.GetWidth() / 2);
         prompt_sprite.SetY(pos_y + one_piece_image_arr[0].GetHeight() + 20);
         prompt_sprite.SetOpacity(1);
 
         if (text) {
-          text_image = Image.Text(text, 1.0, 1.0, 1.0);
+          text_image = Image.Text(text, 1.0, 1.0, 1.0, 1.0, "Sans 14", "center");
           bullets_sprite.SetImage(text_image);
           bullets_sprite.SetX(Window.GetWidth() / 2 - text_image.GetWidth() / 2);
           bullets_sprite.SetY(prompt_sprite.GetY() + prompt_image.GetHeight() + 10);
@@ -104,7 +104,7 @@ let
       }
 
       fun display_message_callback (text) {
-        msg_image = Image.Text(text, 1.0, 0.3, 0.3);
+        msg_image = Image.Text(text, 1.0, 0.3, 0.3, 1.0, "Sans 12", "center");
         message_sprite.SetImage(msg_image);
         message_sprite.SetX(Window.GetWidth() / 2 - msg_image.GetWidth() / 2);
         message_sprite.SetY(Window.GetHeight() - 60);

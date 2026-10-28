@@ -31,7 +31,7 @@ in
       settings = {
         "$schema" = "https://starship.rs/config-schema.json";
         add_newline = true;
-        format = "[](fg:color_orange)[](bg:color_yellow fg:color_orange)$directory[](bg:color_green fg:color_yellow)[](bg:color_aqua fg:color_green)$c$cpp$rust$golang$nodejs$python[](bg:color_purple fg:color_aqua)[ ](fg:color_purple)$fill[](fg:color_aqua)$cmd_duration[](bg:color_aqua fg:color_purple)$memory_usage[](bg:color_purple fg:color_bg1)$time[](fg:color_bg1)\n$character";
+        format = "[](fg:color_orange)[](bg:color_yellow fg:color_orange)$directory[](bg:color_green fg:color_yellow)$git_branch$git_status[](fg:color_green)$c$cpp$rust$golang$nodejs$python [ ](fg:color_purple)$fill[](fg:color_aqua)$cmd_duration[](bg:color_aqua fg:color_purple)$memory_usage[](bg:color_purple fg:color_bg1)$time[](fg:color_bg1)\n$character";
         # format = "[](fg:color_orange)$os$username[](bg:color_yellow fg:color_orange)$directory[](bg:color_green fg:color_yellow)$git_branch$git_status[](bg:color_aqua fg:color_green)$c$cpp$rust$golang$nodejs$python[](bg:color_purple fg:color_aqua)$docker_context[ ](fg:color_purple)$fill[](fg:color_aqua)$cmd_duration[](bg:color_aqua fg:color_purple)$memory_usage[](bg:color_purple fg:color_bg1)$time[](fg:color_bg1)\n$character";
         palette = "matugen";
 
@@ -109,12 +109,12 @@ in
         };
         username = {
           show_always = true;
-          style_user = "bg:color_orange fg:color_fg0";
-          style_root = "bg:color_orange fg:color_fg0";
+          style_user = "bg:color_orange fg:color_bg1";
+          style_root = "bg:color_orange fg:color_bg1";
           format = "[  $user]($style)";
         };
         directory = {
-          style = "fg:color_fg0 bg:color_yellow";
+          style = "fg:color_bg1 bg:color_yellow";
           format = "[ 📂 $path ]($style)";
           truncation_length = 3;
           truncation_symbol = "…/";
@@ -150,7 +150,7 @@ in
         git_branch = {
           symbol = "";
           style = "bg:color_green";
-          format = "[[ $symbol $branch ](fg:color_fg0 bg:color_green)]($style)";
+          format = "[[ $symbol $branch ](fg:color_bg1 bg:color_green)]($style)";
         };
         git_status = {
           style = "bg:color_green";

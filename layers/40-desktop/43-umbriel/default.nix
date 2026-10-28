@@ -121,6 +121,12 @@ in
       duration_ms = 250
       curve = "ease-out"
 
+      [animation.scratchpad]
+      enabled = true
+      dim = 0.0
+      duration_ms = 320
+      curve = "ease-out"
+
       # ==============================================================================
       # Input
       # ==============================================================================
@@ -145,6 +151,8 @@ in
       "Mod+X" = "spawn:noctalia msg panel-toggle control-center"
       "Mod+N" = { action = "spawn:noctalia msg panel-toggle noctalia/notes:panel", repeat = false }
       "Mod+Shift+N" = { action = "spawn:noctalia msg panel-toggle noctalia/notes:panel", repeat = false }
+      "Mod+period" = { action = "spawn:rofi-todo", repeat = false }
+      "Mod+Shift+period" = { action = "spawn:rofi-todo --quick-add", repeat = false }
       "Mod+Comma" = "spawn:noctalia msg settings-toggle"
       "Mod+Shift+Comma" = { action = "spawn:umbriel-config gui", repeat = false }
       "Mod+Tab" = "spawn:noctalia msg window-switcher"

@@ -1,7 +1,7 @@
 _:
 let
   machinesInventory = {
-    # Z0R0 — Desktop workstation (dev, gaming, inference)
+    # Z0R0 — Remote Desktop workstation / Builder (dev, gaming, inference)
     # Always-on services: none (ExtremeRouter enabled directly in machine config)
     z0r0 = {
       tags = [
@@ -13,7 +13,7 @@ let
         "ai-agent"
         "intel-12th-gen"
       ];
-      deploy.targetHost = "root@127.0.0.1";
+      deploy.targetHost = "root@100.64.0.1";
     };
 
     # LUFFY — Homelab server + local GUI desktop (memory, media, private data)
@@ -32,7 +32,7 @@ let
         "media"
         "intel-9th-gen"
       ];
-      deploy.targetHost = "root@192.168.1.54"; # Direct LAN target (Tailscale 100.72.46.75 / luffy.nfp.nix fallback)
+      deploy.targetHost = "root@100.64.0.3"; # Tailnet (LAN fallback 192.168.1.54)
     };
 
     # SANJI — Dell Precision 7680 (desktop workstation, control-plane, local inference, agent orchestrator)
@@ -47,7 +47,7 @@ let
         "ai-inference"
         "agent-orchestrator"
       ];
-      deploy.targetHost = "root@192.168.1.68";
+      deploy.targetHost = "root@100.64.0.6"; # Tailnet node (LAN fallback 192.168.1.68)
     };
   };
 in
