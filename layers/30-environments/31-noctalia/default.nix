@@ -230,6 +230,7 @@ in
           evtest
           gpu-screen-recorder
           mpvpaper
+          ai-usagebar
 
           # Color generation helper — extracts colors from noctalia theme JSON
           (pkgs.writeShellScriptBin "noctalia-regen-colors" ''

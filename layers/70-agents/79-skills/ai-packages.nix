@@ -64,6 +64,7 @@ in
             librechat
             nextjs-ollama-llm-ui
             skills
+            ai-usagebar
             openshell
             # gemini-cli removed from nixpkgs — superseded by Antigravity CLI
             # jan
