@@ -71,6 +71,7 @@ in
       # Appearance & Frosted Glass Blur (macOS Vibrancy & Brilliance)
       # ==============================================================================
       [appearance]
+      border_width = 5
       corner_radius = 14
       drag_opacity = 0.85
 
@@ -286,6 +287,7 @@ in
       [[window_rule]]
       blur = true
       opacity = 0.94
+      border_width = 5
 
       [[window_rule]]
       match.app_id = "^dev.noctalia.Noctalia$"
