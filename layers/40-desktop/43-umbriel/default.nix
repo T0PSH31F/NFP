@@ -58,14 +58,30 @@ in
       ]
 
       # ==============================================================================
-      # Active Shaders — Psychedelic & Ambient Collection (Community Shaders)
+      # Active Shaders — Psychedelic & Glass Collection (Community Shaders)
       # ==============================================================================
       [effects]
       border = "psychedelic.fractal-flow"
-      window = "psychedelic.fractal-veil"
+      window = "window.liquid-glass"
       cursor = "cursor.comet"
       screen = "vignette"
       max_fps = 120
+
+      # ==============================================================================
+      # Appearance & Frosted Glass Blur (macOS Vibrancy & Brilliance)
+      # ==============================================================================
+      [appearance]
+      corner_radius = 14
+      drag_opacity = 0.85
+
+      [appearance.blur]
+      enabled = true
+      radius = 8
+      passes = 4
+      brightness = 1.05
+      contrast = 0.98
+      saturation = 1.25
+      noise = 0.015
 
       [animation]
       enabled = true
@@ -100,7 +116,7 @@ in
 
       [animation.dim_unfocused]
       enabled = true
-      dim = 0.85
+      dim = 0.12
       duration_ms = 250
       curve = "ease-out"
 
@@ -269,6 +285,7 @@ in
       # ==============================================================================
       [[window_rule]]
       blur = true
+      opacity = 0.94
 
       [[window_rule]]
       match.app_id = "^dev.noctalia.Noctalia$"
