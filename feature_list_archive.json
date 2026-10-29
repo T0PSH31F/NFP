@@ -9,6 +9,72 @@
   },
   "features": [
     {
+      "id": "mcp-phase1-nix-build-coordination",
+      "priority": 1,
+      "name": "Phase 1: Nix Build/Eval Coordination & Preflight Locks",
+      "behavior": "Implement nfp-check flock coordinator, optimize init.sh single-pass evaluation, remove build-cores alias, create nix-resource-safety rule, and redact credentials.",
+      "verification": [
+        "./layers/00-cyberia/06-scripts/nfp-check.sh eval all",
+        "./layers/00-cyberia/06-scripts/nfp-check.sh static",
+        "ALLOW_DIRTY=1 ./init.sh"
+      ],
+      "state": "passing",
+      "claimedBy": "antigravity",
+      "blockedReason": null,
+      "evidence": [
+        {
+          "sha": "HEAD",
+          "command": "./layers/00-cyberia/06-scripts/nfp-check.sh eval all && ALLOW_DIRTY=1 ./init.sh",
+          "output": "nfp-check lock coordination verified with flock; init.sh single-pass evaluation verified; build-cores alias removed; rules updated.",
+          "at": "2026-09-24T13:26:00Z"
+        }
+      ]
+    },
+    {
+      "id": "mcp-phase2-correctness-and-containment",
+      "priority": 2,
+      "name": "Phase 2: MCP Correctness and Containment",
+      "behavior": "Remove invalid mcp-gateway systemd unit and port 8085 collision, remove @latest and unpinned npx entries from production MCP catalogs, reconcile ContextForge port 8094 & remove public firewall opening, and add mcp-containment-check.",
+      "verification": [
+        "nix build .#checks.x86_64-linux.mcp-containment-check",
+        "./layers/00-cyberia/06-scripts/nfp-check.sh eval all",
+        "./init.sh --worktree"
+      ],
+      "state": "passing",
+      "claimedBy": "antigravity",
+      "blockedReason": null,
+      "evidence": [
+        {
+          "sha": "HEAD",
+          "command": "nix build .#checks.x86_64-linux.mcp-containment-check && ./layers/00-cyberia/06-scripts/nfp-check.sh eval all && ./init.sh --worktree",
+          "output": "mcp-containment-check passed; mcp-gateway unit removed; port 8085 uniquely reserved for Hermes; ContextForge firewall opening removed; fleet evaluated cleanly.",
+          "at": "2026-09-24T13:55:00Z"
+        }
+      ]
+    },
+    {
+      "id": "mcp-phase3-typed-mcp-registry",
+      "priority": 3,
+      "name": "Phase 3: Typed MCP Server Registry & Submodule",
+      "behavior": "Replace attrsOf anything with typed submodule schema (transport, package, command, url, args, environmentFile, scope, domain, risk, approval, dataClasses, maxResultBytes, cacheTtlSeconds, description) and build-time assertions in server-catalog.nix.",
+      "verification": [
+        "nix build .#checks.x86_64-linux.mcp-registry-type-check",
+        "nix build .#checks.x86_64-linux.mcp-containment-check",
+        "./init.sh --worktree"
+      ],
+      "state": "passing",
+      "claimedBy": "antigravity",
+      "blockedReason": null,
+      "evidence": [
+        {
+          "sha": "HEAD",
+          "command": "nix build .#checks.x86_64-linux.mcp-registry-type-check && nix build .#checks.x86_64-linux.mcp-containment-check && ./init.sh --worktree",
+          "output": "mcp-registry-type-check & mcp-containment-check passed; typed submodule schema enforced; build-time assertions for transport, destructive approvals, and remote Tailnet IPs verified.",
+          "at": "2026-09-24T14:25:30Z"
+        }
+      ]
+    },
+    {
       "id": "p0-git-identity",
       "priority": 1,
       "name": "Git author identity configured and CI enforced",

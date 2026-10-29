@@ -124,6 +124,9 @@ cleanup() {
 }
 trap cleanup EXIT INT TERM
 
+# Optimize Boehm GC for Nix evaluations to prevent memory bloat and avoid tripping OOM
+export GC_FREE_SPACE_DIVISOR=1
+
 run_with_timeout() {
   local cmd=("$@")
   timeout --foreground --kill-after=10s "${TIMEOUT}s" "${cmd[@]}"

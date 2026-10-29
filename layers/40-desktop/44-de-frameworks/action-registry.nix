@@ -79,6 +79,13 @@ in
       cmd = "pypr toggle term";
     })
     (mkAction {
+      chord = "Super+N";
+      action = "open-tasklist";
+      desc = "Open & edit Super+N tasklist";
+      category = "tasks";
+      cmd = "uwsm app -- ghostty -e nvim /home/t0psh31f/Clan/NFP/tasklist.md";
+    })
+    (mkAction {
       chord = "Alt+N";
       action = "toggle-scratchpad-gedit";
       desc = "Toggle right Gedit notepad panel";

@@ -11,8 +11,10 @@ import json
 import time
 import re
 import uuid
+import sqlite3
 import urllib.request
 import urllib.error
+from pathlib import Path
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from datetime import datetime, timezone
 
@@ -21,6 +23,8 @@ JEV_PORT = int(os.environ.get("JEV_PORT", "20127"))
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://127.0.0.1:11434")
 OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "qwen3.5:9b")
 UPSTREAM_ROUTER_URL = os.environ.get("UPSTREAM_ROUTER_URL", "http://127.0.0.1:20128")
+STATE_DB_PATH = Path(os.environ.get("PI_STATE_DB", Path.home() / ".local/share/pi-durable/state.sqlite"))
+JEV_RULES_FILE = Path(__file__).parent / "jev_rules.json"
 
 METRICS = {
     "total_requests": 0,
@@ -30,18 +34,55 @@ METRICS = {
     "notifications": 0,
 }
 
-# Routine patterns that can be dropped at zero token cost
-ROUTINE_PING_PATTERNS = [
+# Routine patterns that can be dropped at zero token cost (fallback defaults)
+DEFAULT_ROUTINE_PING_PATTERNS = [
     r"^(?:ok|pong|ping|heartbeat|healthz?|status\s*200|200\s*ok)$",
     r"\{\s*\"(?:status|health|ping)\"\s*:\s*(?:\"(?:ok|pong|alive|healthy)\"|200)\s*\}",
     r"connection\s+keep-?alive",
     r"routine\s+check\s+passed",
 ]
 
-# High-risk trigger keywords for deterministic escalation
-CRITICAL_PATTERNS = [
+# High-risk trigger keywords for deterministic escalation (fallback defaults)
+DEFAULT_CRITICAL_PATTERNS = [
     r"\b(out of memory|oom-killer|disk\s*full|read-only file system|kernel panic|segfault|security breach|unauthorized root|database corruption)\b",
 ]
+
+def load_heuristic_patterns() -> tuple[list[str], list[str]]:
+    """Loads heuristic rules from jev_rules.json if present; falls back to defaults."""
+    if JEV_RULES_FILE.exists():
+        try:
+            data = json.loads(JEV_RULES_FILE.read_text(encoding="utf-8"))
+            pings = data.get("routine_ping_patterns", DEFAULT_ROUTINE_PING_PATTERNS)
+            crits = data.get("critical_patterns", DEFAULT_CRITICAL_PATTERNS)
+            return pings, crits
+        except Exception:
+            pass
+    return DEFAULT_ROUTINE_PING_PATTERNS, DEFAULT_CRITICAL_PATTERNS
+
+def log_drop_to_sqlite(event_text: str, reason: str, stage: int = 1, tokens_saved: int = 0) -> None:
+    """Logs dropped requests to SQLite for dream cycle weakness mining."""
+    try:
+        STATE_DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+        conn = sqlite3.connect(str(STATE_DB_PATH))
+        now = datetime.now(timezone.utc).isoformat()
+        conn.execute("""
+        CREATE TABLE IF NOT EXISTS jev_drops (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            timestamp TEXT NOT NULL,
+            event_text TEXT NOT NULL,
+            drop_reason TEXT NOT NULL,
+            stage INTEGER NOT NULL,
+            tokens_saved INTEGER NOT NULL
+        );
+        """)
+        conn.execute(
+            "INSERT INTO jev_drops (timestamp, event_text, drop_reason, stage, tokens_saved) VALUES (?, ?, ?, ?, ?)",
+            (now, str(event_text)[:1000], str(reason)[:500], stage, tokens_saved),
+        )
+        conn.commit()
+        conn.close()
+    except Exception:
+        pass
 
 def stage1_heuristic_check(payload_text: str) -> dict | None:
     """Stage 1: Zero-token heuristic check. Returns decision dict if droppable or critical, else None."""
@@ -57,7 +98,9 @@ def stage1_heuristic_check(payload_text: str) -> dict | None:
             "tokens_used": 0,
         }
 
-    for pat in ROUTINE_PING_PATTERNS:
+    routine_pats, critical_pats = load_heuristic_patterns()
+
+    for pat in routine_pats:
         if re.search(pat, clean):
             return {
                 "stage": 1,
@@ -69,7 +112,7 @@ def stage1_heuristic_check(payload_text: str) -> dict | None:
                 "tokens_used": 0,
             }
 
-    for pat in CRITICAL_PATTERNS:
+    for pat in critical_pats:
         if re.search(pat, clean, re.I):
             return {
                 "stage": 1,
@@ -202,7 +245,9 @@ def run_triage(event_text: str) -> dict:
     if res is not None:
         METRICS["stage1_heuristic_drops"] += 1
         res["latency_ms"] = round((time.time() - t0) * 1000, 2)
-        if res["verdict"] in ("NOTIFY", "DISPATCH_AGENT"):
+        if res["verdict"] == "IGNORE":
+            log_drop_to_sqlite(event_text, res.get("reason", "Stage 1 heuristic drop"), stage=1, tokens_saved=20)
+        elif res["verdict"] in ("NOTIFY", "DISPATCH_AGENT"):
             res["a2ui_card"] = build_a2ui_card(res, event_text)
         return res
 

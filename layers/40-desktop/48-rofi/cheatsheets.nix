@@ -77,7 +77,8 @@ let
     Super+Shift+A -> O      | OpenCode Desktop                | AI coding workspace                     | action-registry    | local
     Super+Shift+A -> P      | Gemini Chat Panel               | Toggle right Gemini panel               | action-registry    | local
     Super+Shift+A -> R      | Polyfloor Router                | AI Model Router status                  | action-registry    | fleet-remote
-    Super+Shift+T           | Kitty                           | Fast terminal companion                 | action-registry    | local
+    Super+N                 | Quick Tasklist                  | Open & edit Super+N tasklist.md         | hyprland           | local
+    Super+Shift+N           | Task Watcher Once               | Trigger single-pass task decomposition   | task-watcher       | local
     Super+Space             | Vicinae Launcher                | Primary Vicinae application launcher     | action-registry    | local
     Super+T                 | Ghostty                         | Primary terminal                        | action-registry    | local
     Super+W -> F            | Fullscreen                      | Toggle window fullscreen                | action-registry    | local

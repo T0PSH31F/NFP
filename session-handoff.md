@@ -1,33 +1,41 @@
 # Session Handoff
 
 ## Last Session Accomplishments
-1. **Always-On Jarvis System Architecture & Router/Voice Refactor**:
-   - **Router Architecture Refactor**:
-     - Bypassed Kong Gateway (`:8090`) for all `/v1/*` streaming and completion requests to eliminate SSE buffering; disabled Kong in [`machines/sanji/default.nix`](file:///home/t0psh31f/Clan/NFP/machines/sanji/default.nix) and [`layers/90-profiles/tags/ai-router.nix`](file:///home/t0psh31f/Clan/NFP/layers/90-profiles/tags/ai-router.nix).
-     - Configured ExtremeRouter ([`layers/70-agents/78-llm-routers/extreme-router.nix`](file:///home/t0psh31f/Clan/NFP/layers/70-agents/78-llm-routers/extreme-router.nix)) with `ENABLE_RTK=true`, `ENABLE_HEADROOM=true`, and defined declarative combo `cascade/agent` (Tier 0: `ollama/qwen3.5:9b`, Tier 1: `opencode/deepseek-v4`, `google/gemini-2.5-flash`, `openrouter/free`, Tier 2: `hermes/claude-sonnet-4.5`, `google/gemini-2.5-pro`).
-     - Seeded SQLite combos table in `/var/lib/extreme-router/db/data.sqlite` and established symlink `extremerouter.nix -> extreme-router.nix`.
-     - Deprecated standalone runtime dependencies on `freellmapi` and `freellmpool`.
-   - **Jev System-1 Pre-Flight Classifier Daemon (`:20127`)**:
-     - Implemented [`layers/70-agents/78-llm-routers/jev_classifier.py`](file:///home/t0psh31f/Clan/NFP/layers/70-agents/78-llm-routers/jev_classifier.py) with two-stage triage: Stage 1 zero-token heuristic filter dropping routine status 200 OKs and pings, and Stage 2 Ollama local SLM classification (`qwen3.5:9b`) computing actionability, risk level, target persona, and verdict (`IGNORE`, `NOTIFY`, `DISPATCH_AGENT`).
-     - Created Nix module [`layers/70-agents/78-llm-routers/jev.nix`](file:///home/t0psh31f/Clan/NFP/layers/70-agents/78-llm-routers/jev.nix) managing `nfp-jev-classifier.service`.
-   - **Local Voice Pipeline & Persona Registry (`72-voice`)**:
-     - Created manifest [`layers/70-agents/72-voice/personas.json`](file:///home/t0psh31f/Clan/NFP/layers/70-agents/72-voice/personas.json) defining 11 pre-registered personas (`jarvis-classic`, `glados-auditor`, `samuel-jackson`, `orc-peon`, `hk-55`, `sc-adjutant`, `johnny-5`, `gandalf`, `paimon`, `cortana`, and `eccentric-jp-girl`).
-     - Implemented daemon [`layers/70-agents/72-voice/nfp_voice_interrupter.py`](file:///home/t0psh31f/Clan/NFP/layers/70-agents/72-voice/nfp_voice_interrupter.py) supporting Silero VAD barge-in interrupts (instantly killing active playback processes on detected speech) and regex trigger parsing (`Switch voice to [Persona]`) hot-swapping active state in `~/.local/share/pi-durable/state.sqlite`.
-   - **Network NAS Backup & SQLite State Replication**:
-     - Declared network NAS mounts in [`layers/10-system/nas-mounts.nix`](file:///home/t0psh31f/Clan/NFP/layers/10-system/nas-mounts.nix) targeting `/mnt/nas/backups/nfp-durable/` with CIFS/NFS automount, soft error handling, and symlinks.
-     - Configured Litestream live WAL frame replication (`nfp-pi-durable-litestream.service`) streaming `~/.local/share/pi-durable/state.sqlite` directly to `/mnt/nas/backups/nfp-durable/state.db` with startup recovery auto-pull (`litestream restore -if-replica-exists`) and periodic backup snapshot timer.
-     - Enabled `layers.layer-10.system.config.nas-mounts.enable = true;` in [`machines/sanji/default.nix`](file:///home/t0psh31f/Clan/NFP/machines/sanji/default.nix).
-   - **A2UI Schema & Pi Agent Alignment**:
-     - Saved JSON Schema [`layers/70-agents/77-dash-desk-ui/a2ui_action_card_schema.json`](file:///home/t0psh31f/Clan/NFP/layers/70-agents/77-dash-desk-ui/a2ui_action_card_schema.json) with interactive action buttons, diff previews, risk levels, and fallback TTL rules.
-     - Updated Jev classifier and Pi durable daemon ([`layers/70-agents/71-harness/pi-durable-daemon.py`](file:///home/t0psh31f/Clan/NFP/layers/70-agents/71-harness/pi-durable-daemon.py)) to emit compliant A2UI cards.
-     - Routed `OPENAI_BASE_URL` and `ANTHROPIC_BASE_URL` across Pi, Hermes, OpenCode, and DSH harnesses to ExtremeRouter (`http://127.0.0.1:20128/v1`).
+1. **Screen-Pipe Passive Desktop Perception (`40-desktop`)**:
+   - **Perception Engine ([`layers/40-desktop/screenpipe.py`](file:///home/t0psh31f/Clan/NFP/layers/40-desktop/screenpipe.py))**:
+     - Captures desktop snapshot keyframes via `grim` on Hyprland IPC socket2 events (`/tmp/hypr/$HYPRLAND_INSTANCE_SIGNATURE/.socket2.sock`) with a 5s debounce.
+     - Performs local zero-token OCR via `tesseract5` and extracts active window metadata (`window_title`, `active_app`).
+     - Logs structured activity into `~/.local/share/jarvis/screenpipe.db` (`desktop_history` table).
+     - Gracefully falls back to headless polling when running outside active display sessions.
+   - **Systemd Service & Packaging ([`layers/40-desktop/screenpipe.nix`](file:///home/t0psh31f/Clan/NFP/layers/40-desktop/screenpipe.nix))**:
+     - Declared dendritic module `layers.layer-40.desktop.screenpipe` with user service `nfp-screenpipe.service`.
+     - Enabled on `sanji` in [`machines/sanji/default.nix`](file:///home/t0psh31f/Clan/NFP/machines/sanji/default.nix).
+
+2. **Personal Memory Reflection Engine (`73-memory`)**:
+   - **Reflection Daemon ([`layers/70-agents/73-memory/reflection.py`](file:///home/t0psh31f/Clan/NFP/layers/70-agents/73-memory/reflection.py))**:
+     - Mines past 24-hour interaction/task logs (`~/.local/share/pi-durable/state.sqlite`) and desktop history (`~/.local/share/jarvis/screenpipe.db`).
+     - Extracts user preferences, goals, and persona feedback into persistent memory [`.agents/memory/user_profile.md`](file:///home/t0psh31f/Clan/NFP/.agents/memory/user_profile.md) using ExtremeRouter LLM (`http://127.0.0.1:20128/v1`) with fallback heuristic analysis.
+     - Wired directly into the nightly Dream Cycle ([`layers/70-agents/71-harness/dream_miner.py`](file:///home/t0psh31f/Clan/NFP/layers/70-agents/71-harness/dream_miner.py)).
+
+3. **EarlyOOM Daemon Hardening & Memory Protection (`19-optimizations`)**:
+   - Updated [`layers/10-system/19-optimizations/optimization.nix`](file:///home/t0psh31f/Clan/NFP/layers/10-system/19-optimizations/optimization.nix):
+     - Added `--ignore "^(nix-daemon|nix|nix-build|clan|nixos-rebuild)$"` and updated `--avoid` regex so earlyoom NEVER targets `nix-daemon` or Nix evaluation processes.
+     - Lowered thresholds (`freeMemThreshold = 10`, `freeSwapThreshold = 5`) to prevent false-positive trigger on minor memory dips.
+   - Tuned Nix Boehm GC with `GC_FREE_SPACE_DIVISOR=1` in [`layers/00-cyberia/06-scripts/nfp-check.sh`](file:///home/t0psh31f/Clan/NFP/layers/00-cyberia/06-scripts/nfp-check.sh).
+
+4. **Forensic System Memory & Swap Audit**:
+   - Analyzed all process memory across RAM and compressed zram swap. Identified key consumers: Node/MCP servers (1.9GB), Antigravity IDE (1.85GB), Spotify CEF (1.18GB), and Python daemons (1.03GB).
+
+5. **Context Window Governance**:
+   - Archived `mcp-phase3-typed-mcp-registry` to `feature_list_archive.json`.
+   - `feature_list.json` maintained at 278 lines (safely under the 300 line cap).
 
 ## Verification Evidence
-1. `python3 layers/70-agents/78-llm-routers/jev_classifier.py --test`: 5/5 assertions passed.
-2. `python3 layers/70-agents/72-voice/nfp_voice_interrupter.py --test`: 4/4 assertions passed.
-3. Tested `litestream replicate -once` and `litestream restore` cycles with verified zero data loss.
-4. `./init.sh --worktree`: passed 5/5 evaluating `sanji`, `z0r0`, and `luffy` cleanly.
+1. `python3 layers/40-desktop/screenpipe.py --test`: 5/5 assertions passed.
+2. `python3 layers/70-agents/73-memory/reflection.py --test`: 5/5 assertions passed.
+3. `python3 layers/70-agents/71-harness/dream_miner.py --test`: 4/4 assertions passed.
+4. `python3 layers/70-agents/73-memory/task_watcher.py --test`: 5/5 assertions passed.
+5. `nix eval --raw .#nixosConfigurations.sanji.config.system.build.toplevel.drvPath`: evaluated cleanly with exit code 0.
 
-## Next Session Recommendations
-1. Deploy updates live to `sanji` via `clan machines update sanji`.
-2. Inspect `systemctl status nfp-jev-classifier` and `systemctl status nfp-pi-durable-litestream`.
+## Next Action
+1. Clean git working trees, commit, push, and run `clan machines update sanji`.

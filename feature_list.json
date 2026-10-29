@@ -9,72 +9,6 @@
   },
   "features": [
     {
-      "id": "mcp-phase1-nix-build-coordination",
-      "priority": 1,
-      "name": "Phase 1: Nix Build/Eval Coordination & Preflight Locks",
-      "behavior": "Implement nfp-check flock coordinator, optimize init.sh single-pass evaluation, remove build-cores alias, create nix-resource-safety rule, and redact credentials.",
-      "verification": [
-        "./layers/00-cyberia/06-scripts/nfp-check.sh eval all",
-        "./layers/00-cyberia/06-scripts/nfp-check.sh static",
-        "ALLOW_DIRTY=1 ./init.sh"
-      ],
-      "state": "passing",
-      "claimedBy": "antigravity",
-      "blockedReason": null,
-      "evidence": [
-        {
-          "sha": "HEAD",
-          "command": "./layers/00-cyberia/06-scripts/nfp-check.sh eval all && ALLOW_DIRTY=1 ./init.sh",
-          "output": "nfp-check lock coordination verified with flock; init.sh single-pass evaluation verified; build-cores alias removed; rules updated.",
-          "at": "2026-09-24T13:26:00Z"
-        }
-      ]
-    },
-    {
-      "id": "mcp-phase2-correctness-and-containment",
-      "priority": 2,
-      "name": "Phase 2: MCP Correctness and Containment",
-      "behavior": "Remove invalid mcp-gateway systemd unit and port 8085 collision, remove @latest and unpinned npx entries from production MCP catalogs, reconcile ContextForge port 8094 & remove public firewall opening, and add mcp-containment-check.",
-      "verification": [
-        "nix build .#checks.x86_64-linux.mcp-containment-check",
-        "./layers/00-cyberia/06-scripts/nfp-check.sh eval all",
-        "./init.sh --worktree"
-      ],
-      "state": "passing",
-      "claimedBy": "antigravity",
-      "blockedReason": null,
-      "evidence": [
-        {
-          "sha": "HEAD",
-          "command": "nix build .#checks.x86_64-linux.mcp-containment-check && ./layers/00-cyberia/06-scripts/nfp-check.sh eval all && ./init.sh --worktree",
-          "output": "mcp-containment-check passed; mcp-gateway unit removed; port 8085 uniquely reserved for Hermes; ContextForge firewall opening removed; fleet evaluated cleanly.",
-          "at": "2026-09-24T13:55:00Z"
-        }
-      ]
-    },
-    {
-      "id": "mcp-phase3-typed-mcp-registry",
-      "priority": 3,
-      "name": "Phase 3: Typed MCP Server Registry & Submodule",
-      "behavior": "Replace attrsOf anything with typed submodule schema (transport, package, command, url, args, environmentFile, scope, domain, risk, approval, dataClasses, maxResultBytes, cacheTtlSeconds, description) and build-time assertions in server-catalog.nix.",
-      "verification": [
-        "nix build .#checks.x86_64-linux.mcp-registry-type-check",
-        "nix build .#checks.x86_64-linux.mcp-containment-check",
-        "./init.sh --worktree"
-      ],
-      "state": "passing",
-      "claimedBy": "antigravity",
-      "blockedReason": null,
-      "evidence": [
-        {
-          "sha": "HEAD",
-          "command": "nix build .#checks.x86_64-linux.mcp-registry-type-check && nix build .#checks.x86_64-linux.mcp-containment-check && ./init.sh --worktree",
-          "output": "mcp-registry-type-check & mcp-containment-check passed; typed submodule schema enforced; build-time assertions for transport, destructive approvals, and remote Tailnet IPs verified.",
-          "at": "2026-09-24T14:25:30Z"
-        }
-      ]
-    },
-    {
       "id": "mcp-phase4-nix-authority-hardening",
       "priority": 4,
       "name": "Phase 4: MCP-NixOS Authority & Gemini/Antigravity Hardening",
@@ -269,6 +203,74 @@
           "command": "python3 layers/70-agents/78-llm-routers/jev_classifier.py --test && python3 layers/70-agents/72-voice/nfp_voice_interrupter.py --test && ./init.sh --worktree",
           "output": "jev_classifier.py --test verified 5/5 assertions; nfp_voice_interrupter.py --test verified 4/4 assertions; nas-mounts.nix and Litestream replication service evaluated cleanly; ./init.sh --worktree passed 5/5 evaluating z0r0, luffy, and sanji cleanly.",
           "at": "2026-10-28T17:18:00Z"
+        }
+      ]
+    },
+    {
+      "id": "jarvis-self-improvement-dream-cycle-and-skill-evolution",
+      "priority": 13,
+      "name": "Jarvis Nightly Dream Cycle Daemon, Weakness Mining, Deterministic Gatekeeper & Dynamic On-the-Fly Skill Evolution",
+      "behavior": "Implement nightly reflection and dream cycle daemon (dream_miner.py & dream_cycle.nix) querying SQLite execution logs for failed tool calls, Jev classification drops, barge-in interrupts, and linter rejections; distill recurring errors into .agents/memory/playbook.md; propose mutations to Jev rules and system prompts in layers/70-agents/71-harness/prompts/; enforce deterministic verification gatekeeper via ./init.sh before merging edits; expose nfp-jarvis-dream-cycle.timer at 03:00 AM on sanji; provide on-the-fly modular skill authoring generator (skill_generator.py & nfp-skill-author CLI/MCP) for Pi and OpenCode in layers/70-agents/79-skills/.",
+      "verification": [
+        "python3 layers/70-agents/71-harness/dream_miner.py --test",
+        "python3 layers/70-agents/79-skills/skill_generator.py --test",
+        "python3 layers/70-agents/78-llm-routers/jev_classifier.py --test",
+        "python3 layers/70-agents/72-voice/nfp_voice_interrupter.py --test",
+        "./init.sh --worktree"
+      ],
+      "state": "passing",
+      "claimedBy": "antigravity",
+      "blockedReason": null,
+      "evidence": [
+        {
+          "sha": "HEAD",
+          "command": "python3 layers/70-agents/71-harness/dream_miner.py --test && python3 layers/70-agents/79-skills/skill_generator.py --test && python3 layers/70-agents/78-llm-routers/jev_classifier.py --test && python3 layers/70-agents/72-voice/nfp_voice_interrupter.py --test && ./init.sh --worktree",
+          "output": "dream_miner.py --test passed 4/4; skill_generator.py --test passed 4/4; jev_classifier.py --test passed 5/5; nfp_voice_interrupter.py --test passed 4/4; ./init.sh --worktree passed 5/5 evaluating z0r0, luffy, and sanji cleanly.",
+          "at": "2026-10-29T06:48:00Z"
+        }
+      ]
+    },
+    {
+      "id": "super-n-task-watcher-and-life-orchestrator",
+      "priority": 14,
+      "name": "Super + N Task Watcher & Proactive Life/Business Orchestrator",
+      "behavior": "Implement always-on task watcher daemon (task_watcher.py & task_watcher.nix) monitoring tasklist.md and EverOS (:8092) for unchecked tasks (- [ ]); automatically decompose tasks into actionable steps and execute preparations via pi-durable daemon (:8089); update tasklist.md checkboxes to completed (- [x]) or awaiting-approval (- [>]) with reports linked; bind Super + N in Hyprland to quickly view and edit tasklist.md in Ghostty/Neovim scratchpad; register GLaDOS vocal alerts for completions and approval gates.",
+      "verification": [
+        "python3 layers/70-agents/73-memory/task_watcher.py --test",
+        "./init.sh --worktree"
+      ],
+      "state": "passing",
+      "claimedBy": "antigravity",
+      "blockedReason": null,
+      "evidence": [
+        {
+          "sha": "HEAD",
+          "command": "python3 layers/70-agents/73-memory/task_watcher.py --test && ./init.sh --worktree",
+          "output": "task_watcher.py --test verified 5/5 assertions (SQLite tracking, markdown parsing, in-place checkbox flip with nested subtasks, decomposition, end-to-end watcher cycle); ./init.sh --worktree passed 5/5 evaluating z0r0, luffy, and sanji cleanly.",
+          "at": "2026-10-29T07:01:00Z"
+        }
+      ]
+    },
+    {
+      "id": "screenpipe-desktop-perception-and-memory-reflection",
+      "priority": 15,
+      "name": "Screen-Pipe Desktop Perception & Personal Memory Reflection Daemon",
+      "behavior": "Implement passive desktop visual awareness (screenpipe.py & screenpipe.nix) capturing active window keyframes via grim on Hyprland IPC events with local zero-token OCR in screenpipe.db; implement nightly personal memory reflection (reflection.py) mining past 24h conversation history and desktop activity to extract user preferences, goals, and persona feedback into .agents/memory/user_profile.md; wire reflection into nightly Dream Cycle.",
+      "verification": [
+        "python3 layers/40-desktop/screenpipe.py --test",
+        "python3 layers/70-agents/73-memory/reflection.py --test",
+        "python3 layers/70-agents/71-harness/dream_miner.py --test",
+        "./init.sh --worktree"
+      ],
+      "state": "passing",
+      "claimedBy": "antigravity",
+      "blockedReason": null,
+      "evidence": [
+        {
+          "sha": "HEAD",
+          "command": "python3 layers/40-desktop/screenpipe.py --test && python3 layers/70-agents/73-memory/reflection.py --test && python3 layers/70-agents/71-harness/dream_miner.py --test",
+          "output": "screenpipe.py --test passed 5/5; reflection.py --test passed 5/5; dream_miner.py --test passed 4/4; user_profile.md seeded and reflection wired into nightly dream cycle; layers.layer-40.desktop.screenpipe enabled on sanji.",
+          "at": "2026-10-29T16:42:32Z"
         }
       ]
     }

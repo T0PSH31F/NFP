@@ -52,6 +52,10 @@ in
         "$mod, slash, exec, cheatsheet"
         "$mod, Return, exec, wlr-which-key"
 
+        # ── Super + N: Task Watcher & Markdown Tasklist ───────────────
+        "$mod, N, exec, uwsm app -- ghostty -e nvim /home/t0psh31f/Clan/NFP/tasklist.md"
+        "$mod SHIFT, N, exec, nfp-task-watcher --once"
+
         # ── Dropdown Scratchpads (Pyprland) ───────────────────────────
         "ALT, T, exec, pypr toggle term"
         "ALT, N, exec, pypr toggle gedit"

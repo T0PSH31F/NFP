@@ -160,6 +160,30 @@ class VoiceInterrupter:
         except Exception:
             pass
 
+        if killed > 0:
+            try:
+                conn = init_state_db(self.db_path)
+                now = datetime.now(timezone.utc).isoformat()
+                active = get_active_persona(self.db_path)
+                conn.execute("""
+                CREATE TABLE IF NOT EXISTS barge_in_events (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    timestamp TEXT NOT NULL,
+                    active_persona TEXT NOT NULL,
+                    killed_pids TEXT,
+                    user_prompt TEXT,
+                    reason TEXT
+                );
+                """)
+                conn.execute(
+                    "INSERT INTO barge_in_events (timestamp, active_persona, killed_pids, user_prompt, reason) VALUES (?, ?, ?, ?, ?)",
+                    (now, active, str(killed), "", "User speech detected during active audio playback"),
+                )
+                conn.commit()
+                conn.close()
+            except Exception:
+                pass
+
         return killed
 
     def handle_user_input(self, text: str) -> dict:

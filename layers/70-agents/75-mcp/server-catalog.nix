@@ -281,6 +281,21 @@ in
           cacheTtlSeconds = 0;
           description = "Shared multi-agent Todo list MCP server with flock and per-agent section write guards";
         };
+        skill-author = {
+          enable = true;
+          transport = "stdio";
+          command = "${pkgs.python3}/bin/python3";
+          args = [
+            "${../79-skills/skill_generator.py}"
+            "--mcp"
+          ];
+          domain = "skills";
+          risk = "write";
+          approval = "never";
+          maxResultBytes = 262144;
+          cacheTtlSeconds = 0;
+          description = "Dynamic on-the-fly modular skill authoring and catalog generation";
+        };
       };
 
       layers.layer-75.mcp.clientConfigs = clientConfigs;

@@ -71,6 +71,9 @@ in
             cherry-studio
             lmstudio
             python314Packages.pydantic-graph
+            (pkgs.writeShellScriptBin "nfp-skill-author" ''
+              exec ${pkgs.python3}/bin/python3 ${./skill_generator.py} "$@"
+            '')
           ]
           ++ cfg.packages
           ++ optionals cfg.enableCodingAgents (

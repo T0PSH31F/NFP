@@ -142,6 +142,12 @@
     wyoming-services.enable = true;
   };
 
+  layers.layer-71.harness.dream-cycle.enable = true;
+
+  layers.layer-73.memory.task-watcher.enable = true;
+
+  layers.layer-40.desktop.screenpipe.enable = true;
+
   layers.layer-76.hermes-live-voice.enable = true;
 
   layers.layer-78.llm-routers.jev-router-plugin = {

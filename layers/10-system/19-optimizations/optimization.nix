@@ -65,14 +65,16 @@
     # Earlyoom - proactive OOM killer
     earlyoom = {
       enable = lib.mkDefault true;
-      freeMemThreshold = lib.mkDefault 15;
-      freeSwapThreshold = lib.mkDefault 15;
+      freeMemThreshold = lib.mkDefault 10;
+      freeSwapThreshold = lib.mkDefault 5;
       enableNotifications = true;
       extraArgs = [
         "--prefer"
         "^(Web Content|chromium|firefox|electron|aionui|brave)$"
         "--avoid"
-        "^(Hyprland|hyprland|noctalia|Noctalia|sshd|systemd|greetd|kong|extreme-router|omniroute|brain-service|caddy|calibre-web)$"
+        "^(Hyprland|hyprland|noctalia|Noctalia|sshd|systemd|greetd|kong|extreme-router|omniroute|brain-service|caddy|calibre-web|nix-daemon|nix|nix-build|clan|nixos-rebuild)$"
+        "--ignore"
+        "^(nix-daemon|nix|nix-build|clan|nixos-rebuild)$"
       ];
     };
 

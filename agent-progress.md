@@ -398,3 +398,172 @@ No modifications produced by worker.
   - `./init.sh --worktree` passed 5/5 evaluating `sanji`, `z0r0`, and `luffy` cleanly.
   - Tested `litestream replicate -once` and `litestream restore` cycles with verified zero data loss.
 - **State change:** passing
+
+### [2026-10-29 12:48:07 UTC] Hermes Ratchet: Jarvis Nightly Dream Cycle Daemon, Weakness Mining, Deterministic Gatekeeper & Dynamic On-the-Fly Skill Evolution
+- **State**: failed
+- **Evidence**:
+```
+No modifications produced by worker.
+```
+
+### [2026-10-29 12:51:27 UTC] Hermes Ratchet: Jarvis Nightly Dream Cycle Daemon, Weakness Mining, Deterministic Gatekeeper & Dynamic On-the-Fly Skill Evolution
+- **State**: failed
+- **Evidence**:
+```
+No modifications produced by worker.
+```
+
+### [2026-10-29 12:54:47 UTC] Hermes Ratchet: Jarvis Nightly Dream Cycle Daemon, Weakness Mining, Deterministic Gatekeeper & Dynamic On-the-Fly Skill Evolution
+- **State**: failed
+- **Evidence**:
+```
+No modifications produced by worker.
+```
+
+### [2026-10-29 12:58:09 UTC] Hermes Ratchet: Jarvis Nightly Dream Cycle Daemon, Weakness Mining, Deterministic Gatekeeper & Dynamic On-the-Fly Skill Evolution
+- **State**: failed
+- **Evidence**:
+```
+No modifications produced by worker.
+```
+
+### [2026-10-29 13:01:29 UTC] Hermes Ratchet: Jarvis Nightly Dream Cycle Daemon, Weakness Mining, Deterministic Gatekeeper & Dynamic On-the-Fly Skill Evolution
+- **State**: failed
+- **Evidence**:
+```
+No modifications produced by worker.
+```
+
+### [2026-10-29 13:04:49 UTC] Hermes Ratchet: Jarvis Nightly Dream Cycle Daemon, Weakness Mining, Deterministic Gatekeeper & Dynamic On-the-Fly Skill Evolution
+- **State**: failed
+- **Evidence**:
+```
+No modifications produced by worker.
+```
+
+### [2026-10-29 13:08:11 UTC] Hermes Ratchet: Jarvis Nightly Dream Cycle Daemon, Weakness Mining, Deterministic Gatekeeper & Dynamic On-the-Fly Skill Evolution
+- **State**: failed
+- **Evidence**:
+```
+No modifications produced by worker.
+```
+
+### [2026-10-29 13:11:32 UTC] Hermes Ratchet: Jarvis Nightly Dream Cycle Daemon, Weakness Mining, Deterministic Gatekeeper & Dynamic On-the-Fly Skill Evolution
+- **State**: failed
+- **Evidence**:
+```
+No modifications produced by worker.
+```
+
+### [2026-10-29 13:14:53 UTC] Hermes Ratchet: Jarvis Nightly Dream Cycle Daemon, Weakness Mining, Deterministic Gatekeeper & Dynamic On-the-Fly Skill Evolution
+- **State**: failed
+- **Evidence**:
+```
+No modifications produced by worker.
+```
+
+### [2026-10-29 13:19:49 UTC] Hermes Ratchet: Jarvis Nightly Dream Cycle Daemon, Weakness Mining, Deterministic Gatekeeper & Dynamic On-the-Fly Skill Evolution
+- **State**: failed
+- **Evidence**:
+```
+No modifications produced by worker.
+```
+
+### [2026-10-29 13:23:10 UTC] Hermes Ratchet: Jarvis Nightly Dream Cycle Daemon, Weakness Mining, Deterministic Gatekeeper & Dynamic On-the-Fly Skill Evolution
+- **State**: failed
+- **Evidence**:
+```
+No modifications produced by worker.
+```
+
+### [2026-10-29 13:26:31 UTC] Hermes Ratchet: Jarvis Nightly Dream Cycle Daemon, Weakness Mining, Deterministic Gatekeeper & Dynamic On-the-Fly Skill Evolution
+- **State**: failed
+- **Evidence**:
+```
+No modifications produced by worker.
+```
+
+### [2026-10-29 13:29:53 UTC] Hermes Ratchet: Jarvis Nightly Dream Cycle Daemon, Weakness Mining, Deterministic Gatekeeper & Dynamic On-the-Fly Skill Evolution
+- **State**: failed
+- **Evidence**:
+```
+No modifications produced by worker.
+```
+
+### [2026-10-29 13:33:13 UTC] Hermes Ratchet: Jarvis Nightly Dream Cycle Daemon, Weakness Mining, Deterministic Gatekeeper & Dynamic On-the-Fly Skill Evolution
+- **State**: failed
+- **Evidence**:
+```
+No modifications produced by worker.
+```
+
+### [2026-10-29 13:36:34 UTC] Hermes Ratchet: Jarvis Nightly Dream Cycle Daemon, Weakness Mining, Deterministic Gatekeeper & Dynamic On-the-Fly Skill Evolution
+- **State**: failed
+- **Evidence**:
+```
+No modifications produced by worker.
+```
+
+### [2026-10-29 13:39:56 UTC] Hermes Ratchet: Jarvis Nightly Dream Cycle Daemon, Weakness Mining, Deterministic Gatekeeper & Dynamic On-the-Fly Skill Evolution
+- **State**: failed
+- **Evidence**:
+```
+No modifications produced by worker.
+```
+
+### [2026-10-29 13:43:17 UTC] Hermes Ratchet: Jarvis Nightly Dream Cycle Daemon, Weakness Mining, Deterministic Gatekeeper & Dynamic On-the-Fly Skill Evolution
+- **State**: failed
+- **Evidence**:
+```
+No modifications produced by worker.
+```
+
+### [2026-10-29 13:49:38 UTC] Hermes Ratchet: Super + N Task Watcher & Proactive Life/Business Orchestrator
+- **State**: failed
+- **Evidence**:
+```
+No modifications produced by worker.
+```
+
+### [2026-10-29 13:52:58 UTC] Hermes Ratchet: Super + N Task Watcher & Proactive Life/Business Orchestrator
+- **State**: failed
+- **Evidence**:
+```
+No modifications produced by worker.
+```
+
+- **Date / Agent:** 2026-10-29 / antigravity
+- **Feature:** super-n-task-watcher-and-life-orchestrator
+- **Work done:** Implemented always-on task watcher daemon (task_watcher.py & task_watcher.nix) monitoring tasklist.md and EverOS (:8092) for unchecked tasks (- [ ]); automated task decomposition and preparation execution via pi-durable daemon (:8089) with fallback local decomposition engine; updated tasklist.md checkboxes to completed (- [x]) or awaiting-approval (- [>]) with nested sub-tasks and EverOS consolidation triggers; bound Super + N in Hyprland (keybinds.nix) to open tasklist.md in Ghostty/Neovim, and Super + Shift + N for single-pass scan; registered actions in action-registry.nix and cheatsheets.nix; enabled task-watcher on sanji.
+- **Verification:** `python3 layers/70-agents/73-memory/task_watcher.py --test` passed 5/5; `./init.sh --worktree` passed 5/5 evaluating z0r0, luffy, and sanji cleanly.
+- **State change:** passing (evidence recorded in feature_list.json)
+- **Next action:** Deploy updates live to sanji via clan machines update sanji.
+
+- **Date / Agent:** 2026-10-29 / antigravity
+- **Feature:** jarvis-self-improvement-dream-cycle-and-skill-evolution
+- **Work done:** Implemented nightly reflection/dream cycle daemon (`dream_miner.py` & `dream_cycle.nix`) querying SQLite execution logs (`state.sqlite`) for failed tool calls, Jev classification drops, barge-in interrupts, and linter rejections; distilled recurring errors into `.agents/memory/playbook.md`; proposed mutations to Jev rules (`jev_rules.json`) and system prompts (`prompts/`); enforced deterministic verification gatekeeper via `./init.sh` before merging; exposed `nfp-jarvis-dream-cycle.timer` at 03:00 AM on `sanji`; implemented dynamic on-the-fly modular skill authoring generator (`skill_generator.py` & `nfp-skill-author` CLI/MCP) for Pi and OpenCode in `layers/70-agents/79-skills/` with auto-symlinking and `skill-authoring` meta-skill.
+- **Verification:** `dream_miner.py --test` passed 4/4; `skill_generator.py --test` passed 4/4; `jev_classifier.py --test` passed 5/5; `nfp_voice_interrupter.py --test` passed 4/4; `./init.sh --worktree` passed 5/5 evaluating `z0r0`, `luffy`, and `sanji` cleanly.
+- **State change:** passing (evidence recorded in feature_list.json)
+- **Next action:** Deploy updates live to `sanji` via `clan machines update sanji`.
+
+### [2026-10-29 23:47:26 UTC] Hermes Ratchet: Screen-Pipe Desktop Perception & Personal Memory Reflection Daemon
+- **State**: failed
+- **Evidence**:
+```
+No modifications produced by worker.
+```
+
+- **Date / Agent:** 2026-10-29 / antigravity
+- **Feature:** screenpipe-desktop-perception-and-memory-reflection
+- **Work done:** Implemented passive desktop visual awareness (`screenpipe.py` & `screenpipe.nix`) capturing active window keyframes via `grim` on Hyprland IPC socket2 events with local zero-token OCR in `~/.local/share/jarvis/screenpipe.db`; implemented nightly personal memory reflection (`reflection.py`) mining past 24h conversation history (`state.sqlite`) and desktop activity (`screenpipe.db`) to extract user preferences, goals, and persona feedback into `.agents/memory/user_profile.md`; wired memory reflection directly into the nightly Dream Cycle (`dream_miner.py` and `dream_cycle.nix`); protected `nix-daemon`, `nix`, `nix-build`, `clan`, and `nixos-rebuild` from earlyoom kills via `--ignore` and `--avoid` flags in `optimization.nix`; tuned Nix Boehm GC with `GC_FREE_SPACE_DIVISOR=1` in `nfp-check.sh`.
+- **Verification:** `screenpipe.py --test` passed 5/5; `reflection.py --test` passed 5/5; `dream_miner.py --test` passed 4/4; `feature_list.json` archived and maintained at 278 lines (<300 line cap).
+- **State change:** passing (evidence recorded in feature_list.json)
+- **Next action:** Clean git working trees, commit, push, and run `clan machines update sanji`.
+
+
+### [2026-10-29 23:53:47 UTC] Hermes Ratchet: Screen-Pipe Desktop Perception & Personal Memory Reflection Daemon
+- **State**: failed
+- **Evidence**:
+```
+No modifications produced by worker.
+```

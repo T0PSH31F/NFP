@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "description": "Jev System-1 Pre-Flight Classifier Heuristic Rule Registry",
+  "updated_at": "2026-10-28T23:30:00Z",
+  "routine_ping_patterns": [
+    "^(?:ok|pong|ping|heartbeat|healthz?|status\\s*200|200\\s*ok)$",
+    "\\{\\s*\"(?:status|health|ping)\"\\s*:\\s*(?:\"(?:ok|pong|alive|healthy)\"|200)\\s*\\}",
+    "connection\\s+keep-?alive",
+    "routine\\s+check\\s+passed"
+  ],
+  "critical_patterns": [
+    "\\b(out of memory|oom-killer|disk\\s*full|read-only file system|kernel panic|segfault|security breach|unauthorized root|database corruption)\\b"
+  ],
+  "custom_rules": []
+}

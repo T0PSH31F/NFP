@@ -466,6 +466,14 @@ in
               ];
               description = "Shared Multi-Agent Todo List (Pi fenced section + @pi claim)";
             };
+            skill-author = {
+              command = "${pkgs.python3}/bin/python3";
+              args = [
+                "${../79-skills/skill_generator.py}"
+                "--mcp"
+              ];
+              description = "Dynamic on-the-fly modular skill authoring and catalog generation";
+            };
           };
         };
 

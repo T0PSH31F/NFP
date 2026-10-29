@@ -155,6 +155,31 @@ async def run_pi_task(
             TASKS_COMPLETED += 1
             if notify_voice:
                 speak_glados("Pi durable worker has completed your delegated task and logged its findings.")
+        else:
+            try:
+                db_p = Path.home() / ".local/share/pi-durable/state.sqlite"
+                db_p.parent.mkdir(parents=True, exist_ok=True)
+                import sqlite3
+                conn = sqlite3.connect(str(db_p))
+                now_str = datetime.now(timezone.utc).isoformat()
+                conn.execute("""
+                CREATE TABLE IF NOT EXISTS failed_tool_calls (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    timestamp TEXT NOT NULL,
+                    tool_name TEXT NOT NULL,
+                    agent TEXT NOT NULL,
+                    error_message TEXT NOT NULL,
+                    payload TEXT
+                );
+                """)
+                conn.execute(
+                    "INSERT INTO failed_tool_calls (timestamp, tool_name, agent, error_message, payload) VALUES (?, ?, ?, ?, ?)",
+                    (now_str, "pi-task", "pi", f"Process exited with code {proc.returncode}: {err[:400]}", task[:400]),
+                )
+                conn.commit()
+                conn.close()
+            except Exception:
+                pass
         return {
             "status": "completed" if ok else "error",
             "returncode": proc.returncode,
