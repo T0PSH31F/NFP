@@ -10,11 +10,7 @@ let
 in
 {
   options.layers.layer-60.gui.gedit = {
-    enable = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Enable Gedit text editor with custom dconf settings";
-    };
+    enable = lib.mkEnableOption "Gedit text editor with custom dconf settings";
   };
 
   home = lib.mkIf cfg.enable {

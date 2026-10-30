@@ -21,11 +21,7 @@ with lib;
     # machine configs that reference `services.ai-services.sillytavern.enable`
     # do not break during the refactoring.
     sillytavern = {
-      enable = mkOption {
-        type = types.bool;
-        default = false;
-        description = "Stub — see services.sillytavern for the actual service";
-      };
+      enable = mkEnableOption "Stub — see services.sillytavern for the actual service";
       port = mkOption {
         type = types.int;
         default = 8000;

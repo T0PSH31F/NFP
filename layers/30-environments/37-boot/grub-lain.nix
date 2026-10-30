@@ -7,11 +7,7 @@
 {
   options.layers.layer-30.theming.themes.grub-lain = {
     enable = lib.mkEnableOption "Lain GRUB theme";
-    efiInstallAsRemovable = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Whether to install GRUB into the default EFI fallback path (/EFI/BOOT/BOOTX64.EFI).";
-    };
+    efiInstallAsRemovable = lib.mkEnableOption "installing GRUB into the default EFI fallback path (/EFI/BOOT/BOOTX64.EFI)";
   };
 
   config = lib.mkIf config.layers.layer-30.theming.themes.grub-lain.enable {

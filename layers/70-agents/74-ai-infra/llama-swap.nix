@@ -13,11 +13,7 @@
 with lib;
 {
   options.services.llama-swap-proxy = {
-    enable = mkOption {
-      type = types.bool;
-      default = false;
-      description = "Whether to enable llama-swap Proxy service";
-    };
+    enable = mkEnableOption "llama-swap Proxy service";
 
     port = mkOption {
       type = types.port;

@@ -5,11 +5,7 @@
 }:
 {
   options.layers.layer-40.desktop.terminals.kitty = {
-    enable = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Enable Kitty terminal emulator";
-    };
+    enable = lib.mkEnableOption "Kitty terminal emulator";
   };
 
   config = lib.mkIf config.layers.layer-40.desktop.terminals.kitty.enable {

@@ -34,11 +34,7 @@ with lib;
       description = "Port for local Piper TTS wrapper or XTTSv2 server";
     };
 
-    useXTTSv2 = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Deploy XTTSv2-UI via OCI containers alongside Piper";
-    };
+    useXTTSv2 = lib.mkEnableOption "deploying XTTSv2-UI via OCI containers alongside Piper";
   };
 
   config =

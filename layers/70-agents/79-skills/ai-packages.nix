@@ -35,11 +35,7 @@ in
       description = "Enable CLI coding agents (claude-code, opencode, goose-cli, jules, pi, ccusage)";
     };
 
-    enableServerTools = mkOption {
-      type = types.bool;
-      default = false;
-      description = "Enable AI server tools (ollama, espeak-ng, pipx)";
-    };
+    enableServerTools = mkEnableOption "AI server tools (ollama, espeak-ng, pipx)";
   };
 
   options.services.llm-agents = {

@@ -10,11 +10,7 @@ let
 in
 {
   options.layers.layer-50.cli.nushell = {
-    enable = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Enable Nushell modern structured shell";
-    };
+    enable = lib.mkEnableOption "Nushell modern structured shell";
   };
 
   home = lib.mkIf cfg.enable {

@@ -82,7 +82,6 @@ in
     description = "The client role configures the machine to use the nix-cache server";
     perInstance =
       {
-        settings,
         instanceName,
         roles,
         ...

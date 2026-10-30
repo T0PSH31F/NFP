@@ -93,7 +93,7 @@ in
     };
 
     timerConfig = mkOption {
-      type = types.attrs;
+      type = types.attrsOf types.anything;
       default = {
         OnCalendar = "daily";
         Persistent = true;

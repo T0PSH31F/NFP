@@ -12,11 +12,7 @@
 with lib;
 {
   options.services.ai-services.open-webui = {
-    enable = mkOption {
-      type = types.bool;
-      default = false;
-      description = "Enable Open WebUI for LLM interfaces";
-    };
+    enable = mkEnableOption "Open WebUI for LLM interfaces";
 
     port = mkOption {
       type = types.int;

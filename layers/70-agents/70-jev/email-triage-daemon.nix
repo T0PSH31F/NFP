@@ -42,11 +42,7 @@ in
       description = "Systemd timer execution interval";
     };
 
-    dryRun = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Dry run mode (logs decisions without modifying message flags)";
-    };
+    dryRun = lib.mkEnableOption "dry run mode (logs decisions without modifying message flags)";
 
     confidenceThreshold = lib.mkOption {
       type = lib.types.numbers.between 0.0 1.0;

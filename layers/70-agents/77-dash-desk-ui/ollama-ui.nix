@@ -13,11 +13,7 @@
 with lib;
 {
   options.services.ai-services.ollama-ui = {
-    enable = mkOption {
-      type = types.bool;
-      default = false;
-      description = "Enable NextJS Ollama LLM UI";
-    };
+    enable = mkEnableOption "NextJS Ollama LLM UI";
 
     port = mkOption {
       type = types.int;

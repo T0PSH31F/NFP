@@ -29,11 +29,7 @@ with lib;
       description = "Host address to bind to. Set to 127.0.0.1 to restrict access to localhost.";
     };
 
-    openFirewall = mkOption {
-      type = types.bool;
-      default = false;
-      description = "Open ports in the firewall for LiteLLM. Note that external exposure also requires setting the host option to a non-loopback address.";
-    };
+    openFirewall = mkEnableOption "opening ports in the firewall for LiteLLM";
 
     settings = mkOption {
       type = types.attrsOf types.anything;

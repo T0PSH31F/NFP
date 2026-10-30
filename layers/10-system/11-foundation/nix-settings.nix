@@ -8,7 +8,6 @@
 # - This module is designed to be imported by ALL machines.
 
 {
-  config,
   lib,
   ...
 }:

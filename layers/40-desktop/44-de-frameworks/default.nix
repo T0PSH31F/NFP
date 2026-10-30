@@ -17,19 +17,11 @@
     };
 
     vicinae = {
-      enable = lib.mkOption {
-        type = lib.types.bool;
-        default = false;
-        description = "Enable Vicinae launcher";
-      };
+      enable = lib.mkEnableOption "Vicinae launcher";
     };
 
     which-key = {
-      enable = lib.mkOption {
-        type = lib.types.bool;
-        default = false;
-        description = "Enable wlr-which-key visual keybinding popup (Vimjoyer vid74)";
-      };
+      enable = lib.mkEnableOption "wlr-which-key visual keybinding popup (Vimjoyer vid74)";
     };
   };
 

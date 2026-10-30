@@ -7,11 +7,7 @@
 }:
 {
   options.layers.layer-60.gui.feh = {
-    enable = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Enable feh image viewer and wallpaper tool";
-    };
+    enable = lib.mkEnableOption "feh image viewer and wallpaper tool";
   };
 
   nixos = lib.mkIf config.layers.layer-60.gui.feh.enable {

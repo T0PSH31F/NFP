@@ -854,17 +854,17 @@ in
         };
       };
       manifest = {
-        enable = mkEnableOption "Route traffic to Manifest" // {
-          default = false;
-        };
+        enable = mkEnableOption "Route traffic to Manifest";
         port = mkOption {
           type = types.port;
           default = 2099;
         };
       };
       freellmapi = {
-        enable = mkEnableOption "Route traffic to FreeLLMAPI" // {
+        enable = mkOption {
+          type = types.bool;
           default = true;
+          description = "Route traffic to FreeLLMAPI";
         };
         port = mkOption {
           type = types.port;
@@ -872,8 +872,10 @@ in
         };
       };
       freellmpool = {
-        enable = mkEnableOption "Route traffic to freellmpool" // {
+        enable = mkOption {
+          type = types.bool;
           default = true;
+          description = "Route traffic to freellmpool";
         };
         port = mkOption {
           type = types.port;
@@ -882,9 +884,7 @@ in
       };
 
       omniroute = {
-        enable = mkEnableOption "Route traffic to OmniRoute" // {
-          default = false;
-        };
+        enable = mkEnableOption "Route traffic to OmniRoute";
         host = mkOption {
           type = types.str;
           default = "127.0.0.1";

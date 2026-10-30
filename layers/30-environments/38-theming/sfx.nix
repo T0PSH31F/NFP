@@ -4,11 +4,7 @@
 }:
 {
   options.layers.layer-30.theming.sfx = {
-    enable = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Enable UI sound effects daemon";
-    };
+    enable = lib.mkEnableOption "UI sound effects daemon";
 
     sounds = {
       switchFocus = lib.mkOption {

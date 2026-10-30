@@ -42,11 +42,7 @@ in
   # Authoritative port is services.polyfloor.port (mkDefault 7777 below), NOT a
   # duplicate constant — legacy shim mirrors that authoritative value.
   options.layers.layer-76.orchestrators.polyfloor = {
-    enable = mkOption {
-      type = types.bool;
-      default = false;
-      description = "Enable Polyfloor multi-agent orchestrator engine";
-    };
+    enable = mkEnableOption "Polyfloor multi-agent orchestrator engine";
     port = mkOption {
       type = types.port;
       default = 7777;
@@ -55,11 +51,7 @@ in
   };
 
   options.services.ai-services.polyfloor = {
-    enable = mkOption {
-      type = types.bool;
-      default = false;
-      description = "Legacy compat mirror of services.polyfloor.enable (read from the upstream option).";
-    };
+    enable = mkEnableOption "Legacy compat mirror of services.polyfloor.enable";
     port = mkOption {
       type = types.port;
       default = 7777;

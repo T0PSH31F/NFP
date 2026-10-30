@@ -11,11 +11,7 @@ let
 in
 {
   options.layers.layer-60.gui.spicetify = {
-    enable = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Enable Spicetify";
-    };
+    enable = lib.mkEnableOption "Spicetify";
   };
 
   home =

@@ -8,11 +8,7 @@
 }:
 {
   options.layers.layer-30.theming.qt = {
-    enable = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Enable QT application theming and style integration";
-    };
+    enable = lib.mkEnableOption "QT application theming and style integration";
   };
 
   # Home Manager QT configuration

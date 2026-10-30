@@ -70,23 +70,9 @@ let
 in
 {
   options.layers.layer-40.desktop.hyprland = {
-    enable = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Enable Hyprland Desktop Environment";
-    };
-
-    isNvidia = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Internal: True if the machine has NVIDIA hardware enabled";
-    };
-
-    isLaptop = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Internal: True if the machine is a laptop";
-    };
+    enable = lib.mkEnableOption "Hyprland Desktop Environment";
+    isNvidia = lib.mkEnableOption "Internal: True if the machine has NVIDIA hardware enabled";
+    isLaptop = lib.mkEnableOption "Internal: True if the machine is a laptop";
   };
 
   nixos = lib.mkIf cfg.enable {

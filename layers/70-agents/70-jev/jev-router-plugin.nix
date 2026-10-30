@@ -47,11 +47,7 @@ in
       description = "Local SLM provider endpoint (e.g. Ollama)";
     };
 
-    openFirewall = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Open port in firewall (disabled by default; accessed via Kong)";
-    };
+    openFirewall = lib.mkEnableOption "opening port in firewall (disabled by default; accessed via Kong)";
   };
 
   config = lib.mkIf cfg.enable {

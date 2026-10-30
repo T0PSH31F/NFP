@@ -8,11 +8,7 @@
 }:
 {
   options.layers.layer-30.theming.gtk = {
-    enable = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Enable GTK theming engine and configuration";
-    };
+    enable = lib.mkEnableOption "GTK theming engine and configuration";
   };
 
   # Home Manager GTK configuration

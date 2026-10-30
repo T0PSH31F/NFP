@@ -18,11 +18,7 @@ in
   ];
 
   options.layers.layer-40.desktop.noctalia = {
-    enable = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Enable Noctalia Desktop Shell (v5)";
-    };
+    enable = lib.mkEnableOption "Noctalia Desktop Shell (v5)";
 
     backend = lib.mkOption {
       type = lib.types.enum [

@@ -47,11 +47,7 @@ with lib;
       description = "Persistent data directory";
     };
 
-    openFirewall = mkOption {
-      type = types.bool;
-      default = false;
-      description = "Whether to open the port in the firewall";
-    };
+    openFirewall = mkEnableOption "opening port in the firewall for AionUi";
   };
 
   config =

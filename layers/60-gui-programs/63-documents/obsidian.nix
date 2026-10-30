@@ -7,11 +7,7 @@
 }:
 {
   options.layers.layer-60.gui.obsidian = {
-    enable = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Enable Obsidian note-taking tool";
-    };
+    enable = lib.mkEnableOption "Obsidian note-taking tool";
   };
 
   home =

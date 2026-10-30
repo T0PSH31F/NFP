@@ -21,8 +21,10 @@ in
   ];
 
   options.layers.layer-50.cli = {
-    enable = lib.mkEnableOption "Complete CLI/TUI environment" // {
+    enable = lib.mkOption {
+      type = lib.types.bool;
       default = true;
+      description = "Enable complete CLI/TUI environment";
     };
 
     theming = {
@@ -70,25 +72,13 @@ in
         default = true;
         description = "Enable Zsh with full Powerlevel10k configuration";
       };
-      bash.enable = lib.mkOption {
-        type = lib.types.bool;
-        default = false;
-        description = "Enable Bash configuration";
-      };
+      bash.enable = lib.mkEnableOption "Bash configuration";
     };
 
-    yazelixIntegration.enable = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Enable Helix + Yazi + Zellij integration (DEPRECATED: migrate to zellij.yazelix.* flags).";
-    };
+    yazelixIntegration.enable = lib.mkEnableOption "Helix + Yazi + Zellij integration (DEPRECATED: migrate to zellij.yazelix.* flags)";
 
     zellij = {
-      enable = lib.mkOption {
-        type = lib.types.bool;
-        default = false;
-        description = "Enable Zellij terminal multiplexer";
-      };
+      enable = lib.mkEnableOption "Zellij terminal multiplexer";
       yazelix = {
         bars.enable = lib.mkEnableOption "Yazelix Zellij bars (top + bottom, CPU/RAM, AI token usage)";
         orchestrator.enable = lib.mkEnableOption "Yazelix pane orchestrator (Alt+y toggleable sidebars)";
@@ -110,11 +100,7 @@ in
       description = "Enable Nix-specific CLI tools (Home Manager side)";
     };
 
-    pythonTools.enable = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Enable Python and related tools (uv, etc.)";
-    };
+    pythonTools.enable = lib.mkEnableOption "Python and related tools (uv, etc.)";
 
     terminal-toys = {
       enable = lib.mkEnableOption "Fun terminal toys (cmatrix, cbonsai, etc.)";

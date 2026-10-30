@@ -21,11 +21,7 @@ let
 in
 {
   options.layers.desktop.noctalia-hyprland = {
-    enable = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Enable Noctalia Hyprland desktop experience adapter";
-    };
+    enable = lib.mkEnableOption "Noctalia Hyprland desktop experience adapter";
   };
 
   nixos = lib.mkIf isEnabled {

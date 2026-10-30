@@ -12,11 +12,7 @@
   ];
 
   options.layers.layer-40.desktop.niri = {
-    enable = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Enable Niri WM";
-    };
+    enable = lib.mkEnableOption "Niri WM";
   };
 
   nixos = lib.mkIf osConfig.layers.layer-40.desktop.niri.enable {

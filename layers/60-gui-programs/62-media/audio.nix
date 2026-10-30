@@ -5,8 +5,10 @@
 }:
 {
   options.layers.layer-60.gui.audio = {
-    enable = lib.mkEnableOption "Audio visualization and management (cava, cavasik, mpd)" // {
+    enable = lib.mkOption {
+      type = lib.types.bool;
       default = true;
+      description = "Enable audio visualization and management (cava, cavasik, mpd)";
     };
   };
 

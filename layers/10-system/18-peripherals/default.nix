@@ -22,11 +22,7 @@ in
   ];
 
   options.layers.layer-10.system.peripherals = {
-    enable = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Master enable toggle for all physical hardware peripherals";
-    };
+    enable = lib.mkEnableOption "all physical hardware peripherals";
 
     controllers = {
       enable = lib.mkOption {

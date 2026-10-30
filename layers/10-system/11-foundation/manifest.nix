@@ -1,7 +1,7 @@
 { lib, config, ... }:
 {
   options.layers.manifest = lib.mkOption {
-    type = lib.types.attrs;
+    type = lib.types.attrsOf lib.types.anything;
     readOnly = true;
     default = {
       system = {

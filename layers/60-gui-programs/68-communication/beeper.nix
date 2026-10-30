@@ -51,11 +51,7 @@ in
       description = "Beeper Desktop local API & MCP port (default: 23373).";
     };
 
-    autostart = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Start Beeper in the background on graphical desktop login.";
-    };
+    autostart = lib.mkEnableOption "starting Beeper in the background on graphical desktop login";
   };
 
   config = lib.mkIf (commEnabled && cfg.enable) {

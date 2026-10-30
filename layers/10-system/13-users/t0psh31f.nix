@@ -1,7 +1,6 @@
 # flake-parts/users/t0psh31f.nix
 {
   pkgs,
-  lib,
   config,
   inputs,
   ...

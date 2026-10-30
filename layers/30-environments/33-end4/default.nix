@@ -11,11 +11,7 @@ let
 in
 {
   options.layers.desktop.end4 = {
-    enable = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Enable end-4 Hyprland desktop experience adapter";
-    };
+    enable = lib.mkEnableOption "end-4 Hyprland desktop experience adapter";
   };
 
   # Skeleton adapter for end4-hyprland experience setup

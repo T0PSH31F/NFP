@@ -174,7 +174,7 @@ let
           };
 
           widget = mkOption {
-            type = types.nullOr types.attrs;
+            type = types.nullOr (types.attrsOf types.anything);
             default = null;
             description = "Optional Homepage widget configuration.";
           };

@@ -15,11 +15,7 @@ in
   ];
 
   options.layers.layer-60.gui.communication = {
-    enable = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Enable communication & messaging applications";
-    };
+    enable = lib.mkEnableOption "communication & messaging applications";
   };
 
   # Multi-class `home` key: mkDendriticModule routes this into

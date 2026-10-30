@@ -63,11 +63,7 @@ in
 
     # ── Equibop ─────────────────────────────────────────────────────────────
     equibop = {
-      enable = lib.mkOption {
-        type = lib.types.bool;
-        default = false;
-        description = "Enable Equibop — the Equicord-bundled Discord desktop client.";
-      };
+      enable = lib.mkEnableOption "Equibop — the Equicord-bundled Discord desktop client";
 
       package = lib.mkOption {
         type = lib.types.nullOr lib.types.package;
