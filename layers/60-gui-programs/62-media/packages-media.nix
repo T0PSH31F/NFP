@@ -3,7 +3,6 @@
   lib,
   pkgs,
   inputs,
-  osConfig ? config,
   ...
 }:
 let

@@ -1,5 +1,4 @@
-{ lib, ... }:
-{
+_: {
   imports = [
     ./cheatsheets.nix
     ./todo-system.nix

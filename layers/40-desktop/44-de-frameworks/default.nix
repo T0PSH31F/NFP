@@ -1,4 +1,4 @@
-{ lib, config, ... }:
+{ lib, ... }:
 {
   options.layers.layer-40.desktop.frameworks = {
     enable = lib.mkOption {

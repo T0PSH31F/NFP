@@ -16,7 +16,7 @@ in
   };
 
   home =
-    { config, osConfig, ... }:
+    { osConfig, ... }:
     lib.mkIf osConfig.layers.layer-60.gui.mpv.enable {
       xdg = {
         desktopEntries.mvi = {

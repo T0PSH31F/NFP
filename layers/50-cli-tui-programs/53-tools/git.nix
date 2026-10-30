@@ -10,7 +10,7 @@ let
 in
 {
   home =
-    { config, ... }:
+    _:
     lib.mkIf cfg.enable {
       programs = {
         delta = {

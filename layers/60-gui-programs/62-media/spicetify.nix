@@ -1,9 +1,7 @@
 {
   pkgs,
   lib,
-  config,
   inputs,
-  osConfig ? config,
   ...
 }:
 let
@@ -21,7 +19,7 @@ in
   };
 
   home =
-    { config, osConfig, ... }:
+    { osConfig, ... }:
     let
       spicePkgs = inputs.spicetify-nix.legacyPackages.${pkgs.stdenv.hostPlatform.system};
     in
