@@ -39,6 +39,7 @@
     "desktop"
     "workstation"
     "laptop"
+    "gaming"
     "development"
     "intel-13th-gen"
     "gpu-compute"
