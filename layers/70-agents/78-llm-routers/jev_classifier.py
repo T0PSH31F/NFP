@@ -258,6 +258,19 @@ def run_triage(event_text: str) -> dict:
     
     if res["verdict"] == "DISPATCH_AGENT":
         METRICS["dispatched_agents"] += 1
+        # Dispatch OnCallAgent for system errors/panics
+        if any(k in event_text.lower() for k in ("panic", "50", "exception", "error", "fail", "oom", "segfault")):
+            try:
+                repo_root = Path(__file__).resolve().parents[3]
+                oncall_script = repo_root / "layers/70-agents/71-harness/oncall_agent.py"
+                if oncall_script.exists():
+                    subprocess.Popen(
+                        [sys.executable, str(oncall_script), "--event", json.dumps({"service": "jev-triage", "error": event_text[:300], "severity": res.get("risk_level", "high")})],
+                        stdout=subprocess.DEVNULL,
+                        stderr=subprocess.DEVNULL
+                    )
+            except Exception:
+                pass
     elif res["verdict"] == "NOTIFY":
         METRICS["notifications"] += 1
 
@@ -365,10 +378,22 @@ class JevHandler(BaseHTTPRequestHandler):
                     self.end_headers()
                     self.wfile.write(resp_body)
             except Exception as e:
+                err_msg = f"Upstream ExtremeRouter unreachable: {e}"
+                try:
+                    repo_root = Path(__file__).resolve().parents[3]
+                    oncall_script = repo_root / "layers/70-agents/71-harness/oncall_agent.py"
+                    if oncall_script.exists():
+                        subprocess.Popen(
+                            [sys.executable, str(oncall_script), "--event", json.dumps({"service": "extreme-router", "error": err_msg, "severity": "high"})],
+                            stdout=subprocess.DEVNULL,
+                            stderr=subprocess.DEVNULL
+                        )
+                except Exception:
+                    pass
                 self.send_response(502)
                 self.send_header("Content-Type", "application/json")
                 self.end_headers()
-                self.wfile.write(json.dumps({"error": f"Upstream ExtremeRouter unreachable: {e}"}).encode("utf-8"))
+                self.wfile.write(json.dumps({"error": err_msg}).encode("utf-8"))
         else:
             self.send_response(404)
             self.end_headers()

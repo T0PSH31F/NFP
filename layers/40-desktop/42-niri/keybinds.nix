@@ -186,6 +186,18 @@ in
           "Mod+Shift+A" = {
             action = spawn "wlr-which-key" "agents";
           };
+          "Mod+V" = {
+            action = spawn "glados-ptt";
+          };
+          "Mod+Shift+V" = {
+            action = spawn "uwsm" "app" "--" "ghostty" "-e" "glados-voice" "--tui";
+          };
+          "Mod+N" = {
+            action = spawn "uwsm" "app" "--" "ghostty" "-e" "nvim" "/home/t0psh31f/Clan/NFP/tasklist.md";
+          };
+          "Mod+Shift+N" = {
+            action = spawn "nfp-task-watcher" "--once";
+          };
 
           # Monitor Movement (Parity with Hyprland binds)
           "Mod+Alt+H" = {

@@ -1,0 +1,16 @@
+{
+  "version": "1.0.0",
+  "last_updated": "2026-10-30T02:47:33.137753+00:00",
+  "topics": {
+    "ai_infrastructure": 1.8,
+    "nix_linux": 1.4,
+    "security_systems": 1.3,
+    "general_tech": 0.8,
+    "crypto_web3": 0.2
+  },
+  "content_types": {
+    "signal": 1.8,
+    "facts": 1.0,
+    "hype": 0.2
+  }
+}

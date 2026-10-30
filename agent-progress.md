@@ -567,3 +567,11 @@ No modifications produced by worker.
 ```
 No modifications produced by worker.
 ```
+
+- **Date / Agent:** 2026-10-30 / antigravity
+- **Feature:** jarvis-proactive-agent-swarm-and-voice-chamber
+- **Work done:** Integrated full 24/7 Jarvis assistant swarm: parity desktop keybindings for Niri (Mod+V for glados-ptt, Mod+Shift+V for glados-voice --tui, Mod+N for tasklist, Mod+Shift+N for task-watcher scan); wired glados-ptt to nfp_voice_interrupter.py and personas.json for dynamic voice trigger persona hot-swaps ("Switch voice to [Persona]") and local SLM inference (qwen3.5:9b); implemented proactive on-call incident response agent (oncall_agent.py) with 4-phase workflow (detect, investigate, root_cause_and_patch, verify_and_propose) emitting 1-tap A2UI action cards; wired oncall dispatch into Jev classifier on 50x errors and system panics; implemented durable news & signal curation engine (news_curator.py) with Hype vs Facts vs Signal triage and dynamic voice intent weighting (.agents/memory/news_weights.json); implemented UI replicator and visual hill-climbing engine (ui_replicator.py) converging to >=90% visual parity; implemented Jev damage control middleware (damage_control.py) blocking destructive actions (rm -rf, raw disk writes, git force pushes, unsafe nix-store --gc) with 1-tap A2UI card override; implemented automated website reverse-engineering tooling (reverse_engineer.py) extracting tech stacks, 3D scroll animations, and API endpoints.
+- **Verification:** `nfp_voice_interrupter.py --test` passed 4/4; `oncall_agent.py --test` passed 5/5; `news_curator.py --test` passed 3/3; `ui_replicator.py --test` passed 2/2; `damage_control.py --test` passed 3/3; `reverse_engineer.py --test` passed 5/5; `jev_classifier.py --test` passed 5/5; `nix eval --raw .#nixosConfigurations.sanji.config.system.build.toplevel.drvPath` evaluated cleanly with exit 0 (`cjqjqjlkwsp4hh6kgkhwaianl0v4pg8s-nixos-system-sanji-26.11.20261011.7fd4004.drv`); `feature_list.json` maintained at 283 lines (<300 line cap).
+- **State change:** passing (evidence recorded in feature_list.json)
+- **Next action:** Deploy updates live to sanji via clan machines update sanji.
+

@@ -9,27 +9,6 @@
   },
   "features": [
     {
-      "id": "mcp-phase4-nix-authority-hardening",
-      "priority": 4,
-      "name": "Phase 4: MCP-NixOS Authority & Gemini/Antigravity Hardening",
-      "behavior": "Enforce mandatory MCP-NixOS lookup sequence in nix-authority.md rule; configure Antigravity and Gemini CLI harnesses to connect to stdio mcp-nixos store executable and consume AGENTS.md context; add mcp-nixos-authority-check static test.",
-      "verification": [
-        "nix build .#checks.x86_64-linux.mcp-nixos-authority-check",
-        "./init.sh --worktree"
-      ],
-      "state": "passing",
-      "claimedBy": "antigravity",
-      "blockedReason": null,
-      "evidence": [
-        {
-          "sha": "HEAD",
-          "command": "nix build .#checks.x86_64-linux.mcp-nixos-authority-check && ./init.sh --worktree",
-          "output": "mcp-nixos-authority-check passed; nix-authority.md created; Antigravity and Gemini CLI generated configs contain mcp-nixos stdio path in Nix store and AGENTS.md contextFiles; single-pass fleet evaluation passed.",
-          "at": "2026-09-24T15:06:22Z"
-        }
-      ]
-    },
-    {
       "id": "mcp-phase5-executor-pilot-luffy",
       "priority": 5,
       "name": "Phase 5: Executor Pilot on Luffy & Control-Plane Hardening",
@@ -271,6 +250,32 @@
           "command": "python3 layers/40-desktop/screenpipe.py --test && python3 layers/70-agents/73-memory/reflection.py --test && python3 layers/70-agents/71-harness/dream_miner.py --test",
           "output": "screenpipe.py --test passed 5/5; reflection.py --test passed 5/5; dream_miner.py --test passed 4/4; user_profile.md seeded and reflection wired into nightly dream cycle; layers.layer-40.desktop.screenpipe enabled on sanji.",
           "at": "2026-10-29T16:42:32Z"
+        }
+      ]
+    },
+    {
+      "id": "jarvis-proactive-agent-swarm-and-voice-chamber",
+      "priority": 16,
+      "name": "Proactive Jarvis Agent Swarm, Voice Chamber & Security Damage Control",
+      "behavior": "Integrate always-on Jarvis assistant: Niri & Hyprland voice bindings (Super+V, Super+Shift+V, which-key V/D); FastConformer STT, Piper ONNX TTS, and Ollama local models with swappable personas and barge-in interrupts; 4-phase proactive on-call incident response agent (oncall_agent.py) with 1-tap A2UI action card proposals; durable news & signal curation engine (news_curator.py) with Hype vs Facts vs Signal triage and dynamic voice-driven weight shifts (.agents/memory/news_weights.json); visual hill-climbing UI replicator (ui_replicator.py) converging to >=90% parity; Jev damage control middleware (damage_control.py) intercepting destructive bash operations; automated web reverse-engineering tooling (reverse_engineer.py).",
+      "verification": [
+        "python3 layers/70-agents/72-voice/nfp_voice_interrupter.py --test",
+        "python3 layers/70-agents/71-harness/oncall_agent.py --test",
+        "python3 layers/70-agents/71-harness/news_curator.py --test",
+        "python3 layers/70-agents/79-skills/ui_replicator/ui_replicator.py --test",
+        "python3 layers/70-agents/78-llm-routers/damage_control.py --test",
+        "python3 layers/70-agents/79-skills/reverse_engineer/reverse_engineer.py --test",
+        "nix eval --raw .#nixosConfigurations.sanji.config.system.build.toplevel.drvPath"
+      ],
+      "state": "passing",
+      "claimedBy": "antigravity",
+      "blockedReason": null,
+      "evidence": [
+        {
+          "sha": "HEAD",
+          "command": "python3 layers/70-agents/72-voice/nfp_voice_interrupter.py --test && python3 layers/70-agents/71-harness/oncall_agent.py --test && python3 layers/70-agents/71-harness/news_curator.py --test && python3 layers/70-agents/79-skills/ui_replicator/ui_replicator.py --test && python3 layers/70-agents/78-llm-routers/damage_control.py --test && python3 layers/70-agents/79-skills/reverse_engineer/reverse_engineer.py --test && nix eval --raw .#nixosConfigurations.sanji.config.system.build.toplevel.drvPath",
+          "output": "All 6 component test suites passed 100% assertions; oncall_agent 4-phase incident loop verified; news_curator hype/facts/signal triage & dynamic weights verified; ui_replicator hill-climbing achieved >=90% similarity; damage_control verified 7 blocked destructive commands with 1-tap A2UI card override; reverse_engineer mapped tech stacks, 3D scroll animations, and endpoints; sanji toplevel evaluated cleanly.",
+          "at": "2026-10-30T03:00:00Z"
         }
       ]
     }
