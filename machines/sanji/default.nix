@@ -56,9 +56,11 @@
     layer-10.system = {
       hardware.kernel = "zen";
       mobile.android.enable = true;
-      config.impermanence.enable = true;
-      config.nas-mount.enable = false;
-      config.nas-mounts.enable = true;
+      config = {
+        impermanence.enable = true;
+        nas-mount.enable = false;
+        nas-mounts.enable = true;
+      };
       virtualization.enable = true;
       sessionResilience.enable = true;
     };
