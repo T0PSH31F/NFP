@@ -30,11 +30,13 @@
     # ── Core Flake Tools & Clan ──────────────────────────────────
     clan-core = {
       url = "git+https://git.clan.lol/clan/clan-core";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-parts.follows = "flake-parts";
-      inputs.sops-nix.follows = "sops-nix";
-      inputs.disko.follows = "disko";
-      inputs.systems.follows = "systems";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        flake-parts.follows = "flake-parts";
+        sops-nix.follows = "sops-nix";
+        disko.follows = "disko";
+        systems.follows = "systems";
+      };
     };
     disko = {
       url = "github:nix-community/disko";
@@ -55,8 +57,10 @@
     };
     impermanence = {
       url = "github:nix-community/impermanence";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.home-manager.follows = "home-manager";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        home-manager.follows = "home-manager";
+      };
     };
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
@@ -94,8 +98,10 @@
     };
     spicetify-nix = {
       url = "github:Gerg-L/spicetify-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.systems.follows = "systems";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        systems.follows = "systems";
+      };
     };
     vicinae = {
       url = "github:vicinaehq/vicinae";
@@ -103,8 +109,10 @@
     };
     vicinae-extensions = {
       url = "github:vicinaehq/extensions";
-      inputs.vicinae.follows = "vicinae";
-      inputs.systems.follows = "systems";
+      inputs = {
+        vicinae.follows = "vicinae";
+        systems.follows = "systems";
+      };
     };
 
     zjstatus = {
@@ -121,8 +129,10 @@
     nixarchy = {
       # Omarchy 4.x vendored for NixOS (upstream tree as a derivation)
       url = "github:olafkfreund/nixarchy";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.home-manager.follows = "home-manager";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        home-manager.follows = "home-manager";
+      };
     };
     quickshell-rise = {
       # Quickshell Rise (HANCORE) modular bar with live-wire particle stream
@@ -133,9 +143,11 @@
     # ── AI & Agents ────────────────────────────────────────────
     camoufox-nix = {
       url = "github:maximoffua/camoufox-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-parts.follows = "flake-parts";
-      inputs.systems.follows = "systems";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        flake-parts.follows = "flake-parts";
+        systems.follows = "systems";
+      };
     };
     hermes-agent = {
       url = "github:NousResearch/hermes-agent";
@@ -155,9 +167,11 @@
       # with no cache hit (they are 404 on cache.nixos.org too, so "from scratch"
       # is the only option). Keep this decoupled; see caches.nix for the
       # substituter + trusted key, which are already configured system-wide.
-      inputs.flake-parts.follows = "flake-parts";
-      inputs.treefmt-nix.follows = "clan-core/treefmt-nix";
-      inputs.systems.follows = "systems";
+      inputs = {
+        flake-parts.follows = "flake-parts";
+        treefmt-nix.follows = "clan-core/treefmt-nix";
+        systems.follows = "systems";
+      };
     };
     nixos-passthru-cache = {
       url = "github:numtide/nixos-passthru-cache";
@@ -169,21 +183,27 @@
     };
     polyfloor = {
       url = "github:T0PSH31F/Polyfloor";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-parts.follows = "flake-parts";
-      inputs.systems.follows = "systems";
-      inputs.clan-core.follows = "clan-core";
-      inputs.sops-nix.follows = "sops-nix";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        flake-parts.follows = "flake-parts";
+        systems.follows = "systems";
+        clan-core.follows = "clan-core";
+        sops-nix.follows = "sops-nix";
+      };
     };
     lxconnect = {
       url = "github:olafkfreund/lxconnect";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-utils.follows = "flake-utils";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        flake-utils.follows = "flake-utils";
+      };
     };
     nix-skills = {
       url = "github:olafkfreund/nix-skills";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.home-manager.follows = "home-manager";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        home-manager.follows = "home-manager";
+      };
     };
 
     hister = {
@@ -194,14 +214,18 @@
     # ── Services & Utilities ───────────────────────────────────
     jerry = {
       url = "github:justchokingaround/jerry";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.systems.follows = "systems";
-      inputs.flake-parts.follows = "flake-parts";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        systems.follows = "systems";
+        flake-parts.follows = "flake-parts";
+      };
     };
     lobster = {
       url = "github:justchokingaround/lobster";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.systems.follows = "systems";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        systems.follows = "systems";
+      };
     };
     luffy = {
       url = "github:DemonKingSwarn/luffy";
