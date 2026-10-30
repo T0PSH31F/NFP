@@ -2,8 +2,6 @@
   name = "ai-services-test";
   nodes.machine =
     {
-      config,
-      pkgs,
       lib,
       ...
     }:

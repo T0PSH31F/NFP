@@ -1,15 +1,10 @@
 # Fleet Healthcheck NixOS VM Test
 # Asserts fleet-healthcheck passes when contract services are up and fails when a service is stopped.
-{
-  pkgs ? import <nixpkgs> { },
-}:
-{
+_: {
   name = "fleet-healthcheck-test";
 
   nodes.machine =
     {
-      config,
-      lib,
       pkgs,
       ...
     }:

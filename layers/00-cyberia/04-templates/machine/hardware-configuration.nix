@@ -5,14 +5,7 @@
 #
 # Or use clan's facter for automatic hardware detection:
 #   clan facts generate <machine-name>
-{
-  config,
-  lib,
-  pkgs,
-  modulesPath,
-  ...
-}:
-{
+_: {
   imports = [ ];
 
   # This is a placeholder. Replace with actual hardware configuration!

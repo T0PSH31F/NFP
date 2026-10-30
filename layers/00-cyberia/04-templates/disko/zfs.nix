@@ -1,8 +1,7 @@
 # ZFS Disko Template
 # Designed for servers: NAS, FTP, Web Servers
 # Features: LUKS encryption, ZFS with datasets, snapshots
-{ config, ... }:
-{
+_: {
   disko.devices = {
     disk.main = {
       type = "disk";

@@ -8,9 +8,7 @@
     # luffy is AdGuard resolver host (100.64.0.3) + Headscale authority
     luffy =
       {
-        config,
         pkgs,
-        lib,
         ...
       }:
       {

@@ -1,7 +1,7 @@
 # Test: GUI hosts get coherent desktop bundle, server-only hosts get experience none
 {
   name = "luffy-desktop-bundle";
-  nodes.machine = { config, lib, ... }: {
+  nodes.machine = { lib, ... }: {
     imports = [
       ../../90-profiles/tags/desktop.nix
       ../../40-desktop/43-experiences/43.0-selector.nix

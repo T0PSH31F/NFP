@@ -2,7 +2,7 @@
 {
   name = "n8n-test";
   nodes.machine =
-    { config, lib, ... }:
+    { lib, ... }:
     {
       imports = [
         ../../20-services/27-automation/n8n.nix

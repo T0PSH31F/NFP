@@ -9,8 +9,6 @@
 
   nodes.machine =
     {
-      config,
-      pkgs,
       lib,
       ...
     }:

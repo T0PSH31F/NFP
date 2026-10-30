@@ -1,8 +1,7 @@
 # Test: luffy service scope & netdata card default policy
 {
-  pkgs ? import <nixpkgs> { },
-  lib ? pkgs.lib,
   nixosConfigurations ? { },
+  ...
 }:
 let
   luffyConfig = nixosConfigurations.luffy.config or { };

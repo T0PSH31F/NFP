@@ -1,5 +1,5 @@
 # Structural check: homepage dashboard service ports registration check
-{ pkgs, lib }:
+{ pkgs, ... }:
 pkgs.runCommand "check-homepage-links"
   {
     nativeBuildInputs = [ pkgs.gnugrep ];

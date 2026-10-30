@@ -1,20 +1,14 @@
 {
   name = "services-test";
-  nodes.machine =
-    {
-      config,
-      pkgs,
-      ...
-    }:
-    {
-      # Don't import services module - it has complex dependencies
-      # Just test basic system services that work in isolation
+  nodes.machine = _: {
+    # Don't import services module - it has complex dependencies
+    # Just test basic system services that work in isolation
 
-      services.openssh.enable = true;
+    services.openssh.enable = true;
 
-      # Systemd / config basics
-      system.stateVersion = "25.05";
-    };
+    # Systemd / config basics
+    system.stateVersion = "25.05";
+  };
 
   testScript = ''
     start_all()

@@ -4,7 +4,6 @@
 # Run with: nix build .#checks.x86_64-linux.themes
 {
   pkgs,
-  lib,
   ...
 }:
 let

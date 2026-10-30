@@ -3,30 +3,23 @@
 {
   name = "jellyfin-test";
 
-  nodes.machine =
-    {
-      config,
-      pkgs,
-      lib,
-      ...
-    }:
-    {
-      services.jellyfin = {
-        enable = true;
-        openFirewall = true;
-      };
-
-      # Media library dirs (nixarr convention)
-      systemd.tmpfiles.rules = [
-        "d /data/media/library/music 0755 - - -"
-        "d /data/media/library/movies 0755 - - -"
-        "d /data/media/library/shows 0755 - - -"
-      ];
-
-      virtualisation.diskSize = 8192; # MiB — Jellyfin 10.11 requires 2GiB free in /var/lib
-
-      system.stateVersion = "25.05";
+  nodes.machine = _: {
+    services.jellyfin = {
+      enable = true;
+      openFirewall = true;
     };
+
+    # Media library dirs (nixarr convention)
+    systemd.tmpfiles.rules = [
+      "d /data/media/library/music 0755 - - -"
+      "d /data/media/library/movies 0755 - - -"
+      "d /data/media/library/shows 0755 - - -"
+    ];
+
+    virtualisation.diskSize = 8192; # MiB — Jellyfin 10.11 requires 2GiB free in /var/lib
+
+    system.stateVersion = "25.05";
+  };
 
   testScript = ''
     start_all()
