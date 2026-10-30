@@ -19,6 +19,7 @@ in
       pkgs.deluge
       pkgs.ffmpeg
       pkgs.jellyfin-desktop
+      pkgs.anilibria-winmaclinux
       pkgs.orca
       pkgs.pirate-get
       pkgs.peerflix-server

@@ -128,13 +128,18 @@ in
         ];
         config = {
           profile = "gpu-hq";
-          vo = "gpu";
+          vo = "gpu-next";
+          gpu-api = "auto";
           hwdec = "auto-safe";
           force-window = "yes";
           keep-open = "yes";
           osc = "no";
           osd-bar = "no";
           border = "no";
+          # Wayland low-latency & smooth presentation
+          video-sync = "display-resample";
+          interpolation = "yes";
+          tscale = "oversample";
         };
         defaultProfiles = [ "gpu-hq" ];
       };

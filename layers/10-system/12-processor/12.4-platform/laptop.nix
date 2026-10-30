@@ -19,6 +19,10 @@ in
       udev.extraRules = ''
         ACTION=="add", SUBSYSTEM=="pci", ATTR{vendor}=="0x8086", ATTR{class}=="0x0c0330", ATTR{power/control}="on"
         ACTION=="add", SUBSYSTEM=="typec", ATTR{power/control}="on"
+
+        # Automated Power Profile Switching on AC vs Battery (Dell Ultra Performance on AC)
+        SUBSYSTEM=="power_supply", ATTR{type}=="Mains", ATTR{online}=="1", RUN+="${pkgs.power-profiles-daemon}/bin/powerprofilesctl set performance"
+        SUBSYSTEM=="power_supply", ATTR{type}=="Mains", ATTR{online}=="0", RUN+="${pkgs.power-profiles-daemon}/bin/powerprofilesctl set balanced"
       '';
       libinput = {
         enable = lib.mkDefault true;

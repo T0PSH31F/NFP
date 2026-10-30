@@ -75,22 +75,24 @@ in
         # IPC injection — Umbriel uses the same noctalia msg IPC as Hyprland
         wayland.windowManager.hyprland.settings."$ipc" = lib.mkForce "noctalia msg";
 
-        xdg.configFile."umbriel/config.toml".text = osConfig.environment.etc."xdg/umbriel/config.toml".text;
+        xdg.configFile = {
+          "umbriel/config.toml".text = osConfig.environment.etc."xdg/umbriel/config.toml".text;
 
-        xdg.configFile."uwsm/env-umbriel".text = ''
-          export XDG_CURRENT_DESKTOP=Umbriel
-          export XDG_SESSION_TYPE=wayland
-          export XDG_SESSION_DESKTOP=Umbriel
-          export WLR_NO_HARDWARE_CURSORS=1
-          export WLR_DRM_DEVICES=/dev/dri/card1:/dev/dri/card0
-        '';
-
-        xdg.configFile."hypr/experiences/wallpaper-hook.sh" = {
-          executable = true;
-          text = ''
-            #!/usr/bin/env bash
-            noctalia msg wallpaper-set "$1" 2>/dev/null || true
+          "uwsm/env-umbriel".text = ''
+            export XDG_CURRENT_DESKTOP=Umbriel
+            export XDG_SESSION_TYPE=wayland
+            export XDG_SESSION_DESKTOP=Umbriel
+            export WLR_NO_HARDWARE_CURSORS=1
+            export WLR_DRM_DEVICES=/dev/dri/card1:/dev/dri/card0
           '';
+
+          "hypr/experiences/wallpaper-hook.sh" = {
+            executable = true;
+            text = ''
+              #!/usr/bin/env bash
+              noctalia msg wallpaper-set "$1" 2>/dev/null || true
+            '';
+          };
         };
       };
     };

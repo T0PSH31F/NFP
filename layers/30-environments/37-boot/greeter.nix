@@ -115,50 +115,54 @@ in
     lib.mkMerge [
       # ── Noctalia Greeter ──────────────────────────────────────────────
       (mkIf (cfg.type == "noctalia-greeter") {
-        users.users.greeter = {
-          isSystemUser = true;
-          group = "greeter";
-          extraGroups = [
-            "video"
-            "render"
-            "input"
-            "tty"
-            "seat"
-          ];
-        };
-        users.groups.greeter = { };
-
-        services.seatd = {
-          enable = true;
-          group = "video";
-        };
-
-        services.greetd.settings.default_session.user = "greeter";
-
-        services.displayManager.noctalia-greeter = {
-          enable = true;
-          package = (pkgs.callPackage "${inputs.noctalia-greeter}/nix/package.nix" { }).overrideAttrs (old: {
-            nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ pkgs.linuxHeaders ];
-            buildInputs = (old.buildInputs or [ ]) ++ [
-              pkgs.linuxHeaders
-              pkgs.util-linux.lib
-              (lib.getLib pkgs.libselinux)
+        users = {
+          users.greeter = {
+            isSystemUser = true;
+            group = "greeter";
+            extraGroups = [
+              "video"
+              "render"
+              "input"
+              "tty"
+              "seat"
             ];
-          });
-          greeter-args = "--session ${cfg.noctalia-greeter.session}";
-          settings = {
-            cursor = {
-              theme = config.layers.layer-30.theming.cursor.theme or "Bibata-Rainbow-Modern";
-              size = config.layers.layer-30.theming.cursor.size or 24;
-              path = "/run/current-system/sw/share/icons";
-            };
-            keyboard = {
-              layout = "us";
-            };
-            appearance = {
-              password_style = "random";
-              wallpaper = {
-                path = "${../../00-cyberia/02-assets/sddm_background/thousand-sunny-poster.png}";
+          };
+          groups.greeter = { };
+        };
+
+        services = {
+          seatd = {
+            enable = true;
+            group = "video";
+          };
+
+          greetd.settings.default_session.user = "greeter";
+
+          displayManager.noctalia-greeter = {
+            enable = true;
+            package = (pkgs.callPackage "${inputs.noctalia-greeter}/nix/package.nix" { }).overrideAttrs (old: {
+              nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ pkgs.linuxHeaders ];
+              buildInputs = (old.buildInputs or [ ]) ++ [
+                pkgs.linuxHeaders
+                pkgs.util-linux.lib
+                (lib.getLib pkgs.libselinux)
+              ];
+            });
+            greeter-args = "--session ${cfg.noctalia-greeter.session}";
+            settings = {
+              cursor = {
+                theme = config.layers.layer-30.theming.cursor.theme or "Bibata-Rainbow-Modern";
+                size = config.layers.layer-30.theming.cursor.size or 24;
+                path = "/run/current-system/sw/share/icons";
+              };
+              keyboard = {
+                layout = "us";
+              };
+              appearance = {
+                password_style = "random";
+                wallpaper = {
+                  path = "${../../00-cyberia/02-assets/sddm_background/thousand-sunny-poster.png}";
+                };
               };
             };
           };

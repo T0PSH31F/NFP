@@ -121,86 +121,90 @@ in
           ];
     };
 
-    # Directory and symlink management
-    systemd.tmpfiles.rules = [
-      "d ${cfg.mountPoint} 0775 root 100 - -"
-      "d ${cfg.backupDir} 0775 1000 100 - -"
-      "L+ /mnt/NAS - - - - ${cfg.mountPoint}"
-      "L+ ${config.users.users.t0psh31f.home}/NAS - - - - ${cfg.mountPoint}"
-    ];
-
     # Deploy system-wide litestream configuration
     environment.etc."litestream.yml".source = litestreamConfigFile;
 
-    # Continuous SQLite WAL streaming daemon with recovery auto-pull on startup
-    systemd.services.nfp-pi-durable-litestream = mkIf cfg.enableLitestream {
-      description = "Litestream SQLite Live Replication Daemon for Pi Durable State";
-      wantedBy = [ "multi-user.target" ];
-      after = [
-        "network.target"
-        "mnt-nas.mount"
+    # Directory and symlink management & background sync daemons
+    systemd = {
+      tmpfiles.rules = [
+        "d ${cfg.mountPoint} 0775 root 100 - -"
+        "d ${cfg.backupDir} 0775 1000 100 - -"
+        "L+ /mnt/NAS - - - - ${cfg.mountPoint}"
+        "L+ ${config.users.users.t0psh31f.home}/NAS - - - - ${cfg.mountPoint}"
       ];
-      wants = [ "network.target" ];
 
-      serviceConfig = {
-        User = "t0psh31f";
-        Group = "users";
-        Restart = "always";
-        RestartSec = "10s";
-        # Auto-pull recovery if local state is missing
-        ExecStartPre = pkgs.writeShellScript "litestream-prestart" ''
-          set -euo pipefail
-          DB="${cfg.sqliteDbPath}"
-          REPLICA="${cfg.backupDir}/state.db"
-          DIR="$(dirname "$DB")"
-          mkdir -p "$DIR"
+      services = {
+        # Continuous SQLite WAL streaming daemon with recovery auto-pull on startup
+        nfp-pi-durable-litestream = mkIf cfg.enableLitestream {
+          description = "Litestream SQLite Live Replication Daemon for Pi Durable State";
+          wantedBy = [ "multi-user.target" ];
+          after = [
+            "network.target"
+            "mnt-nas.mount"
+          ];
+          wants = [ "network.target" ];
 
-          if [ ! -f "$DB" ] && [ -d "$REPLICA" ]; then
-            echo "[Litestream] Local database missing; performing recovery auto-pull from $REPLICA..."
-            ${pkgs.litestream}/bin/litestream restore -if-replica-exists -config /etc/litestream.yml "$DB" || true
-          fi
-        '';
-        ExecStart = "${pkgs.litestream}/bin/litestream replicate -config /etc/litestream.yml -restore-if-db-not-exists";
+          serviceConfig = {
+            User = "t0psh31f";
+            Group = "users";
+            Restart = "always";
+            RestartSec = "10s";
+            # Auto-pull recovery if local state is missing
+            ExecStartPre = pkgs.writeShellScript "litestream-prestart" ''
+              set -euo pipefail
+              DB="${cfg.sqliteDbPath}"
+              REPLICA="${cfg.backupDir}/state.db"
+              DIR="$(dirname "$DB")"
+              mkdir -p "$DIR"
+
+              if [ ! -f "$DB" ] && [ -d "$REPLICA" ]; then
+                echo "[Litestream] Local database missing; performing recovery auto-pull from $REPLICA..."
+                ${pkgs.litestream}/bin/litestream restore -if-replica-exists -config /etc/litestream.yml "$DB" || true
+              fi
+            '';
+            ExecStart = "${pkgs.litestream}/bin/litestream replicate -config /etc/litestream.yml -restore-if-db-not-exists";
+          };
+        };
+
+        # Periodic snapshot sync timer for offline / reboot survival
+        nfp-pi-durable-nas-snapshot = mkIf cfg.enableLitestream {
+          description = "Periodic SQLite Snapshot Sync to NAS Backup Directory";
+          after = [
+            "network.target"
+            "mnt-nas.mount"
+          ];
+          serviceConfig = {
+            Type = "oneshot";
+            User = "t0psh31f";
+            Group = "users";
+            ExecStart = pkgs.writeShellScript "nas-snapshot-sync" ''
+              set -euo pipefail
+              DB="${cfg.sqliteDbPath}"
+              TARGET_DIR="${cfg.backupDir}"
+
+              # Gracefully exit 0 if mount is currently unreachable or offline
+              if [ ! -d "$TARGET_DIR" ]; then
+                echo "[SnapshotSync] NAS backup directory $TARGET_DIR not accessible, skipping."
+                exit 0
+              fi
+
+              if [ -f "$DB" ]; then
+                echo "[SnapshotSync] Syncing Litestream force-snapshot to $TARGET_DIR..."
+                ${pkgs.litestream}/bin/litestream replicate -config /etc/litestream.yml -once -force-snapshot || true
+              fi
+            '';
+          };
+        };
       };
-    };
 
-    # Periodic snapshot sync timer for offline / reboot survival
-    systemd.services.nfp-pi-durable-nas-snapshot = mkIf cfg.enableLitestream {
-      description = "Periodic SQLite Snapshot Sync to NAS Backup Directory";
-      after = [
-        "network.target"
-        "mnt-nas.mount"
-      ];
-      serviceConfig = {
-        Type = "oneshot";
-        User = "t0psh31f";
-        Group = "users";
-        ExecStart = pkgs.writeShellScript "nas-snapshot-sync" ''
-          set -euo pipefail
-          DB="${cfg.sqliteDbPath}"
-          TARGET_DIR="${cfg.backupDir}"
-
-          # Gracefully exit 0 if mount is currently unreachable or offline
-          if [ ! -d "$TARGET_DIR" ]; then
-            echo "[SnapshotSync] NAS backup directory $TARGET_DIR not accessible, skipping."
-            exit 0
-          fi
-
-          if [ -f "$DB" ]; then
-            echo "[SnapshotSync] Syncing Litestream force-snapshot to $TARGET_DIR..."
-            ${pkgs.litestream}/bin/litestream replicate -config /etc/litestream.yml -once -force-snapshot || true
-          fi
-        '';
-      };
-    };
-
-    systemd.timers.nfp-pi-durable-nas-snapshot = mkIf cfg.enableLitestream {
-      description = "Periodic SQLite Snapshot Sync to NAS Timer";
-      wantedBy = [ "timers.target" ];
-      timerConfig = {
-        OnBootSec = "5m";
-        OnUnitActiveSec = "15m";
-        Persistent = true;
+      timers.nfp-pi-durable-nas-snapshot = mkIf cfg.enableLitestream {
+        description = "Periodic SQLite Snapshot Sync to NAS Timer";
+        wantedBy = [ "timers.target" ];
+        timerConfig = {
+          OnBootSec = "5m";
+          OnUnitActiveSec = "15m";
+          Persistent = true;
+        };
       };
     };
   };

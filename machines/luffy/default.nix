@@ -55,7 +55,6 @@ in
   # 01 - MACHINE IDENTITY
   # ============================================================================
   networking.hostName = "luffy";
-  system.stateVersion = "25.05";
 
   # Memory services run here (brain-service, Honcho, GNO) — see layers/90-profiles/tags/pkb-node.nix
   machine.tags = [
@@ -67,15 +66,6 @@ in
 
   # Headscale: migrated DB from nami; reachable via LAN + tailnet.
   # enable + serverUrl set in services block below (mkForce true).
-
-  # Honcho postgres password from sops. The template file is read by the module
-  # at runtime via databaseUrlFile (kept out of the nix store).
-  sops.templates."honcho-database-url".content = ''
-    DATABASE_URL=postgresql://honcho:${
-      config.sops.placeholder."postgres-password"
-    }@host.containers.internal:5432/honcho
-  '';
-  services.honcho.databaseUrlFile = config.sops.templates."honcho-database-url".path;
 
   nixpkgs.config.allowUnfree = true;
 
@@ -115,10 +105,6 @@ in
     };
   };
   layers.layer-20.services.config.your-spotify.enable = true;
-  services.searxng.enable = true;
-  services.calibre-web-app.enable = true;
-  services.jev-engine.enable = true;
-  services.wyoming-services.enable = true;
   layers.layer-76.hermes-live-voice.enable = true;
   layers.layer-78.llm-routers.jev-router-plugin = {
     enable = true;
@@ -127,8 +113,6 @@ in
     openFirewall = false;
     upstreamRouterUrl = "http://100.64.0.1:20128";
   };
-  services.lead-triage-webhook.enable = true;
-  services.ad-hook-miner.enable = true;
   layers.layer-20.services.config.nixarr-stack.enable = true;
   layers.layer-20.services.config.jackett.enable = true;
   layers.layer-20.services.config.netdata.enable = true;
@@ -138,9 +122,6 @@ in
     client.enable = true;
     server.enable = true;
   };
-  # RustDesk relay: use Tailnet MagicDNS name so it resolves over Headscale
-  # regardless of luffy's current LAN IP (avoids 192.168.1.54 hardcode).
-  services.rustdesk-server.signal.relayHosts = [ "luffy.nfp.nix" ];
 
   # Desktop experience: owned by tag/profile architecture.
   # luffy is hybrid server+desktop: desktop tag enables base Hyprland/Noctalia
@@ -201,6 +182,15 @@ in
   # 03 - SERVICE SPECIFICS & OVERRIDES (Layer 20)
   # ============================================================================
   services = {
+    honcho.databaseUrlFile = config.sops.templates."honcho-database-url".path;
+    searxng.enable = true;
+    calibre-web-app.enable = true;
+    jev-engine.enable = true;
+    wyoming-services.enable = true;
+    lead-triage-webhook.enable = true;
+    ad-hook-miner.enable = true;
+    rustdesk-server.signal.relayHosts = [ "luffy.nfp.nix" ];
+
     # Headscale moved BACK to luffy (2026-09-15) — was on nami, unreachable behind Alibaba SG
     headscale-server = {
       enable = lib.mkForce true;
@@ -335,140 +325,180 @@ in
       globalConfig = ''
         email admin@lovelain.duckdns.org
       '';
-      virtualHosts."lovelain.duckdns.org" = {
-        useACMEHost = "lovelain.duckdns.org";
-        extraConfig = ''
-          encode zstd gzip
-          header Strict-Transport-Security "max-age=31536000; includeSubDomains"
-          reverse_proxy localhost:3007
-        '';
-      };
-      virtualHosts."*.lovelain.duckdns.org" = {
-        useACMEHost = "lovelain.duckdns.org";
-        extraConfig = ''
-          encode zstd gzip
-          header Strict-Transport-Security "max-age=31536000; includeSubDomains"
+      virtualHosts = {
+        "lovelain.duckdns.org" = {
+          useACMEHost = "lovelain.duckdns.org";
+          extraConfig = ''
+            encode zstd gzip
+            header Strict-Transport-Security "max-age=31536000; includeSubDomains"
+            reverse_proxy localhost:3007
+          '';
+        };
+        "*.lovelain.duckdns.org" = {
+          useACMEHost = "lovelain.duckdns.org";
+          extraConfig = ''
+            encode zstd gzip
+            header Strict-Transport-Security "max-age=31536000; includeSubDomains"
 
-          @crawl4ai host crawl4ai.lovelain.duckdns.org
-          handle @crawl4ai { reverse_proxy localhost:32775 }
+            @crawl4ai host crawl4ai.lovelain.duckdns.org
+            handle @crawl4ai { reverse_proxy localhost:32775 }
 
-          @skyvernui host skyvern.lovelain.duckdns.org
-          handle @skyvernui { reverse_proxy localhost:32776 }
+            @skyvernui host skyvern.lovelain.duckdns.org
+            handle @skyvernui { reverse_proxy localhost:32776 }
 
-          @skyvernapi host skyvernapi.lovelain.duckdns.org
-          handle @skyvernapi { reverse_proxy localhost:32779 }
+            @skyvernapi host skyvernapi.lovelain.duckdns.org
+            handle @skyvernapi { reverse_proxy localhost:32779 }
 
-          @skyvernchrome host skyvernchrome.lovelain.duckdns.org
-          handle @skyvernchrome { reverse_proxy localhost:32780 }
+            @skyvernchrome host skyvernchrome.lovelain.duckdns.org
+            handle @skyvernchrome { reverse_proxy localhost:32780 }
 
-          @simstudio host simstudio.lovelain.duckdns.org
-          handle @simstudio { reverse_proxy localhost:32790 }
+            @simstudio host simstudio.lovelain.duckdns.org
+            handle @simstudio { reverse_proxy localhost:32790 }
 
-          @simstudiort host simstudiort.lovelain.duckdns.org
-          handle @simstudiort { reverse_proxy localhost:32789 }
+            @simstudiort host simstudiort.lovelain.duckdns.org
+            handle @simstudiort { reverse_proxy localhost:32789 }
 
-          @spacedrive host spacedrive.lovelain.duckdns.org
-          handle @spacedrive { reverse_proxy localhost:32768 }
+            @spacedrive host spacedrive.lovelain.duckdns.org
+            handle @spacedrive { reverse_proxy localhost:32768 }
 
-          @spacedriveapi host spacedriveapi.lovelain.duckdns.org
-          handle @spacedriveapi { reverse_proxy localhost:32769 }
+            @spacedriveapi host spacedriveapi.lovelain.duckdns.org
+            handle @spacedriveapi { reverse_proxy localhost:32769 }
 
-          @vault host vault.lovelain.duckdns.org
-          handle @vault { reverse_proxy localhost:8222 }
+            @vault host vault.lovelain.duckdns.org
+            handle @vault { reverse_proxy localhost:8222 }
 
-          @kavita host kavita.lovelain.duckdns.org
-          handle @kavita { reverse_proxy localhost:5000 }
+            @kavita host kavita.lovelain.duckdns.org
+            handle @kavita { reverse_proxy localhost:5000 }
 
-          # Headscale now on luffy (tailnet authority luffy.nfp.nix:8086). Public Caddy route remains on lovelain.
-          @headscale host headscale.lovelain.duckdns.org
-          handle @headscale { reverse_proxy localhost:8086 }
+            # Headscale now on luffy (tailnet authority luffy.nfp.nix:8086). Public Caddy route remains on lovelain.
+            @headscale host headscale.lovelain.duckdns.org
+            handle @headscale { reverse_proxy localhost:8086 }
 
-          @chat host chat.lovelain.duckdns.org
-          handle @chat { reverse_proxy localhost:3004 }
+            @chat host chat.lovelain.duckdns.org
+            handle @chat { reverse_proxy localhost:3004 }
 
-          @beszel host beszel.lovelain.duckdns.org
-          # handle @beszel { reverse_proxy localhost:32772 }  # removed — beszel dropped
+            @beszel host beszel.lovelain.duckdns.org
+            # handle @beszel { reverse_proxy localhost:32772 }  # removed — beszel dropped
 
-          @adguard host adguard.lovelain.duckdns.org
-          handle @adguard { reverse_proxy localhost:3002 }
+            @adguard host adguard.lovelain.duckdns.org
+            handle @adguard { reverse_proxy localhost:3002 }
 
-          @openclaw host openclaw.lovelain.duckdns.org
-          handle @openclaw { reverse_proxy localhost:59879 }
+            @openclaw host openclaw.lovelain.duckdns.org
+            handle @openclaw { reverse_proxy localhost:59879 }
 
-          @n8n host n8n.lovelain.duckdns.org
-          handle @n8n { reverse_proxy localhost:5678 }
+            @n8n host n8n.lovelain.duckdns.org
+            handle @n8n { reverse_proxy localhost:5678 }
 
-          @komga host komga.lovelain.duckdns.org
-          # handle @komga { reverse_proxy localhost:25600 }  # removed — komga dropped
+            @komga host komga.lovelain.duckdns.org
+            # handle @komga { reverse_proxy localhost:25600 }  # removed — komga dropped
 
-          @spotify host spotify.lovelain.duckdns.org
-          handle @spotify { reverse_proxy localhost:3457 }
+            @spotify host spotify.lovelain.duckdns.org
+            handle @spotify { reverse_proxy localhost:3457 }
 
-          @missionctrl host mission-control.lovelain.duckdns.org
-          handle @missionctrl { reverse_proxy http://47.254.90.69:3099 }
-        '';
-      };
-      virtualHosts."element.local" = {
-        extraConfig = ''
-          root * ${elementWebPkg}
-          file_server
-          @noext not path *.html *.js *.css *.png *.svg *.ico *.json *.webp
-          handle @noext {
-            try_files {path} /index.html
+            @missionctrl host mission-control.lovelain.duckdns.org
+            handle @missionctrl { reverse_proxy http://47.254.90.69:3099 }
+          '';
+        };
+        "element.local" = {
+          extraConfig = ''
+            root * ${elementWebPkg}
             file_server
-          }
-        '';
-      };
-      virtualHosts."element.lovelain.duckdns.org" = {
-        extraConfig = ''
-          root * ${elementWebPkg}
-          file_server
-          @noext not path *.html *.js *.css *.png *.svg *.ico *.json *.webp
-          handle @noext {
-            try_files {path} /index.html
+            @noext not path *.html *.js *.css *.png *.svg *.ico *.json *.webp
+            handle @noext {
+              try_files {path} /index.html
+              file_server
+            }
+          '';
+        };
+        "element.lovelain.duckdns.org" = {
+          extraConfig = ''
+            root * ${elementWebPkg}
             file_server
-          }
-        '';
+            @noext not path *.html *.js *.css *.png *.svg *.ico *.json *.webp
+            handle @noext {
+              try_files {path} /index.html
+              file_server
+            }
+          '';
+        };
+        "matrix.local" = {
+          extraConfig = ''
+            reverse_proxy http://127.0.0.1:8008 {
+              header_up Host {host}
+              header_up X-Real-IP {remote_host}
+              header_up X-Forwarded-For {remote_host}
+            }
+          '';
+        };
+        # Public Matrix homeserver on duckdns domain
+        "matrix.lovelain.duckdns.org" = {
+          extraConfig = ''
+            # Serve well-known discovery documents for phone clients
+            @wellknownClient path /.well-known/matrix/client
+            handle @wellknownClient {
+              header Content-Type application/json
+              respond `{"m.homeserver":{"base_url":"https://matrix.lovelain.duckdns.org"}}` 200
+            }
+            @wellknownServer path /.well-known/matrix/server
+            handle @wellknownServer {
+              header Content-Type application/json
+              respond `{"m.server":"matrix.lovelain.duckdns.org:443"}` 200
+            }
+            reverse_proxy http://127.0.0.1:8008 {
+              header_up Host {host}
+              header_up X-Real-IP {remote_host}
+              header_up X-Forwarded-For {remote_host}
+            }
+          '';
+        };
       };
-      virtualHosts."matrix.local" = {
-        extraConfig = ''
-          reverse_proxy http://127.0.0.1:8008 {
-            header_up Host {host}
-            header_up X-Real-IP {remote_host}
-            header_up X-Forwarded-For {remote_host}
-          }
-        '';
-      };
-      # Public Matrix homeserver on duckdns domain
-      virtualHosts."matrix.lovelain.duckdns.org" = {
-        extraConfig = ''
-          # Serve well-known discovery documents for phone clients
-          @wellknownClient path /.well-known/matrix/client
-          handle @wellknownClient {
-            header Content-Type application/json
-            respond `{"m.homeserver":{"base_url":"https://matrix.lovelain.duckdns.org"}}` 200
-          }
-          @wellknownServer path /.well-known/matrix/server
-          handle @wellknownServer {
-            header Content-Type application/json
-            respond `{"m.server":"matrix.lovelain.duckdns.org:443"}` 200
-          }
-          reverse_proxy http://127.0.0.1:8008 {
-            header_up Host {host}
-            header_up X-Real-IP {remote_host}
-            header_up X-Forwarded-For {remote_host}
-          }
-        '';
+    };
+
+    # Bind Synapse HTTP listener to 0.0.0.0 so z0r0's hermes can reach it via Tailscale
+    matrix-synapse = {
+      extraConfigFiles = [
+        config.sops.templates."synapse-email-config".path
+      ];
+      settings.listeners = [
+        {
+          port = 8008;
+          bind_addresses = [ "0.0.0.0" ];
+          type = "http";
+          tls = false;
+          x_forwarded = true;
+          resources = [
+            {
+              names = [ "client" ];
+              compress = true;
+            }
+            {
+              names = [ "federation" ];
+              compress = false;
+            }
+          ];
+        }
+      ];
+    };
+
+    autobrr = {
+      enable = true;
+      openFirewall = true; # nixarr had host = 0.0.0.0; native module defaults to loopback
+      settings = {
+        host = "0.0.0.0";
+        port = 7474;
+        checkForUpdates = false;
       };
     };
   };
 
   # Podman Rootless Virtualization
-  virtualisation.oci-containers.backend = "podman";
-  virtualisation.podman = {
-    enable = true;
-    autoPrune.enable = true;
-    dockerCompat = true;
+  virtualisation = {
+    oci-containers.backend = "podman";
+    podman = {
+      enable = true;
+      autoPrune.enable = true;
+      dockerCompat = true;
+    };
   };
 
   # Machine-specific firewall overrides (Master fleet firewall rules defined in layer-10 networking.nix)
@@ -481,23 +511,69 @@ in
   # ============================================================================
   # 05 - SECURITY & SECRETS (SOPS/ACME)
   # ============================================================================
-  sops.age.keyFile = "/persist/home/t0psh31f/.config/sops/age/keys.txt";
+  sops = {
+    age.keyFile = "/persist/home/t0psh31f/.config/sops/age/keys.txt";
 
-  # Login passwords: clan-core's users service generates user-password-root var
-  # (vars/per-machine/luffy/user-password-root/) and wires hashedPasswordFile itself.
-  # The root password lives in vars/per-machine/luffy/user-password-root/user-password (sops-encrypted).
-  # NOTE: do NOT define hashedPasswordFile here — it conflicts with the clan users service.
+    secrets = {
+      "duckdns-token" = {
+        sopsFile = lib.mkForce ../../layers/00-cyberia/03-treasure/secrets/duckdns.yaml;
+        format = lib.mkForce "yaml";
+      };
+      "postgres-password" = {
+        sopsFile = lib.mkForce ../../layers/00-cyberia/03-treasure/secrets/postgres.yaml;
+        format = lib.mkForce "yaml";
+      };
+      smtp_pass = {
+        sopsFile = ../../layers/00-cyberia/03-treasure/secrets/external_services.yaml;
+      };
+    };
 
-  sops.secrets."duckdns-token" = {
-    sopsFile = lib.mkForce ../../layers/00-cyberia/03-treasure/secrets/duckdns.yaml;
-    format = lib.mkForce "yaml";
-  };
-  sops.templates."duckdns-env".content = ''
-    DUCKDNS_TOKEN=${config.sops.placeholder."duckdns-token"}
-  '';
-  sops.secrets."postgres-password" = {
-    sopsFile = lib.mkForce ../../layers/00-cyberia/03-treasure/secrets/postgres.yaml;
-    format = lib.mkForce "yaml";
+    templates = {
+      "honcho-database-url".content = ''
+        DATABASE_URL=postgresql://honcho:${
+          config.sops.placeholder."postgres-password"
+        }@host.containers.internal:5432/honcho
+      '';
+      "duckdns-env".content = ''
+        DUCKDNS_TOKEN=${config.sops.placeholder."duckdns-token"}
+      '';
+      "synapse-email-config" = {
+        content = ''
+          email:
+            smtp_host: smtp.gmail.com
+            smtp_port: 587
+            smtp_user: wrighterik77@gmail.com
+            smtp_pass: ${config.sops.placeholder.smtp_pass}
+            require_transport_security: true
+            enable_tls: true
+            force_tls: true
+            notif_from: "Matrix <wrighterik77@gmail.com>"
+            app_name: "NFP Matrix"
+        '';
+        # Synapse runs as matrix-synapse user, needs read access
+        mode = "0644";
+        owner = "matrix-synapse";
+      };
+      "homepage-api-env" = {
+        content = ''
+          IMMICH_API_KEY=""
+          HEADSCALE_API_KEY=""
+          ADGUARD_AUTH=""
+          PORTAINER_API_KEY=""
+          JELLYFIN_API_KEY=""
+          SONARR_API_KEY=""
+          RADARR_API_KEY=""
+          LIDARR_API_KEY=""
+          PROWLARR_API_KEY=""
+          BAZARR_API_KEY=""
+          OVERSEERR_API_KEY=""
+          READARR_API_KEY=""
+          GRAFANA_API_KEY=""
+        '';
+        mode = "0640";
+        owner = "homepage-dashboard";
+      };
+    };
   };
 
   # ACME Let's Encrypt Wildcard via DuckDNS
@@ -513,74 +589,6 @@ in
     };
   };
 
-  # ── Matrix Synapse SMTP (email verification, password resets) ─────────
-  sops.secrets.smtp_pass = {
-    sopsFile = ../../layers/00-cyberia/03-treasure/secrets/external_services.yaml;
-  };
-
-  sops.templates."synapse-email-config" = {
-    content = ''
-      email:
-        smtp_host: smtp.gmail.com
-        smtp_port: 587
-        smtp_user: wrighterik77@gmail.com
-        smtp_pass: ${config.sops.placeholder.smtp_pass}
-        require_transport_security: true
-        enable_tls: true
-        force_tls: true
-        notif_from: "Matrix <wrighterik77@gmail.com>"
-        app_name: "NFP Matrix"
-    '';
-    # Synapse runs as matrix-synapse user, needs read access
-    mode = "0644";
-    owner = "matrix-synapse";
-  };
-
-  services.matrix-synapse.extraConfigFiles = [
-    config.sops.templates."synapse-email-config".path
-  ];
-
-  sops.templates."homepage-api-env" = {
-    content = ''
-      IMMICH_API_KEY=""
-      HEADSCALE_API_KEY=""
-      ADGUARD_AUTH=""
-      PORTAINER_API_KEY=""
-      JELLYFIN_API_KEY=""
-      SONARR_API_KEY=""
-      RADARR_API_KEY=""
-      LIDARR_API_KEY=""
-      PROWLARR_API_KEY=""
-      BAZARR_API_KEY=""
-      OVERSEERR_API_KEY=""
-      READARR_API_KEY=""
-      GRAFANA_API_KEY=""
-    '';
-    mode = "0640";
-    owner = "homepage-dashboard";
-  };
-
-  # Bind Synapse HTTP listener to 0.0.0.0 so z0r0's hermes can reach it via Tailscale
-  services.matrix-synapse.settings.listeners = [
-    {
-      port = 8008;
-      bind_addresses = [ "0.0.0.0" ];
-      type = "http";
-      tls = false;
-      x_forwarded = true;
-      resources = [
-        {
-          names = [ "client" ];
-          compress = true;
-        }
-        {
-          names = [ "federation" ];
-          compress = false;
-        }
-      ];
-    }
-  ];
-
   # ============================================================================
   # 06 - STORE INTEGRITY & SAFE GARBAGE COLLECTION
   # ============================================================================
@@ -588,46 +596,78 @@ in
   # deleting boot-critical util-linux sibling outputs (mount, login, swap).
   # See machines/z0r0/default.nix for full explanation.
 
-  system.activationScripts.gcroot-util-linux = ''
-    mkdir -p /nix/var/nix/gcroots
-    _ulbin="${pkgs.util-linux.bin}"
-    if [ -d "$_ulbin/bin" ]; then
-      for link in "$_ulbin"/bin/*; do
-        [ -L "$link" ] || continue
-        target=$(readlink -f "$link" 2>/dev/null) || continue
-        case "$target" in
-          /nix/store/*)
-            storepath=$(echo "$target" | cut -d/ -f1-4)
-            name=$(basename "$storepath")
-            ln -sfn "$storepath" "/nix/var/nix/gcroots/util-linux-fix-$name"
-            ;;
-        esac
-      done
-    fi
-  '';
-
-  system.activationScripts.clean-boot-entries = ''
-    if [ -d /boot/loader/entries ]; then
-      for f in /boot/loader/entries/*.conf; do
-        [ -f "$f" ] || continue
-        init_path=$(${pkgs.gnugrep}/bin/grep -E 'options.*init=' "$f" | ${pkgs.gnused}/bin/sed -E 's/.*init=([^ ]+).*/\1/')
-        if [ -n "$init_path" ] && [ ! -e "$init_path" ]; then
-          echo "Pruning orphan boot entry: $f (init $init_path missing)"
-          rm -f "$f"
+  system = {
+    stateVersion = "25.05";
+    activationScripts = {
+      gcroot-util-linux = ''
+        mkdir -p /nix/var/nix/gcroots
+        _ulbin="${pkgs.util-linux.bin}"
+        if [ -d "$_ulbin/bin" ]; then
+          for link in "$_ulbin"/bin/*; do
+            [ -L "$link" ] || continue
+            target=$(readlink -f "$link" 2>/dev/null) || continue
+            case "$target" in
+              /nix/store/*)
+                storepath=$(echo "$target" | cut -d/ -f1-4)
+                name=$(basename "$storepath")
+                ln -sfn "$storepath" "/nix/var/nix/gcroots/util-linux-fix-$name"
+                ;;
+            esac
+          done
         fi
-      done
-    fi
-  '';
+      '';
 
-  # Safe automatic garbage collection
-  systemd.services.nix-safe-gc = {
-    description = "Safe Nix GC (old generations only, preserves unreferenced-but-needed paths)";
-    startAt = "Sun 04:00";
-    serviceConfig = {
-      Type = "oneshot";
-      ExecStart = "${pkgs.nix}/bin/nix-collect-garbage --delete-older-than 14d";
-      Nice = 19;
-      IOSchedulingClass = "idle";
+      clean-boot-entries = ''
+        if [ -d /boot/loader/entries ]; then
+          for f in /boot/loader/entries/*.conf; do
+            [ -f "$f" ] || continue
+            init_path=$(${pkgs.gnugrep}/bin/grep -E 'options.*init=' "$f" | ${pkgs.gnused}/bin/sed -E 's/.*init=([^ ]+).*/\1/')
+            if [ -n "$init_path" ] && [ ! -e "$init_path" ]; then
+              echo "Pruning orphan boot entry: $f (init $init_path missing)"
+              rm -f "$f"
+            fi
+          done
+        fi
+      '';
+    };
+  };
+
+  # Safe automatic garbage collection & service overrides
+  systemd.services = {
+    nix-safe-gc = {
+      description = "Safe Nix GC (old generations only, preserves unreferenced-but-needed paths)";
+      startAt = "Sun 04:00";
+      serviceConfig = {
+        Type = "oneshot";
+        ExecStart = "${pkgs.nix}/bin/nix-collect-garbage --delete-older-than 14d";
+        Nice = 19;
+        IOSchedulingClass = "idle";
+      };
+    };
+
+    headscale-tunnel-nami = {
+      enable = lib.mkForce false;
+      description = "Reverse tunnel: expose luffy headscale on nami:8087";
+      after = [
+        "network-online.target"
+        "headscale.service"
+      ];
+      wants = [ "network-online.target" ];
+      wantedBy = [ "multi-user.target" ];
+      serviceConfig = {
+        Type = "simple";
+        ExecStart = "${pkgs.openssh}/bin/ssh -N -i /root/.ssh/id_ed25519 -o ConnectTimeout=15 -o ServerAliveInterval=30 -o ServerAliveCountMax=3 -o ExitOnForwardFailure=yes -o StrictHostKeyChecking=no -R 8087:127.0.0.1:8086 root@47.254.90.69";
+        Restart = "always";
+        RestartSec = 5;
+      };
+    };
+
+    prowlarr.serviceConfig = {
+      StateDirectory = lib.mkForce null;
+      DynamicUser = lib.mkForce false;
+      User = lib.mkForce "prowlarr";
+      Group = lib.mkForce "prowlarr";
+      ReadWritePaths = [ "/data/.state/nixarr/prowlarr" ];
     };
   };
 
@@ -643,45 +683,8 @@ in
     }
   ];
 
-  # Reverse tunnel: expose luffy's headscale on nami as localhost:8087 so nami's
-  # tailscale client can reach the (migrated) control server over SSH.
-  # Requires luffy's root SSH key on nami (installed 2026-09-15).
-  #
-  # DISABLED 2026-10-13: nami (47.254.90.69) is permanently unreachable —
-  # `ssh: connect to host ... port 22: Connection timed out` on every attempt,
-  # 803 restarts and climbing. Nothing to tunnel to. Re-enable if it returns.
-  systemd.services.headscale-tunnel-nami.enable = lib.mkForce false;
-  systemd.services.headscale-tunnel-nami = {
-    description = "Reverse tunnel: expose luffy headscale on nami:8087";
-    after = [
-      "network-online.target"
-      "headscale.service"
-    ];
-    wants = [ "network-online.target" ];
-    wantedBy = [ "multi-user.target" ];
-    serviceConfig = {
-      Type = "simple";
-      # ConnectTimeout=15: without it the OS TCP connect timeout (~130s) governs
-      # each attempt, so a recovered nami waits up to ~2m19s before the tunnel
-      # is re-established. 15s detects recovery ~5x faster while still tolerating
-      # normal Alibaba SG latency.
-      ExecStart = "${pkgs.openssh}/bin/ssh -N -i /root/.ssh/id_ed25519 -o ConnectTimeout=15 -o ServerAliveInterval=30 -o ServerAliveCountMax=3 -o ExitOnForwardFailure=yes -o StrictHostKeyChecking=no -R 8087:127.0.0.1:8086 root@47.254.90.69";
-      Restart = "always";
-      RestartSec = 5;
-    };
-  };
-
-  # === Prowlarr: disable systemd StateDirectory — conflicts with nixarr's
-  # /data/.state/nixarr/prowlarr data dir AND the /var/lib/prowlarr impermanence
-  # bind mount ("Device or resource busy" at STATE_DIRECTORY setup step).
-  # ExecStart already points -data at /data/.state/nixarr/prowlarr.
-  systemd.services.prowlarr.serviceConfig = {
-    StateDirectory = lib.mkForce null;
-    DynamicUser = lib.mkForce false;
-    User = lib.mkForce "prowlarr";
-    Group = lib.mkForce "prowlarr";
-    ReadWritePaths = [ "/data/.state/nixarr/prowlarr" ];
-  };
+  # Reverse tunnel (headscale-tunnel-nami) and Prowlarr service overrides
+  # are defined in systemd.services above.
 
   # Provide a safe-gc convenience script
   environment.systemPackages = [
@@ -722,13 +725,4 @@ in
   # (checkForUpdates=false, host 0.0.0.0, port 7474 — no filters), so nothing
   # is lost by moving to the native module's StateDirectory.
   nixarr.autobrr.enable = lib.mkForce false;
-  services.autobrr = {
-    enable = true;
-    openFirewall = true; # nixarr had host = 0.0.0.0; native module defaults to loopback
-    settings = {
-      host = "0.0.0.0";
-      port = 7474;
-      checkForUpdates = false;
-    };
-  };
 }
