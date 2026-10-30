@@ -40,11 +40,20 @@ DEFAULT_POLL_INTERVAL = int(os.environ.get("POLL_INTERVAL", "15"))
 GLADOS_TTS_BIN = os.environ.get("GLADOS_TTS_BIN", "/home/t0psh31f/.local/bin/glados-tts-cli")
 
 
-def speak_glados(text: str) -> None:
-    """Trigger background GLaDOS voice notification."""
+_last_speech_time = 0.0
+
+
+def speak_glados(text: str, min_interval_sec: float = 15.0) -> None:
+    """Trigger background GLaDOS voice notification with cooldown."""
+    global _last_speech_time
     clean = re.sub(r"\s+", " ", text).strip()
     if not clean:
         return
+    now = time.time()
+    if now - _last_speech_time < min_interval_sec:
+        logging.info(f"Skipping voice alert due to cooldown ({now - _last_speech_time:.1f}s < {min_interval_sec}s): {clean[:40]}")
+        return
+    _last_speech_time = now
     for candidate in [GLADOS_TTS_BIN, "/run/current-system/sw/bin/glados-speak"]:
         if os.path.exists(candidate) and os.access(candidate, os.X_OK):
             try:
@@ -291,9 +300,6 @@ class TaskWatcher:
             """, (item.task_hash, item.text, item.section, now_iso, now_iso))
             self.conn.commit()
 
-            if self.glados_voice:
-                speak_glados(f"Enrichment Center task watcher detected task: {item.text[:60]}. Initiating autonomous decomposition.")
-
             # Decompose and execute via pi-durable
             res = delegate_to_pi_durable(item.text, self.pi_url)
             gate_status = res.get("gate_status", "completed")
@@ -329,15 +335,15 @@ class TaskWatcher:
 
             tasks_advanced += 1
 
-            if self.glados_voice:
-                if gate_status == "completed":
-                    speak_glados(f"Task completed: {item.text[:50]}. Checkmark updated.")
-                else:
-                    speak_glados(f"Task paused at approval gate: {item.text[:50]}.")
+            # Only vocalize if a task is explicitly blocked on human approval
+            if self.glados_voice and gate_status != "completed":
+                speak_glados(f"Task paused at approval gate: {item.text[:50]}.", min_interval_sec=10.0)
 
         # Sync EverOS
         if tasks_advanced > 0:
             notify_everos_consolidation(self.everos_url)
+            if self.glados_voice:
+                speak_glados(f"Enrichment Center task watcher processed {tasks_advanced} tasks in task list.", min_interval_sec=30.0)
 
         # Record run telemetry
         self.conn.execute("""
