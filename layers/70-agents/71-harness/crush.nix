@@ -8,7 +8,6 @@
   lib,
   pkgs,
   inputs,
-  osConfig ? config,
   ...
 }:
 with lib;

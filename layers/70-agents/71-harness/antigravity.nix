@@ -14,7 +14,6 @@
   config,
   pkgs,
   lib,
-  osConfig ? config,
   ...
 }:
 {

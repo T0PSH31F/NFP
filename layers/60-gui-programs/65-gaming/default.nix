@@ -2,7 +2,6 @@
   config,
   lib,
   pkgs,
-  osConfig ? config,
   ...
 }:
 let
@@ -128,7 +127,7 @@ in
   };
 
   home =
-    { config, osConfig, ... }:
+    { osConfig, ... }:
     mkIf osConfig.layers.layer-60.gui.gaming.enable {
       home.packages = with pkgs; [
         cartridges

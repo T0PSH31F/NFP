@@ -99,7 +99,7 @@ in
       AIDER_MODEL = cfg.defaultModel;
     };
 
-    home-manager.users.${user} = { pkgs, ... }: {
+    home-manager.users.${user} = _: {
       config = {
         xdg.configFile."aider/aider.conf.yml".text = ''
           model: ${cfg.defaultModel}
