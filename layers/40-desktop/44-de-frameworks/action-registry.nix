@@ -1,6 +1,6 @@
 # 🗺️ Central Declarative Keymap & Action Registry (NFP)
 # Unified action definitions for Hyprland, Niri, wlr-which-key, and Rofi cheat sheets.
-{ lib }:
+_:
 let
   mkAction =
     {

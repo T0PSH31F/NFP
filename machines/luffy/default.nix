@@ -645,23 +645,6 @@ in
       };
     };
 
-    headscale-tunnel-nami = {
-      enable = lib.mkForce false;
-      description = "Reverse tunnel: expose luffy headscale on nami:8087";
-      after = [
-        "network-online.target"
-        "headscale.service"
-      ];
-      wants = [ "network-online.target" ];
-      wantedBy = [ "multi-user.target" ];
-      serviceConfig = {
-        Type = "simple";
-        ExecStart = "${pkgs.openssh}/bin/ssh -N -i /root/.ssh/id_ed25519 -o ConnectTimeout=15 -o ServerAliveInterval=30 -o ServerAliveCountMax=3 -o ExitOnForwardFailure=yes -o StrictHostKeyChecking=no -R 8087:127.0.0.1:8086 root@47.254.90.69";
-        Restart = "always";
-        RestartSec = 5;
-      };
-    };
-
     prowlarr.serviceConfig = {
       StateDirectory = lib.mkForce null;
       DynamicUser = lib.mkForce false;
@@ -672,10 +655,6 @@ in
   };
 
   # Persist luffy's root SSH keypair across impermanence rollbacks.
-  # 2026-09-23: /root/.ssh was wiped by the btrfs rollback, killing the
-  # headscale-tunnel-nami reverse tunnel (21k restart loop, auth denied) and
-  # taking nami offline. The tunnel reuses this key; without persistence every
-  # reboot breaks nami's control-plane path.
   environment.persistence."/persist".directories = [
     {
       directory = "/root/.ssh";

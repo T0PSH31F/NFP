@@ -144,23 +144,21 @@ in
         networking.firewall.allowedTCPPorts = optional cfg.openFirewall cfg.port;
 
         # Home-Manager configuration seeding for desktop client
-        home-manager.users.${user} =
-          { pkgs, ... }:
-          {
-            config = {
-              xdg.configFile."feishin/server-config.json".text = builtins.toJSON {
-                servers = [
-                  {
-                    id = "default-server";
-                    name = cfg.serverConnection.name;
-                    url = cfg.serverConnection.url;
-                    type = cfg.serverConnection.serverType;
-                  }
-                ];
-                activeServerId = "default-server";
-              };
+        home-manager.users.${user} = _: {
+          config = {
+            xdg.configFile."feishin/server-config.json".text = builtins.toJSON {
+              servers = [
+                {
+                  id = "default-server";
+                  name = cfg.serverConnection.name;
+                  url = cfg.serverConnection.url;
+                  type = cfg.serverConnection.serverType;
+                }
+              ];
+              activeServerId = "default-server";
             };
           };
+        };
       }
 
       # Containerized web player when mode is "server" or "both"

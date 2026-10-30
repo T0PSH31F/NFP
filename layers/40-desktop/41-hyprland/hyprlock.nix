@@ -2,7 +2,6 @@
   osConfig ? config,
   config,
   lib,
-  pkgs,
   ...
 }:
 let

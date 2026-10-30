@@ -8,7 +8,6 @@
 # and importing the HM module here pulls in XDG portal assertions.
 {
   inputs,
-  lib,
   ...
 }:
 {
