@@ -62,26 +62,15 @@
   # ============================================================================
 
   services = {
-    # Earlyoom - proactive OOM killer
-    earlyoom = {
-      enable = lib.mkDefault true;
-      freeMemThreshold = lib.mkDefault 10;
-      freeSwapThreshold = lib.mkDefault 5;
-      enableNotifications = true;
-      extraArgs = [
-        "--prefer"
-        "^(Web Content|chromium|firefox|electron|aionui|brave)$"
-        "--avoid"
-        "^(Hyprland|hyprland|noctalia|Noctalia|sshd|systemd|greetd|kong|extreme-router|omniroute|brain-service|caddy|calibre-web|nix-daemon|nix|nix-build|clan|nixos-rebuild)$"
-        "--ignore"
-        "^(nix-daemon|nix|nix-build|clan|nixos-rebuild)$"
-      ];
-    };
+    # Earlyoom disabled in favor of systemd-oomd (cgroup PSI pressure based).
+    # On systems with zramSwap and high swappiness, earlyoom's swap threshold
+    # repeatedly triggers false positives, terminating IDEs, agents, and desktop sessions.
+    earlyoom.enable = lib.mkDefault false;
 
     # Modern performance-oriented dbus implementation
     dbus.implementation = "broker";
 
-    # Conflict resolution: earlyoom wants systembus-notify, smartd disables it
+    # Conflict resolution: keep systembus-notify enabled for smartd / desktop alerts
     systembus-notify.enable = lib.mkForce true;
 
     # Explicitly disable conflicting power services (managed elsewhere)

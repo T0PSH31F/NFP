@@ -439,1008 +439,1015 @@ in
           '')
         ];
 
-        programs.noctalia = {
-          enable = true;
-          systemd.enable = true;
-          inherit (cfg) package;
-          checkConfig = true;
-
-          settings = {
-            # ── Shell ────────────────────────────────────────────────
-            shell = {
-              corner_radius_scale = 1.0;
-              font_family = "JetBrainsMono NF Medium";
-              lang = "";
-              time_format = "{:%H:%M:%S}";
-              date_format = "";
-              polkit_agent = true;
-              password_style = "random";
-              launch_apps_as_systemd_services = true;
-              telemetry_enabled = true;
-              screen_time_enabled = true;
-              avatar_path = "/home/t0psh31f/Clan/NFP/layers/00-cyberia/02-assets/png-ico/Zoro.png";
-              external_ip_enabled = true;
-              app_icon_colorize = false;
-            };
-            shell.animation = {
-              speed = 0.75;
-            };
-            shell.greeter_sync = {
-              auto_sync = true;
-            };
-            shell.launcher = {
-              categories = true;
-              default_view = "all";
-              show_icons = true;
-              sort_by_usage = true;
-              app_grid = true;
-              compact = true;
-            };
-            shell.panel = {
-              launcher_placement = "attached";
-              open_near_click_clipboard = true;
-              transparency_mode = "glass";
-            };
-            shell.screen_corners = {
-              enabled = true;
-            };
-            shell.screenshot = {
-              confirm_region = true;
-            };
-
-            # ── Theme ────────────────────────────────────────────────
-            theme = {
-              mode = "dark";
-              source = "wallpaper";
-              wallpaper_scheme = "m3-content";
-              # community_palette removed — use wallpaper-based color generation
-              # To restore a fixed palette, uncomment and set: community_palette = "Palette Name";
-            };
-            theme.templates = {
-              builtin_ids = [
-                "btop"
-                "cava"
-                "gtk3"
-                "gtk4"
-                "ghostty"
-                "helix"
-                "hyprland"
-                "kcolorscheme"
-                "kitty"
-                "qt"
-                "starship"
-                "wezterm"
-              ];
-              community_ids = [
-                "pi-agent"
-                "spicetify"
-                "pywalfox"
-                "neovim"
-                "obsidian"
-                "vscode"
-                "zed"
-                "rofi"
-                "vicinae"
-                "discord"
-                "papirus-icons"
-                "telegram"
-                "yazi"
-                "zathura"
-                "snappy-switcher"
-                "hyprtoolkit"
-                "opencode"
-              ];
-            };
-
-            # ── Wallpaper ────────────────────────────────────────────
-            wallpaper = {
-              enabled = true;
-              fill_mode = "crop";
-              fill_color = "surface";
-              directory = "/home/t0psh31f/Pictures";
-              directory_dark = "/home/t0psh31f/Pictures";
-              transition = [
-                "honeycomb"
-                "fade"
-              ];
-              transition_duration = 17600;
-              transition_on_startup = true;
-            };
-            wallpaper.automation = {
-              enabled = false;
-              interval_seconds = 900;
-              order = "random";
-            };
-            wallpaper.default = {
-              path = "/home/t0psh31f/Pictures/one-piece-season-15-3840x2160-22127.jpg";
-            };
-            wallpaper.last = {
-              path = "/home/t0psh31f/Pictures/one-piece-season-15-3840x2160-22127.jpg";
-            };
-            wallpaper.monitor = {
-              "eDP-1" = {
-                directory = "/home/t0psh31f/Pictures";
-              };
-              "DP-1" = {
-                directory = "/home/t0psh31f/Pictures";
-              };
-              "HDMI-A-1" = {
-                directory = "/home/t0psh31f/Pictures";
-              };
-              "HDMI-A-2" = {
-                directory = "/home/t0psh31f/Pictures";
-              };
-            };
-            wallpaper.monitors = {
-              "eDP-1" = {
-                path = "/home/t0psh31f/Pictures/one-piece-season-15-3840x2160-22127.jpg";
-              };
-              "HDMI-A-2" = {
-                path = "/home/t0psh31f/Pictures/one-piece-season-15-3840x2160-22127.jpg";
-              };
-              "DP-2" = {
-                path = "/home/t0psh31f/Pictures/one-piece-season-15-3840x2160-22127.jpg";
-              };
-            };
-
-            # ── Backdrop ─────────────────────────────────────────────
-            backdrop = {
-              enabled = false; # Disabled: oversized blur regions behind notifications/dock/OSD
-              blur_intensity = 0.4;
-              tint_intensity = 0.6;
-            };
-
-            # ── Audio ────────────────────────────────────────────────
-            audio = {
-              enable_overdrive = true;
-              enable_sounds = true;
-            };
-
-            # ── Four-Bar Cockpit Geometry & Theming ─────────────────
-            bar = {
-              order = [
-                "default"
-                "bottom-bar"
-                "left-bar"
-                "right-bar"
-              ];
-            };
-
-            # 1. Top Bar: Always visible primary system cockpit
-            bar.default = {
-              enabled = true;
-              position = "top";
-              layer = "overlay";
-              thickness = 44;
-              scale = 1.15;
-              padding = 14;
-              panel_overlap = -2;
-              margin_edge = 0;
-              margin_ends = 36;
-              margin_opposite_edge = 0;
-              reserve_space = true;
-              background_opacity = 0.82;
-              border = "primary";
-              border_width = 1.5;
-              capsule = true;
-              capsule_border = "secondary";
-              capsule_border_width = 1.5;
-              capsule_opacity = 0.85;
-              capsule_padding = 9.0;
-              concave_edge_corners = true;
-              radius = 28;
-              radius_top_left = 0;
-              radius_top_right = 0;
-              radius_bottom_left = 28;
-              radius_bottom_right = 28;
-              font_family = "Symbols Nerd Font Mono";
-              widget_spacing = 4;
-              color = "primary";
-              icon_color = "secondary";
-              start = [
-                "launcher"
-                "workspaces"
-              ];
-              center = [
-                "media"
-                "cat"
-              ];
-              end = [
-                "tailnet"
-                "battery"
-                "clock"
-                "control-center"
-              ];
-              dead_zone.actions = {
-                scroll_up = "volume-up";
-                scroll_down = "volume-down";
-                middle = "volume-mute";
-              };
-            };
-
-            # 2. Bottom Bar: Always visible dock & taskbar hybrid
-            bar.bottom-bar = {
-              enabled = true;
-              position = "bottom";
-              layer = "overlay";
-              thickness = 44;
-              scale = 1.15;
-              padding = 14;
-              panel_overlap = -2;
-              margin_edge = 0;
-              margin_ends = 36;
-              margin_opposite_edge = 0;
-              reserve_space = true;
-              background_opacity = 0.82;
-              border = "primary";
-              border_width = 1.5;
-              capsule = true;
-              capsule_border = "secondary";
-              capsule_border_width = 1.5;
-              capsule_opacity = 0.85;
-              capsule_padding = 9.0;
-              concave_edge_corners = true;
-              radius = 28;
-              radius_bottom_left = 0;
-              radius_bottom_right = 0;
-              radius_top_left = 28;
-              radius_top_right = 28;
-              font_family = "Symbols Nerd Font Mono";
-              widget_spacing = 4;
-              color = "primary";
-              icon_color = "secondary";
-              dead_zone.actions = {
-                scroll_up = "volume-up";
-                scroll_down = "volume-down";
-                middle = "volume-mute";
-              };
-              start = [
-                "session"
-                "notes"
-                "herdr"
-              ];
-              center = [
-                "taskbar"
-              ];
-              end = [
-                "cpu"
-                "gpu"
-                "ram"
-                "disk"
-                "clipboard"
-                "tray"
-                "notifications"
-              ];
-            };
-
-            # 3. Left Bar: Auto-hiding AI fleet, containers & telemetry
-            bar.left-bar = {
-              enabled = true;
-              position = "left";
-              layer = "overlay";
-              thickness = 44;
-              scale = 1.15;
-              padding = 14;
-              panel_overlap = -2;
-              margin_edge = 0;
-              margin_ends = 36;
-              margin_opposite_edge = 0;
-              reserve_space = false;
-              auto_hide = true;
-              smart_auto_hide = true;
-              auto_hide_delay_ms = 250;
-              show_on_workspace_switch = true;
-              background_opacity = 0.82;
-              border = "hover";
-              border_width = 1.5;
-              capsule = true;
-              capsule_border = "secondary";
-              capsule_border_width = 1.5;
-              capsule_opacity = 0.85;
-              capsule_padding = 9.0;
-              concave_edge_corners = true;
-              radius = 28;
-              radius_top_left = 0;
-              radius_bottom_left = 0;
-              radius_top_right = 28;
-              radius_bottom_right = 28;
-              font_family = "Symbols Nerd Font Mono";
-              widget_spacing = 4;
-              color = "primary";
-              icon_color = "primary";
-              start = [
-                "agents"
-                "herdr"
-              ];
-              center = [
-                "containers"
-                "ai-usage"
-                "router"
-              ];
-              end = [
-                "neuralwatt"
-                "ai-triage"
-              ];
-            };
-
-            # 4. Right Bar: Auto-hiding quick tools & productivity
-            bar.right-bar = {
-              enabled = true;
-              position = "right";
-              layer = "overlay";
-              thickness = 44;
-              scale = 1.15;
-              padding = 14;
-              panel_overlap = -2;
-              margin_edge = 0;
-              margin_ends = 36;
-              margin_opposite_edge = 0;
-              reserve_space = false;
-              auto_hide = true;
-              smart_auto_hide = true;
-              auto_hide_delay_ms = 250;
-              show_on_workspace_switch = true;
-              background_opacity = 0.82;
-              border = "hover";
-              border_width = 1.5;
-              capsule = true;
-              capsule_border = "secondary";
-              capsule_border_width = 1.5;
-              capsule_opacity = 0.85;
-              capsule_padding = 9.0;
-              concave_edge_corners = true;
-              radius = 28;
-              radius_top_right = 0;
-              radius_bottom_right = 0;
-              radius_top_left = 28;
-              radius_bottom_left = 28;
-              font_family = "Symbols Nerd Font Mono";
-              widget_spacing = 4;
-              color = "primary";
-              icon_color = "primary";
-              start = [
-                "screen-toolkit"
-                "screen_recorder"
-              ];
-              center = [
-                "todo"
-                "phone"
-                "mail"
-              ];
-              end = [
-                "wallhaven"
-                "theme-switcher"
-                "w-engine"
-              ];
-            };
-
-            # ── Brightness ────────────────────────────────────────────
-            brightness = {
-              sync_all_monitors = true;
-            };
-
-            # ── Calendar ─────────────────────────────────────────────
-            calendar = {
-              enabled = true;
-              refresh_minutes = 240;
-            };
-            calendar.account.personal_google = {
-              color = "primary";
-              name = "WE77";
-              type = "google";
-            };
-            calendar.account.secondary_google = {
-              color = "secondary";
-              name = "LL";
-              type = "google";
-            };
-
-            # ── Control Center ────────────────────────────────────────
-            control_center = {
-              sidebar = "full";
-              sidebar_section = "full";
-              width = 920;
-            };
-            control_center.shortcuts = [
-              { type = "wifi"; }
-              { type = "bluetooth"; }
-              { type = "nightlight"; }
-              { type = "keyboard_layout"; }
-              { type = "wallpaper"; }
-              { type = "power_profile"; }
-            ];
-
-            # ── Dock ─────────────────────────────────────────────────
-            dock = {
-              enabled = false;
-              position = "bottom";
-              auto_hide = false;
-              active_monitor_only = false;
-              show_running = true;
-              magnification = true;
-              magnification_scale = 1.35;
-              background_opacity = 0.81;
-              launcher_icon = "brand-nixos";
-              launcher_position = "start";
-              launcher_custom_image = "/home/t0psh31f/.icons/nixos-logo.png";
-              margin_edge = 2;
-              pinned = [ "Brave" ];
-              radius = 23;
-              reserve_space = false;
-              show_dots = true;
-            };
-
-            # ── Hot Corners ──────────────────────────────────────────
-            hot_corners = {
-              enabled = true;
-              top_left.action = "launcher";
-              top_right.action = "control_center";
-              bottom_left.action = "window_switcher";
-            };
-
-            # ── Idle ─────────────────────────────────────────────────
-            # DISABLED: noctalia's native idle system causes Wayland
-            # "Broken pipe" crashes on Intel Iris Xe when the display
-            # wakes from DPMS screen-off. hypridle handles this instead.
-            idle = {
-              behavior_order = [ ];
-              behavior = {
-                lock = {
-                  action = "lock";
-                  enabled = false;
-                  timeout = 600.0;
-                };
-                screen-off = {
-                  action = "screen_off";
-                  enabled = false;
-                  timeout = 660.0;
-                };
-                lock-and-suspend = {
-                  action = "lock_and_suspend";
-                  enabled = false;
-                  timeout = 900.0;
-                };
-              };
-            };
-
-            # ── Keybinds ─────────────────────────────────────────────
-            keybinds = {
-              cancel = [ "Escape" ];
-              up = [
-                "Up"
-                "Alt+j"
-              ];
-              down = [
-                "Down"
-                "Alt+k"
-              ];
-              left = [
-                "Left"
-                "Alt+h"
-              ];
-              right = [
-                "Right"
-                "Alt+l"
-              ];
-            };
-
-            # ── Location ──────────────────────────────────────────────
-            location = {
-              address = "Los Angeles, CA";
-              auto_locate = true;
-            };
-
-            # ── Lockscreen Widgets ────────────────────────────────────
-            lockscreen_widgets = {
-              enabled = true;
-              schema_version = 2;
-              widget_order = [
-                "lockscreen-login-box@DP-2"
-                "lockscreen-login-box@eDP-1"
-              ];
-            };
-            lockscreen_widgets.grid = {
-              cell_size = 16;
-              major_interval = 4;
-              visible = true;
-            };
-            lockscreen_widgets.widget."lockscreen-login-box@eDP-1" = {
-              box_height = 70.0;
-              box_width = 400.0;
-              cx = 800.0;
-              cy = 881.0;
-              output = "eDP-1";
-              rotation = 0.0;
-              type = "login_box";
-            };
-            lockscreen_widgets.widget."lockscreen-login-box@eDP-1".settings = {
-              background_color = "surface_variant";
-              background_opacity = 0.88;
-              background_radius = 12.0;
-              input_opacity = 1.0;
-              input_radius = 6.0;
-              show_caps_lock = true;
-              show_keyboard_layout = true;
-              show_login_button = true;
-            };
-            lockscreen_widgets.widget."lockscreen-login-box@DP-2" = {
-              box_height = 70.0;
-              box_width = 400.0;
-              cx = 960.0;
-              cy = 961.0;
-              output = "DP-2";
-              rotation = 0.0;
-              type = "login_box";
-            };
-            lockscreen_widgets.widget."lockscreen-login-box@DP-2".settings = {
-              background_color = "surface_variant";
-              background_opacity = 0.88;
-              background_radius = 12.0;
-              input_opacity = 1.0;
-              input_radius = 6.0;
-              show_caps_lock = true;
-              show_keyboard_layout = true;
-              show_login_button = true;
-            };
-
-            # ── Notifications ─────────────────────────────────────────
-            notification = {
-              enable_daemon = true;
-              position = "top_right";
-              layer = "overlay";
-              background_opacity = 0.94;
-            };
-
-            # ── OSD ──────────────────────────────────────────────────
-            osd = {
-              position = "bottom_center";
-              position_vertical = "center_right";
-              orientation = "horizontal";
-              scale = 1.0;
-              background_opacity = 0.97;
-            };
-
-            # ── Plugins ──────────────────────────────────────────────
-            plugins.enabled = [
-              # Official plugins
-              "noctalia/bongocat"
-              "noctalia/screen_recorder"
-              "noctalia/notes"
-              "noctalia/wallhaven"
-              # Community plugins
-              "community/9router-control"
-              "community/anilist"
-              "community/audio-switcher"
-              "community/bookmarks"
-              "community/calculator"
-              "community/claude-companion"
-              "community/config-swap"
-              "community/dns-switcher"
-              "community/drive-health"
-              "community/ds4-color"
-              "community/eyecare"
-              "community/file-search"
-              "community/game-launcher"
-              "community/gamer-mode"
-              "community/gslapper"
-              "community/hassio"
-              "community/hypr-layout-switcher"
-              "community/imagemagick-clock"
-              "community/ip-monitor"
-              "community/keybind-cheatsheet"
-              "community/keymap"
-              "community/llamanager"
-              "community/lyrics"
-              "community/mimir"
-              "community/mini-docker"
-              "community/niri-active-workspace"
-              "community/niri-animations"
-              "community/nix-monitor"
-              "community/noctwhspr"
-              "community/obsidian"
-              "community/phone-connect"
-              "community/portctl"
-              "community/procmon"
-              "community/screen-toolkit"
-              "community/special-workspaces"
-              "community/spotify-lyrics"
-              "community/ssh-launcher"
-              "community/tailscale"
-              "community/tailnet"
-              "community/todo"
-              "community/topgrade-wrapper"
-              "community/udiskie"
-              "community/web-launcher"
-              "community/w-engine"
-            ];
-            plugins.source = [
-              {
-                name = "official";
-                kind = "git";
-                location = "https://github.com/noctalia-dev/official-plugins";
-              }
-              {
-                name = "community";
-                kind = "git";
-                location = "https://github.com/noctalia-dev/community-plugins";
-              }
-            ];
-
-            # ── System Monitor (Low-Overhead Polling) ────────────────
-            system.monitor = {
-              cpu_poll_seconds = 5;
-              gpu_poll_seconds = 30;
-              memory_poll_seconds = 5;
-              network_poll_seconds = 5;
-              disk_poll_seconds = 60;
-            };
-
-            # ── Weather ──────────────────────────────────────────────
-            weather = {
-              unit = "imperial";
-            };
-
-            # ── Battery Device ───────────────────────────────────────
-            battery.device."/org/freedesktop/UPower/devices/mouse_dev_4E_B6_4B_9A_28_22" = {
-              warning_threshold = 10;
-            };
-
-            # ── Widget Definitions & Styling ─────────────────────────
-            widget.battery = {
-              capsule = true;
-              capsule_border = "primary";
-              capsule_fill = "on_primary";
-              capsule_foreground = "on_primary";
-              capsule_opacity = 0.92;
-              display_mode = "graphic";
-              scale = 1.1;
-            };
-            widget.bluetooth = {
-              enabled = true;
-              capsule = true;
-              capsule_border = "primary";
-              capsule_fill = "on_primary";
-              capsule_foreground = "on_primary";
-              capsule_opacity = 0.90;
-            };
-            widget.brightness = {
-              enabled = true;
-              show_label = false;
-              capsule = true;
-              capsule_border = "primary";
-              capsule_fill = "on_primary";
-              capsule_foreground = "on_primary";
-              capsule_opacity = 0.90;
-            };
-            widget.clipboard = {
-              capsule = true;
-              capsule_border = "primary";
-              capsule_fill = "on_primary";
-              capsule_foreground = "on_primary";
-              capsule_opacity = 0.91;
-            };
-            widget.clock = {
-              capsule = true;
-              capsule_border = "primary";
-              capsule_fill = "on_primary";
-              capsule_foreground = "on_primary";
-              capsule_opacity = 0.90;
-              format = "{:%a, %b %d %H:%M:%S}";
-              scale = 1.1;
-            };
-            widget.tailnet = {
-              type = "rylos/tailnet:bar";
-              capsule = true;
-              capsule_border = "primary";
-              capsule_fill = "on_primary";
-              capsule_foreground = "secondary";
-              capsule_opacity = 0.90;
-            };
-            widget.control-center = {
-              capsule = true;
-              capsule_border = "primary";
-              capsule_fill = "on_primary";
-              capsule_foreground = "secondary";
-              capsule_opacity = 0.91;
-              custom_image = "/home/t0psh31f/.icons/Anime/1P/one-piece-jolly-roger-icons-by-crountch/png/256x256/Luffys flag.png";
-            };
-            widget.launcher = {
-              capsule = true;
-              capsule_border = "primary";
-              capsule_fill = "on_primary";
-              capsule_foreground = "secondary";
-              capsule_opacity = 0.89;
-              custom_image = "/home/t0psh31f/.icons/nixos-logo.png";
-              glyph = "brand-nixos";
-              scale = 1.25;
-            };
-            widget.media = {
-              capsule = true;
-              capsule_border = "primary";
-              capsule_fill = "on_primary";
-              capsule_foreground = "secondary";
-              capsule_opacity = 0.93;
-              color = "primary";
-              hide_when_no_media = true;
-              min_length = 116;
-              title_scroll = "always";
-            };
-            widget.network = {
-              capsule = true;
-              capsule_border = "primary";
-              capsule_fill = "on_primary";
-              capsule_foreground = "on_primary";
-              capsule_opacity = 0.90;
-              color = "primary";
-              enabled = true;
-              icon_color = "primary";
-            };
-            widget.notifications = {
-              capsule = true;
-              hide_when_no_unread = true;
-            };
-            widget.session = {
-              enabled = true;
-              capsule = true;
-              capsule_border = "primary";
-              capsule_fill = "on_primary";
-              capsule_foreground = "secondary";
-              capsule_opacity = 0.90;
-            };
-            widget.tray = {
-              capsule = true;
-              capsule_border = "primary";
-              capsule_fill = "on_primary";
-              capsule_foreground = "secondary";
-              capsule_opacity = 0.93;
-              color = "secondary";
-              drawer = true;
-              icon_color = "secondary";
-            };
-            widget.volume = {
-              capsule = true;
-              capsule_border = "primary";
-              capsule_fill = "on_primary";
-              capsule_foreground = "tertiary";
-              capsule_opacity = 0.86;
-              capsule_padding = 11;
-              scale = 1.1;
-            };
-            widget.wallpaper = {
-              capsule = true;
-              capsule_border = "primary";
-              capsule_fill = "on_primary";
-              capsule_foreground = "secondary";
-              capsule_opacity = 0.88;
-              color = "primary";
-              icon_color = "primary";
-            };
-            widget.workspaces = {
-              capsule = true;
-              capsule_border = "primary";
-              capsule_fill = "on_primary";
-              capsule_foreground = "secondary";
-              capsule_opacity = 0.90;
-              color = "primary";
-              label_source = "name";
-              show_labels = true;
-              empty_color = "tertiary";
-              icon_color = "primary";
-              labels_only_when_occupied = false;
-            };
-            widget.taskbar = {
-              capsule = true;
-              capsule_border = "primary";
-              capsule_fill = "on_primary";
-              capsule_foreground = "secondary";
-              capsule_opacity = 0.90;
-              show_running = true;
-            };
-            widget.cat = {
-              type = "noctalia/bongocat:cat";
-            };
-            widget.notes = {
-              type = "noctalia/notes:notes";
-            };
-            widget.agents = {
-              type = "notfinaldev/agentik:agents";
-            };
-            widget.herdr = {
-              type = "hy4ri/herdr:bar";
-            };
-            widget.containers = {
-              type = "davinci13/containers:bar";
-            };
-            widget.ai-usage = {
-              type = "felipeartur/ai-usagebar:bar";
-            };
-            widget.router = {
-              type = "weinguyen/9router-control:widget";
-            };
-            widget.neuralwatt = {
-              type = "omertahaoztop/neuralwatt:bar";
-            };
-            widget.ai-triage = {
-              type = "miguelfm/ai-triage:bar";
-            };
-            widget.screen-toolkit = {
-              type = "alexander/screen-toolkit:widget";
-            };
-            widget.todo = {
-              type = "nightwatch75/todo:todo";
-            };
-            widget.phone = {
-              type = "icefish/phone-connect:bar";
-            };
-            widget.mail = {
-              type = "mdj2812/thunderbird-companion:mail";
-            };
-            widget.wallhaven = {
-              type = "noctalia/wallhaven:wallhaven";
-            };
-            widget.theme-switcher = {
-              type = "theblackdon/theme-switcher:theme-switcher";
-            };
-            widget.w-engine = {
-              type = "tadomika_ari/w-engine:w-engine-widget";
-            };
-            widget.cpu = {
-              type = "sysmon";
-              stat = "cpu_usage";
-              show_value = true;
-              show_glyph = true;
-              visualization = "gauge";
-              capsule = true;
-              capsule_border = "primary";
-              capsule_fill = "on_primary";
-              capsule_foreground = "primary";
-              capsule_opacity = 0.85;
-            };
-            widget.gpu = {
-              type = "sysmon";
-              stat = "gpu_usage";
-              show_value = true;
-              show_glyph = true;
-              visualization = "gauge";
-              capsule = true;
-              capsule_border = "primary";
-              capsule_fill = "on_primary";
-              capsule_foreground = "primary";
-              capsule_opacity = 0.85;
-            };
-            widget.ram = {
-              type = "sysmon";
-              stat = "ram_pct";
-              show_value = true;
-              show_glyph = true;
-              visualization = "gauge";
-              capsule = true;
-              capsule_border = "primary";
-              capsule_fill = "on_primary";
-              capsule_foreground = "primary";
-              capsule_opacity = 0.85;
-            };
-            widget.swap = {
-              type = "sysmon";
-              stat = "swap_pct";
-              show_value = true;
-              show_glyph = true;
-              visualization = "gauge";
-              capsule = true;
-              capsule_border = "primary";
-              capsule_fill = "on_primary";
-              capsule_foreground = "primary";
-              capsule_opacity = 0.85;
-            };
-            widget.disk = {
-              type = "sysmon";
-              stat = "disk_free_pct";
-              path = "/";
-              show_value = true;
-              show_glyph = true;
-              visualization = "gauge";
-              capsule = true;
-              capsule_border = "primary";
-              capsule_fill = "on_primary";
-              capsule_foreground = "primary";
-              capsule_opacity = 0.85;
-            };
-
-            # ── Hooks ─────────────────────────────────────────────────
-            # Auto-reload Hyprland (and the GPU shader) whenever Noctalia
-            # changes the wallpaper or regenerates the color palette.
-            # This keeps borders, active/inactive colors, and the vibrancy
-            # shader in sync without requiring a compositor restart.
-            # NOTE: hooks are not yet supported in v5.0.0 — using systemd
-            # service + noctalia-hypr-reload script instead.
-            # hooks = {
-            #   enabled = true;
-            #   wallpaperChange = "noctalia-hypr-reload";
-            #   colorGeneration = "noctalia-hypr-reload && zellij-colors-sync";
-            # };
-          };
-        };
-
-        systemd.user.services = {
-          # Noctalia v5 is statically linked and dlopen's libEGL.so at runtime.
-          # Two vars are required for eglGetDisplay to succeed:
-          #   1. LD_LIBRARY_PATH — so dlopen("libEGL.so") finds the GLVND dispatcher
-          #      (/run/opengl-driver/lib only has libEGL_mesa.so, not the dispatcher)
-          #   2. __EGL_VENDOR_LIBRARY_DIRS — so GLVND can locate the Mesa ICD
-          #      vendor JSON (50_mesa.json) and back the dispatcher with a real driver.
-          # Without both, eglGetDisplay returns NULL and noctalia crashes on startup.
+        programs = {
           noctalia = {
-            Service = {
-              Environment = [
-                "LD_LIBRARY_PATH=${pkgs.libglvnd}/lib:/run/opengl-driver/lib"
-                "__EGL_VENDOR_LIBRARY_DIRS=/run/opengl-driver/share/glvnd/egl_vendor.d"
+            enable = true;
+            systemd.enable = true;
+            inherit (cfg) package;
+            checkConfig = true;
+
+            settings = {
+              # ── Shell ────────────────────────────────────────────────
+              shell = {
+                corner_radius_scale = 1.0;
+                font_family = "JetBrainsMono NF Medium";
+                lang = "";
+                time_format = "{:%H:%M:%S}";
+                date_format = "";
+                polkit_agent = true;
+                password_style = "random";
+                launch_apps_as_systemd_services = true;
+                telemetry_enabled = true;
+                screen_time_enabled = true;
+                avatar_path = "/home/t0psh31f/Clan/NFP/layers/00-cyberia/02-assets/png-ico/Zoro.png";
+                external_ip_enabled = true;
+                app_icon_colorize = false;
+              };
+              shell.animation = {
+                speed = 0.75;
+              };
+              shell.greeter_sync = {
+                auto_sync = true;
+              };
+              shell.launcher = {
+                categories = true;
+                default_view = "all";
+                show_icons = true;
+                sort_by_usage = true;
+                app_grid = true;
+                compact = true;
+              };
+              shell.panel = {
+                launcher_placement = "attached";
+                open_near_click_clipboard = true;
+                transparency_mode = "glass";
+              };
+              shell.screen_corners = {
+                enabled = true;
+              };
+              shell.screenshot = {
+                confirm_region = true;
+              };
+
+              # ── Theme ────────────────────────────────────────────────
+              theme = {
+                mode = "dark";
+                source = "wallpaper";
+                wallpaper_scheme = "m3-content";
+                # community_palette removed — use wallpaper-based color generation
+                # To restore a fixed palette, uncomment and set: community_palette = "Palette Name";
+              };
+              theme.templates = {
+                builtin_ids = [
+                  "btop"
+                  "cava"
+                  "gtk3"
+                  "gtk4"
+                  "ghostty"
+                  "helix"
+                  "hyprland"
+                  "kcolorscheme"
+                  "kitty"
+                  "qt"
+                  "starship"
+                  "wezterm"
+                ];
+                community_ids = [
+                  "pi-agent"
+                  "spicetify"
+                  "pywalfox"
+                  "neovim"
+                  "obsidian"
+                  "vscode"
+                  "zed"
+                  "rofi"
+                  "vicinae"
+                  "discord"
+                  "papirus-icons"
+                  "telegram"
+                  "yazi"
+                  "zathura"
+                  "snappy-switcher"
+                  "hyprtoolkit"
+                  "opencode"
+                ];
+              };
+
+              # ── Wallpaper ────────────────────────────────────────────
+              wallpaper = {
+                enabled = true;
+                fill_mode = "crop";
+                fill_color = "surface";
+                directory = "/home/t0psh31f/Pictures";
+                directory_dark = "/home/t0psh31f/Pictures";
+                transition = [
+                  "honeycomb"
+                  "fade"
+                ];
+                transition_duration = 17600;
+                transition_on_startup = true;
+              };
+              wallpaper.automation = {
+                enabled = false;
+                interval_seconds = 900;
+                order = "random";
+              };
+              wallpaper.default = {
+                path = "/home/t0psh31f/Pictures/one-piece-season-15-3840x2160-22127.jpg";
+              };
+              wallpaper.last = {
+                path = "/home/t0psh31f/Pictures/one-piece-season-15-3840x2160-22127.jpg";
+              };
+              wallpaper.monitor = {
+                "eDP-1" = {
+                  directory = "/home/t0psh31f/Pictures";
+                };
+                "DP-1" = {
+                  directory = "/home/t0psh31f/Pictures";
+                };
+                "HDMI-A-1" = {
+                  directory = "/home/t0psh31f/Pictures";
+                };
+                "HDMI-A-2" = {
+                  directory = "/home/t0psh31f/Pictures";
+                };
+              };
+              wallpaper.monitors = {
+                "eDP-1" = {
+                  path = "/home/t0psh31f/Pictures/one-piece-season-15-3840x2160-22127.jpg";
+                };
+                "HDMI-A-2" = {
+                  path = "/home/t0psh31f/Pictures/one-piece-season-15-3840x2160-22127.jpg";
+                };
+                "DP-2" = {
+                  path = "/home/t0psh31f/Pictures/one-piece-season-15-3840x2160-22127.jpg";
+                };
+              };
+
+              # ── Backdrop ─────────────────────────────────────────────
+              backdrop = {
+                enabled = false; # Disabled: oversized blur regions behind notifications/dock/OSD
+                blur_intensity = 0.4;
+                tint_intensity = 0.6;
+              };
+
+              # ── Audio ────────────────────────────────────────────────
+              audio = {
+                enable_overdrive = true;
+                enable_sounds = true;
+              };
+
+              # ── Four-Bar Cockpit Geometry & Theming ─────────────────
+              bar = {
+                order = [
+                  "default"
+                  "bottom-bar"
+                  "left-bar"
+                  "right-bar"
+                ];
+              };
+
+              # 1. Top Bar: Always visible primary system cockpit
+              bar.default = {
+                enabled = true;
+                position = "top";
+                layer = "overlay";
+                thickness = 44;
+                scale = 1.15;
+                padding = 14;
+                panel_overlap = -2;
+                margin_edge = 0;
+                margin_ends = 36;
+                margin_opposite_edge = 0;
+                reserve_space = true;
+                background_opacity = 0.82;
+                border = "primary";
+                border_width = 1.5;
+                capsule = true;
+                capsule_border = "secondary";
+                capsule_border_width = 1.5;
+                capsule_opacity = 0.85;
+                capsule_padding = 9.0;
+                concave_edge_corners = true;
+                radius = 28;
+                radius_top_left = 0;
+                radius_top_right = 0;
+                radius_bottom_left = 28;
+                radius_bottom_right = 28;
+                font_family = "Symbols Nerd Font Mono";
+                widget_spacing = 4;
+                color = "primary";
+                icon_color = "secondary";
+                start = [
+                  "launcher"
+                  "workspaces"
+                ];
+                center = [
+                  "media"
+                  "cat"
+                ];
+                end = [
+                  "tailnet"
+                  "battery"
+                  "clock"
+                  "control-center"
+                ];
+                dead_zone.actions = {
+                  scroll_up = "volume-up";
+                  scroll_down = "volume-down";
+                  middle = "volume-mute";
+                };
+              };
+
+              # 2. Bottom Bar: Always visible dock & taskbar hybrid
+              bar.bottom-bar = {
+                enabled = true;
+                position = "bottom";
+                layer = "overlay";
+                thickness = 44;
+                scale = 1.15;
+                padding = 14;
+                panel_overlap = -2;
+                margin_edge = 0;
+                margin_ends = 36;
+                margin_opposite_edge = 0;
+                reserve_space = true;
+                background_opacity = 0.82;
+                border = "primary";
+                border_width = 1.5;
+                capsule = true;
+                capsule_border = "secondary";
+                capsule_border_width = 1.5;
+                capsule_opacity = 0.85;
+                capsule_padding = 9.0;
+                concave_edge_corners = true;
+                radius = 28;
+                radius_bottom_left = 0;
+                radius_bottom_right = 0;
+                radius_top_left = 28;
+                radius_top_right = 28;
+                font_family = "Symbols Nerd Font Mono";
+                widget_spacing = 4;
+                color = "primary";
+                icon_color = "secondary";
+                dead_zone.actions = {
+                  scroll_up = "volume-up";
+                  scroll_down = "volume-down";
+                  middle = "volume-mute";
+                };
+                start = [
+                  "session"
+                  "notes"
+                  "herdr"
+                ];
+                center = [
+                  "taskbar"
+                ];
+                end = [
+                  "cpu"
+                  "gpu"
+                  "ram"
+                  "disk"
+                  "clipboard"
+                  "tray"
+                  "notifications"
+                ];
+              };
+
+              # 3. Left Bar: Auto-hiding AI fleet, containers & telemetry
+              bar.left-bar = {
+                enabled = true;
+                position = "left";
+                layer = "overlay";
+                thickness = 44;
+                scale = 1.15;
+                padding = 14;
+                panel_overlap = -2;
+                margin_edge = 0;
+                margin_ends = 36;
+                margin_opposite_edge = 0;
+                reserve_space = false;
+                auto_hide = true;
+                smart_auto_hide = true;
+                auto_hide_delay_ms = 250;
+                show_on_workspace_switch = true;
+                background_opacity = 0.82;
+                border = "hover";
+                border_width = 1.5;
+                capsule = true;
+                capsule_border = "secondary";
+                capsule_border_width = 1.5;
+                capsule_opacity = 0.85;
+                capsule_padding = 9.0;
+                concave_edge_corners = true;
+                radius = 28;
+                radius_top_left = 0;
+                radius_bottom_left = 0;
+                radius_top_right = 28;
+                radius_bottom_right = 28;
+                font_family = "Symbols Nerd Font Mono";
+                widget_spacing = 4;
+                color = "primary";
+                icon_color = "primary";
+                start = [
+                  "agents"
+                  "herdr"
+                ];
+                center = [
+                  "containers"
+                  "ai-usage"
+                  "router"
+                ];
+                end = [
+                  "neuralwatt"
+                  "ai-triage"
+                ];
+              };
+
+              # 4. Right Bar: Auto-hiding quick tools & productivity
+              bar.right-bar = {
+                enabled = true;
+                position = "right";
+                layer = "overlay";
+                thickness = 44;
+                scale = 1.15;
+                padding = 14;
+                panel_overlap = -2;
+                margin_edge = 0;
+                margin_ends = 36;
+                margin_opposite_edge = 0;
+                reserve_space = false;
+                auto_hide = true;
+                smart_auto_hide = true;
+                auto_hide_delay_ms = 250;
+                show_on_workspace_switch = true;
+                background_opacity = 0.82;
+                border = "hover";
+                border_width = 1.5;
+                capsule = true;
+                capsule_border = "secondary";
+                capsule_border_width = 1.5;
+                capsule_opacity = 0.85;
+                capsule_padding = 9.0;
+                concave_edge_corners = true;
+                radius = 28;
+                radius_top_right = 0;
+                radius_bottom_right = 0;
+                radius_top_left = 28;
+                radius_bottom_left = 28;
+                font_family = "Symbols Nerd Font Mono";
+                widget_spacing = 4;
+                color = "primary";
+                icon_color = "primary";
+                start = [
+                  "screen-toolkit"
+                  "screen_recorder"
+                ];
+                center = [
+                  "todo"
+                  "phone"
+                  "mail"
+                ];
+                end = [
+                  "wallhaven"
+                  "theme-switcher"
+                  "w-engine"
+                ];
+              };
+
+              # ── Brightness ────────────────────────────────────────────
+              brightness = {
+                sync_all_monitors = true;
+              };
+
+              # ── Calendar ─────────────────────────────────────────────
+              calendar = {
+                enabled = true;
+                refresh_minutes = 240;
+              };
+              calendar.account.personal_google = {
+                color = "primary";
+                name = "WE77";
+                type = "google";
+              };
+              calendar.account.secondary_google = {
+                color = "secondary";
+                name = "LL";
+                type = "google";
+              };
+
+              # ── Control Center ────────────────────────────────────────
+              control_center = {
+                sidebar = "full";
+                sidebar_section = "full";
+                width = 920;
+              };
+              control_center.shortcuts = [
+                { type = "wifi"; }
+                { type = "bluetooth"; }
+                { type = "nightlight"; }
+                { type = "keyboard_layout"; }
+                { type = "wallpaper"; }
+                { type = "power_profile"; }
               ];
+
+              # ── Dock ─────────────────────────────────────────────────
+              dock = {
+                enabled = false;
+                position = "bottom";
+                auto_hide = false;
+                active_monitor_only = false;
+                show_running = true;
+                magnification = true;
+                magnification_scale = 1.35;
+                background_opacity = 0.81;
+                launcher_icon = "brand-nixos";
+                launcher_position = "start";
+                launcher_custom_image = "/home/t0psh31f/.icons/nixos-logo.png";
+                margin_edge = 2;
+                pinned = [ "Brave" ];
+                radius = 23;
+                reserve_space = false;
+                show_dots = true;
+              };
+
+              # ── Hot Corners ──────────────────────────────────────────
+              hot_corners = {
+                enabled = true;
+                top_left.action = "launcher";
+                top_right.action = "control_center";
+                bottom_left.action = "window_switcher";
+              };
+
+              # ── Idle ─────────────────────────────────────────────────
+              # DISABLED: noctalia's native idle system causes Wayland
+              # "Broken pipe" crashes on Intel Iris Xe when the display
+              # wakes from DPMS screen-off. hypridle handles this instead.
+              idle = {
+                behavior_order = [ ];
+                behavior = {
+                  lock = {
+                    action = "lock";
+                    enabled = false;
+                    timeout = 600.0;
+                  };
+                  screen-off = {
+                    action = "screen_off";
+                    enabled = false;
+                    timeout = 660.0;
+                  };
+                  lock-and-suspend = {
+                    action = "lock_and_suspend";
+                    enabled = false;
+                    timeout = 900.0;
+                  };
+                };
+              };
+
+              # ── Keybinds ─────────────────────────────────────────────
+              keybinds = {
+                cancel = [ "Escape" ];
+                up = [
+                  "Up"
+                  "Alt+j"
+                ];
+                down = [
+                  "Down"
+                  "Alt+k"
+                ];
+                left = [
+                  "Left"
+                  "Alt+h"
+                ];
+                right = [
+                  "Right"
+                  "Alt+l"
+                ];
+              };
+
+              # ── Location ──────────────────────────────────────────────
+              location = {
+                address = "Los Angeles, CA";
+                auto_locate = true;
+              };
+
+              # ── Lockscreen Widgets ────────────────────────────────────
+              lockscreen_widgets = {
+                enabled = true;
+                schema_version = 2;
+                widget_order = [
+                  "lockscreen-login-box@DP-2"
+                  "lockscreen-login-box@eDP-1"
+                ];
+              };
+              lockscreen_widgets.grid = {
+                cell_size = 16;
+                major_interval = 4;
+                visible = true;
+              };
+              lockscreen_widgets.widget."lockscreen-login-box@eDP-1" = {
+                box_height = 70.0;
+                box_width = 400.0;
+                cx = 800.0;
+                cy = 881.0;
+                output = "eDP-1";
+                rotation = 0.0;
+                type = "login_box";
+              };
+              lockscreen_widgets.widget."lockscreen-login-box@eDP-1".settings = {
+                background_color = "surface_variant";
+                background_opacity = 0.88;
+                background_radius = 12.0;
+                input_opacity = 1.0;
+                input_radius = 6.0;
+                show_caps_lock = true;
+                show_keyboard_layout = true;
+                show_login_button = true;
+              };
+              lockscreen_widgets.widget."lockscreen-login-box@DP-2" = {
+                box_height = 70.0;
+                box_width = 400.0;
+                cx = 960.0;
+                cy = 961.0;
+                output = "DP-2";
+                rotation = 0.0;
+                type = "login_box";
+              };
+              lockscreen_widgets.widget."lockscreen-login-box@DP-2".settings = {
+                background_color = "surface_variant";
+                background_opacity = 0.88;
+                background_radius = 12.0;
+                input_opacity = 1.0;
+                input_radius = 6.0;
+                show_caps_lock = true;
+                show_keyboard_layout = true;
+                show_login_button = true;
+              };
+
+              # ── Notifications ─────────────────────────────────────────
+              notification = {
+                enable_daemon = true;
+                position = "top_right";
+                layer = "overlay";
+                background_opacity = 0.94;
+              };
+
+              # ── OSD ──────────────────────────────────────────────────
+              osd = {
+                position = "bottom_center";
+                position_vertical = "center_right";
+                orientation = "horizontal";
+                scale = 1.0;
+                background_opacity = 0.97;
+              };
+
+              # ── Plugins ──────────────────────────────────────────────
+              plugins.enabled = [
+                # Official plugins
+                "noctalia/bongocat"
+                "noctalia/screen_recorder"
+                "noctalia/notes"
+                "noctalia/wallhaven"
+                # Community plugins
+                "community/9router-control"
+                "community/anilist"
+                "community/audio-switcher"
+                "community/bookmarks"
+                "community/calculator"
+                "community/claude-companion"
+                "community/config-swap"
+                "community/dns-switcher"
+                "community/drive-health"
+                "community/ds4-color"
+                "community/eyecare"
+                "community/file-search"
+                "community/game-launcher"
+                "community/gamer-mode"
+                "community/gslapper"
+                "community/hassio"
+                "community/hypr-layout-switcher"
+                "community/imagemagick-clock"
+                "community/ip-monitor"
+                "community/keybind-cheatsheet"
+                "community/keymap"
+                "community/llamanager"
+                "community/lyrics"
+                "community/mimir"
+                "community/mini-docker"
+                "community/niri-active-workspace"
+                "community/niri-animations"
+                "community/nix-monitor"
+                "community/noctwhspr"
+                "community/obsidian"
+                "community/phone-connect"
+                "community/portctl"
+                "community/procmon"
+                "community/screen-toolkit"
+                "community/special-workspaces"
+                "community/spotify-lyrics"
+                "community/ssh-launcher"
+                "community/tailscale"
+                "community/tailnet"
+                "community/todo"
+                "community/topgrade-wrapper"
+                "community/udiskie"
+                "community/web-launcher"
+                "community/w-engine"
+              ];
+              plugins.source = [
+                {
+                  name = "official";
+                  kind = "git";
+                  location = "https://github.com/noctalia-dev/official-plugins";
+                }
+                {
+                  name = "community";
+                  kind = "git";
+                  location = "https://github.com/noctalia-dev/community-plugins";
+                }
+              ];
+
+              # ── System Monitor (Low-Overhead Polling) ────────────────
+              system.monitor = {
+                cpu_poll_seconds = 5;
+                gpu_poll_seconds = 30;
+                memory_poll_seconds = 5;
+                network_poll_seconds = 5;
+                disk_poll_seconds = 60;
+              };
+
+              # ── Weather ──────────────────────────────────────────────
+              weather = {
+                unit = "imperial";
+              };
+
+              # ── Battery Device ───────────────────────────────────────
+              battery.device."/org/freedesktop/UPower/devices/mouse_dev_4E_B6_4B_9A_28_22" = {
+                warning_threshold = 10;
+              };
+
+              # ── Widget Definitions & Styling ─────────────────────────
+              widget = {
+                battery = {
+                  capsule = true;
+                  capsule_border = "primary";
+                  capsule_fill = "on_primary";
+                  capsule_foreground = "on_primary";
+                  capsule_opacity = 0.92;
+                  display_mode = "graphic";
+                  scale = 1.1;
+                };
+                bluetooth = {
+                  enabled = true;
+                  capsule = true;
+                  capsule_border = "primary";
+                  capsule_fill = "on_primary";
+                  capsule_foreground = "on_primary";
+                  capsule_opacity = 0.90;
+                };
+                brightness = {
+                  enabled = true;
+                  show_label = false;
+                  capsule = true;
+                  capsule_border = "primary";
+                  capsule_fill = "on_primary";
+                  capsule_foreground = "on_primary";
+                  capsule_opacity = 0.90;
+                };
+                clipboard = {
+                  capsule = true;
+                  capsule_border = "primary";
+                  capsule_fill = "on_primary";
+                  capsule_foreground = "on_primary";
+                  capsule_opacity = 0.91;
+                };
+                clock = {
+                  capsule = true;
+                  capsule_border = "primary";
+                  capsule_fill = "on_primary";
+                  capsule_foreground = "on_primary";
+                  capsule_opacity = 0.90;
+                  format = "{:%a, %b %d %H:%M:%S}";
+                  scale = 1.1;
+                };
+                tailnet = {
+                  type = "rylos/tailnet:bar";
+                  capsule = true;
+                  capsule_border = "primary";
+                  capsule_fill = "on_primary";
+                  capsule_foreground = "secondary";
+                  capsule_opacity = 0.90;
+                };
+                control-center = {
+                  capsule = true;
+                  capsule_border = "primary";
+                  capsule_fill = "on_primary";
+                  capsule_foreground = "secondary";
+                  capsule_opacity = 0.91;
+                  custom_image = "/home/t0psh31f/.icons/Anime/1P/one-piece-jolly-roger-icons-by-crountch/png/256x256/Luffys flag.png";
+                };
+                launcher = {
+                  capsule = true;
+                  capsule_border = "primary";
+                  capsule_fill = "on_primary";
+                  capsule_foreground = "secondary";
+                  capsule_opacity = 0.89;
+                  custom_image = "/home/t0psh31f/.icons/nixos-logo.png";
+                  glyph = "brand-nixos";
+                  scale = 1.25;
+                };
+                media = {
+                  capsule = true;
+                  capsule_border = "primary";
+                  capsule_fill = "on_primary";
+                  capsule_foreground = "secondary";
+                  capsule_opacity = 0.93;
+                  color = "primary";
+                  hide_when_no_media = true;
+                  min_length = 116;
+                  title_scroll = "always";
+                };
+                network = {
+                  capsule = true;
+                  capsule_border = "primary";
+                  capsule_fill = "on_primary";
+                  capsule_foreground = "on_primary";
+                  capsule_opacity = 0.90;
+                  color = "primary";
+                  enabled = true;
+                  icon_color = "primary";
+                };
+                notifications = {
+                  capsule = true;
+                  hide_when_no_unread = true;
+                };
+                session = {
+                  enabled = true;
+                  capsule = true;
+                  capsule_border = "primary";
+                  capsule_fill = "on_primary";
+                  capsule_foreground = "secondary";
+                  capsule_opacity = 0.90;
+                };
+                tray = {
+                  capsule = true;
+                  capsule_border = "primary";
+                  capsule_fill = "on_primary";
+                  capsule_foreground = "secondary";
+                  capsule_opacity = 0.93;
+                  color = "secondary";
+                  drawer = true;
+                  icon_color = "secondary";
+                };
+                volume = {
+                  capsule = true;
+                  capsule_border = "primary";
+                  capsule_fill = "on_primary";
+                  capsule_foreground = "tertiary";
+                  capsule_opacity = 0.86;
+                  capsule_padding = 11;
+                  scale = 1.1;
+                };
+                wallpaper = {
+                  capsule = true;
+                  capsule_border = "primary";
+                  capsule_fill = "on_primary";
+                  capsule_foreground = "secondary";
+                  capsule_opacity = 0.88;
+                  color = "primary";
+                  icon_color = "primary";
+                };
+                workspaces = {
+                  capsule = true;
+                  capsule_border = "primary";
+                  capsule_fill = "on_primary";
+                  capsule_foreground = "secondary";
+                  capsule_opacity = 0.90;
+                  color = "primary";
+                  label_source = "name";
+                  show_labels = true;
+                  empty_color = "tertiary";
+                  icon_color = "primary";
+                  labels_only_when_occupied = false;
+                };
+                taskbar = {
+                  capsule = true;
+                  capsule_border = "primary";
+                  capsule_fill = "on_primary";
+                  capsule_foreground = "secondary";
+                  capsule_opacity = 0.90;
+                  show_running = true;
+                };
+                cat = {
+                  type = "noctalia/bongocat:cat";
+                };
+                notes = {
+                  type = "noctalia/notes:notes";
+                };
+                agents = {
+                  type = "notfinaldev/agentik:agents";
+                };
+                herdr = {
+                  type = "hy4ri/herdr:bar";
+                };
+                containers = {
+                  type = "davinci13/containers:bar";
+                };
+                ai-usage = {
+                  type = "felipeartur/ai-usagebar:bar";
+                };
+                router = {
+                  type = "weinguyen/9router-control:widget";
+                };
+                neuralwatt = {
+                  type = "omertahaoztop/neuralwatt:bar";
+                };
+                ai-triage = {
+                  type = "miguelfm/ai-triage:bar";
+                };
+                screen-toolkit = {
+                  type = "alexander/screen-toolkit:widget";
+                };
+                todo = {
+                  type = "nightwatch75/todo:todo";
+                };
+                phone = {
+                  type = "icefish/phone-connect:bar";
+                };
+                mail = {
+                  type = "mdj2812/thunderbird-companion:mail";
+                };
+                wallhaven = {
+                  type = "noctalia/wallhaven:wallhaven";
+                };
+                theme-switcher = {
+                  type = "theblackdon/theme-switcher:theme-switcher";
+                };
+                w-engine = {
+                  type = "tadomika_ari/w-engine:w-engine-widget";
+                };
+                cpu = {
+                  type = "sysmon";
+                  stat = "cpu_usage";
+                  show_value = true;
+                  show_glyph = true;
+                  visualization = "gauge";
+                  capsule = true;
+                  capsule_border = "primary";
+                  capsule_fill = "on_primary";
+                  capsule_foreground = "primary";
+                  capsule_opacity = 0.85;
+                };
+                gpu = {
+                  type = "sysmon";
+                  stat = "gpu_usage";
+                  show_value = true;
+                  show_glyph = true;
+                  visualization = "gauge";
+                  capsule = true;
+                  capsule_border = "primary";
+                  capsule_fill = "on_primary";
+                  capsule_foreground = "primary";
+                  capsule_opacity = 0.85;
+                };
+                ram = {
+                  type = "sysmon";
+                  stat = "ram_pct";
+                  show_value = true;
+                  show_glyph = true;
+                  visualization = "gauge";
+                  capsule = true;
+                  capsule_border = "primary";
+                  capsule_fill = "on_primary";
+                  capsule_foreground = "primary";
+                  capsule_opacity = 0.85;
+                };
+                swap = {
+                  type = "sysmon";
+                  stat = "swap_pct";
+                  show_value = true;
+                  show_glyph = true;
+                  visualization = "gauge";
+                  capsule = true;
+                  capsule_border = "primary";
+                  capsule_fill = "on_primary";
+                  capsule_foreground = "primary";
+                  capsule_opacity = 0.85;
+                };
+                disk = {
+                  type = "sysmon";
+                  stat = "disk_free_pct";
+                  path = "/";
+                  show_value = true;
+                  show_glyph = true;
+                  visualization = "gauge";
+                  capsule = true;
+                  capsule_border = "primary";
+                  capsule_fill = "on_primary";
+                  capsule_foreground = "primary";
+                  capsule_opacity = 0.85;
+                };
+
+              };
+
+              # ── Hooks ─────────────────────────────────────────────────
+              # Auto-reload Hyprland (and the GPU shader) whenever Noctalia
+              # changes the wallpaper or regenerates the color palette.
+              # This keeps borders, active/inactive colors, and the vibrancy
+              # shader in sync without requiring a compositor restart.
+              # NOTE: hooks are not yet supported in v5.0.0 — using systemd
+              # service + noctalia-hypr-reload script instead.
+              # hooks = {
+              #   enabled = true;
+              #   wallpaperChange = "noctalia-hypr-reload";
+              #   colorGeneration = "noctalia-hypr-reload && zellij-colors-sync";
+              # };
             };
           };
 
-          noctalia-experience-dirs = {
-            Unit = {
-              Description = "Ensure Noctalia HVE cache and experience directories exist";
-              Before = [ "graphical-session-pre.target" ];
+          zsh.initContent = lib.mkAfter ''
+            if command -v noctalia-starship-sync >/dev/null 2>&1; then
+              noctalia-starship-sync
+            fi
+          '';
+
+          bash.initExtra = lib.mkAfter ''
+            if command -v noctalia-starship-sync >/dev/null 2>&1; then
+              noctalia-starship-sync
+            fi
+          '';
+        };
+
+        systemd.user = {
+          services = {
+            # Noctalia v5 is statically linked and dlopen's libEGL.so at runtime.
+            # Two vars are required for eglGetDisplay to succeed:
+            #   1. LD_LIBRARY_PATH — so dlopen("libEGL.so") finds the GLVND dispatcher
+            #      (/run/opengl-driver/lib only has libEGL_mesa.so, not the dispatcher)
+            #   2. __EGL_VENDOR_LIBRARY_DIRS — so GLVND can locate the Mesa ICD
+            #      vendor JSON (50_mesa.json) and back the dispatcher with a real driver.
+            # Without both, eglGetDisplay returns NULL and noctalia crashes on startup.
+            noctalia = {
+              Service = {
+                Environment = [
+                  "LD_LIBRARY_PATH=${pkgs.libglvnd}/lib:/run/opengl-driver/lib"
+                  "__EGL_VENDOR_LIBRARY_DIRS=/run/opengl-driver/share/glvnd/egl_vendor.d"
+                ];
+              };
             };
-            Install = {
-              WantedBy = [ "graphical-session-pre.target" ];
+
+            noctalia-experience-dirs = {
+              Unit = {
+                Description = "Ensure Noctalia HVE cache and experience directories exist";
+                Before = [ "graphical-session-pre.target" ];
+              };
+              Install = {
+                WantedBy = [ "graphical-session-pre.target" ];
+              };
+              Service = {
+                Type = "oneshot";
+                RemainAfterExit = true;
+                ExecStart = "${pkgs.bash}/bin/bash -c 'mkdir -p %h/.config/hypr/experiences %h/.cache/noctalia/HVE'";
+              };
             };
-            Service = {
-              Type = "oneshot";
-              RemainAfterExit = true;
-              ExecStart = "${pkgs.bash}/bin/bash -c 'mkdir -p %h/.config/hypr/experiences %h/.cache/noctalia/HVE'";
+
+            # Sync Noctalia colors → Hyprland borders, Zellij, and Starship on login.
+            # Runs noctalia-hypr-reload which regenerates noctalia-colors.conf
+            # from the current wallpaper and reloads the compositor.
+            noctalia-colors-sync = {
+              Unit = {
+                Description = "Sync Noctalia colors to Hyprland, Zellij, and Starship";
+                After = [
+                  "graphical-session.target"
+                  "noctalia.service"
+                ];
+                Requires = [ "noctalia.service" ];
+              };
+              Service = {
+                Type = "oneshot";
+                ExecStart = "${pkgs.bash}/bin/bash -c 'sleep 3 && noctalia-hypr-reload && noctalia-starship-sync'";
+              };
+              Install = {
+                WantedBy = [ "graphical-session.target" ];
+              };
             };
           };
 
-          # Sync Noctalia colors → Hyprland borders, Zellij, and Starship on login.
-          # Runs noctalia-hypr-reload which regenerates noctalia-colors.conf
-          # from the current wallpaper and reloads the compositor.
-          noctalia-colors-sync = {
+          # Re-sync colors every 15 min (wallpaper auto-regenerates on this cycle)
+          timers.noctalia-colors-sync = {
             Unit = {
-              Description = "Sync Noctalia colors to Hyprland, Zellij, and Starship";
-              After = [
-                "graphical-session.target"
-                "noctalia.service"
-              ];
-              Requires = [ "noctalia.service" ];
+              Description = "Periodic Noctalia color sync";
             };
-            Service = {
-              Type = "oneshot";
-              ExecStart = "${pkgs.bash}/bin/bash -c 'sleep 3 && noctalia-hypr-reload && noctalia-starship-sync'";
+            Timer = {
+              OnBootSec = "30s";
+              OnUnitActiveSec = "15min";
+              Unit = "noctalia-colors-sync.service";
             };
             Install = {
-              WantedBy = [ "graphical-session.target" ];
+              WantedBy = [ "timers.target" ];
             };
           };
         };
-
-        # Re-sync colors every 15 min (wallpaper auto-regenerates on this cycle)
-        systemd.user.timers.noctalia-colors-sync = {
-          Unit = {
-            Description = "Periodic Noctalia color sync";
-          };
-          Timer = {
-            OnBootSec = "30s";
-            OnUnitActiveSec = "15min";
-            Unit = "noctalia-colors-sync.service";
-          };
-          Install = {
-            WantedBy = [ "timers.target" ];
-          };
-        };
-        # Encapsulated Noctalia Starship Palette sync
-        programs.zsh.initContent = lib.mkAfter ''
-          if command -v noctalia-starship-sync >/dev/null 2>&1; then
-            noctalia-starship-sync
-          fi
-        '';
-
-        programs.bash.initExtra = lib.mkAfter ''
-          if command -v noctalia-starship-sync >/dev/null 2>&1; then
-            noctalia-starship-sync
-          fi
-        '';
       };
     };
 }

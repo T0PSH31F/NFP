@@ -46,17 +46,18 @@
 
   hardware.graphics.enable = true;
 
-  systemd.settings.Manager = {
-    DefaultEnvironment = "WLR_RENDERER_ALLOW_SOFTWARE=1 WLR_NO_HARDWARE_CURSORS=1 LIBGL_ALWAYS_SOFTWARE=1";
-  };
-  systemd.user.settings.Manager = {
-    DefaultEnvironment = "WLR_RENDERER_ALLOW_SOFTWARE=1 WLR_NO_HARDWARE_CURSORS=1 LIBGL_ALWAYS_SOFTWARE=1";
-  };
-
-  systemd.services.greetd.environment = {
-    WLR_RENDERER_ALLOW_SOFTWARE = "1";
-    WLR_NO_HARDWARE_CURSORS = "1";
-    LIBGL_ALWAYS_SOFTWARE = "1";
+  systemd = {
+    settings.Manager = {
+      DefaultEnvironment = "WLR_RENDERER_ALLOW_SOFTWARE=1 WLR_NO_HARDWARE_CURSORS=1 LIBGL_ALWAYS_SOFTWARE=1";
+    };
+    user.settings.Manager = {
+      DefaultEnvironment = "WLR_RENDERER_ALLOW_SOFTWARE=1 WLR_NO_HARDWARE_CURSORS=1 LIBGL_ALWAYS_SOFTWARE=1";
+    };
+    services.greetd.environment = {
+      WLR_RENDERER_ALLOW_SOFTWARE = "1";
+      WLR_NO_HARDWARE_CURSORS = "1";
+      LIBGL_ALWAYS_SOFTWARE = "1";
+    };
   };
 
   environment.sessionVariables = {

@@ -21,6 +21,7 @@ in
       pkgs.jellyfin-desktop
       pkgs.orca
       pkgs.pirate-get
+      pkgs.peerflix-server
       pkgs.spotdl
       pkgs.transmission_4
       pkgs.yt-dlp
