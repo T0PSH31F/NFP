@@ -10,46 +10,72 @@ let
 in
 {
   options.layers.layer-50.cli.nixvim = {
-    enable = lib.mkEnableOption "NixVim — declarative Neovim" // {
+    enable = lib.mkOption {
+      type = lib.types.bool;
       default = true;
+      description = "NixVim — declarative Neovim";
     };
 
     plugins = {
-      blink-cmp = lib.mkEnableOption "blink.cmp completion engine" // {
+      blink-cmp = lib.mkOption {
+        type = lib.types.bool;
         default = true;
+        description = "blink.cmp completion engine";
       };
-      neo-tree = lib.mkEnableOption "Neo-tree file explorer" // {
+      neo-tree = lib.mkOption {
+        type = lib.types.bool;
         default = true;
+        description = "Neo-tree file explorer";
       };
-      telescope = lib.mkEnableOption "Telescope fuzzy finder" // {
+      telescope = lib.mkOption {
+        type = lib.types.bool;
         default = true;
+        description = "Telescope fuzzy finder";
       };
-      noice = lib.mkEnableOption "Noice command line UI" // {
+      noice = lib.mkOption {
+        type = lib.types.bool;
         default = true;
+        description = "Noice command line UI";
       };
-      neoscroll = lib.mkEnableOption "Neoscroll smooth scrolling animations" // {
+      neoscroll = lib.mkOption {
+        type = lib.types.bool;
         default = true;
+        description = "Neoscroll smooth scrolling animations";
       };
-      smear-cursor = lib.mkEnableOption "Smear-cursor trailing effect" // {
+      smear-cursor = lib.mkOption {
+        type = lib.types.bool;
         default = true;
+        description = "Smear-cursor trailing effect";
       };
-      lazygit = lib.mkEnableOption "LazyGit integration" // {
+      lazygit = lib.mkOption {
+        type = lib.types.bool;
         default = true;
+        description = "LazyGit integration";
       };
-      trouble = lib.mkEnableOption "Trouble diagnostics list" // {
+      trouble = lib.mkOption {
+        type = lib.types.bool;
         default = true;
+        description = "Trouble diagnostics list";
       };
-      which-key = lib.mkEnableOption "Which-key keybinding help" // {
+      which-key = lib.mkOption {
+        type = lib.types.bool;
         default = true;
+        description = "Which-key keybinding help";
       };
-      opencode = lib.mkEnableOption "OpenCode AI assistant (Claude Code)" // {
+      opencode = lib.mkOption {
+        type = lib.types.bool;
         default = true;
+        description = "OpenCode AI assistant (Claude Code)";
       };
-      ollama = lib.mkEnableOption "Ollama local LLM integration" // {
+      ollama = lib.mkOption {
+        type = lib.types.bool;
         default = true;
+        description = "Ollama local LLM integration";
       };
-      multicursors = lib.mkEnableOption "Multicursors.nvim — VS Code-style multi-cursor editing" // {
+      multicursors = lib.mkOption {
+        type = lib.types.bool;
         default = true;
+        description = "Multicursors.nvim — VS Code-style multi-cursor editing";
       };
     };
   };

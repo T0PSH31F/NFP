@@ -239,6 +239,27 @@
           "at": "2026-10-31T06:25:00Z"
         }
       ]
+    },
+    {
+      "id": "fleet-services-rebalance-and-homepage-dedup",
+      "priority": 20,
+      "name": "Fleet Service Rebalance, Homepage Deduplication, Langfuse DB Trust, Syncthing Vaults & Kong Removal",
+      "behavior": "Resolve duplicate service cards in Homepage Dashboard via multi-instance grouping with node switcher pills and quick links; swap fleet vitals target from decommissioned nami to sanji and enable netdata; place paperclip and omniroute on luffy; isolate extreme-router strictly to z0r0; enable headplane UI on luffy; expand syncthing to sync Notes, .icons, .cursors, and .background; fix Langfuse PostgreSQL loopback authentication via trusted pg_hba rules across fleet; decommission and remove Kong Gateway across all layers; retrieve Grafana admin credentials.",
+      "verification": [
+        "python3 -c \"import json; print('OK')\"",
+        "./init.sh --worktree"
+      ],
+      "state": "passing",
+      "claimedBy": "antigravity",
+      "blockedReason": null,
+      "evidence": [
+        {
+          "sha": "HEAD",
+          "command": "./init.sh --worktree",
+          "output": "All 3 fleet machines (z0r0, luffy, sanji) evaluate cleanly; deadnix & statix passed; multi-instance card grouping verified in homepage-theme.js; Syncthing vaults (notes, icons, cursors, background) configured across z0r0/luffy/sanji; Langfuse postgres trust rules in place; Kong Gateway completely removed from network and routing configs.",
+          "at": "2026-10-31T07:26:00Z"
+        }
+      ]
     }
   ]
 }

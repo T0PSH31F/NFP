@@ -31,19 +31,12 @@
   nixos =
     let
       cfg = config.layers.layer-71.harness.codex;
-      kongBase =
-        if (config.services.ai-services.kong-gateway.enable or false) then
-          "http://127.0.0.1:${toString (config.services.ai-services.kong-gateway.proxyPort or 8090)}"
-        else
-          "http://127.0.0.1:20128";
+      routerBase = "http://127.0.0.1:20128";
     in
     lib.mkIf cfg.enable {
       environment.systemPackages = lib.optional (pkgs ? codex) pkgs.codex;
       environment.sessionVariables = {
-        OPENAI_BASE_URL_KONG_ER = lib.mkDefault "${kongBase}/v1";
-        OPENAI_BASE_URL_KONG_OMNI = lib.mkDefault "${kongBase}/omni/v1";
-        OPENAI_BASE_URL_KONG_FREE = lib.mkDefault "${kongBase}/llm/free/v1";
-        OPENAI_BASE_URL_KONG_FRONTIER = lib.mkDefault "${kongBase}/llm/frontier/v1";
+        OPENAI_BASE_URL = lib.mkDefault "${routerBase}/v1";
         OPENAI_BASE_URL_EXTREME_DIRECT = lib.mkDefault "http://127.0.0.1:20128/v1";
       };
     };
@@ -52,52 +45,30 @@
     { osConfig, ... }:
     let
       cfg = osConfig.layers.layer-71.harness.codex;
-      kongBase =
-        if (osConfig.services.ai-services.kong-gateway.enable or false) then
-          "http://127.0.0.1:${toString (osConfig.services.ai-services.kong-gateway.proxyPort or 8090)}"
-        else
-          "http://127.0.0.1:20128";
+      routerBase = "http://127.0.0.1:20128";
       codexConfigToml = ''
-        model_provider = "kong"
-        model = "cx/gpt-5.3-codex"
+        model_provider = "extreme-router"
+        model = "cascade/agent"
 
         [profiles.responses]
-        model_provider = "kong"
-        model = "cx/gpt-5.3-codex"
+        model_provider = "extreme-router"
+        model = "cascade/agent"
 
-        [model_providers.kong]
-        name = "Kong AI Gateway"
-        base_url = "${kongBase}/v1"
-        env_key = "KONG_KEY_CODEX"
-        wire_api = "responses"
-
-        [model_providers.kong-er]
-        name = "Kong ExtremeRouter"
-        base_url = "http://sanji.nfp.nix:8090/v1"
-        env_key = "KONG_KEY_CODEX"
+        [model_providers.extreme-router]
+        name = "ExtremeRouter"
+        base_url = "${routerBase}/v1"
+        env_key = "EXTREMEROUTER_API_KEY"
         wire_api = "responses"
 
         [model_providers.jev]
         name = "Jev Tier Router"
-        base_url = "${kongBase}/jev/v1"
-        env_key = "KONG_KEY_CODEX"
-        wire_api = "responses"
-
-        [model_providers.kong-omni]
-        name = "Kong OmniRoute"
-        base_url = "${kongBase}/omni/v1"
-        env_key = "KONG_KEY_CODEX"
-        wire_api = "responses"
-
-        [model_providers.kong-free]
-        name = "Kong FreeLLMPool"
-        base_url = "${kongBase}/llm/free/v1"
-        env_key = "KONG_KEY_CODEX"
+        base_url = "http://127.0.0.1:20127/v1"
+        env_key = "EXTREMEROUTER_API_KEY"
         wire_api = "responses"
 
         [model_providers.extreme-direct]
         name = "ExtremeRouter Direct"
-        base_url = "http://z0r0.nfp.nix:20128/v1"
+        base_url = "http://127.0.0.1:20128/v1"
         env_key = "EXTREMEROUTER_API_KEY"
         wire_api = "responses"
       '';

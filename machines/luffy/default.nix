@@ -114,8 +114,34 @@ in
     upstreamRouterUrl = "http://100.64.0.1:20128";
   };
   layers.layer-20.services.config.nixarr-stack.enable = true;
-  layers.layer-20.services.config.jackett.enable = true;
+  layers.layer-20.services.config.jackett.enable = false;
   layers.layer-20.services.config.netdata.enable = true;
+
+  # Paperclip orchestrator online on luffy
+  layers.layer-76.orchestrators.paperclip.enable = true;
+
+  # Keep extreme-router strictly on z0r0
+  layers.layer-78.llm-routers.extreme-router.enable = false;
+
+  # Headplane web UI for local Headscale server
+  layers.layer-20.services.config.headplane = {
+    enable = true;
+    port = 3050;
+    headscaleUrl = "http://127.0.0.1:8086";
+  };
+
+  # OmniRoute AI Gateway on luffy
+  services.ai-services.omniroute = {
+    enable = true;
+    port = 20129;
+    environmentFile = config.sops.templates."omniroute-env".path;
+  };
+
+  # Langfuse LLM Observability suite
+  services.infrastructure.langfuse = {
+    enable = true;
+    port = 3005;
+  };
 
   layers.layer-20.services.communication.rustdesk = {
     enable = true;
@@ -327,7 +353,7 @@ in
     };
 
     # Moved from Nami
-    n8n-server.enable = true;
+    n8n-server.enable = false;
     mautrix-bridges = {
       enable = true;
       homeserverUrl = "http://localhost:8008";
@@ -417,7 +443,7 @@ in
             handle @openclaw { reverse_proxy localhost:59879 }
 
             @n8n host n8n.lovelain.duckdns.org
-            handle @n8n { reverse_proxy localhost:5678 }
+            # handle @n8n { reverse_proxy localhost:5678 }  # deactivated
 
             @komga host komga.lovelain.duckdns.org
             # handle @komga { reverse_proxy localhost:25600 }  # removed — komga dropped

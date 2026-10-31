@@ -15,11 +15,7 @@ with lib;
 let
   cfg = config.layers.layer-76.hermes-live-voice;
   voiceDaemon = ../../72-voice/hermes-voice-daemon.py;
-  kongBaseUrl =
-    if (config.services.ai-services.kong-gateway.enable or false) then
-      "http://127.0.0.1:${toString (config.services.ai-services.kong-gateway.proxyPort or 8090)}"
-    else
-      "http://sanji.nfp.nix:8090";
+  routerBaseUrl = "http://127.0.0.1:20128";
   jevBaseUrl = "http://127.0.0.1:${
     toString (
       if (config.layers.layer-78.llm-routers.jev.enable or false) then
@@ -50,10 +46,10 @@ in
         exec ${pkgs.python3}/bin/python3 ${voiceDaemon} --serve --port ${toString cfg.port} "$@"
       '')
       (pkgs.writeShellScriptBin "nfp-voice-demo" ''
-        exec ${pkgs.python3}/bin/python3 ${voiceDaemon} --demo --jev-url "${jevBaseUrl}" --kong-url "${kongBaseUrl}" "$@"
+        exec ${pkgs.python3}/bin/python3 ${voiceDaemon} --demo --jev-url "${jevBaseUrl}" --router-url "${routerBaseUrl}" "$@"
       '')
       (pkgs.writeShellScriptBin "nfp-voice-golden-test" ''
-        exec ${pkgs.python3}/bin/python3 ${voiceDaemon} --golden-test --jev-url "${jevBaseUrl}" --kong-url "${kongBaseUrl}" "$@"
+        exec ${pkgs.python3}/bin/python3 ${voiceDaemon} --golden-test --jev-url "${jevBaseUrl}" --router-url "${routerBaseUrl}" "$@"
       '')
     ];
 
@@ -97,7 +93,7 @@ in
               "HERMES_HOME=/var/lib/hermes/.hermes"
               "HERMES_LIVE_PORT=${toString cfg.port}"
               "HERMES_VOICE_STATE_DIR=/var/lib/hermes-voice"
-              "KONG_BASE_URL=${kongBaseUrl}"
+              "ROUTER_BASE_URL=${routerBaseUrl}"
               "JEV_BASE_URL=${jevBaseUrl}"
             ];
           };
@@ -128,9 +124,8 @@ in
               if ! curl -sf --max-time 3 "${jevBaseUrl}/health" >/dev/null 2>&1; then
                 FAILURES+=("jev-router:${jevBaseUrl}")
               fi
-              KONG_CODE="$(curl -s -o /dev/null -w "%{http_code}" --max-time 3 "${kongBaseUrl}" || echo "000")"
-              if [ "$KONG_CODE" = "000" ]; then
-                FAILURES+=("kong-gateway:${kongBaseUrl}")
+              if ! curl -sf --max-time 3 "${routerBaseUrl}/v1/models" >/dev/null 2>&1; then
+                FAILURES+=("extreme-router:${routerBaseUrl}")
               fi
               if ! curl -sf --max-time 3 "http://127.0.0.1:8089/healthz" >/dev/null 2>&1; then
                 FAILURES+=("pi-durable-daemon:8089")
@@ -176,7 +171,7 @@ in
             EnvironmentFile = optional (
               config.sops ? templates && config.sops.templates ? "hermes-env"
             ) config.sops.templates."hermes-env".path;
-            ExecStart = "${pkgs.python3}/bin/python3 ${voiceDaemon} --golden-test --jev-url ${jevBaseUrl} --kong-url ${kongBaseUrl}";
+            ExecStart = "${pkgs.python3}/bin/python3 ${voiceDaemon} --golden-test --jev-url ${jevBaseUrl} --router-url ${routerBaseUrl}";
           };
         };
       };

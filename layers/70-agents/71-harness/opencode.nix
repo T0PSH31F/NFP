@@ -512,15 +512,10 @@
               };
             };
 
-            # Kong AI Gateway — unified LLM provider
-            # Routes to ExtremeRouter (coding), FreeLLMAPI (free), etc.
+            # ExtremeRouter Primary LLM Provider
             kong =
               let
-                kongUrl =
-                  if (osConfig.services.ai-services.kong-gateway.enable or false) then
-                    "http://127.0.0.1:${toString (osConfig.services.ai-services.kong-gateway.proxyPort or 8090)}/v1"
-                  else
-                    "http://127.0.0.1:20128/v1";
+                kongUrl = "http://127.0.0.1:20128/v1";
               in
               {
                 npm = "@ai-sdk/openai-compatible";

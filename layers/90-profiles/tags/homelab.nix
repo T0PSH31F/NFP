@@ -10,7 +10,7 @@
       vaultwarden-server.enable = lib.mkDefault true;
       filebrowser-app.enable = lib.mkDefault true;
       glances-server.enable = lib.mkDefault false;
-      n8n-server.enable = lib.mkDefault true;
+      n8n-server.enable = lib.mkDefault false;
 
       postgresql.enableTCPIP = lib.mkDefault true; # Enable remote Postgres for MatrixDB, honcho, etc.
 

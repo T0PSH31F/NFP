@@ -16,7 +16,7 @@
       # Mock options required by the media-stack modules in isolation
       options = {
         environment.persistence = lib.mkOption {
-          type = lib.types.attrs;
+          type = lib.types.attrsOf lib.types.anything;
           default = { };
         };
 

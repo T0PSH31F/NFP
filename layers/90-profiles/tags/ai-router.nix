@@ -8,7 +8,6 @@
 {
   config = lib.mkIf (lib.elem "ai-router" config.machine.tags) {
     services.ai-services = {
-      kong-gateway.enable = lib.mkDefault false;
       omniroute.enable = lib.mkDefault false;
       manifest.enable = lib.mkDefault false;
       freellmapi.enable = lib.mkDefault false;

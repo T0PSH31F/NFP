@@ -112,6 +112,15 @@
   # Netdata real-time monitoring
   layers.layer-20.services.config.netdata.enable = true;
 
+  # Primary ExtremeRouter instance on z0r0
+  layers.layer-78.llm-routers.extreme-router.enable = true;
+
+  # Langfuse LLM Observability suite
+  services.infrastructure.langfuse = {
+    enable = true;
+    port = 3005;
+  };
+
   # Isolated second Tailscale daemon for friend tailnet (userspace proxy)
   layers.layer-20.services.config.tailscale-sidecar.enable = true;
 

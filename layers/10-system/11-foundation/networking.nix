@@ -68,8 +68,6 @@
         8087 # Mealie
         8088 # Open WebUI
         8089 # Filebrowser
-        8090 # Kong Gateway (proxy)
-        8091 # Kong Admin API
         7777 # Polyfloor API
         7119 # CalibreWeb
         8095 # qBittorrent WebUI

@@ -17,7 +17,7 @@
       options = {
         layers.layer-10.system.config.impermanence.enable = lib.mkEnableOption "impermanence";
         environment.persistence = lib.mkOption {
-          type = lib.types.attrs;
+          type = lib.types.attrsOf lib.types.anything;
           default = { };
         };
         layers.meta.primaryUser = lib.mkOption {

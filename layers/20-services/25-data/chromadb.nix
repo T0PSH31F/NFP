@@ -6,11 +6,7 @@
 with lib;
 {
   options.services.ai-services.chromadb = {
-    enable = mkOption {
-      type = types.bool;
-      default = false;
-      description = "Enable ChromaDB vector database";
-    };
+    enable = mkEnableOption "ChromaDB vector database";
 
     port = mkOption {
       type = types.int;

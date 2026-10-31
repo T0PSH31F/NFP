@@ -10,8 +10,10 @@ let
 in
 {
   options.layers.layer-60.gui.mpv = {
-    enable = lib.mkEnableOption "MPV Media Player" // {
+    enable = lib.mkOption {
+      type = lib.types.bool;
       default = true;
+      description = "MPV Media Player";
     };
   };
 

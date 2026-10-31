@@ -68,8 +68,8 @@ in
 
     smbVersion = mkOption {
       type = types.str;
-      default = "3.0";
-      description = "SMB protocol version (e.g. 3.0, 3.1.1, 2.1, 1.0)";
+      default = "1.0";
+      description = "SMB protocol version (e.g. 1.0, 2.1, 3.0, 3.1.1 — Buffalo LinkStation requires 1.0)";
     };
 
     credentialsFile = mkOption {

@@ -510,7 +510,7 @@
     const allIds = group.instances.map(i => i.id).join(' ');
 
     const switcherPillsHtml = group.instances.map((inst, idx) => {
-      const hostName = inst.targetHost || (inst.name.match(/\(([^)]+)\)/) ? inst.name.match(/\(([^)]+)\)/)[1] : 'node');
+      const hostName = inst.targetHost || (inst.id.includes('@') ? inst.id.split('@')[1] : (inst.name.match(/\(([^)]+)\)/) ? inst.name.match(/\(([^)]+)\)/)[1] : 'luffy'));
       const isFirst = idx === 0;
       return `
         <button class="instance-pill ${isFirst ? 'active' : ''}"
@@ -536,7 +536,7 @@
       const hasLogs = inst.logs && inst.logs.enable && inst.logs.url;
       const declaredFields = (inst.metric && inst.metric.fields) || [];
       const isHealthOnly = !inst.metric || inst.metric.mode === 'health-only' || declaredFields.length === 0;
-      const hostName = inst.targetHost || (inst.name.match(/\(([^)]+)\)/) ? inst.name.match(/\(([^)]+)\)/)[1] : 'node');
+      const hostName = inst.targetHost || (inst.id.includes('@') ? inst.id.split('@')[1] : (inst.name.match(/\(([^)]+)\)/) ? inst.name.match(/\(([^)]+)\)/)[1] : 'luffy'));
 
       const initialFieldsHtml = isHealthOnly
         ? `<div class="metric-health-pill">HEALTH CHECKED</div>`
@@ -572,7 +572,7 @@
     }).join('');
 
     const quickLinksHtml = group.instances.map(inst => {
-      const hostName = inst.targetHost || (inst.name.match(/\(([^)]+)\)/) ? inst.name.match(/\(([^)]+)\)/)[1] : 'node');
+      const hostName = inst.targetHost || (inst.id.includes('@') ? inst.id.split('@')[1] : (inst.name.match(/\(([^)]+)\)/) ? inst.name.match(/\(([^)]+)\)/)[1] : 'luffy'));
       return `<a href="${inst.url}" target="_blank" rel="noopener noreferrer" class="quick-node-link" title="Open on ${hostName}">${hostName} ↗</a>`;
     }).join('');
 

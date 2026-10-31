@@ -6,36 +6,12 @@
 with lib;
 {
   options.services.databases = {
-    postgresql.enable = mkOption {
-      type = types.bool;
-      default = false;
-      description = "Persist PostgreSQL data. Auto-detected from services.postgresql.enable by default.";
-    };
-    mysql.enable = mkOption {
-      type = types.bool;
-      default = false;
-      description = "Persist MySQL data. Auto-detected from services.mysql.enable by default.";
-    };
-    redis.enable = mkOption {
-      type = types.bool;
-      default = false;
-      description = "Persist Redis data. Auto-detected from services.redis.servers by default.";
-    };
-    mongodb.enable = mkOption {
-      type = types.bool;
-      default = false;
-      description = "Persist MongoDB data. Auto-detected from services.mongodb.enable by default.";
-    };
-    influxdb.enable = mkOption {
-      type = types.bool;
-      default = false;
-      description = "Persist InfluxDB data. Auto-detected from services.influxdb.enable by default.";
-    };
-    victoriametrics.enable = mkOption {
-      type = types.bool;
-      default = false;
-      description = "Persist VictoriaMetrics data. Auto-detected from services.victoriametrics.enable by default.";
-    };
+    postgresql.enable = mkEnableOption "Persist PostgreSQL data. Auto-detected from services.postgresql.enable by default.";
+    mysql.enable = mkEnableOption "Persist MySQL data. Auto-detected from services.mysql.enable by default.";
+    redis.enable = mkEnableOption "Persist Redis data. Auto-detected from services.redis.servers by default.";
+    mongodb.enable = mkEnableOption "Persist MongoDB data. Auto-detected from services.mongodb.enable by default.";
+    influxdb.enable = mkEnableOption "Persist InfluxDB data. Auto-detected from services.influxdb.enable by default.";
+    victoriametrics.enable = mkEnableOption "Persist VictoriaMetrics data. Auto-detected from services.victoriametrics.enable by default.";
   };
 
   config = mkIf config.layers.layer-10.system.config.impermanence.enable {

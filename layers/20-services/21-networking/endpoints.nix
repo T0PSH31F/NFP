@@ -33,7 +33,6 @@ in
       freellmapi = mkEndpoint "127.0.0.1" (config.services.ai-services.freellmapi.port or 3001) "/v1";
       freellmpool = mkEndpoint "127.0.0.1" (config.services.ai-services.freellmpool.port or 8083) "/v1";
       manifest = mkEndpoint "127.0.0.1" (config.services.ai-services.manifest.port or 2099) "/v1";
-      kong = mkEndpoint "127.0.0.1" (config.services.ai-services.kong-gateway.proxyPort or 8090) "/v1";
       jev-router = mkEndpoint "127.0.0.1" (config.layers.layer-78.llm-routers.jev-router-plugin.port
         or 20127
       ) "/v1";

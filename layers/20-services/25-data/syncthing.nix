@@ -116,6 +116,50 @@ in
             ignorePerms = false;
             rescanIntervalS = 60;
           };
+          "notes-vault" = {
+            path = "${cfg.dataDir}/Notes";
+            devices = [
+              "z0r0"
+              "luffy"
+              "sanji"
+            ];
+            label = "Notes Vault";
+            ignorePerms = false;
+            rescanIntervalS = 60;
+          };
+          "icons-vault" = {
+            path = "${cfg.dataDir}/.icons";
+            devices = [
+              "z0r0"
+              "luffy"
+              "sanji"
+            ];
+            label = "Icons Vault";
+            ignorePerms = false;
+            rescanIntervalS = 60;
+          };
+          "cursors-vault" = {
+            path = "${cfg.dataDir}/.cursors";
+            devices = [
+              "z0r0"
+              "luffy"
+              "sanji"
+            ];
+            label = "Cursors Vault";
+            ignorePerms = false;
+            rescanIntervalS = 60;
+          };
+          "background-vault" = {
+            path = "${cfg.dataDir}/.background";
+            devices = [
+              "z0r0"
+              "luffy"
+              "sanji"
+            ];
+            label = "Background Vault";
+            ignorePerms = false;
+            rescanIntervalS = 60;
+          };
         };
       };
     };

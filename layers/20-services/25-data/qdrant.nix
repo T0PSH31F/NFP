@@ -6,11 +6,7 @@
 with lib;
 {
   options.services.ai-services.qdrant = {
-    enable = mkOption {
-      type = types.bool;
-      default = false;
-      description = "Enable Qdrant vector database";
-    };
+    enable = mkEnableOption "Qdrant vector database";
 
     port = mkOption {
       type = types.int;

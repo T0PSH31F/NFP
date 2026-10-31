@@ -17,8 +17,10 @@
   ];
 
   options.layers.layer-79.skills.todo-system = {
-    enable = lib.mkEnableOption "Rofi + Hermes To-Do system" // {
+    enable = lib.mkOption {
+      type = lib.types.bool;
       default = true;
+      description = "Rofi + Hermes To-Do system";
     };
   };
 }

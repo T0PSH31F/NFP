@@ -32,11 +32,7 @@ in
       description = "IP addresses AdGuard Home should bind its DNS server to. Default 0.0.0.0 all interfaces. Override to specific IPs if port 53 conflicts with podman aardvark-dns.";
     };
 
-    dhcp = mkOption {
-      type = types.bool;
-      default = false;
-      description = "Enable AdGuard Home DHCP server";
-    };
+    dhcp = mkEnableOption "AdGuard Home DHCP server";
 
     lanInterface = mkOption {
       type = types.str;

@@ -101,6 +101,7 @@ with lib;
           "Games"
           "Appimages"
           "Notes"
+          ".icons"
           ".cursors"
           ".thunderbird"
           ".background"

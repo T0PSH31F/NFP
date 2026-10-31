@@ -507,58 +507,24 @@
                 api_key: "''${NOUS_API_KEY}"
                 request_timeout_seconds: 180
                 fetch_models: true
-              kong-er:
-                base_url: "http://${
-                  if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
-                }:8090/v1"
-                api_key: "''${KONG_API_KEY}"
+              extreme-router:
+                base_url: "http://127.0.0.1:20128/v1"
+                api_key: "''${EXTREMEROUTER_API_KEY}"
                 request_timeout_seconds: 180
                 fetch_models: true
               jev:
-                base_url: "http://${
-                  if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
-                }:8090/jev/v1"
-                api_key: "''${KONG_API_KEY}"
+                base_url: "http://127.0.0.1:20127/v1"
+                api_key: "''${EXTREMEROUTER_API_KEY}"
                 request_timeout_seconds: 180
                 fetch_models: true
-              kong-voice:
-                base_url: "http://${
-                  if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
-                }:8090/jev/v1"
-                api_key: "''${KONG_KEY_HERMES_VOICE}"
-                request_timeout_seconds: 30
-                fetch_models: true
-              kong-omni:
-                base_url: "http://${
-                  if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
-                }:8090/omni/v1"
-                api_key: "''${KONG_API_KEY}"
-                request_timeout_seconds: 180
-                fetch_models: true
-              kong-free:
-                base_url: "http://${
-                  if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
-                }:8090/llm/free/v1"
-                api_key: "''${KONG_API_KEY}"
-                request_timeout_seconds: 180
-                fetch_models: true
-              kong-frontier:
-                base_url: "http://${
-                  if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
-                }:8090/llm/frontier/v1"
-                api_key: "''${KONG_API_KEY}"
+              omniroute:
+                base_url: "http://127.0.0.1:20129/v1"
+                api_key: "''${EXTREMEROUTER_API_KEY}"
                 request_timeout_seconds: 180
                 fetch_models: true
               extreme-direct:
                 base_url: "http://z0r0.nfp.nix:20128/v1"
                 api_key: "''${EXTREMEROUTER_API_KEY}"
-                request_timeout_seconds: 180
-                fetch_models: true
-              kong:
-                base_url: "http://${
-                  if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
-                }:8090/v1"
-                api_key: "''${KONG_API_KEY}"
                 request_timeout_seconds: 180
                 fetch_models: true
 
@@ -567,41 +533,17 @@
                 base_url: "https://inference-api.nousresearch.com/v1"
                 api_key: "''${NOUS_API_KEY}"
                 fetch_models: true
-              - name: kong-er
-                base_url: "http://${
-                  if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
-                }:8090/v1"
-                api_key: "''${KONG_API_KEY}"
+              - name: extreme-router
+                base_url: "http://127.0.0.1:20128/v1"
+                api_key: "''${EXTREMEROUTER_API_KEY}"
                 fetch_models: true
               - name: jev
-                base_url: "http://${
-                  if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
-                }:8090/jev/v1"
-                api_key: "''${KONG_API_KEY}"
+                base_url: "http://127.0.0.1:20127/v1"
+                api_key: "''${EXTREMEROUTER_API_KEY}"
                 fetch_models: true
-              - name: kong-voice
-                base_url: "http://${
-                  if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
-                }:8090/jev/v1"
-                api_key: "''${KONG_KEY_HERMES_VOICE}"
-                fetch_models: true
-              - name: kong-omni
-                base_url: "http://${
-                  if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
-                }:8090/omni/v1"
-                api_key: "''${KONG_API_KEY}"
-                fetch_models: true
-              - name: kong-free
-                base_url: "http://${
-                  if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
-                }:8090/llm/free/v1"
-                api_key: "''${KONG_API_KEY}"
-                fetch_models: true
-              - name: kong-frontier
-                base_url: "http://${
-                  if (config.services.ai-services.kong-gateway.enable or false) then "127.0.0.1" else "sanji.nfp.nix"
-                }:8090/llm/frontier/v1"
-                api_key: "''${KONG_API_KEY}"
+              - name: omniroute
+                base_url: "http://127.0.0.1:20129/v1"
+                api_key: "''${EXTREMEROUTER_API_KEY}"
                 fetch_models: true
               - name: extreme-direct
                 base_url: "http://z0r0.nfp.nix:20128/v1"
@@ -611,8 +553,8 @@
             fallback_providers:
               - nous
               - jev
-              - kong-er
-              - kong-free
+              - extreme-router
+              - omniroute
               - extreme-direct
 
             credential_pool_strategies:

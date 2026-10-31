@@ -69,6 +69,12 @@ in
       openFirewall = true;
     };
 
+    services.readarr = {
+      enable = true;
+      dataDir = "${cfg.stateDir}/readarr";
+      openFirewall = false;
+    };
+
     # Declarative nfp.services contracts for nixarr media services
     nfp.services = {
       jellyfin = {
@@ -369,6 +375,33 @@ in
               "subtitles"
             ];
           };
+        };
+        healthcheck = {
+          enable = true;
+          path = "/";
+          expectedStatus = [
+            200
+            401
+          ];
+        };
+      };
+
+      readarr = {
+        enable = true;
+        host = config.networking.hostName;
+        bind = "127.0.0.1";
+        port = 8787;
+        tailnetName = "readarr";
+        tls = "headscale";
+        backup.paths = [ "${cfg.stateDir}/readarr" ];
+        homepage = {
+          enable = true;
+          category = "robin";
+          order = 25;
+          title = "Readarr";
+          subtitle = "Poneglyph Book Finder";
+          icon = "readarr";
+          satellite = null;
         };
         healthcheck = {
           enable = true;

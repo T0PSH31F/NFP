@@ -112,13 +112,27 @@ with lib;
         };
       };
 
+      services.postgresql = mkIf (config.services.postgresql.enable or false) {
+        ensureDatabases = [ "paperclip" ];
+        ensureUsers = [
+          {
+            name = "paperclip";
+            ensureDBOwnership = true;
+          }
+        ];
+      };
+
       systemd.tmpfiles.rules = [
         "d ${cfg.dataDir} 0755 root root -"
       ];
 
       systemd.services.paperclip = {
         description = "Paperclip — orchestrate AI agent teams";
-        after = [ "network.target" ];
+        after = [
+          "network.target"
+          "postgresql.service"
+        ];
+        wants = optional (config.services.postgresql.enable or false) "postgresql.service";
         wantedBy = [ "multi-user.target" ];
 
         serviceConfig = {

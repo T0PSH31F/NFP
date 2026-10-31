@@ -6,7 +6,7 @@
     services.feishin.enable = lib.mkDefault true;
 
     layers.layer-20.services.config = {
-      media-stack.enable = lib.mkDefault true;
+      media-stack.enable = lib.mkDefault false; # Legacy stack deprecated in favor of nixarr-stack
       nixarr-stack.enable = lib.mkDefault true;
       romm.enable = lib.mkDefault true;
     };

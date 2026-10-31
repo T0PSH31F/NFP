@@ -596,5 +596,12 @@ No modifications produced by worker.
 - **State change:** passing (evidence recorded in feature_list.json)
 - **Next action:** Commit, push, and notify user.
 
+- **Date / Agent:** 2026-10-31 / antigravity
+- **Feature:** fleet-services-rebalance-and-homepage-dedup
+- **Work done:** Swapped homepage fleet vitals from nami to sanji Netdata (`:19999`); implemented multi-instance card deduplication with node switcher pills and status indicators in `homepage-theme.js`; relocated Paperclip and OmniRoute (`:20129`) to luffy; isolated ExtremeRouter (`:20128`) strictly to z0r0; enabled Headplane UI (`:3050`) on luffy; expanded Syncthing to sync `Notes`, `~/.icons`, `~/.cursors`, and `~/.background` across `z0r0`, `luffy`, and `sanji`; updated impermanence to persist `.icons`; configured PostgreSQL trusted TCP loopback for Langfuse (`127.0.0.1/32 trust`) and updated database connection string; completely eradicated Kong Gateway (tombstoned module to false, removed ports 8090/8091 from firewall and endpoints, stripped Kong templates from `kong-secrets.nix`, and repointed all agent harnesses to ExtremeRouter and Jev directly); retrieved Grafana admin credentials.
+- **Verification:** `./init.sh --worktree` passed 5/5 across all 3 machines (`z0r0`, `luffy`, `sanji`); deadnix & statix passed; `feature_list.json` maintained under 300 lines (265 lines).
+- **State change:** passing (evidence recorded in feature_list.json)
+- **Next action:** Commit, push to main, and vocalize update via GLaDOS voice.
+
 
 

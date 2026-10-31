@@ -110,9 +110,6 @@
         enable = true;
         acceleration = "cuda";
       };
-      kong-gateway = {
-        enable = false;
-      };
       omniroute = {
         enable = false;
         environmentFile = config.sops.templates."omniroute-env".path;
@@ -163,6 +160,10 @@
     ollamaUrl = "http://127.0.0.1:11434";
     ollamaModel = "qwen3.5:9b";
   };
+
+  layers.layer-20.services.config.netdata.enable = true;
+  layers.layer-76.orchestrators.paperclip.enable = false;
+  layers.layer-78.llm-routers.extreme-router.enable = false;
 
   # ============================================================================
   # 05 - SECURITY & SECRETS (SOPS)
