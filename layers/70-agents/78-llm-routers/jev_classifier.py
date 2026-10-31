@@ -368,15 +368,28 @@ class JevHandler(BaseHTTPRequestHandler):
                     headers={"Content-Type": "application/json"},
                     method="POST"
                 )
-                with urllib.request.urlopen(upstream_req, timeout=60) as upstream_resp:
+                with urllib.request.urlopen(upstream_req, timeout=120) as upstream_resp:
                     self.send_response(upstream_resp.status)
+                    is_streaming = "stream" in raw_body and '"stream": true' in raw_body.lower()
                     for k, v in upstream_resp.headers.items():
                         if k.lower() not in ("content-length", "transfer-encoding"):
                             self.send_header(k, v)
-                    resp_body = upstream_resp.read()
-                    self.send_header("Content-Length", str(len(resp_body)))
-                    self.end_headers()
-                    self.wfile.write(resp_body)
+                    if is_streaming:
+                        self.send_header("Transfer-Encoding", "chunked")
+                        self.end_headers()
+                        while True:
+                            chunk = upstream_resp.read(1024)
+                            if not chunk:
+                                break
+                            self.wfile.write(f"{len(chunk):X}\r\n".encode("ascii") + chunk + b"\r\n")
+                            self.wfile.flush()
+                        self.wfile.write(b"0\r\n\r\n")
+                        self.wfile.flush()
+                    else:
+                        resp_body = upstream_resp.read()
+                        self.send_header("Content-Length", str(len(resp_body)))
+                        self.end_headers()
+                        self.wfile.write(resp_body)
             except Exception as e:
                 err_msg = f"Upstream ExtremeRouter unreachable: {e}"
                 try:
@@ -430,11 +443,15 @@ def self_test():
     print("==> All Jev Classifier tests PASSED!")
     return 0
 
+class ReusableHTTPServer(HTTPServer):
+    allow_reuse_address = True
+    daemon_threads = True
+
 if __name__ == "__main__":
     if "--test" in sys.argv:
         sys.exit(self_test())
 
-    server = HTTPServer((JEV_HOST, JEV_PORT), JevHandler)
+    server = ReusableHTTPServer((JEV_HOST, JEV_PORT), JevHandler)
     print(f"[JevClassifier] Daemon listening on http://{JEV_HOST}:{JEV_PORT}")
     try:
         server.serve_forever()

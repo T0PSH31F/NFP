@@ -80,8 +80,8 @@ in
         "$mod ALT, F, fullscreen, 1"
 
         # ── Window Floating & Pinning Controls ─────────────────────────
-        "$mod, V, togglefloating"
-        "$mod SHIFT, V, exec, hypr-window-pin"
+        "$mod SHIFT, F, togglefloating"
+        "$mod ALT, P, exec, hypr-window-pin"
 
         # ── Fractional Window Sizing Presets ───────────────────────────
         "$mod SHIFT, Minus, exec, hypr-fractional-resize 1/3"

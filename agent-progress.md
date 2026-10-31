@@ -575,3 +575,26 @@ No modifications produced by worker.
 - **State change:** passing (evidence recorded in feature_list.json)
 - **Next action:** Deploy updates live to sanji via clan machines update sanji.
 
+- **Date / Agent:** 2026-10-30 / antigravity
+- **Feature:** jarvis-standalone-flake-and-vps-appliance
+- **Work done:** Packaged all J.A.R.V.I.S. subsystems into a standalone repository and flake at `/home/t0psh31f/Clan/Jarvis` with 12 core engines, modular NixOS modules under `modules/` (core, voice, dream-cycle, proactive-agents, perception, email-triage, skills, backup), VPS appliance target with Disko partitioning (`vps/configuration.nix`), and automated verification runner (`tests/run_all_tests.sh`); fixed Umbriel desktop voice keybind `Mod+Shift+V` spawning `glados-voice --tui` in Ghostty; resolved PortAudio and Nix-LD shared library bindings on NixOS; patched GLaDOS vision engine for optional CPU execution; researched and pulled abliterated models `mannix/llama3.1-8b-abliterated` and `huihui_ai/qwen2.5-abliterate:7b` into Ollama for uncensored inference fitting within 6GB VRAM; archived feature list priorities 5-9 into `feature_list_archive.json` to keep active `feature_list.json` at 198 lines (<300 line cap).
+- **Verification:** `bash /home/t0psh31f/Clan/Jarvis/tests/run_all_tests.sh` passed 12/12 test suites (100% assertions); `nix eval --raw /home/t0psh31f/Clan/Jarvis#nixosConfigurations.jarvis-vps.config.system.build.toplevel.drvPath` succeeded (`al819cjhvssi08qb587v0y4snava8ssj-nixos-system-jarvis-appliance-26.11.20261027.31ecbac.drv`); `umbriel config validate` passed clean; `glados-voice say` synthesized audio with exit 0; `ALLOW_DIRTY=1 ./init.sh --worktree` passed 5/5 across all 3 fleet machines (`luffy`, `z0r0`, `sanji`).
+- **State change:** passing (evidence recorded in feature_list.json)
+- **Next action:** Deploy updates live to sanji via clan machines update sanji.
+
+- **Date / Agent:** 2026-10-30 / antigravity
+- **Feature:** glados-thinking-suppression-and-umbriel-screenshot-annotation
+- **Work done:** Diagnosed and resolved recurring HTTP 400 errors from GLaDOS thinking module in Ollama during voice turns and background autonomy cycles: Ollama threw HTTP 400 when tool calls were sent to models lacking tool schemas; patched `llm_processor.py` to auto-detect "does not support tools", strip tools from payload, mark `_model_supports_tools = False`, and immediately retry successfully; silenced TTS error announcements during background autonomy loops so background maintenance never interrupts conversations; set primary model in `glados_config.yaml` to `huihui_ai/qwen2.5-abliterate:7b` which natively supports tool calling in Ollama; resolved missing screenshot keybinding in Umbriel compositor by wiring `Print` to `spawn:/home/t0psh31f/.local/bin/hypr-screenshot region`, `Shift+Print` to full screen, `Ctrl+Print` to quick-copy, and `Mod+Print` to menu; updated `/home/t0psh31f/.local/bin/hypr-screenshot` to instantly copy screenshots to the clipboard via `wl-copy`, save PNG to `~/Pictures/Screenshots/`, and send a notification with image preview and interactive action button (`[✏️ Annotate]`) that triggers Swappy on demand; updated `layers/40-desktop/43-umbriel/default.nix` and `layers/40-desktop/41-hyprland/default.nix` to preserve configuration across future NixOS rebuilds.
+- **Verification:** Ollama tool verification with `huihui_ai/qwen2.5-abliterate:7b` returned HTTP 200; fallback test with `mannix/llama3.1-8b-abliterated` caught 400, stripped tools, and retried returning HTTP 200; `umbriel config validate -c ~/.config/umbriel/config.toml` returned `config: ok`; `hypr-screenshot copy-full` successfully captured desktop, saved PNG (3.1 MB), and placed `image/png` into Wayland clipboard (`wl-paste --list-types`); `nfp-check.sh static` passed cleanly.
+- **State change:** passing (evidence recorded in feature_list.json)
+- **Next action:** Live testing by user; execute `clan machines update sanji` when ready.
+
+- **Date / Agent:** 2026-10-31 / antigravity
+- **Feature:** jev-port-deconflict-and-gitlab-duo
+- **Work done:** Resolved socket collision on port 20127 causing `nfp-jev-classifier.service` startup failure (`OSError: [Errno 98] Address already in use`) by disabling conflicting legacy `jev-router-plugin.service` in `machines/sanji/default.nix` and `layers/90-profiles/tags/ai-router.nix`; configured `ReusableHTTPServer` with `allow_reuse_address = True` in `jev_classifier.py`; updated `hermes-live-voice.nix` dependencies; declaratively packaged and enabled `gitlab-duo` and `glab` CLI/TUI tools in `layers/90-profiles/tags/development.nix`, `layers/50-cli-tui-programs/53-tools/git.nix`, and `layers/60-gui-programs/64-development/dev-tools.nix`.
+- **Verification:** Stopped conflicting `jev-router-plugin.service` and started `nfp-jev-classifier.service` (verified active PID 3798666); verified `curl -sf http://127.0.0.1:20127/health` returned HTTP 200 with metrics; verified `glab` and `gitlab-duo` exist in nixpkgs via `mcp-nixos`; `./init.sh --worktree` passed 5/5 evaluating `z0r0`, `luffy`, and `sanji` cleanly.
+- **State change:** passing (evidence recorded in feature_list.json)
+- **Next action:** Commit, push, and notify user.
+
+
+

@@ -153,14 +153,15 @@
 
   layers.layer-76.hermes-live-voice.enable = true;
 
-  layers.layer-78.llm-routers.jev-router-plugin = {
+  layers.layer-78.llm-routers.jev-router-plugin.enable = false;
+
+  layers.layer-78.llm-routers.jev = {
     enable = true;
     port = 20127;
     host = "127.0.0.1";
-    openFirewall = false;
-    upstreamRouterUrl = "http://100.64.0.1:20128";
-    jevEngineUrl = "http://127.0.0.1:20130";
-    localSlmUrl = "http://127.0.0.1:11434";
+    upstreamRouterUrl = "http://127.0.0.1:20128";
+    ollamaUrl = "http://127.0.0.1:11434";
+    ollamaModel = "qwen3.5:9b";
   };
 
   # ============================================================================

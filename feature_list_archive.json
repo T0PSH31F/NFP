@@ -1,6 +1,6 @@
 {
   "project": "NFP",
-  "description": "NixOS fleet flake — dendritic layers, clan-core, impermanence, AI agent fleet",
+  "description": "NixOS fleet flake \u2014 dendritic layers, clan-core, impermanence, AI agent fleet",
   "states": {
     "untried": "No verified attempt yet.",
     "in-progress": "Being actively worked; not yet verified.",
@@ -798,7 +798,7 @@
       "id": "clan-fleet-update",
       "priority": 1,
       "name": "Fleet Deployment via Clan Machine Updates",
-      "behavior": "Execute live machine updates (clan machines update z0r0 and clan machines update luffy) to deploy the unified Phase 1–5 stack to hardware",
+      "behavior": "Execute live machine updates (clan machines update z0r0 and clan machines update luffy) to deploy the unified Phase 1\u20135 stack to hardware",
       "verification": [
         "clan machines update z0r0",
         "clan machines update luffy"
@@ -810,7 +810,7 @@
         {
           "sha": "HEAD",
           "command": "clan machines update z0r0",
-          "output": "Verified live machine update on z0r0 succeeded (target is already running /nix/store/hkj3hdv8xbckpss448b6y85x0j7861yq-nixos-system-z0r0-26.11.20260730.1559d3d — activation succeeded); luffy confirmed offline on Tailscale (100.80.146.120 timed out).",
+          "output": "Verified live machine update on z0r0 succeeded (target is already running /nix/store/hkj3hdv8xbckpss448b6y85x0j7861yq-nixos-system-z0r0-26.11.20260730.1559d3d \u2014 activation succeeded); luffy confirmed offline on Tailscale (100.80.146.120 timed out).",
           "at": "2026-08-27T02:04:45Z"
         }
       ]
@@ -1181,7 +1181,7 @@
     {
       "id": "group-a-session-path-propagation",
       "priority": 1,
-      "name": "Group A — Session PATH propagation (fixes agent-detection across the board)",
+      "name": "Group A \u2014 Session PATH propagation (fixes agent-detection across the board)",
       "behavior": "dbus-update-activation-environment --systemd --all and systemctl --user import-environment PATH present in Hyprland and Niri startup config",
       "verification": [
         "grep -q 'dbus-update-activation-environment' layers/40-desktop/41-hyprland/default.nix",
@@ -1202,7 +1202,7 @@
     {
       "id": "group-b-orchestrator-fhs-wrapping",
       "priority": 2,
-      "name": "Group B — buildFHSEnv wrapping for orchestrators that still fail",
+      "name": "Group B \u2014 buildFHSEnv wrapping for orchestrators that still fail",
       "behavior": "Wrap AionUI / mission-control / ExtremeRouter or inject PATH shims ensuring CLI agents (Claude Code, Hermes, OpenCode) are detected and execute end-to-end",
       "verification": [
         "nix eval .#nixosConfigurations.z0r0.config.systemd.services.aionui.serviceConfig.ExecStart",
@@ -1223,7 +1223,7 @@
     {
       "id": "group-c-extremerouter-mitm-ca-trust",
       "priority": 3,
-      "name": "Group C — MITM proxy CA trust (ExtremeRouter)",
+      "name": "Group C \u2014 MITM proxy CA trust (ExtremeRouter)",
       "behavior": "ExtremeRouter generated root CA certificate registered in security.pki.certificateFiles",
       "verification": [
         "nix eval .#nixosConfigurations.z0r0.config.security.pki.certificateFiles"
@@ -1243,7 +1243,7 @@
     {
       "id": "group-d-pxpipe-impermanence-docs",
       "priority": 4,
-      "name": "Group D — pxpipe explicitly outside Nix",
+      "name": "Group D \u2014 pxpipe explicitly outside Nix",
       "behavior": "pipx/uv available, user pipx and uv dirs added to impermanence persistence, documented as intentionally non-Nix",
       "verification": [
         "grep -q 'pipx' layers/10-system/15-filesystem/impermanence.nix",
@@ -1264,7 +1264,7 @@
     {
       "id": "group-e-profiles-machines-audit",
       "priority": 5,
-      "name": "Group E — Profiles/machines regression audit",
+      "name": "Group E \u2014 Profiles/machines regression audit",
       "behavior": "Git log/diff audit completed for dendritic migration removed toggles in machines/*/default.nix; all toggles restored to tag files or verified",
       "verification": [
         "nix build .#checks.x86_64-linux.dendritic-structure-test --no-link"
@@ -1284,7 +1284,7 @@
     {
       "id": "public-docs-readme-overhaul",
       "priority": 6,
-      "name": "Task 1 — README.md overhaul for public portfolio",
+      "name": "Task 1 \u2014 README.md overhaul for public portfolio",
       "behavior": "README.md rewritten for external audience with intro, architecture table, init.sh quickstart, and clean paths",
       "verification": [
         "test -f README.md",
@@ -1305,7 +1305,7 @@
     {
       "id": "public-docs-consistency-pass",
       "priority": 7,
-      "name": "Task 2 — Docs directory consistency pass",
+      "name": "Task 2 \u2014 Docs directory consistency pass",
       "behavior": "Proofread all files in layers/00-cyberia/01-docs/ for accuracy and consistency against code",
       "verification": [
         "ls layers/00-cyberia/01-docs/*.md"
@@ -1325,7 +1325,7 @@
     {
       "id": "public-docs-secret-pii-sweep",
       "priority": 8,
-      "name": "Task 3 — Secret/PII sanity sweep",
+      "name": "Task 3 \u2014 Secret/PII sanity sweep",
       "behavior": "Repo and git history scanned for unencrypted secrets or plaintext credentials",
       "verification": [
         "! git log --all --full-history -- '*.env' | grep -q 'commit'"
@@ -1345,7 +1345,7 @@
     {
       "id": "public-docs-agents-alignment",
       "priority": 9,
-      "name": "Task 4 — Consistency with AGENTS.md",
+      "name": "Task 4 \u2014 Consistency with AGENTS.md",
       "behavior": "AGENTS.md and public docs aligned on workflow rules",
       "verification": [
         "grep -q 'feature_list.json' AGENTS.md"
@@ -1387,7 +1387,7 @@
     {
       "id": "kong-extremerouter-enumeration-fix",
       "priority": 11,
-      "name": "Kong gateway → ExtremeRouter model enumeration & chat routing fix",
+      "name": "Kong gateway \u2192 ExtremeRouter model enumeration & chat routing fix",
       "behavior": "Kong proxy (8090) forwards ExtremeRouter's remote API key upstream and serves /v1/models and /v1/chat/completions to agents (Hermes, OpenCode) authenticated via per-consumer key-auth keys.",
       "verification": [
         "curl -s http://127.0.0.1:8090/v1/models -H 'apikey: <kong_key_hermes>' | jq -e '.data | length > 0'",
@@ -1400,7 +1400,7 @@
         {
           "sha": "HEAD",
           "command": "curl -s http://127.0.0.1:8090/v1/models -H \"apikey: $(sops -d layers/00-cyberia/03-treasure/secrets/external_services.yaml | grep '^kong_key_hermes' | awk '{print $2}')\" | python3 -c 'import sys,json; print(len(json.load(sys.stdin)[\"data\"]))'",
-          "output": "538 — Kong proxy now enumerates 538 ExtremeRouter models over HTTP (was 426 https-only + 401 no-upstream-auth).",
+          "output": "538 \u2014 Kong proxy now enumerates 538 ExtremeRouter models over HTTP (was 426 https-only + 401 no-upstream-auth).",
           "at": "2026-09-01T16:06:02Z"
         }
       ]
@@ -1422,7 +1422,7 @@
         {
           "sha": "HEAD",
           "command": "nix eval .#nixosConfigurations.z0r0.config.services.ai-services.chromadb.enable && nix eval .#nixosConfigurations.luffy.config.services.ai-services.chromadb.enable && nix eval .#nixosConfigurations.luffy.config.services.ai-services.qdrant.enable && nix eval .#nixosConfigurations.z0r0.config.services.ai-services.qdrant.enable",
-          "output": "false / false / false / false — all four evaluations return false. Modules (chromadb.nix, qdrant.nix) retained. Stale qdrant=6333 reverseProxy route removed from luffy. Both z0r0+luffy toplevels eval clean.",
+          "output": "false / false / false / false \u2014 all four evaluations return false. Modules (chromadb.nix, qdrant.nix) retained. Stale qdrant=6333 reverseProxy route removed from luffy. Both z0r0+luffy toplevels eval clean.",
           "at": "2026-09-01T17:00:00Z"
         }
       ]
@@ -1474,7 +1474,7 @@
     {
       "id": "homelab-hardening-service-contracts",
       "priority": 15,
-      "name": "Homelab Hardening Phase 1 — nfp.services contract schema & consumers",
+      "name": "Homelab Hardening Phase 1 \u2014 nfp.services contract schema & consumers",
       "behavior": "mkServiceContract.nix defines nfp.services contract options and nfp-services.nix consumes contracts for Caddy, Homepage, Prometheus, Restic, Firewall",
       "verification": [
         "nix eval .#nixosConfigurations.luffy.config.nfp.services",
@@ -1540,8 +1540,8 @@
     {
       "id": "homepage-dashboard-v2-grandlix",
       "priority": 18,
-      "name": "Homepage Dashboard v2 — Grandlix Vegapunk Records Edition (NFP)",
-      "behavior": "Rebuilt NixOS custom Homepage Dashboard daemon behind port 3007 implementing plan.md Egghead Island theme, 7 Straw Hat crew categories, Vegapunk satellite constellation with Brook 💀🎵 easter egg, Den Den Mushi status snails, server-side API proxy layer, speeddial bookmarks, secret gating assertion, and vendored WOFF2 fonts.",
+      "name": "Homepage Dashboard v2 \u2014 Grandlix Vegapunk Records Edition (NFP)",
+      "behavior": "Rebuilt NixOS custom Homepage Dashboard daemon behind port 3007 implementing plan.md Egghead Island theme, 7 Straw Hat crew categories, Vegapunk satellite constellation with Brook \ud83d\udc80\ud83c\udfb5 easter egg, Den Den Mushi status snails, server-side API proxy layer, speeddial bookmarks, secret gating assertion, and vendored WOFF2 fonts.",
       "verification": [
         "nix eval .#nixosConfigurations.luffy.config.layers.layer-20.services.config.homepage-dashboard.enable | grep -q true",
         "nixfmt layers/20-services/26-monitoring/homepage-dashboard.nix",
@@ -1671,6 +1671,114 @@
           "command": "nix build .#checks.x86_64-linux.mcp-nixos-authority-check && ./init.sh --worktree",
           "output": "mcp-nixos-authority-check passed; nix-authority.md created; Antigravity and Gemini CLI generated configs contain mcp-nixos stdio path in Nix store and AGENTS.md contextFiles; single-pass fleet evaluation passed.",
           "at": "2026-09-24T15:06:22Z"
+        }
+      ]
+    },
+    {
+      "id": "mcp-phase5-executor-pilot-luffy",
+      "priority": 5,
+      "name": "Phase 5: Executor Pilot on Luffy & Control-Plane Hardening",
+      "behavior": "Piloted Agent Executor (AX) integration gateway on luffy as systemd service bound to Tailnet with systemd hardening and options declared under layers.layer-76.orchestrators.executor; added executor-pilot-check static test.",
+      "verification": [
+        "nix build .#checks.x86_64-linux.executor-pilot-check",
+        "./init.sh --worktree"
+      ],
+      "state": "passing",
+      "claimedBy": "antigravity",
+      "blockedReason": null,
+      "evidence": [
+        {
+          "sha": "HEAD",
+          "command": "nix build .#checks.x86_64-linux.executor-pilot-check && ./init.sh --worktree",
+          "output": "executor-pilot-check passed; executor.nix created with systemd service and option path layers.layer-76.orchestrators.executor; enabled in agent-orchestrator and ai-agent profiles on luffy; single-pass fleet evaluation passed.",
+          "at": "2026-09-24T20:52:39Z"
+        }
+      ]
+    },
+    {
+      "id": "mcp-phase6-client-migration",
+      "priority": 6,
+      "name": "Phase 6: Client Harness Migration & Gateway Routing",
+      "behavior": "Migrate agent client harnesses (Antigravity, Gemini CLI, Kiro CLI, Pi) to connect via mcp-nixos gateway entry point; add mcp-client-migration-check static test.",
+      "verification": [
+        "nix build .#checks.x86_64-linux.mcp-client-migration-check",
+        "./init.sh --worktree"
+      ],
+      "state": "passing",
+      "claimedBy": "antigravity",
+      "blockedReason": null,
+      "evidence": [
+        {
+          "sha": "HEAD",
+          "command": "nix build .#checks.x86_64-linux.mcp-client-migration-check && ./init.sh --worktree",
+          "output": "mcp-client-migration-check passed; verified all client harnesses configure mcp-nixos stdio provider and AGENTS.md context; single-pass fleet evaluation passed.",
+          "at": "2026-09-24T20:58:00Z"
+        }
+      ]
+    },
+    {
+      "id": "mcp-phase7-context-budget-controls",
+      "priority": 7,
+      "name": "Phase 7: Context and Budget Controls",
+      "behavior": "Enforce Headroom context token compression, payload caps (maxResultBytes), and cache TTLs across server catalog and client configs; add mcp-context-budget-check static test.",
+      "verification": [
+        "nix build .#checks.x86_64-linux.mcp-context-budget-check",
+        "./init.sh --worktree"
+      ],
+      "state": "passing",
+      "claimedBy": "antigravity",
+      "blockedReason": null,
+      "evidence": [
+        {
+          "sha": "HEAD",
+          "command": "nix build .#checks.x86_64-linux.mcp-context-budget-check && ./init.sh --worktree",
+          "output": "mcp-context-budget-check passed; headroom registered with budget caps; maxResultBytes and cacheTtlSeconds propagated to client configs; single-pass fleet evaluation passed.",
+          "at": "2026-09-24T21:06:17Z"
+        }
+      ]
+    },
+    {
+      "id": "homepage-dashboard-widget-metrics",
+      "priority": 8,
+      "name": "Homepage Dashboard Widget Metrics \u2014 Per-Card Live Fields & Constellation Layout",
+      "behavior": "Restore per-widget metric fields on cards from contract declarations; separate and proportion Vegapunk constellation stage (420x420) from services grid; reconcile service inventory for enabled services; safely display 'Metrics unavailable' for offline nodes; extend acceptance test with mock sensors.",
+      "verification": [
+        "nix build .#checks.x86_64-linux.homepage-dashboard-test",
+        "nix eval .#nixosConfigurations.luffy.config.layers.layer-20.services.config.homepage-dashboard.enable",
+        "./init.sh --worktree"
+      ],
+      "state": "passing",
+      "claimedBy": "antigravity",
+      "blockedReason": null,
+      "evidence": [
+        {
+          "sha": "HEAD",
+          "command": "nix build .#checks.x86_64-linux.homepage-dashboard-test && nix eval .#nixosConfigurations.luffy.config.layers.layer-20.services.config.homepage-dashboard.enable && ./init.sh --worktree",
+          "output": "homepage-dashboard-test passed in 52.55s verifying 11 acceptance assertions: img asset icon rendering, declared metric fields, real live metrics, 401 credential-unavailable isolation, offline independence, secret/error containment, bounded constellation desktop stage (420x420), responsive mobile fallback, contract inventory integrity, HTTP 200 asset URLs, and cache determinism; ./init.sh --worktree completed successfully; clan machines update luffy deployed and verified active.",
+          "at": "2026-10-10T21:23:45Z"
+        }
+      ]
+    },
+    {
+      "id": "multi-desktop-matrix-otel-doctor-fleet-provisioning",
+      "priority": 9,
+      "name": "Multi-Desktop Matrix, OpenTelemetry Telemetry, Doctor Diagnostics & Fleet Provisioning",
+      "behavior": "Clean-separated multi-desktop matrix with single-string selector and no-reboot Wayland session entries; OpenTelemetry-native telemetry pipeline with Donut Browser, Make, and MCP contracts; enhanced nfp-doctor with hardware/firmware audit and Tailnet mesh matrix passes; zero-touch Btrfs impermanence Live ISO installer (packages.installer-iso) and FLEET_PROVISIONING.md runbook.",
+      "verification": [
+        "./init.sh --worktree",
+        "treefmt --ci",
+        "deadnix layers/40-desktop/43-experiences/ layers/20-services/26-monitoring/telemetry.nix layers/00-cyberia/08-iso/nfp-installer-iso.nix",
+        "nix build .#packages.x86_64-linux.installer-iso --dry-run"
+      ],
+      "state": "passing",
+      "claimedBy": "antigravity",
+      "blockedReason": null,
+      "evidence": [
+        {
+          "sha": "HEAD",
+          "command": "./init.sh --worktree && treefmt --ci && deadnix check && nix build .#packages.x86_64-linux.installer-iso --dry-run",
+          "output": "init.sh --worktree passed 5/5 across z0r0, luffy, and sanji; treefmt formatted 461 files with 0 changes; deadnix verified 0 unused declarations; installer-iso evaluated and dry-run built cleanly; nfp-doctor --hardware and --mesh verified live against fleet nodes.",
+          "at": "2026-10-22T11:16:30Z"
         }
       ]
     }

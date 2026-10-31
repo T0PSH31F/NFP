@@ -38,3 +38,4 @@ docs/*
 sqlite_mcp_server.db
 dsh-*/
 session-handoff.md
+runs/

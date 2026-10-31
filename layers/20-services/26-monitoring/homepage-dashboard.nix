@@ -80,6 +80,8 @@ let
     {
       inherit id;
       name = displayTitle;
+      baseTitle = svc.homepage.title;
+      inherit targetHost;
       category = svc.homepage.category;
       order = svc.homepage.order;
       onePieceSub = svc.homepage.subtitle;
@@ -1154,9 +1156,9 @@ let
             cur_host = socket.gethostname()
 
             hosts_to_query = [
-                ("z0r0", "z0r0 (Workstation/AI)", ["http://127.0.0.1:19999", "http://z0r0.nfp.nix:19999", "http://100.80.146.121:19999"]),
-                ("luffy", "luffy (Homelab Server)", ["http://127.0.0.1:19999", "http://luffy.nfp.nix:19999", "http://100.80.146.120:19999"]),
-                ("nami", "nami (Mini Edge)", ["http://nami.nfp.nix:19999", "http://100.80.146.122:19999"]),
+                ("z0r0", "z0r0 (Workstation/AI)", ["http://127.0.0.1:19999", "http://z0r0.nfp.nix:19999", "http://100.64.0.1:19999", "http://100.80.146.121:19999"]),
+                ("luffy", "luffy (Homelab Server)", ["http://127.0.0.1:19999", "http://luffy.nfp.nix:19999", "http://100.64.0.3:19999", "http://100.80.146.120:19999"]),
+                ("sanji", "sanji (Workstation / Precision 7680)", ["http://127.0.0.1:19999", "http://sanji.nfp.nix:19999", "http://100.64.0.6:19999", "http://192.168.1.68:19999"]),
             ]
 
             vitals = []

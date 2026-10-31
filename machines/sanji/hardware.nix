@@ -95,6 +95,14 @@
     };
   };
 
+  # Swap Configuration (32GB backing disk swap beneath zram)
+  swapDevices = [
+    {
+      device = "/persist/swapfile";
+      priority = 10;
+    }
+  ];
+
   hardware.cpu.intel.updateMicrocode = lib.mkDefault true;
   nixpkgs.hostPlatform = "x86_64-linux";
 }

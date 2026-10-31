@@ -22,10 +22,30 @@ let
       edit|region)
         GEOM=$(slurp 2>/dev/null) || exit 0
         [ -z "$GEOM" ] && exit 0
-        grim -g "$GEOM" - | swappy -f -
+        grim -g "$GEOM" "$SAVE_DIR/$FILENAME"
+        wl-copy --type image/png < "$SAVE_DIR/$FILENAME"
+        ACTION=$(notify-send -t 8000 -u low -i "$SAVE_DIR/$FILENAME" \
+          -a "Screenshot" "Screenshot Captured" "Copied to clipboard. Click to annotate." \
+          -A "annotate=✏️ Annotate" \
+          -A "open=📁 Open" 2>/dev/null || true)
+        if [ "$ACTION" = "annotate" ]; then
+          exec swappy -f "$SAVE_DIR/$FILENAME"
+        elif [ "$ACTION" = "open" ]; then
+          exec xdg-open "$SAVE_DIR"
+        fi
         ;;
       edit-full|full)
-        grim - | swappy -f -
+        grim "$SAVE_DIR/$FILENAME"
+        wl-copy --type image/png < "$SAVE_DIR/$FILENAME"
+        ACTION=$(notify-send -t 8000 -u low -i "$SAVE_DIR/$FILENAME" \
+          -a "Screenshot" "Full Screen Captured" "Copied to clipboard. Click to annotate." \
+          -A "annotate=✏️ Annotate" \
+          -A "open=📁 Open" 2>/dev/null || true)
+        if [ "$ACTION" = "annotate" ]; then
+          exec swappy -f "$SAVE_DIR/$FILENAME"
+        elif [ "$ACTION" = "open" ]; then
+          exec xdg-open "$SAVE_DIR"
+        fi
         ;;
       copy-region)
         GEOM=$(slurp 2>/dev/null) || exit 0

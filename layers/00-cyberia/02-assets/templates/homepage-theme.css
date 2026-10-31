@@ -1197,3 +1197,127 @@ html, body {
     background-attachment: fixed;
   }
 }
+
+/* --------------------------------------------------------------------------
+   13. Multi-Instance Fleet Service Groups & Switcher
+   -------------------------------------------------------------------------- */
+.hidden {
+  display: none !important;
+}
+
+.instance-switcher-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 5px 8px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid var(--poster-inner-border);
+  border-radius: var(--radius-sm);
+  margin: 4px 0 6px 0;
+  flex-wrap: wrap;
+}
+
+.instance-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  font-family: var(--font-header);
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  letter-spacing: 0.06em;
+}
+
+.instance-pill:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border-color: var(--poster-gold);
+}
+
+.instance-pill.active {
+  background: rgba(212, 175, 55, 0.22);
+  color: var(--poster-gold);
+  border-color: var(--poster-accent);
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.35);
+}
+
+.instance-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--status-offline);
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.instance-dot.dot-online {
+  background: var(--status-online);
+  box-shadow: 0 0 6px var(--status-online);
+}
+
+.instance-dot.dot-offline {
+  background: var(--status-error);
+}
+
+.instance-view {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.multi-instance-badge {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-header);
+  font-size: 0.58rem;
+  color: var(--poster-gold);
+  background: rgba(212, 175, 55, 0.15);
+  border: 1px solid var(--poster-border);
+  border-radius: 3px;
+  padding: 2px 6px;
+  letter-spacing: 0.06em;
+  vertical-align: middle;
+  margin-left: 6px;
+}
+
+.instance-quick-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding-top: 6px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.08);
+  font-family: var(--font-header);
+  font-size: 0.62rem;
+  color: var(--text-dim);
+  flex-wrap: wrap;
+}
+
+.quick-links-label {
+  color: var(--poster-gold);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.quick-node-link {
+  color: var(--text-muted);
+  text-decoration: none;
+  padding: 2px 6px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: all 0.2s ease;
+}
+
+.quick-node-link:hover {
+  color: var(--poster-accent);
+  border-color: var(--poster-gold);
+  background: rgba(255, 255, 255, 0.08);
+}
+

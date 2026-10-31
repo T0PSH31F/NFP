@@ -73,27 +73,56 @@ in
         enableZshIntegration = true;
       };
     };
-    home.packages = with pkgs; [
-      bar
-      cloudflare-cli
-      cpx
-      detox
-      duf
-      dust
-      hyperfine
-      pq-cli
-      procs
-      progress
-      pv
-      rsyncy
-      stripe-cli
-      supabase-cli
-      tealdeer
-      tokei
-      trash-cli
-      trippy
-      wrangler
-      xxh
-    ];
+    home.packages =
+      with pkgs;
+      [
+        bar
+        cloudflare-cli
+        cpx
+        detox
+        duf
+        dust
+        fastcrw
+        hyperfine
+        pq-cli
+        procs
+        progress
+        pv
+        rsyncy
+        sqlite
+        stripe-cli
+        supabase-cli
+        tealdeer
+        tokei
+        trash-cli
+        trippy
+        wrangler
+        xxh
+      ]
+      ++ [
+        (writeShellScriptBin "cgc" ''
+          if [ -x "$HOME/.local/bin/cgc" ]; then
+            exec "$HOME/.local/bin/cgc" "$@"
+          elif [ -x "$HOME/.local/share/uv/tools/codegraphcontext/bin/cgc" ]; then
+            exec "$HOME/.local/share/uv/tools/codegraphcontext/bin/cgc" "$@"
+          else
+            echo "Error: cgc not found in ~/.local/bin or ~/.local/share/uv/tools" >&2
+            exit 1
+          fi
+        '')
+        (writeShellScriptBin "codegraphcontext" ''
+          exec cgc "$@"
+        '')
+      ];
+
+    home.activation.token-saver-symlinks = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      $DRY_RUN_CMD mkdir -p "$HOME/.config/crw" "$HOME/.codegraphcontext/.venv/bin"
+      if [ -e "$HOME/.local/bin/crw" ]; then
+        $DRY_RUN_CMD ln -sfn "$HOME/.local/bin/crw" "$HOME/.config/crw/crw"
+      fi
+      if [ -e "$HOME/.local/bin/cgc" ]; then
+        $DRY_RUN_CMD ln -sfn "$HOME/.local/bin/cgc" "$HOME/.codegraphcontext/.venv/bin/cgc"
+      fi
+    '';
   };
 }

@@ -30,6 +30,9 @@
     fallback = true;
   };
 
+  # Ensure user local bin (~/.local/bin) is available in system environment PATH
+  environment.localBinInPath = true;
+
   imports = [
     inputs.home-manager.nixosModules.home-manager
     inputs.sops-nix.nixosModules.sops
@@ -127,6 +130,7 @@
     # Boot/System essentials
     curl
     git
+    sqlite
     vim
     wget
     ghostty.terminfo

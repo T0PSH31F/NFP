@@ -93,7 +93,13 @@ in
               noctalia msg wallpaper-set "$1" 2>/dev/null || true
             '';
           };
-        };
+        }
+        // (lib.mapAttrs' (
+          n: v:
+          lib.nameValuePair (lib.removePrefix "xdg/" n) {
+            inherit (v) text;
+          }
+        ) (lib.filterAttrs (n: _: lib.hasPrefix "xdg/umbriel/presets/" n) osConfig.environment.etc));
       };
     };
 }

@@ -131,6 +131,12 @@ in
   # Explicit machine boundary selection required for hybrid server+desktop.
   layers.desktop.experience = "noctalia";
 
+  # Antigravity IDE & CLI suite with FHS environment
+  layers.layer-71.harness.antigravity = {
+    enable = true;
+    enableIde = true;
+  };
+
   # Greeter follows desktop tag default (noctalia-greeter / hyprland-uwsm);
   # keep explicit only if diverging from tag default — currently redundant,
   # so rely on tag profile. Remove duplicate greeter config to avoid drift.
@@ -175,7 +181,31 @@ in
   hardware.nvidia = {
     enable = true;
     modesetting.enable = true;
+    nvidiaPersistenced = true;
+    powerManagement.enable = lib.mkForce true;
     package = lib.mkForce config.boot.kernelPackages.nvidiaPackages.legacy_580;
+  };
+
+  # ============================================================================
+  # 02.1 - HARDWARE & PERFORMANCE OPTIMIZATION (Intel i7-9700F + Quadro P620)
+  # ============================================================================
+  powerManagement.cpuFreqGovernor = lib.mkDefault "powersave";
+  services.thermald.enable = true;
+
+  # ZRAM compressed swap in RAM to absorb memory spikes and protect SSD
+  zramSwap = {
+    enable = true;
+    algorithm = "zstd";
+    memoryPercent = 50;
+    priority = 100;
+  };
+
+  # Sysctl optimizations for 24GB RAM desktop/server workload
+  boot.kernel.sysctl = {
+    "vm.swappiness" = 10;
+    "vm.vfs_cache_pressure" = 50;
+    "vm.dirty_background_ratio" = 5;
+    "vm.dirty_ratio" = 10;
   };
 
   # ============================================================================
@@ -652,6 +682,37 @@ in
       Group = lib.mkForce "prowlarr";
       ReadWritePaths = [ "/data/.state/nixarr/prowlarr" ];
     };
+
+    # Ensure postgresql-setup refreshes collation versions so CREATE DATABASE never fails
+    postgresql-setup = {
+      preStart = ''
+        ${config.services.postgresql.package}/bin/psql -d postgres -c "ALTER DATABASE template1 REFRESH COLLATION VERSION;" || true
+        ${config.services.postgresql.package}/bin/psql -d postgres -c "ALTER DATABASE postgres REFRESH COLLATION VERSION;" || true
+      '';
+    };
+
+    # Ensure nginx waits for network-online so it resolves cache.nixos.org reliably
+    nginx = {
+      after = [ "network-online.target" ];
+      wants = [ "network-online.target" ];
+    };
+
+    # Wyoming faster whisper network online and restart safety
+    wyoming-faster-whisper-local = {
+      after = [ "network-online.target" ];
+      wants = [ "network-online.target" ];
+      serviceConfig.RestartSec = lib.mkForce "10s";
+    };
+
+    # Fix ad-hook-miner StateDirectory migration error
+    ad-hook-miner.serviceConfig.DynamicUser = lib.mkForce false;
+
+    # Filebrowser data directory permissions
+    filebrowser.preStart = ''
+      mkdir -p /var/lib/filebrowser/data
+      chown -R filebrowser:filebrowser /var/lib/filebrowser
+      chmod 700 /var/lib/filebrowser/data
+    '';
   };
 
   # Persist luffy's root SSH keypair across impermanence rollbacks.
@@ -704,4 +765,5 @@ in
   # (checkForUpdates=false, host 0.0.0.0, port 7474 — no filters), so nothing
   # is lost by moving to the native module's StateDirectory.
   nixarr.autobrr.enable = lib.mkForce false;
+  nixarr.anchorr.enable = lib.mkForce false;
 }

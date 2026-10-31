@@ -1,0 +1,21 @@
+---
+description: Automatically routes terminal execution commands through RTK, enforces Semantic Knowledge Graph First policies (CodeGraphContext for code, JevGraph for docs), and enforces Ponytail terse token-saving rules with Headroom context compression and Anti-Slop quality filtering.
+globs: *
+alwaysApply: true
+---
+
+# RTK (Rust Token Killer) & Semantic Knowledge Graph Automation
+
+Always prefix terminal and CLI execution commands with `rtk` (e.g. `rtk git status`, `rtk cargo test`, `rtk npm test`, `rtk pytest`, `rtk vitest`, `rtk ls`, `rtk rg`).
+- Output is compressed to save tokens while preserving critical errors and signal.
+- In multi-command chains, prefix each sub-command: `rtk git add . && rtk git commit -m "update"`.
+- Use `rtk gain` to review token savings metrics.
+
+## Mandatory Semantic Knowledge Graph First:
+- **Code Files:** Query CodeGraphContext (/codegraph-query, `cgc query`, `cgc find`) FIRST for symbol definitions, call hierarchies, and architecture BEFORE reading source code files. Never dump entire source files into prompt context.
+- **Non-Code Files:** Use JevGraph (/jevgraph-query, `jevgraph`) strictly for documentation (PDF, DOCX, TXT, MD specs).
+- Utilize Headroom context compression (CCR) for heavy JSON/tool payload reduction.
+- Enforce Anti-Slop quality gates: purpose test before aesthetics, human WCAG contrast, no generic AI intros.
+- Enforce Ponytail YAGNI: shortest working diff, standard library first, max 3 lines explanation, zero fluff.
+- Use `rtk git diff -U1` for compact single-line context diffs.
+- Inspect AST symbol outlines (/rtk-outline) before reading entire files.

@@ -22,6 +22,7 @@
         kiro-cli.enable = lib.mkDefault true;
         pi-coding-agent.enable = lib.mkDefault true;
         aider-chat.enable = lib.mkDefault true;
+        gitlab.enable = lib.mkDefault true;
         opencode = {
           enable = lib.mkDefault true;
           desktop = lib.mkDefault true;

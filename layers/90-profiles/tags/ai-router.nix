@@ -18,7 +18,7 @@
 
     layers.layer-78.llm-routers = {
       extreme-router.enable = lib.mkDefault true;
-      jev-router-plugin.enable = lib.mkDefault true;
+      jev-router-plugin.enable = lib.mkDefault false;
       jev.enable = lib.mkDefault true;
     };
   };

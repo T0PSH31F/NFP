@@ -1,6 +1,6 @@
 {
   "project": "NFP",
-  "description": "NixOS fleet flake — dendritic layers, clan-core, impermanence, AI agent fleet",
+  "description": "NixOS fleet flake \u2014 dendritic layers, clan-core, impermanence, AI agent fleet",
   "states": {
     "untried": "No verified attempt yet.",
     "in-progress": "Being actively worked; not yet verified.",
@@ -8,114 +8,6 @@
     "passing": "Required verification has passed and evidence is recorded."
   },
   "features": [
-    {
-      "id": "mcp-phase5-executor-pilot-luffy",
-      "priority": 5,
-      "name": "Phase 5: Executor Pilot on Luffy & Control-Plane Hardening",
-      "behavior": "Piloted Agent Executor (AX) integration gateway on luffy as systemd service bound to Tailnet with systemd hardening and options declared under layers.layer-76.orchestrators.executor; added executor-pilot-check static test.",
-      "verification": [
-        "nix build .#checks.x86_64-linux.executor-pilot-check",
-        "./init.sh --worktree"
-      ],
-      "state": "passing",
-      "claimedBy": "antigravity",
-      "blockedReason": null,
-      "evidence": [
-        {
-          "sha": "HEAD",
-          "command": "nix build .#checks.x86_64-linux.executor-pilot-check && ./init.sh --worktree",
-          "output": "executor-pilot-check passed; executor.nix created with systemd service and option path layers.layer-76.orchestrators.executor; enabled in agent-orchestrator and ai-agent profiles on luffy; single-pass fleet evaluation passed.",
-          "at": "2026-09-24T20:52:39Z"
-        }
-      ]
-    },
-    {
-      "id": "mcp-phase6-client-migration",
-      "priority": 6,
-      "name": "Phase 6: Client Harness Migration & Gateway Routing",
-      "behavior": "Migrate agent client harnesses (Antigravity, Gemini CLI, Kiro CLI, Pi) to connect via mcp-nixos gateway entry point; add mcp-client-migration-check static test.",
-      "verification": [
-        "nix build .#checks.x86_64-linux.mcp-client-migration-check",
-        "./init.sh --worktree"
-      ],
-      "state": "passing",
-      "claimedBy": "antigravity",
-      "blockedReason": null,
-      "evidence": [
-        {
-          "sha": "HEAD",
-          "command": "nix build .#checks.x86_64-linux.mcp-client-migration-check && ./init.sh --worktree",
-          "output": "mcp-client-migration-check passed; verified all client harnesses configure mcp-nixos stdio provider and AGENTS.md context; single-pass fleet evaluation passed.",
-          "at": "2026-09-24T20:58:00Z"
-        }
-      ]
-    },
-    {
-      "id": "mcp-phase7-context-budget-controls",
-      "priority": 7,
-      "name": "Phase 7: Context and Budget Controls",
-      "behavior": "Enforce Headroom context token compression, payload caps (maxResultBytes), and cache TTLs across server catalog and client configs; add mcp-context-budget-check static test.",
-      "verification": [
-        "nix build .#checks.x86_64-linux.mcp-context-budget-check",
-        "./init.sh --worktree"
-      ],
-      "state": "passing",
-      "claimedBy": "antigravity",
-      "blockedReason": null,
-      "evidence": [
-        {
-          "sha": "HEAD",
-          "command": "nix build .#checks.x86_64-linux.mcp-context-budget-check && ./init.sh --worktree",
-          "output": "mcp-context-budget-check passed; headroom registered with budget caps; maxResultBytes and cacheTtlSeconds propagated to client configs; single-pass fleet evaluation passed.",
-          "at": "2026-09-24T21:06:17Z"
-        }
-      ]
-    },
-    {
-      "id": "homepage-dashboard-widget-metrics",
-      "priority": 8,
-      "name": "Homepage Dashboard Widget Metrics — Per-Card Live Fields & Constellation Layout",
-      "behavior": "Restore per-widget metric fields on cards from contract declarations; separate and proportion Vegapunk constellation stage (420x420) from services grid; reconcile service inventory for enabled services; safely display 'Metrics unavailable' for offline nodes; extend acceptance test with mock sensors.",
-      "verification": [
-        "nix build .#checks.x86_64-linux.homepage-dashboard-test",
-        "nix eval .#nixosConfigurations.luffy.config.layers.layer-20.services.config.homepage-dashboard.enable",
-        "./init.sh --worktree"
-      ],
-      "state": "passing",
-      "claimedBy": "antigravity",
-      "blockedReason": null,
-      "evidence": [
-        {
-          "sha": "HEAD",
-          "command": "nix build .#checks.x86_64-linux.homepage-dashboard-test && nix eval .#nixosConfigurations.luffy.config.layers.layer-20.services.config.homepage-dashboard.enable && ./init.sh --worktree",
-          "output": "homepage-dashboard-test passed in 52.55s verifying 11 acceptance assertions: img asset icon rendering, declared metric fields, real live metrics, 401 credential-unavailable isolation, offline independence, secret/error containment, bounded constellation desktop stage (420x420), responsive mobile fallback, contract inventory integrity, HTTP 200 asset URLs, and cache determinism; ./init.sh --worktree completed successfully; clan machines update luffy deployed and verified active.",
-          "at": "2026-10-10T21:23:45Z"
-        }
-      ]
-    },
-    {
-      "id": "multi-desktop-matrix-otel-doctor-fleet-provisioning",
-      "priority": 9,
-      "name": "Multi-Desktop Matrix, OpenTelemetry Telemetry, Doctor Diagnostics & Fleet Provisioning",
-      "behavior": "Clean-separated multi-desktop matrix with single-string selector and no-reboot Wayland session entries; OpenTelemetry-native telemetry pipeline with Donut Browser, Make, and MCP contracts; enhanced nfp-doctor with hardware/firmware audit and Tailnet mesh matrix passes; zero-touch Btrfs impermanence Live ISO installer (packages.installer-iso) and FLEET_PROVISIONING.md runbook.",
-      "verification": [
-        "./init.sh --worktree",
-        "treefmt --ci",
-        "deadnix layers/40-desktop/43-experiences/ layers/20-services/26-monitoring/telemetry.nix layers/00-cyberia/08-iso/nfp-installer-iso.nix",
-        "nix build .#packages.x86_64-linux.installer-iso --dry-run"
-      ],
-      "state": "passing",
-      "claimedBy": "antigravity",
-      "blockedReason": null,
-      "evidence": [
-        {
-          "sha": "HEAD",
-          "command": "./init.sh --worktree && treefmt --ci && deadnix check && nix build .#packages.x86_64-linux.installer-iso --dry-run",
-          "output": "init.sh --worktree passed 5/5 across z0r0, luffy, and sanji; treefmt formatted 461 files with 0 changes; deadnix verified 0 unused declarations; installer-iso evaluated and dry-run built cleanly; nfp-doctor --hardware and --mesh verified live against fleet nodes.",
-          "at": "2026-10-22T11:16:30Z"
-        }
-      ]
-    },
     {
       "id": "kong-jev-voice-router-stack-hardening",
       "priority": 10,
@@ -276,6 +168,75 @@
           "command": "python3 layers/70-agents/72-voice/nfp_voice_interrupter.py --test && python3 layers/70-agents/71-harness/oncall_agent.py --test && python3 layers/70-agents/71-harness/news_curator.py --test && python3 layers/70-agents/79-skills/ui_replicator/ui_replicator.py --test && python3 layers/70-agents/78-llm-routers/damage_control.py --test && python3 layers/70-agents/79-skills/reverse_engineer/reverse_engineer.py --test && nix eval --raw .#nixosConfigurations.sanji.config.system.build.toplevel.drvPath",
           "output": "All 6 component test suites passed 100% assertions; oncall_agent 4-phase incident loop verified; news_curator hype/facts/signal triage & dynamic weights verified; ui_replicator hill-climbing achieved >=90% similarity; damage_control verified 7 blocked destructive commands with 1-tap A2UI card override; reverse_engineer mapped tech stacks, 3D scroll animations, and endpoints; sanji toplevel evaluated cleanly.",
           "at": "2026-10-30T03:00:00Z"
+        }
+      ]
+    },
+    {
+      "id": "jarvis-standalone-flake-and-vps-appliance",
+      "priority": 17,
+      "name": "Standalone Jarvis Flake, VPS Appliance & Full-Duplex Voice Keybind",
+      "behavior": "Package all Jarvis capabilities into a standalone Git repo and flake (~/Clan/Jarvis) with modular NixOS modules (core, voice, dream-cycle, proactive-agents, perception, email-triage, skills, backup), VPS appliance target with Disko partitioning, and automated test runner; fix Umbriel Mod+Shift+V full-duplex voice chamber shortcut; pull and configure uncensored/abliterated models (mannix/llama3.1-8b-abliterated and huihui_ai/qwen2.5-abliterate:7b) in Ollama.",
+      "verification": [
+        "bash /home/t0psh31f/Clan/Jarvis/tests/run_all_tests.sh",
+        "nix eval --raw /home/t0psh31f/Clan/Jarvis#nixosConfigurations.jarvis-vps.config.system.build.toplevel.drvPath",
+        "umbriel config validate",
+        "ollama list"
+      ],
+      "state": "passing",
+      "claimedBy": "antigravity",
+      "blockedReason": null,
+      "evidence": [
+        {
+          "sha": "HEAD",
+          "command": "bash /home/t0psh31f/Clan/Jarvis/tests/run_all_tests.sh && nix eval --raw /home/t0psh31f/Clan/Jarvis#nixosConfigurations.jarvis-vps.config.system.build.toplevel.drvPath && umbriel config validate && ollama list",
+          "output": "12/12 Jarvis test suites passed 100% assertions; jarvis-vps toplevel evaluated cleanly to /nix/store/al819cjhvssi08qb587v0y4snava8ssj-nixos-system-jarvis-appliance-26.11.20261027.31ecbac.drv; Umbriel config validated clean with Mod+Shift+V wired to glados-voice --tui; mannix/llama3.1-8b-abliterated and huihui_ai/qwen2.5-abliterate:7b pulled and active in Ollama.",
+          "at": "2026-10-30T09:35:00Z"
+        }
+      ]
+    },
+    {
+      "id": "glados-thinking-suppression-and-umbriel-screenshot-annotation",
+      "priority": 18,
+      "name": "GLaDOS Voice HTTP 400 Suppression & Fallback, and Umbriel Screenshot Clipboard & Swappy Annotation Keybinds",
+      "behavior": "Resolve repetitive HTTP 400 errors from GLaDOS thinking module in Ollama by providing automatic fallback without tools, setting tool-capable huihui_ai/qwen2.5-abliterate:7b as primary model, and silencing TTS error notifications during background autonomy loops; configure Umbriel Print/Shift+Print keybindings to execute hypr-screenshot with immediate clipboard copy, file saving, and interactive Swappy annotation action.",
+      "verification": [
+        "LD_LIBRARY_PATH=\"/run/current-system/sw/share/nix-ld/lib:/run/current-system/sw/lib\" /home/t0psh31f/Projects/GLaDOS/.venv/bin/python3 -c \"import requests; r = requests.post('http://localhost:11434/v1/chat/completions', json={'model':'huihui_ai/qwen2.5-abliterate:7b','messages':[{'role':'user','content':'hi'}],'tools':[{'type':'function','function':{'name':'f'}}]}); assert r.status_code == 200\"",
+        "umbriel config validate -c ~/.config/umbriel/config.toml",
+        "which swappy grim slurp wl-copy",
+        "./layers/00-cyberia/06-scripts/nfp-check.sh static"
+      ],
+      "state": "passing",
+      "claimedBy": "antigravity",
+      "blockedReason": null,
+      "evidence": [
+        {
+          "sha": "HEAD",
+          "command": "LD_LIBRARY_PATH=\"/run/current-system/sw/share/nix-ld/lib:/run/current-system/sw/lib\" /home/t0psh31f/Projects/GLaDOS/.venv/bin/python3 -c \"...\" && umbriel config validate -c ~/.config/umbriel/config.toml && which swappy grim slurp wl-copy && ./layers/00-cyberia/06-scripts/nfp-check.sh static",
+          "output": "Ollama tool test passed: HTTP 200; umbriel config validate passed: ok; swappy, grim, slurp, wl-copy confirmed on PATH; nfp-check.sh static passed cleanly.",
+          "at": "2026-10-30T14:50:00Z"
+        }
+      ]
+    },
+    {
+      "id": "jev-port-deconflict-and-gitlab-duo",
+      "priority": 19,
+      "name": "Jev Classifier Port 20127 Collision Resolution & GitLab Duo Integration",
+      "behavior": "Resolve socket collision (Errno 98: Address already in use) on port 20127 by retiring redundant jev-router-plugin.service in favor of nfp-jev-classifier.service with ReusableHTTPServer; update hermes-live-voice dependency; declaratively package and enable gitlab-duo and glab across development and CLI profiles.",
+      "verification": [
+        "curl -sf http://127.0.0.1:20127/health",
+        "systemctl is-active nfp-jev-classifier.service",
+        "which glab gitlab-duo",
+        "./init.sh --worktree"
+      ],
+      "state": "passing",
+      "claimedBy": "antigravity",
+      "blockedReason": null,
+      "evidence": [
+        {
+          "sha": "HEAD",
+          "command": "curl -sf http://127.0.0.1:20127/health && systemctl is-active nfp-jev-classifier.service && ./init.sh --worktree",
+          "output": "curl /health returned HTTP 200 OK with status: ok; nfp-jev-classifier.service active (PID 3798666); glab and gitlab-duo packaged in development profile and git CLI tools; ./init.sh --worktree passed 5/5 evaluating z0r0, luffy, and sanji cleanly.",
+          "at": "2026-10-31T06:25:00Z"
         }
       ]
     }

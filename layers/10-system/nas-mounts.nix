@@ -1,6 +1,6 @@
 # Tier: 10-system
 # Module: nas-mounts.nix
-# Purpose: Network NAS automount & Litestream SQLite live replication pipeline for Pi durable state.
+# Purpose: Network NAS automount & Litestream SQLite live replication pipeline for Pi & Jarvis durable state.
 # Option Path: layers.layer-10.system.config.nas-mounts
 # Enabling Host Tags: workstation, desktop, ai-agent
 {
@@ -12,13 +12,33 @@
 with lib;
 let
   cfg = config.layers.layer-10.system.config.nas-mounts;
+  primaryUser = config.layers.meta.primaryUser or "t0psh31f";
+  userHome = config.users.users.${primaryUser}.home or "/home/${primaryUser}";
+
   litestreamConfigFile = pkgs.writeText "litestream.yml" ''
     dbs:
-      - path: ${cfg.sqliteDbPath}
+    ${concatMapStringsSep "\n" (db: ''
+      - path: ${db.path}
         replicas:
           - type: file
-            path: ${cfg.backupDir}/state.db
-            sync-interval: 1s
+            path: ${cfg.backupDir}/${db.name}.db
+            sync-interval: ${cfg.syncInterval}
+            retention: ${cfg.retention}
+            snapshot-interval: ${cfg.snapshotInterval}
+    '') cfg.databases}
+  '';
+
+  reachabilityCheck = pkgs.writeShellScript "check-nas-reachable" ''
+    set -euo pipefail
+    # Fast 1-second ping or port check before attempting mount/replication
+    if ${pkgs.iputils}/bin/ping -c 1 -W 1 "${cfg.host}" >/dev/null 2>&1; then
+      exit 0
+    fi
+    PORT="${if cfg.protocol == "nfs" then "2049" else "445"}"
+    if ${pkgs.netcat}/bin/nc -z -w 1 "${cfg.host}" "$PORT" >/dev/null 2>&1; then
+      exit 0
+    fi
+    exit 1
   '';
 in
 {
@@ -46,6 +66,18 @@ in
       description = "SMB share name to mount (case-sensitive)";
     };
 
+    smbVersion = mkOption {
+      type = types.str;
+      default = "3.0";
+      description = "SMB protocol version (e.g. 3.0, 3.1.1, 2.1, 1.0)";
+    };
+
+    credentialsFile = mkOption {
+      type = types.nullOr types.path;
+      default = null;
+      description = "Optional path to CIFS credentials file for authenticated shares";
+    };
+
     nfsPath = mkOption {
       type = types.str;
       default = "/mnt/nas/backups";
@@ -64,10 +96,64 @@ in
       description = "Target backup directory on NAS for SQLite WAL replicas and snapshots";
     };
 
+    databases = mkOption {
+      type = types.listOf (
+        types.submodule {
+          options = {
+            name = mkOption {
+              type = types.str;
+              description = "Database identifier name for the replica folder on NAS";
+            };
+            path = mkOption {
+              type = types.str;
+              description = "Absolute local path to the SQLite database";
+            };
+          };
+        }
+      );
+      default = [
+        {
+          name = "state";
+          path = "${userHome}/.local/share/pi-durable/state.sqlite";
+        }
+        {
+          name = "screenpipe";
+          path = "${userHome}/.local/share/jarvis/screenpipe.db";
+        }
+        {
+          name = "execution";
+          path = "${userHome}/.local/share/jarvis/execution.db";
+        }
+        {
+          name = "tasklist";
+          path = "${userHome}/.local/share/nfp-task-watcher/tasklist.db";
+        }
+      ];
+      description = "List of local SQLite databases to continuously replicate to the NAS.";
+    };
+
     sqliteDbPath = mkOption {
       type = types.str;
-      default = "/home/t0psh31f/.local/share/pi-durable/state.sqlite";
-      description = "Local SQLite database path to replicate via Litestream";
+      default = "${userHome}/.local/share/pi-durable/state.sqlite";
+      description = "Backwards-compatible legacy single database option (superseded by databases).";
+    };
+
+    retention = mkOption {
+      type = types.str;
+      default = "168h";
+      description = "Retention duration for Litestream WAL segments on NAS (e.g. 168h for 7 days).";
+    };
+
+    syncInterval = mkOption {
+      type = types.str;
+      default = "1s";
+      description = "Litestream continuous WAL frame synchronization interval.";
+    };
+
+    snapshotInterval = mkOption {
+      type = types.str;
+      default = "24h";
+      description = "Litestream periodic baseline snapshot creation interval.";
     };
 
     enableLitestream = mkOption {
@@ -83,6 +169,8 @@ in
       samba
       nfs-utils
       litestream
+      iputils
+      netcat
     ];
 
     # Automount filesystem declaration
@@ -103,22 +191,33 @@ in
             "nfsvers=4.1"
           ]
         else
-          [
-            "guest"
-            "uid=1000"
-            "gid=100"
-            "file_mode=0775"
-            "dir_mode=0775"
-            "vers=1.0"
-            "soft"
-            "x-systemd.automount"
-            "noauto"
-            "x-systemd.idle-timeout=60"
-            "x-systemd.device-timeout=10s"
-            "x-systemd.mount-timeout=15s"
-            "_netdev"
-            "x-systemd.before=shutdown.target"
-          ];
+          (
+            (
+              if cfg.credentialsFile != null then
+                [
+                  "credentials=${toString cfg.credentialsFile}"
+                ]
+              else
+                [
+                  "guest"
+                ]
+            )
+            ++ [
+              "uid=1000"
+              "gid=100"
+              "file_mode=0775"
+              "dir_mode=0775"
+              "vers=${cfg.smbVersion}"
+              "soft"
+              "x-systemd.automount"
+              "noauto"
+              "x-systemd.idle-timeout=60"
+              "x-systemd.device-timeout=10s"
+              "x-systemd.mount-timeout=15s"
+              "_netdev"
+              "x-systemd.before=shutdown.target"
+            ]
+          );
     };
 
     # Deploy system-wide litestream configuration
@@ -130,13 +229,13 @@ in
         "d ${cfg.mountPoint} 0775 root 100 - -"
         "d ${cfg.backupDir} 0775 1000 100 - -"
         "L+ /mnt/NAS - - - - ${cfg.mountPoint}"
-        "L+ ${config.users.users.t0psh31f.home}/NAS - - - - ${cfg.mountPoint}"
+        "L+ ${userHome}/NAS - - - - ${cfg.mountPoint}"
       ];
 
       services = {
         # Continuous SQLite WAL streaming daemon with recovery auto-pull on startup
         nfp-pi-durable-litestream = mkIf cfg.enableLitestream {
-          description = "Litestream SQLite Live Replication Daemon for Pi Durable State";
+          description = "Litestream SQLite Live Replication Daemon for Pi & Jarvis Durable State";
           wantedBy = [ "multi-user.target" ];
           after = [
             "network.target"
@@ -145,22 +244,33 @@ in
           wants = [ "network.target" ];
 
           serviceConfig = {
-            User = "t0psh31f";
+            User = primaryUser;
             Group = "users";
-            Restart = "always";
-            RestartSec = "10s";
-            # Auto-pull recovery if local state is missing
+            Restart = "on-failure";
+            RestartSec = "30s";
+            Slice = "background.slice";
+            MemoryHigh = "256M";
+            MemoryMax = "512M";
+
+            # Pre-flight reachability check: cleanly pause if NAS is offline
+            ExecCondition = reachabilityCheck;
+
+            # Auto-pull recovery if local databases are missing
             ExecStartPre = pkgs.writeShellScript "litestream-prestart" ''
               set -euo pipefail
-              DB="${cfg.sqliteDbPath}"
-              REPLICA="${cfg.backupDir}/state.db"
-              DIR="$(dirname "$DB")"
-              mkdir -p "$DIR"
+              TARGET_DIR="${cfg.backupDir}"
 
-              if [ ! -f "$DB" ] && [ -d "$REPLICA" ]; then
-                echo "[Litestream] Local database missing; performing recovery auto-pull from $REPLICA..."
-                ${pkgs.litestream}/bin/litestream restore -if-replica-exists -config /etc/litestream.yml "$DB" || true
-              fi
+              ${concatMapStringsSep "\n" (db: ''
+                DB="${db.path}"
+                REPLICA="${cfg.backupDir}/${db.name}.db"
+                DIR="$(dirname "$DB")"
+                mkdir -p "$DIR"
+
+                if [ ! -f "$DB" ] && [ -d "$REPLICA" ]; then
+                  echo "[Litestream] Local database $DB missing; performing recovery auto-pull from $REPLICA..."
+                  ${pkgs.litestream}/bin/litestream restore -if-replica-exists -config /etc/litestream.yml "$DB" || true
+                fi
+              '') cfg.databases}
             '';
             ExecStart = "${pkgs.litestream}/bin/litestream replicate -config /etc/litestream.yml -restore-if-db-not-exists";
           };
@@ -175,23 +285,30 @@ in
           ];
           serviceConfig = {
             Type = "oneshot";
-            User = "t0psh31f";
+            User = primaryUser;
             Group = "users";
+            Slice = "background.slice";
+            MemoryHigh = "256M";
+            MemoryMax = "512M";
+
+            ExecCondition = reachabilityCheck;
+
             ExecStart = pkgs.writeShellScript "nas-snapshot-sync" ''
               set -euo pipefail
-              DB="${cfg.sqliteDbPath}"
               TARGET_DIR="${cfg.backupDir}"
 
-              # Gracefully exit 0 if mount is currently unreachable or offline
               if [ ! -d "$TARGET_DIR" ]; then
                 echo "[SnapshotSync] NAS backup directory $TARGET_DIR not accessible, skipping."
                 exit 0
               fi
 
-              if [ -f "$DB" ]; then
-                echo "[SnapshotSync] Syncing Litestream force-snapshot to $TARGET_DIR..."
-                ${pkgs.litestream}/bin/litestream replicate -config /etc/litestream.yml -once -force-snapshot || true
-              fi
+              ${concatMapStringsSep "\n" (db: ''
+                DB="${db.path}"
+                if [ -f "$DB" ]; then
+                  echo "[SnapshotSync] Syncing Litestream force-snapshot for $DB to $TARGET_DIR..."
+                  ${pkgs.litestream}/bin/litestream replicate -config /etc/litestream.yml -once -force-snapshot || true
+                fi
+              '') cfg.databases}
             '';
           };
         };

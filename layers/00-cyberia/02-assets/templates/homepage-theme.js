@@ -127,7 +127,7 @@
           <div class="fleet-vitals-flag">🏴‍☠️</div>
           <div>
             <h2>GRAND LINE FLEET VITALS</h2>
-            <span class="fleet-vitals-subtitle">High-Definition Telemetry via Netdata Engine (z0r0 · luffy · nami)</span>
+            <span class="fleet-vitals-subtitle">High-Definition Telemetry via Netdata Engine (z0r0 · luffy · sanji)</span>
           </div>
         </div>
         <div class="fleet-vitals-meta" id="fleet-vitals-meta">COLLECTING VITALS...</div>
@@ -269,7 +269,7 @@
           </div>
 
           <div class="services-grid">
-            ${cat.services.map(svc => createWantedPosterCardHtml(svc, cat.color)).join('')}
+            ${groupServicesByBase(cat.services).map(grp => renderServiceGroup(grp, cat.color)).join('')}
           </div>
         `;
       } else {
@@ -285,7 +285,7 @@
             <div class="vivre-card-summary" id="cat-summary-${cat.id}">${cat.services.length} SERVICES (PROBING...)</div>
           </header>
           <div class="services-grid">
-            ${cat.services.map(svc => createWantedPosterCardHtml(svc, cat.color)).join('')}
+            ${groupServicesByBase(cat.services).map(grp => renderServiceGroup(grp, cat.color)).join('')}
           </div>
         `;
       }
@@ -298,8 +298,75 @@
     }
   }
 
+  function groupServicesByBase(services) {
+    const groups = [];
+    const map = new Map();
+
+    (services || []).forEach(svc => {
+      const baseName = svc.baseTitle || svc.name.replace(/\s*\([^)]*\)$/, '').trim();
+      const groupKey = `${svc.category}:${baseName.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
+      if (!map.has(groupKey)) {
+        const grp = {
+          groupKey: groupKey,
+          baseName: baseName,
+          category: svc.category,
+          instances: []
+        };
+        map.set(groupKey, grp);
+        groups.push(grp);
+      }
+      map.get(groupKey).instances.push(svc);
+    });
+
+    return groups;
+  }
+
+  function renderServiceGroup(group, catColor) {
+    if (group.instances.length === 1) {
+      return createWantedPosterCardHtml(group.instances[0], catColor);
+    }
+    return createMultiInstancePosterCardHtml(group, catColor);
+  }
+
+  window.switchServiceInstance = function (evt, groupKey, targetId) {
+    if (evt) {
+      evt.preventDefault();
+      evt.stopPropagation();
+    }
+    const card = document.querySelector(`[data-group-key="${groupKey}"]`);
+    if (!card) return;
+
+    const pills = card.querySelectorAll('.instance-pill');
+    pills.forEach(p => {
+      const match = p.getAttribute('data-target-id') === targetId;
+      p.classList.toggle('active', match);
+      p.setAttribute('aria-selected', match ? 'true' : 'false');
+    });
+
+    const views = card.querySelectorAll('.instance-view');
+    views.forEach(v => {
+      const match = v.getAttribute('data-instance-id') === targetId;
+      v.classList.toggle('hidden', !match);
+    });
+
+    const snails = card.querySelectorAll('.den-den-mushi-container');
+    snails.forEach(s => {
+      const match = s.getAttribute('data-instance-id') === targetId;
+      s.classList.toggle('hidden', !match);
+    });
+  };
+
   window.focusCanonicalCard = function (svcId) {
-    const card = document.querySelector(`[data-service-id='${svcId}']`);
+    let card = document.querySelector(`[data-service-id='${svcId}']`);
+    if (!card) {
+      card = document.querySelector(`[data-all-ids~='${svcId}']`);
+      if (card) {
+        const groupKey = card.getAttribute('data-group-key');
+        if (groupKey && window.switchServiceInstance) {
+          window.switchServiceInstance(null, groupKey, svcId);
+        }
+      }
+    }
     if (card) {
       card.scrollIntoView({ behavior: 'smooth', block: 'center' });
       card.classList.add('card-highlight-pulse');
@@ -431,6 +498,124 @@
     `;
   }
 
+  function createMultiInstancePosterCardHtml(group, catColor) {
+    const first = group.instances[0];
+    const isBrook = group.instances.some(s => s.satellite === 'brook' || s.id === 'lidarr');
+    const hasImg = first.icon && (first.icon.startsWith('/') || first.icon.endsWith('.svg') || first.icon.endsWith('.png'));
+    const iconHtml = hasImg
+      ? `<img src="${first.icon}" alt="${group.baseName}" class="service-card-icon" onerror="this.src='/assets/icons/fallback.svg'">`
+      : `<span class="wanted-portrait-emoji">${first.icon || '⚓'}</span>`;
+
+    const allSearchTerms = `${group.baseName.toLowerCase()} ${(first.onePieceSub || '').toLowerCase()} ${group.instances.map(i => (i.targetHost || i.name)).join(' ').toLowerCase()}`;
+    const allIds = group.instances.map(i => i.id).join(' ');
+
+    const switcherPillsHtml = group.instances.map((inst, idx) => {
+      const hostName = inst.targetHost || (inst.name.match(/\(([^)]+)\)/) ? inst.name.match(/\(([^)]+)\)/)[1] : 'node');
+      const isFirst = idx === 0;
+      return `
+        <button class="instance-pill ${isFirst ? 'active' : ''}"
+                role="tab"
+                type="button"
+                aria-selected="${isFirst ? 'true' : 'false'}"
+                data-target-id="${inst.id}"
+                onclick="window.switchServiceInstance(event, '${group.groupKey}', '${inst.id}')">
+          <span class="instance-dot" id="dot-${inst.id}"></span>
+          <span class="instance-host-label">${hostName}</span>
+        </button>
+      `;
+    }).join('');
+
+    const snailsHtml = group.instances.map((inst, idx) => `
+      <div class="den-den-mushi-container ${idx === 0 ? '' : 'hidden'}" id="snail-${inst.id}" data-instance-id="${inst.id}">
+        ${DEN_DEN_MUSHI_SVGS.checking}
+      </div>
+    `).join('');
+
+    const instanceViewsHtml = group.instances.map((inst, idx) => {
+      const isFirst = idx === 0;
+      const hasLogs = inst.logs && inst.logs.enable && inst.logs.url;
+      const declaredFields = (inst.metric && inst.metric.fields) || [];
+      const isHealthOnly = !inst.metric || inst.metric.mode === 'health-only' || declaredFields.length === 0;
+      const hostName = inst.targetHost || (inst.name.match(/\(([^)]+)\)/) ? inst.name.match(/\(([^)]+)\)/)[1] : 'node');
+
+      const initialFieldsHtml = isHealthOnly
+        ? `<div class="metric-health-pill">HEALTH CHECKED</div>`
+        : declaredFields.map(f => {
+            const label = f.replace(/([A-Z])/g, ' $1').toUpperCase();
+            return `
+              <div class="metric-field-item">
+                <span class="metric-field-key">${label}</span>
+                <span class="metric-field-val" id="metric-${inst.id}-${f}">—</span>
+              </div>
+            `;
+          }).join('');
+
+      return `
+        <div class="instance-view ${isFirst ? '' : 'hidden'}" data-instance-id="${inst.id}">
+          <div class="bounty-plaque" id="bounty-plaque-${inst.id}">
+            <span class="bounty-currency">฿</span>
+            <span class="bounty-figure" id="bounty-${inst.id}">FETCHING...</span>
+          </div>
+
+          <div class="card-metrics-grid" id="metrics-${inst.id}">
+            ${initialFieldsHtml}
+          </div>
+
+          <div class="widget-error-container" id="error-${inst.id}" style="display: none;"></div>
+
+          <div class="wanted-actions">
+            <a href="${inst.url}" target="_blank" rel="noopener noreferrer" class="action-btn action-btn-primary" aria-label="Board ${inst.name}">BOARD ${hostName.toUpperCase()}</a>
+            ${hasLogs ? `<a href="${inst.logs.url}" target="_blank" rel="noopener noreferrer" class="action-btn action-btn-secondary" aria-label="View logs for ${inst.name}">LOGS</a>` : ''}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    const quickLinksHtml = group.instances.map(inst => {
+      const hostName = inst.targetHost || (inst.name.match(/\(([^)]+)\)/) ? inst.name.match(/\(([^)]+)\)/)[1] : 'node');
+      return `<a href="${inst.url}" target="_blank" rel="noopener noreferrer" class="quick-node-link" title="Open on ${hostName}">${hostName} ↗</a>`;
+    }).join('');
+
+    return `
+      <article class="wanted-poster-card ${isBrook ? 'brook-card' : ''} multi-instance-card"
+               data-service-id="${first.id}"
+               data-group-key="${group.groupKey}"
+               data-all-ids="${allIds}"
+               data-search-terms="${allSearchTerms}"
+               style="--accent-color: ${catColor}">
+        <div class="wanted-poster-frame">
+          <div class="wanted-poster-masthead">
+            <span class="wanted-text">WANTED</span>
+            <span class="dead-or-alive-text">DEAD OR ALIVE</span>
+          </div>
+
+          <div class="wanted-portrait-box">
+            <div class="wanted-portrait-inner">
+              ${iconHtml}
+            </div>
+            ${snailsHtml}
+          </div>
+
+          <div class="wanted-identity">
+            <h3 class="wanted-name">${group.baseName} <span class="multi-instance-badge">${group.instances.length} NODES</span></h3>
+            <span class="wanted-role">${first.onePieceSub || 'MULTI-NODE FLEET SERVICE'}</span>
+          </div>
+
+          <div class="instance-switcher-bar" role="tablist" aria-label="Switch node for ${group.baseName}">
+            ${switcherPillsHtml}
+          </div>
+
+          ${instanceViewsHtml}
+
+          <div class="instance-quick-links">
+            <span class="quick-links-label">DIRECT:</span>
+            ${quickLinksHtml}
+          </div>
+        </div>
+      </article>
+    `;
+  }
+
   function renderSpeeddial(bookmarks) {
     const main = document.getElementById('dashboard-main');
     if (!main || !bookmarks || bookmarks.length === 0) return;
@@ -499,6 +684,12 @@
           snailEl.innerHTML = isOnline ? DEN_DEN_MUSHI_SVGS.online : DEN_DEN_MUSHI_SVGS.offline;
         }
 
+        const dotEl = document.getElementById(`dot-${svc.id}`);
+        if (dotEl) {
+          dotEl.classList.toggle('dot-online', isOnline);
+          dotEl.classList.toggle('dot-offline', !isOnline);
+        }
+
         if (orbitNode) {
           orbitNode.style.opacity = isOnline ? '1' : '0.45';
         }
@@ -557,6 +748,11 @@
         const metricsEl = document.getElementById(`metrics-${svc.id}`);
         const orbitNode = document.getElementById(`orbit-${svc.id}`);
         if (snailEl) snailEl.innerHTML = DEN_DEN_MUSHI_SVGS.offline;
+        const dotEl = document.getElementById(`dot-${svc.id}`);
+        if (dotEl) {
+          dotEl.classList.remove('dot-online');
+          dotEl.classList.add('dot-offline');
+        }
         if (bountyEl) bountyEl.textContent = 'OFFLINE';
         if (bountyPlaqueEl) bountyPlaqueEl.classList.add('bounty-offline');
         if (metricsEl) {

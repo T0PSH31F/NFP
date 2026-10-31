@@ -21,7 +21,12 @@ let
     else
       "http://sanji.nfp.nix:8090";
   jevBaseUrl = "http://127.0.0.1:${
-    toString (config.layers.layer-78.llm-routers.jev-router-plugin.port or 20127)
+    toString (
+      if (config.layers.layer-78.llm-routers.jev.enable or false) then
+        config.layers.layer-78.llm-routers.jev.port
+      else
+        (config.layers.layer-78.llm-routers.jev-router-plugin.port or 20127)
+    )
   }";
 in
 {
@@ -64,7 +69,7 @@ in
           after = [
             "network-online.target"
             "hermes-agent.service"
-            "jev-router-plugin.service"
+            "nfp-jev-classifier.service"
           ];
           wants = [
             "network-online.target"
@@ -154,7 +159,7 @@ in
           after = [
             "network-online.target"
             "hermes-live-gateway.service"
-            "jev-router-plugin.service"
+            "nfp-jev-classifier.service"
           ];
           wants = [
             "network-online.target"

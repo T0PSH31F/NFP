@@ -25,6 +25,7 @@ in
       curlie
       cyberstrike
       devin-desktop
+      gitlab-duo
       hcom
       httpie
       ketch

@@ -62,10 +62,21 @@
   # ============================================================================
 
   services = {
-    # Earlyoom disabled in favor of systemd-oomd (cgroup PSI pressure based).
-    # On systems with zramSwap and high swappiness, earlyoom's swap threshold
-    # repeatedly triggers false positives, terminating IDEs, agents, and desktop sessions.
-    earlyoom.enable = lib.mkDefault false;
+    # Earlyoom - proactive OOM killer preventing total kernel page-thrashing lockups
+    earlyoom = {
+      enable = lib.mkDefault true;
+      freeMemThreshold = lib.mkDefault 5;
+      freeSwapThreshold = lib.mkDefault 5;
+      enableNotifications = true;
+      extraArgs = [
+        "--prefer"
+        "^(Web Content|Isolated Web Co|chromium|firefox|brave)$"
+        "--avoid"
+        "^(Hyprland|hyprland|noctalia|Noctalia|sshd|systemd|greetd|extreme-router|omniroute|brain-service|caddy|calibre-web|nix-daemon|nix|nix-build|clan|nixos-rebuild|glados.*|jarvis.*|ghostty|neovim|nvim)$"
+        "--ignore"
+        "^(nix-daemon|nix|nix-build|clan|nixos-rebuild|systemd)$"
+      ];
+    };
 
     # Modern performance-oriented dbus implementation
     dbus.implementation = "broker";

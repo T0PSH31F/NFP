@@ -20,6 +20,9 @@ in
       pkgs.jellyfin-desktop
       pkgs.anilibria-winmaclinux
       pkgs.orca
+      pkgs.webtorrent_desktop
+      pkgs.torrentstream
+      pkgs.vlc-bittorrent
       pkgs.pirate-get
       pkgs.peerflix-server
       pkgs.spotdl

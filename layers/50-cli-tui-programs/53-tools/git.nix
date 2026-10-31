@@ -64,6 +64,8 @@ in
         gitleaks
         gitui
         gh
+        glab
+        gitlab-duo
       ];
     };
 }
