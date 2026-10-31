@@ -270,8 +270,8 @@ let
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>NIX FLAKE PIRATES — Cyberia Fleet Command</title>
-      <link rel="stylesheet" href="/assets/css/theme.css?v=20261031c">
-      <link rel="stylesheet" href="/assets/css/custom.css?v=20261031c">
+      <link rel="stylesheet" href="/assets/css/theme.css?v=20261031d">
+      <link rel="stylesheet" href="/assets/css/custom.css?v=20261031d">
     </head>
     <body>
       <video
@@ -319,7 +319,7 @@ let
 
       <main class="dashboard-main" id="dashboard-main"></main>
 
-      <script src="/assets/js/app.js?v=20261031c"></script>
+      <script src="/assets/js/app.js?v=20261031d"></script>
     </body>
     </html>
     EOF

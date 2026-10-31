@@ -571,9 +571,14 @@
       `;
     }).join('');
 
-    const quickLinksHtml = group.instances.map(inst => {
+    const quickLaunchButtonsHtml = group.instances.map(inst => {
       const hostName = inst.targetHost || (inst.id.includes('@') ? inst.id.split('@')[1] : (inst.name.match(/\(([^)]+)\)/) ? inst.name.match(/\(([^)]+)\)/)[1] : 'luffy'));
-      return `<a href="${inst.url}" target="_blank" rel="noopener noreferrer" class="quick-node-link" title="Open on ${hostName}">${hostName} ↗</a>`;
+      return `
+        <a href="${inst.url}" target="_blank" rel="noopener noreferrer" class="quick-node-btn" title="Direct launch ${group.baseName} on ${hostName}">
+          <span class="quick-node-dot" id="quick-dot-${inst.id}"></span>
+          <span class="quick-node-host">${hostName.toUpperCase()} ↗</span>
+        </a>
+      `;
     }).join('');
 
     return `
@@ -607,9 +612,11 @@
 
           ${instanceViewsHtml}
 
-          <div class="instance-quick-links">
-            <span class="quick-links-label">DIRECT:</span>
-            ${quickLinksHtml}
+          <div class="instance-quick-launch-ribbon">
+            <span class="quick-launch-label">LAUNCH:</span>
+            <div class="quick-launch-btn-group">
+              ${quickLaunchButtonsHtml}
+            </div>
           </div>
         </div>
       </article>
@@ -690,6 +697,12 @@
           dotEl.classList.toggle('dot-offline', !isOnline);
         }
 
+        const quickDotEl = document.getElementById(`quick-dot-${svc.id}`);
+        if (quickDotEl) {
+          quickDotEl.classList.toggle('dot-online', isOnline);
+          quickDotEl.classList.toggle('dot-offline', !isOnline);
+        }
+
         if (orbitNode) {
           orbitNode.style.opacity = isOnline ? '1' : '0.45';
         }
@@ -752,6 +765,11 @@
         if (dotEl) {
           dotEl.classList.remove('dot-online');
           dotEl.classList.add('dot-offline');
+        }
+        const quickDotEl = document.getElementById(`quick-dot-${svc.id}`);
+        if (quickDotEl) {
+          quickDotEl.classList.remove('dot-online');
+          quickDotEl.classList.add('dot-offline');
         }
         if (bountyEl) bountyEl.textContent = 'OFFLINE';
         if (bountyPlaqueEl) bountyPlaqueEl.classList.add('bounty-offline');

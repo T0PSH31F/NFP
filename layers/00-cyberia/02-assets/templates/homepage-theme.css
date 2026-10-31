@@ -1286,38 +1286,74 @@ html, body {
   margin-left: 6px;
 }
 
-.instance-quick-links {
+.instance-quick-launch-ribbon {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   gap: 8px;
-  padding-top: 6px;
-  border-top: 1px dashed rgba(255, 255, 255, 0.08);
-  font-family: var(--font-header);
-  font-size: 0.62rem;
-  color: var(--text-dim);
+  padding: 6px 10px;
+  background: rgba(0, 0, 0, 0.45);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  margin-top: 10px;
   flex-wrap: wrap;
 }
 
-.quick-links-label {
+.quick-launch-label {
   color: var(--poster-gold);
+  font-family: var(--font-header);
+  font-size: 0.65rem;
   font-weight: 700;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
 }
 
-.quick-node-link {
-  color: var(--text-muted);
+.quick-launch-btn-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.quick-node-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+  color: var(--text-main);
   text-decoration: none;
-  padding: 2px 6px;
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 3px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  font-family: var(--font-header);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
   transition: all 0.2s ease;
 }
 
-.quick-node-link:hover {
-  color: var(--poster-accent);
-  border-color: var(--poster-gold);
-  background: rgba(255, 255, 255, 0.08);
+.quick-node-btn:hover {
+  background: rgba(0, 217, 255, 0.15);
+  border-color: #00d9ff;
+  color: #fff;
+  box-shadow: 0 0 10px rgba(0, 217, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.quick-node-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.quick-node-dot.dot-online {
+  background: #39ff14;
+  box-shadow: 0 0 6px #39ff14;
+}
+
+.quick-node-dot.dot-offline {
+  background: #ff0055;
+  box-shadow: 0 0 6px #ff0055;
 }
 
