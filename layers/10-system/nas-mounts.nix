@@ -47,8 +47,8 @@ in
 
     host = mkOption {
       type = types.str;
-      default = "192.168.1.158";
-      description = "NAS hostname or IP address";
+      default = "169.254.16.208";
+      description = "NAS hostname or IP address (Buffalo LinkStation active link-local address: 169.254.16.208)";
     };
 
     protocol = mkOption {
@@ -233,6 +233,24 @@ in
       ];
 
       services = {
+        ensure-nas-route = {
+          description = "Ensure Link-Local Route to Network NAS";
+          wantedBy = [ "network-online.target" ];
+          after = [ "network.target" ];
+          serviceConfig = {
+            Type = "oneshot";
+            RemainAfterExit = true;
+            ExecStart = pkgs.writeShellScript "ensure-nas-route" ''
+              if echo "${cfg.host}" | grep -q '^169\.254\.'; then
+                DEFAULT_IFACE=$(${pkgs.iproute2}/bin/ip route | grep '^default' | head -n1 | awk '{print $5}')
+                if [ -n "$DEFAULT_IFACE" ]; then
+                  ${pkgs.iproute2}/bin/ip route replace 169.254.0.0/16 dev "$DEFAULT_IFACE" scope link metric 1000 || true
+                fi
+              fi
+            '';
+          };
+        };
+
         # Continuous SQLite WAL streaming daemon with recovery auto-pull on startup
         nfp-pi-durable-litestream = mkIf cfg.enableLitestream {
           description = "Litestream SQLite Live Replication Daemon for Pi & Jarvis Durable State";

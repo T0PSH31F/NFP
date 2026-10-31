@@ -280,7 +280,7 @@ def handle_list_observability_targets(args):
         "netdata": {
             "z0r0": "http://z0r0.nfp.nix:19999",
             "luffy": "http://luffy.nfp.nix:19999",
-            "nami": "http://nami.nfp.nix:19999",
+            "sanji": "http://sanji.nfp.nix:19999",
         },
         "alertmanager": {
             "url": "http://luffy.nfp.nix:9093",
@@ -294,7 +294,7 @@ def handle_get_observability_coverage(args):
         "hostCoverage": [
             {"host": "z0r0", "nodeExporter": True, "netdata": True, "glances": False, "alloy": True, "loki": True, "promScrape": True, "status": "nominal"},
             {"host": "luffy", "nodeExporter": True, "netdata": True, "glances": False, "alloy": True, "loki": True, "promScrape": True, "status": "nominal"},
-            {"host": "nami", "nodeExporter": True, "netdata": True, "glances": False, "alloy": True, "loki": True, "promScrape": True, "status": "nominal"},
+            {"host": "sanji", "nodeExporter": True, "netdata": True, "glances": False, "alloy": True, "loki": True, "promScrape": True, "status": "nominal"},
         ],
         "glancesPolicy": "Glances permanently disabled and removed across all hosts. Netdata is sole real-time vitals authority.",
         "tracingAuthority": "Langfuse for LLM/agent spans. Tempo recommended for non-LLM OTLP tracing in future ADR.",

@@ -270,8 +270,8 @@ let
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>NIX FLAKE PIRATES — Cyberia Fleet Command</title>
-      <link rel="stylesheet" href="/assets/css/theme.css">
-      <link rel="stylesheet" href="/assets/css/custom.css">
+      <link rel="stylesheet" href="/assets/css/theme.css?v=20261031c">
+      <link rel="stylesheet" href="/assets/css/custom.css?v=20261031c">
     </head>
     <body>
       <video
@@ -319,7 +319,7 @@ let
 
       <main class="dashboard-main" id="dashboard-main"></main>
 
-      <script src="/assets/js/app.js"></script>
+      <script src="/assets/js/app.js?v=20261031c"></script>
     </body>
     </html>
     EOF
@@ -1038,10 +1038,15 @@ let
                 self.send_response(200)
                 if file_path.endswith(".html"):
                     self.send_header("Content-Type", "text/html; charset=utf-8")
+                    self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
+                    self.send_header("Pragma", "no-cache")
+                    self.send_header("Expires", "0")
                 elif file_path.endswith(".css"):
                     self.send_header("Content-Type", "text/css")
+                    self.send_header("Cache-Control", "no-cache, must-revalidate")
                 elif file_path.endswith(".js"):
                     self.send_header("Content-Type", "application/javascript")
+                    self.send_header("Cache-Control", "no-cache, must-revalidate")
                 elif file_path.endswith(".ttf"):
                     self.send_header("Content-Type", "font/ttf")
                 elif file_path.endswith(".png"):
