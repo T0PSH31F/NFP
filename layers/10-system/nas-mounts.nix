@@ -241,8 +241,8 @@ in
             Type = "oneshot";
             RemainAfterExit = true;
             ExecStart = pkgs.writeShellScript "ensure-nas-route" ''
-              if echo "${cfg.host}" | grep -q '^169\.254\.'; then
-                DEFAULT_IFACE=$(${pkgs.iproute2}/bin/ip route | grep '^default' | head -n1 | awk '{print $5}')
+              if echo "${cfg.host}" | ${pkgs.gnugrep}/bin/grep -q '^169\.254\.'; then
+                DEFAULT_IFACE=$(${pkgs.iproute2}/bin/ip route | ${pkgs.gnugrep}/bin/grep '^default' | ${pkgs.coreutils}/bin/head -n1 | ${pkgs.gawk}/bin/awk '{print $5}')
                 if [ -n "$DEFAULT_IFACE" ]; then
                   ${pkgs.iproute2}/bin/ip route replace 169.254.0.0/16 dev "$DEFAULT_IFACE" scope link metric 1000 || true
                 fi
