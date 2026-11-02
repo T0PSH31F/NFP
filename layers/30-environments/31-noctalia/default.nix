@@ -225,6 +225,8 @@ in
           gst_all_1.gst-plugins-good
           evtest
           gpu-screen-recorder
+          linux-wallpaperengine
+          ffmpeg
           mpvpaper
           libsecret
           python3

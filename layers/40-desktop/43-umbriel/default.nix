@@ -975,7 +975,11 @@ let
   };
 
   mkConfigFile =
-    { includePath, presetEffects }:
+    {
+      includePath,
+      noctaliaPath,
+      presetEffects,
+    }:
     ''
       # ==============================================================================
       # General
@@ -985,14 +989,16 @@ let
       xwayland = true
 
       # ==============================================================================
-      # Includes — Shaders & Effect Presets
+      # Includes — Shaders, Effect Presets & Noctalia Dynamic Palette
       # ==============================================================================
       # Includes all 189+ curated GLSL shader effect presets from:
       # • Community Shaders: https://github.com/noctalia-dev/community-umbriel-shaders
       # • Prometheaus Shaders: https://github.com/prometheaus/umbriel-shaders
+      # • Noctalia Dynamic Theme Palette: ${noctaliaPath}
       [include]
       files = [
-        "${includePath}"
+        "${includePath}",
+        "${noctaliaPath}"
       ]
 
       ${presetEffects}
@@ -1540,6 +1546,7 @@ in
       etc = {
         "xdg/umbriel/config.toml".text = mkConfigFile {
           includePath = "shaders/all-shaders.toml";
+          noctaliaPath = "noctalia.toml";
           presetEffects = presets.${cfg.themePreset}.effects;
         };
 
@@ -1556,6 +1563,7 @@ in
         lib.nameValuePair "xdg/umbriel/presets/${name}.toml" {
           text = mkConfigFile {
             includePath = "../shaders/all-shaders.toml";
+            noctaliaPath = "../noctalia.toml";
             presetEffects = preset.effects;
           };
         }
