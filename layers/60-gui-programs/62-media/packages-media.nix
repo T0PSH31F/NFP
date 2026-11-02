@@ -7,6 +7,11 @@
 }:
 let
   system = pkgs.stdenv.hostPlatform.system;
+  anilibriaEnglish = pkgs.anilibria-winmaclinux.overrideAttrs (oldAttrs: {
+    postPatch = (oldAttrs.postPatch or "") + ''
+      ${pkgs.python3}/bin/python3 ${./translate-anilibria.py} src
+    '';
+  });
 in
 {
   options.layers.layer-60.gui.media-packages = {
@@ -18,7 +23,7 @@ in
       pkgs.deluge
       pkgs.ffmpeg
       pkgs.jellyfin-desktop
-      pkgs.anilibria-winmaclinux
+      anilibriaEnglish
       pkgs.orca
       pkgs.webtorrent_desktop
       pkgs.torrentstream

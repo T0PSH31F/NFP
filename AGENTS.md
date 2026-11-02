@@ -63,6 +63,7 @@ clan machines update luffy     # update homelab server
 
 - **Never run `nix-store --gc`**: Use `nix-safe-gc` or `nix-collect-garbage --delete-older-than 14d`.
 - **Atomic Commits & Pushes**: All changes must be committed with proper layer/module reference and cross-machine impact.
+- **Workstation Resource Preservation (`sanji`)**: Heavy Nix evaluations (`nix eval`, `nfp-check eval`) and flake checks must be offloaded to `z0r0` (`100.64.0.1`) or `luffy` (`100.64.0.3`) via `nfp-check eval`. Never run heavy multi-host evaluations unconstrained on `sanji`.
 
 ---
 

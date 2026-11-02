@@ -1,43 +1,24 @@
 # Session Handoff
 
 ## Last Session Accomplishments
-1. **Homepage Dashboard Vitals & Multi-Instance Card Deduplication**:
-   - Swapped fleet vitals queries from decommissioned `nami` to `sanji` Netdata (`:19999`) in [`layers/20-services/26-monitoring/homepage-dashboard.nix`](file:///home/t0psh31f/Clan/NFP/layers/20-services/26-monitoring/homepage-dashboard.nix).
-   - Enabled Netdata on `sanji`: `layers.layer-20.services.config.netdata.enable = true;` in [`machines/sanji/default.nix`](file:///home/t0psh31f/Clan/NFP/machines/sanji/default.nix).
-   - Verified multi-instance grouping in [`layers/00-cyberia/02-assets/templates/homepage-theme.js`](file:///home/t0psh31f/Clan/NFP/layers/00-cyberia/02-assets/templates/homepage-theme.js): deduplicates identical cross-machine cards into a single clean card with dynamic node switcher pills (`[luffy] [z0r0] [sanji]`), status indicators, and direct quick links.
+1. **Umbriel 16-Preset Gallery Overhaul & Keybindings (`layers/40-desktop/43-umbriel/default.nix`)**:
+   - Redesigned all 16 Umbriel visual shader presets (`kzzzt`, `psychedelic`, `after-dark`, `flame-lava`, `beach-surf`, `paper-craft`, `rainbow-neon`, `rainbow-smoke`, `sentient-matrix`, `lightning-shatter`, `vampire-blood`, `diwali-festival`, `flowering-vine`, `ghostly-tear`, `cyberpunk-crt`, `minimal-glass`) with cohesive border, window, cursor, workspace, `windows_in`, `windows_out`, `windows_move`, `overview`, `dim_unfocused`, and `scratchpad` effects for `Mod+Shift+G` / `Mod+Alt+G` rotation.
+   - Set `palette = false` on `kzzzt` community shader `effect.toml` files so `kzzzt` retains its signature neon cyan/magenta colors instead of being overridden by the wallpaper palette.
+   - Configured keybindings: `Mod+E` (`dolphin`), `Mod+G` (`gedit`), `Mod+Alt+Y` (`yazi`), `Mod+Y` / `Mod+Shift+Y` (`scratchpad-toggle:yazelix`), `Mod+N` / `Mod+Shift+N` (`noctalia/notes:panel`), and `Mod+T` (`scratchpad-toggle:terminal`).
+   - Enabled `middle_click_paste = true` and `accel_profile = "adaptive"` for mouse and touchpad.
 
-2. **Fleet Service Rebalancing (Paperclip, OmniRoute, ExtremeRouter, Headplane)**:
-   - **Paperclip**: Enabled `layers.layer-76.orchestrators.paperclip.enable = true;` on `luffy` in [`machines/luffy/default.nix`](file:///home/t0psh31f/Clan/NFP/machines/luffy/default.nix), disabled on `sanji` (`machines/sanji/default.nix`). Configured declarative PostgreSQL database and role provisioning in [`layers/70-agents/76-orchestrators/paperclip.nix`](file:///home/t0psh31f/Clan/NFP/layers/70-agents/76-orchestrators/paperclip.nix).
-   - **ExtremeRouter**: Confined strictly to `z0r0` via `layers.layer-78.llm-routers.extreme-router.enable = true;` in [`machines/z0r0/default.nix`](file:///home/t0psh31f/Clan/NFP/machines/z0r0/default.nix), disabled on `sanji` and `luffy`.
-   - **OmniRoute**: Enabled on `luffy` (`:20129`) via `services.ai-services.omniroute = { enable = true; port = 20129; environmentFile = config.sops.templates."omniroute-env".path; };` in `machines/luffy/default.nix`, disabled on `sanji`.
-   - **Headplane**: Enabled on `luffy` (`:3050`) via `layers.layer-20.services.config.headplane = { enable = true; port = 3050; headscaleUrl = "http://127.0.0.1:8086"; };` in `machines/luffy/default.nix`.
+2. **Workstation Resource Preservation (`sanji` Eval Offloading)**:
+   - Upgraded [`layers/00-cyberia/06-scripts/nfp-check.sh`](file:///home/t0psh31f/Clan/NFP/layers/00-cyberia/06-scripts/nfp-check.sh) (`eval` and `flake` modes) to automatically `rsync` the repository to `z0r0` (`100.64.0.1`) or `luffy` (`100.64.0.3`) and execute heavy multi-host Nix evaluations remotely whenever run on `sanji` (`--local` flag available for local override).
+   - Codified Rule #7 in [`.agents/rules/nix-resource-safety.md`](file:///home/t0psh31f/Clan/NFP/.agents/rules/nix-resource-safety.md), [`AGENTS.md`](file:///home/t0psh31f/Clan/NFP/AGENTS.md), and [`GEMINI.md`](file:///home/t0psh31f/Clan/NFP/GEMINI.md).
 
-3. **Syncthing & Impermanence Vaults**:
-   - Expanded Syncthing in [`layers/20-services/25-data/syncthing.nix`](file:///home/t0psh31f/Clan/NFP/layers/20-services/25-data/syncthing.nix) to sync `notes-vault` (`~/Notes`), `icons-vault` (`~/.icons`), `cursors-vault` (`~/.cursors`), and `background-vault` (`~/.background`) across `[ "z0r0" "luffy" "sanji" ]`.
-   - Added `.icons` to user persisted directories in [`layers/10-system/15-filesystem/impermanence.nix`](file:///home/t0psh31f/Clan/NFP/layers/10-system/15-filesystem/impermanence.nix).
+3. **Equal 3-Node Distributed Fleet Building (`layers/10-system/11-foundation/builders.nix`)**:
+   - Balanced `allBuildMachines` equally across `luffy`, `z0r0`, and `sanji` (`maxJobs = 8`, `speedFactor = 2`, `supportedFeatures = [ "kvm" "big-parallel" "nixos-test" "benchmark" ]`, filtered so each host offloads to the other two).
+   - Added declarative `programs.ssh.knownHosts` public keys for `z0r0`, `luffy`, and `sanji` (`100.64.0.*` and `.nfp.nix`) so `nix-daemon` never fails host key verification during distributed builds.
 
-4. **Langfuse PostgreSQL TCP Trust**:
-   - Diagnosed Prisma error P1010 caused by container UID 1001 failing Postgres peer socket auth and SCRAM password rejection.
-   - Added trusted TCP loopback rules (`host langfuse all 127.0.0.1/32 trust` and `host paperclip all 127.0.0.1/32 trust`) in [`layers/20-services/25-data/postgresql-vectordb.nix`](file:///home/t0psh31f/Clan/NFP/layers/20-services/25-data/postgresql-vectordb.nix).
-   - Updated default `databaseUrl` to `postgresql://postgres@127.0.0.1:5432/langfuse` in [`layers/70-agents/73-memory/langfuse.nix`](file:///home/t0psh31f/Clan/NFP/layers/70-agents/73-memory/langfuse.nix).
-
-5. **Complete Eradication of Kong Gateway**:
-   - Stripped container definition from [`layers/70-agents/78-llm-routers/kong-gateway.nix`](file:///home/t0psh31f/Clan/NFP/layers/70-agents/78-llm-routers/kong-gateway.nix) while keeping tombstone option `enable = lib.mkForce false;`.
-   - Stripped all Kong environment templates and consumer configs from [`layers/70-agents/78-llm-routers/kong-secrets.nix`](file:///home/t0psh31f/Clan/NFP/layers/70-agents/78-llm-routers/kong-secrets.nix).
-   - Removed firewall ports 8090 and 8091 from [`layers/10-system/11-foundation/networking.nix`](file:///home/t0psh31f/Clan/NFP/layers/10-system/11-foundation/networking.nix).
-   - Removed `kong` endpoint from [`layers/20-services/21-networking/endpoints.nix`](file:///home/t0psh31f/Clan/NFP/layers/20-services/21-networking/endpoints.nix) and Prometheus Kong scrape job from [`layers/20-services/26-monitoring/monitoring.nix`](file:///home/t0psh31f/Clan/NFP/layers/20-services/26-monitoring/monitoring.nix).
-   - Updated agent harnesses (`claude-code.nix`, `codex.nix`, `hermes.nix`, `hermes-live-voice.nix`, `opencode.nix`) to route directly to ExtremeRouter (`http://127.0.0.1:20128/v1`) or Jev (`http://127.0.0.1:20127/v1`).
-
-6. **Grafana Admin Credentials Retrieved**:
-   - Decrypted credentials via SOPS:
-     - **Username**: `admin`
-     - **Password**: `G0!nc0c4nut5`
-
-7. **NAS Mounts**:
-   - Configured SMB 1.0 (`vers=1.0`) in [`layers/10-system/nas-mounts.nix`](file:///home/t0psh31f/Clan/NFP/layers/10-system/nas-mounts.nix) for the Buffalo LinkStation.
-   - Identified that physical NAS at `192.168.1.158` is currently unpowered or disconnected on the LAN (100% packet loss).
+4. **Declarative AniLibria English Translation (`layers/60-gui-programs/62-media/`)**:
+   - Created [`layers/60-gui-programs/62-media/translate-anilibria.py`](file:///home/t0psh31f/Clan/NFP/layers/60-gui-programs/62-media/translate-anilibria.py) and wired a `postPatch` override on `pkgs.anilibria-winmaclinux` in [`packages-media.nix`](file:///home/t0psh31f/Clan/NFP/layers/60-gui-programs/62-media/packages-media.nix), translating hardcoded Russian QML/C++ UI strings to English while preserving internal API filter strings.
 
 ## Verification Evidence
-1. `./init.sh --worktree`: passed 5/5 with 0 errors across `z0r0`, `luffy`, and `sanji`.
-2. `feature_list.json`: strictly 265 lines (< 300 line cap).
-3. `statix` & `deadnix`: clean check with zero fatal errors.
+1. `./layers/00-cyberia/06-scripts/nfp-check.sh static`: passed with 0 formatting changes.
+2. `./layers/00-cyberia/06-scripts/nfp-check.sh eval sanji`: offloaded to `100.64.0.1` (`z0r0`) and succeeded cleanly.
+3. `feature_list.json`: strictly 262 lines (< 300 line cap) and valid JSON.

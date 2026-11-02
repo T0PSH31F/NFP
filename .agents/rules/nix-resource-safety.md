@@ -12,3 +12,4 @@ description: Nix concurrency, resource safety, and flock coordination rules
 4. **No Unneeded Reruns**: Never rerun a passing verification command if no relevant files have changed.
 5. **Clean Process Lifecycle**: Never abandon child processes or background jobs running Nix commands.
 6. **Targeted Process Management**: Never run global `pkill nix`, `killall nix`, or kill processes not started by your own subshell.
+7. **Workstation Evaluation Offloading (sanji)**: When running on workstation nodes like `sanji`, all heavy fleet evaluations and flake checks MUST be offloaded to remote builder nodes (`z0r0` or `luffy`) via `nfp-check eval` (or `nfp-check flake`) to preserve workstation RAM, CPU, and interactive GUI responsiveness. Agents MUST NOT execute heavy multi-host Nix evaluations locally on `sanji`.

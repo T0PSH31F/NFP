@@ -11,12 +11,23 @@ mkdir -p "${LOCK_DIR}"
 
 MODE="eval"
 WAIT_MODE=0
+LOCAL_EVAL=0
+REMOTE_HOST=""
 
 # Parse options
 while [ $# -gt 0 ]; do
   case "$1" in
   --wait)
     WAIT_MODE=1
+    shift
+    ;;
+  --local)
+    LOCAL_EVAL=1
+    shift
+    ;;
+  --remote)
+    shift
+    REMOTE_HOST="${1:-}"
     shift
     ;;
   status | static | eval | flake | build)
@@ -141,6 +152,54 @@ static)
   ;;
 eval)
   TARGET="${1:-all}"
+  CURRENT_HOST="$(hostname -s 2>/dev/null || cat /etc/hostname 2>/dev/null || echo "unknown")"
+
+  # Workstation offload: offload to z0r0 or luffy when running on sanji or when requested
+  if [ "${LOCAL_EVAL}" = "0" ] && { [ "${CURRENT_HOST}" = "sanji" ] || [ -n "${REMOTE_HOST}" ] || [ "${NFP_REMOTE_EVAL:-0}" = "1" ]; }; then
+    CANDIDATES=()
+    if [ -n "${REMOTE_HOST}" ]; then
+      CANDIDATES=("${REMOTE_HOST}")
+    else
+      CANDIDATES=("100.64.0.1" "100.64.0.3")
+    fi
+
+    CHOSEN_HOST=""
+    for cand in "${CANDIDATES[@]}"; do
+      if ssh -o ConnectTimeout=2 -o BatchMode=yes "root@${cand}" "true" 2>/dev/null; then
+        CHOSEN_HOST="${cand}"
+        break
+      fi
+    done
+
+    if [ -n "${CHOSEN_HOST}" ]; then
+      echo "==> Offloading evaluation from workstation (${CURRENT_HOST}) to remote builder (${CHOSEN_HOST})..."
+      REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+      REMOTE_DIR="/tmp/nfp-eval"
+
+      ssh "root@${CHOSEN_HOST}" "mkdir -p ${REMOTE_DIR}"
+      rsync -az --delete \
+        --exclude '.git' \
+        --exclude 'result*' \
+        --exclude '.direnv' \
+        --exclude '.devenv' \
+        "${REPO_ROOT}/" "root@${CHOSEN_HOST}:${REMOTE_DIR}/"
+
+      if [ "${TARGET}" = "all" ]; then
+        echo "==> Remotely evaluating all fleet machine toplevels (z0r0, luffy, sanji)"
+        run_with_timeout ssh "root@${CHOSEN_HOST}" "cd ${REMOTE_DIR} && nix eval --raw path:.#nixosConfigurations.z0r0.config.system.build.toplevel.drvPath >/dev/null"
+        run_with_timeout ssh "root@${CHOSEN_HOST}" "cd ${REMOTE_DIR} && nix eval --raw path:.#nixosConfigurations.luffy.config.system.build.toplevel.drvPath >/dev/null"
+        run_with_timeout ssh "root@${CHOSEN_HOST}" "cd ${REMOTE_DIR} && nix eval --raw path:.#nixosConfigurations.sanji.config.system.build.toplevel.drvPath >/dev/null"
+      else
+        echo "==> Remotely evaluating host: ${TARGET}"
+        run_with_timeout ssh "root@${CHOSEN_HOST}" "cd ${REMOTE_DIR} && nix eval --raw path:.#nixosConfigurations.${TARGET}.config.system.build.toplevel.drvPath >/dev/null"
+      fi
+      echo "==> Remote evaluation on ${CHOSEN_HOST} succeeded."
+      exit 0
+    else
+      echo "WARNING: Remote evaluation hosts unreachable; falling back to local evaluation."
+    fi
+  fi
+
   if [ "${TARGET}" = "all" ]; then
     echo "==> Evaluating all fleet machine toplevels (z0r0, luffy, sanji)"
     run_with_timeout nix eval --raw .#nixosConfigurations.z0r0.config.system.build.toplevel.drvPath >/dev/null
@@ -153,6 +212,43 @@ eval)
   echo "==> Evaluation succeeded."
   ;;
 flake)
+  CURRENT_HOST="$(hostname -s 2>/dev/null || cat /etc/hostname 2>/dev/null || echo "unknown")"
+  if [ "${LOCAL_EVAL}" = "0" ] && { [ "${CURRENT_HOST}" = "sanji" ] || [ -n "${REMOTE_HOST}" ] || [ "${NFP_REMOTE_EVAL:-0}" = "1" ]; }; then
+    CANDIDATES=()
+    if [ -n "${REMOTE_HOST}" ]; then
+      CANDIDATES=("${REMOTE_HOST}")
+    else
+      CANDIDATES=("100.64.0.1" "100.64.0.3")
+    fi
+
+    CHOSEN_HOST=""
+    for cand in "${CANDIDATES[@]}"; do
+      if ssh -o ConnectTimeout=2 -o BatchMode=yes "root@${cand}" "true" 2>/dev/null; then
+        CHOSEN_HOST="${cand}"
+        break
+      fi
+    done
+
+    if [ -n "${CHOSEN_HOST}" ]; then
+      echo "==> Offloading nix flake check from workstation (${CURRENT_HOST}) to remote builder (${CHOSEN_HOST})..."
+      REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+      REMOTE_DIR="/tmp/nfp-eval"
+
+      ssh "root@${CHOSEN_HOST}" "mkdir -p ${REMOTE_DIR}"
+      rsync -az --delete \
+        --exclude '.git' \
+        --exclude 'result*' \
+        --exclude '.direnv' \
+        --exclude '.devenv' \
+        "${REPO_ROOT}/" "root@${CHOSEN_HOST}:${REMOTE_DIR}/"
+
+      run_with_timeout ssh "root@${CHOSEN_HOST}" "cd ${REMOTE_DIR} && nix flake check"
+      echo "==> Remote nix flake check on ${CHOSEN_HOST} succeeded."
+      exit 0
+    else
+      echo "WARNING: Remote evaluation hosts unreachable; falling back to local flake check."
+    fi
+  fi
   echo "==> Running nix flake check"
   run_with_timeout nix flake check
   ;;

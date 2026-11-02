@@ -22,7 +22,7 @@ let
   presets = rec {
     kzzzt = {
       name = "kzzzt";
-      description = "Glitch CRT & Circuit Traces (kzzzt-open, kzzzt-close, kzzzt-ring, kzzzt window & glitch phase)";
+      description = "Glitch CRT & Circuit Traces (kzzzt window, kzzzt-ring, kzzzt-open/close, tv-glitch, vhs, glitch-open)";
       effects = ''
         [effects]
         border = "kzzzt-ring"
@@ -55,9 +55,28 @@ let
 
         [animation.windows_move]
         enabled = true
-        effect = "wobbly-move"
+        effect = "tv-glitch"
         curve = "easeout"
         duration_ms = 650
+
+        [animation.overview]
+        enabled = true
+        effect = "vhs"
+        duration_ms = 400
+        curve = "easeout"
+
+        [animation.dim_unfocused]
+        enabled = true
+        effect = "glitch"
+        dim = 0.12
+        duration_ms = 250
+        curve = "ease-out"
+
+        [animation.scratchpad]
+        enabled = true
+        effect = "glitch-open"
+        duration_ms = 280
+        curve = "easeout"
       '';
     };
 
@@ -96,15 +115,33 @@ let
 
         [animation.windows_move]
         enabled = true
-        effect = "wobbly-move"
+        effect = "psychedelic.fractal-bloom"
         curve = "easeout"
         duration_ms = 650
+
+        [animation.overview]
+        enabled = true
+        effect = "psychedelic.fractal-iris"
+        duration_ms = 500
+        curve = "easeout"
+
+        [animation.dim_unfocused]
+        enabled = true
+        dim = 0.15
+        duration_ms = 250
+        curve = "ease-out"
+
+        [animation.scratchpad]
+        enabled = true
+        effect = "psychedelic.fractal-bloom"
+        duration_ms = 300
+        curve = "easeout"
       '';
     };
 
     after-dark = {
       name = "after-dark";
-      description = "Halloween After Dark (somethings-watching, witchfire, midnight-fog, witching-hour)";
+      description = "Halloween After Dark (somethings-watching, witchfire, midnight-fog, witching-hour, ghostly-tear)";
       effects = ''
         [effects]
         border = "after-dark.somethings-watching"
@@ -137,15 +174,33 @@ let
 
         [animation.windows_move]
         enabled = true
-        effect = "wobbly-move"
+        effect = "ghostly-tear"
         curve = "easeout"
         duration_ms = 650
+
+        [animation.overview]
+        enabled = true
+        effect = "ghostly-tear"
+        duration_ms = 500
+        curve = "easeout"
+
+        [animation.dim_unfocused]
+        enabled = true
+        dim = 0.20
+        duration_ms = 250
+        curve = "ease-out"
+
+        [animation.scratchpad]
+        enabled = true
+        effect = "witching-hour"
+        duration_ms = 300
+        curve = "easeout"
       '';
     };
 
     flame-lava = {
       name = "flame-lava";
-      description = "Molten Lava & Fire (portal-lava, fire-tendrils, flame-grilled, workspace-burn)";
+      description = "Molten Lava & Fire (portal-lava, fire-tendrils, flame-grilled, workspace-burn, heat-melt)";
       effects = ''
         [effects]
         border = "portal-lava"
@@ -178,15 +233,33 @@ let
 
         [animation.windows_move]
         enabled = true
-        effect = "wobbly-move"
+        effect = "flame-grilled"
         curve = "easeout"
         duration_ms = 650
+
+        [animation.overview]
+        enabled = true
+        effect = "workspace-melt"
+        duration_ms = 500
+        curve = "easeout"
+
+        [animation.dim_unfocused]
+        enabled = true
+        dim = 0.15
+        duration_ms = 250
+        curve = "ease-out"
+
+        [animation.scratchpad]
+        enabled = true
+        effect = "flame-grilled"
+        duration_ms = 300
+        curve = "easeout"
       '';
     };
 
     beach-surf = {
       name = "beach-surf";
-      description = "Coastal Surf & Oceanic Foam (beach-surf, beach-surf-overlay, water-splash, pond-wake)";
+      description = "Coastal Surf & Oceanic Foam (beach-surf, beach-surf-overlay, water-splash, pond-wake, water-conjure)";
       effects = ''
         [effects]
         border = "beach-surf"
@@ -219,15 +292,34 @@ let
 
         [animation.windows_move]
         enabled = true
-        effect = "wobbly-move"
+        effect = "water-conjure"
         curve = "easeout"
         duration_ms = 650
+
+        [animation.overview]
+        enabled = true
+        effect = "water-conjure"
+        duration_ms = 500
+        curve = "easeout"
+
+        [animation.dim_unfocused]
+        enabled = true
+        effect = "ripple-open"
+        dim = 0.12
+        duration_ms = 250
+        curve = "ease-out"
+
+        [animation.scratchpad]
+        enabled = true
+        effect = "beach-surf-animation"
+        duration_ms = 300
+        curve = "easeout"
       '';
     };
 
     paper-craft = {
       name = "paper-craft";
-      description = "Origami & Stationery Paper (paper border, paper-content, paper-animation, sand-collapse)";
+      description = "Origami & Stationery Paper (paper border, paper-content, paper-animation, triangle-flaps, sand-collapse)";
       effects = ''
         [effects]
         border = "paper"
@@ -260,9 +352,27 @@ let
 
         [animation.windows_move]
         enabled = true
-        effect = "wobbly-move"
+        effect = "triangle-flaps"
         curve = "easeout"
         duration_ms = 650
+
+        [animation.overview]
+        enabled = true
+        effect = "triangle-flaps"
+        duration_ms = 500
+        curve = "easeout"
+
+        [animation.dim_unfocused]
+        enabled = true
+        dim = 0.10
+        duration_ms = 250
+        curve = "ease-out"
+
+        [animation.scratchpad]
+        enabled = true
+        effect = "paper-animation"
+        duration_ms = 300
+        curve = "easeout"
       '';
     };
 
@@ -301,9 +411,27 @@ let
 
         [animation.windows_move]
         enabled = true
-        effect = "wobbly-move"
+        effect = "plasma-flow-open"
         curve = "easeout"
         duration_ms = 650
+
+        [animation.overview]
+        enabled = true
+        effect = "workspace-noctalia-wave"
+        duration_ms = 500
+        curve = "easeout"
+
+        [animation.dim_unfocused]
+        enabled = true
+        dim = 0.15
+        duration_ms = 250
+        curve = "ease-out"
+
+        [animation.scratchpad]
+        enabled = true
+        effect = "plasma-flow-open"
+        duration_ms = 300
+        curve = "easeout"
       '';
     };
 
@@ -342,15 +470,33 @@ let
 
         [animation.windows_move]
         enabled = true
-        effect = "wobbly-move"
+        effect = "smoke-open"
         curve = "easeout"
         duration_ms = 650
+
+        [animation.overview]
+        enabled = true
+        effect = "workspace-noctalia-wave"
+        duration_ms = 500
+        curve = "easeout"
+
+        [animation.dim_unfocused]
+        enabled = true
+        dim = 0.15
+        duration_ms = 250
+        curve = "ease-out"
+
+        [animation.scratchpad]
+        enabled = true
+        effect = "smoke-open"
+        duration_ms = 300
+        curve = "easeout"
       '';
     };
 
     sentient-matrix = {
       name = "sentient-matrix";
-      description = "Sentient AI Motherboard (sentient-runner, sentient-circuit-v2, glitch-open/close, transporter)";
+      description = "Sentient AI Motherboard (sentient-runner, sentient-circuit-v2, glitch-open/close, tv-glitch, transporter)";
       effects = ''
         [effects]
         border = "sentient-runner"
@@ -383,9 +529,28 @@ let
 
         [animation.windows_move]
         enabled = true
-        effect = "wobbly-move"
+        effect = "tv-glitch"
         curve = "easeout"
         duration_ms = 650
+
+        [animation.overview]
+        enabled = true
+        effect = "workspace-transporter"
+        duration_ms = 500
+        curve = "easeout"
+
+        [animation.dim_unfocused]
+        enabled = true
+        effect = "glitch"
+        dim = 0.12
+        duration_ms = 250
+        curve = "ease-out"
+
+        [animation.scratchpad]
+        enabled = true
+        effect = "glitch-open"
+        duration_ms = 280
+        curve = "easeout"
       '';
     };
 
@@ -418,21 +583,39 @@ let
 
         [animation.windows_out]
         enabled = true
-        effect = "voronoi-shatter-close"
+        effect = "shattered-glass"
         duration_ms = 600
         curve = "linear"
 
         [animation.windows_move]
         enabled = true
-        effect = "wobbly-move"
+        effect = "shattered-glass"
         curve = "easeout"
         duration_ms = 650
+
+        [animation.overview]
+        enabled = true
+        effect = "workspace-shatter"
+        duration_ms = 500
+        curve = "easeout"
+
+        [animation.dim_unfocused]
+        enabled = true
+        dim = 0.12
+        duration_ms = 250
+        curve = "ease-out"
+
+        [animation.scratchpad]
+        enabled = true
+        effect = "shattered-glass"
+        duration_ms = 300
+        curve = "easeout"
       '';
     };
 
     vampire-blood = {
       name = "vampire-blood";
-      description = "Gothic Blood & Vampire Wake (heartbeat border, parchment-dark, blood-drip-in/out, midnight-fog)";
+      description = "Gothic Blood & Vampire Wake (heartbeat border, parchment-dark, vampire-wake, blood-drip/drain, blood-sweep, vampire-blood-wash)";
       effects = ''
         [effects]
         border = "heartbeat"
@@ -447,7 +630,7 @@ let
         [animation.workspaces]
         enabled = true
         style = "reveal"
-        effect = "workspace-dust-cloud"
+        effect = "vampire-blood-wash"
         duration_ms = 1000
         curve = "linear"
 
@@ -465,15 +648,34 @@ let
 
         [animation.windows_move]
         enabled = true
-        effect = "wobbly-move"
+        effect = "blood-sweep"
         curve = "easeout"
         duration_ms = 650
+
+        [animation.overview]
+        enabled = true
+        effect = "workspace-dust-cloud"
+        duration_ms = 500
+        curve = "easeout"
+
+        [animation.dim_unfocused]
+        enabled = true
+        effect = "cells"
+        dim = 0.15
+        duration_ms = 250
+        curve = "ease-out"
+
+        [animation.scratchpad]
+        enabled = true
+        effect = "blood-drip-in"
+        duration_ms = 300
+        curve = "easeout"
       '';
     };
 
     diwali-festival = {
       name = "diwali-festival";
-      description = "Diwali Festival of Lights (diya-lights, diya-glow-overlay, festival-sparks, rangoli-iris)";
+      description = "Diwali Festival of Lights (diya-lights, diya-glow-overlay, festival-sparks, rangoli-iris, cloud-puff)";
       effects = ''
         [effects]
         border = "diwali.diya-lights"
@@ -506,15 +708,33 @@ let
 
         [animation.windows_move]
         enabled = true
-        effect = "wobbly-move"
+        effect = "diwali.cloud-puff"
         curve = "easeout"
         duration_ms = 650
+
+        [animation.overview]
+        enabled = true
+        effect = "diwali.rangoli-iris"
+        duration_ms = 500
+        curve = "easeout"
+
+        [animation.dim_unfocused]
+        enabled = true
+        dim = 0.12
+        duration_ms = 250
+        curve = "ease-out"
+
+        [animation.scratchpad]
+        enabled = true
+        effect = "diwali.cloud-puff"
+        duration_ms = 300
+        curve = "easeout"
       '';
     };
 
     flowering-vine = {
       name = "flowering-vine";
-      description = "Botanical Flowering Vine (flowering-vine, flowering-vine-overlay, fairy-tail cursor, iris reveal)";
+      description = "Botanical Flowering Vine (flowering-vine, flowering-vine-overlay, fairy-tail cursor, ripple-open/close, iris reveal)";
       effects = ''
         [effects]
         border = "flowering-vine"
@@ -547,15 +767,33 @@ let
 
         [animation.windows_move]
         enabled = true
-        effect = "wobbly-move"
+        effect = "ripple-open"
         curve = "easeout"
         duration_ms = 650
+
+        [animation.overview]
+        enabled = true
+        effect = "workspace-iris"
+        duration_ms = 500
+        curve = "easeout"
+
+        [animation.dim_unfocused]
+        enabled = true
+        dim = 0.12
+        duration_ms = 250
+        curve = "ease-out"
+
+        [animation.scratchpad]
+        enabled = true
+        effect = "ripple-open"
+        duration_ms = 300
+        curve = "easeout"
       '';
     };
 
     ghostly-tear = {
       name = "ghostly-tear";
-      description = "Spectral Ghostly Tear (dual-orbit border, mercury-sheen, ghost-thread, ghostly-tear in/out)";
+      description = "Spectral Ghostly Tear (dual-orbit border, mercury-sheen, ghost-thread, ghostly-tear in/out/move/overview)";
       effects = ''
         [effects]
         border = "dual-orbit"
@@ -588,15 +826,33 @@ let
 
         [animation.windows_move]
         enabled = true
-        effect = "wobbly-move"
+        effect = "ghostly-tear"
         curve = "easeout"
         duration_ms = 650
+
+        [animation.overview]
+        enabled = true
+        effect = "ghostly-tear"
+        duration_ms = 500
+        curve = "easeout"
+
+        [animation.dim_unfocused]
+        enabled = true
+        dim = 0.18
+        duration_ms = 250
+        curve = "ease-out"
+
+        [animation.scratchpad]
+        enabled = true
+        effect = "ghostly-tear"
+        duration_ms = 300
+        curve = "easeout"
       '';
     };
 
     cyberpunk-crt = {
       name = "cyberpunk-crt";
-      description = "Retro Arcade CRT (window.crt, neon-bleed, old-tv/tv-glitch, workspace-crt-scanline)";
+      description = "Retro Arcade CRT (window.crt, neon-bleed, old-tv/tv-glitch, workspace-crt-scanline, vhs, glitch)";
       effects = ''
         [effects]
         border = "neon-bleed"
@@ -629,9 +885,28 @@ let
 
         [animation.windows_move]
         enabled = true
-        effect = "wobbly-move"
+        effect = "tv-glitch"
         curve = "easeout"
         duration_ms = 650
+
+        [animation.overview]
+        enabled = true
+        effect = "vhs"
+        duration_ms = 400
+        curve = "easeout"
+
+        [animation.dim_unfocused]
+        enabled = true
+        effect = "glitch"
+        dim = 0.12
+        duration_ms = 250
+        curve = "ease-out"
+
+        [animation.scratchpad]
+        enabled = true
+        effect = "old-tv"
+        duration_ms = 300
+        curve = "easeout"
       '';
     };
 
@@ -669,9 +944,26 @@ let
 
         [animation.windows_move]
         enabled = true
-        effect = "wobbly-move"
         curve = "easeout"
-        duration_ms = 650
+        duration_ms = 400
+
+        [animation.overview]
+        enabled = true
+        effect = "workspace-wipe"
+        duration_ms = 500
+        curve = "easeout"
+
+        [animation.dim_unfocused]
+        enabled = true
+        dim = 0.12
+        duration_ms = 250
+        curve = "ease-out"
+
+        [animation.scratchpad]
+        enabled = true
+        effect = "reveal"
+        duration_ms = 280
+        curve = "easeout"
       '';
     };
 
@@ -725,23 +1017,18 @@ let
       [animation.windows_drag]
       physics = true
 
-      [animation.dim_unfocused]
-      enabled = true
-      dim = 0.12
-      duration_ms = 250
-      curve = "ease-out"
-
-      [animation.scratchpad]
-      enabled = true
-      effect = "panel-scroll"
-      dim = 0.0
-      blur = false
-      duration_ms = 280
-      curve = "easeout"
-
       # ==============================================================================
       # Input
       # ==============================================================================
+      [input]
+      middle_click_paste = true
+
+      [input.mouse]
+      accel_profile = "adaptive"
+
+      [input.touchpad]
+      accel_profile = "adaptive"
+
       [input.keyboard]
       numlock_toggle = true
 
@@ -761,6 +1048,9 @@ let
       "Mod+Space" = "spawn:noctalia msg panel-toggle launcher"
       "Mod+A" = "spawn:noctalia msg panel-toggle launcher"
       "Mod+X" = "spawn:noctalia msg panel-toggle control-center"
+      "Mod+E" = { action = "spawn:dolphin", repeat = false }
+      "Mod+G" = { action = "spawn:gedit", repeat = false }
+      "Mod+Alt+Y" = { action = "spawn:yazi", repeat = false }
       "Mod+N" = { action = "spawn:noctalia msg panel-toggle noctalia/notes:panel", repeat = false }
       "Mod+Shift+N" = { action = "spawn:noctalia msg panel-toggle noctalia/notes:panel", repeat = false }
       "Mod+period" = { action = "spawn:rofi-todo", repeat = false }

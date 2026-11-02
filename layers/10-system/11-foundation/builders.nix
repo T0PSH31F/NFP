@@ -15,7 +15,7 @@ let
   currentHost = config.networking.hostName;
   baseDomain = config.layers.meta.tailnetDomain or "nfp.nix";
 
-  # Master registry of potential build machines across the fleet
+  # Master registry of potential build machines across the fleet (distributed equally across luffy, z0r0, sanji)
   allBuildMachines = [
     {
       hostName = "luffy.${baseDomain}";
@@ -35,12 +35,27 @@ let
       hostName = "z0r0.${baseDomain}";
       machineId = "z0r0";
       system = "x86_64-linux";
-      maxJobs = 6;
+      maxJobs = 8;
       speedFactor = 2;
       supportedFeatures = [
         "kvm"
         "big-parallel"
         "nixos-test"
+        "benchmark"
+      ];
+      sshUser = "root";
+    }
+    {
+      hostName = "sanji.${baseDomain}";
+      machineId = "sanji";
+      system = "x86_64-linux";
+      maxJobs = 8;
+      speedFactor = 2;
+      supportedFeatures = [
+        "kvm"
+        "big-parallel"
+        "nixos-test"
+        "benchmark"
       ];
       sshUser = "root";
     }
@@ -105,6 +120,33 @@ in
           sshUser
           ;
       }) (filter (m: m.machineId != "phone" || cfg.enablePhoneBuilder) remoteBuildMachines);
+    };
+
+    # Declarative host keys for all fleet machines to eliminate "Host key verification failed" in nix-daemon
+    programs.ssh.knownHosts = {
+      z0r0 = {
+        hostNames = [
+          "z0r0.${baseDomain}"
+          "100.64.0.1"
+        ];
+        publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDFylABIGcvVqbGUT+y8lQZRty0/BeCTGs9QHwqzdzrb";
+      };
+      luffy = {
+        hostNames = [
+          "luffy.${baseDomain}"
+          "100.64.0.3"
+          "192.168.1.54"
+        ];
+        publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIED0hTwN/NTxlnnnFc1/3oDOOQmsG8Nw/oZin+s9mdxx";
+      };
+      sanji = {
+        hostNames = [
+          "sanji.${baseDomain}"
+          "100.64.0.6"
+          "192.168.1.68"
+        ];
+        publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB7VxJTk07Z8WIcBoBFzqOy2TyEhypZmHDsGJeZzKFqa";
+      };
     };
   };
 }

@@ -605,3 +605,9 @@ No modifications produced by worker.
 
 
 
+- **Date / Agent:** 2026-11-02 / antigravity
+- **Feature:** umbriel-presets-eval-offload-builders-and-anilibria-en
+- **Work done:** Overhauled all 16 Umbriel shader presets in `layers/40-desktop/43-umbriel/default.nix` for cohesive borders, windows, cursors, workspaces, overview, dim_unfocused, and scratchpads; added keybindings (`Mod+E` dolphin, `Mod+G` gedit, `Mod+Alt+Y` yazi, `Mod+Y` yazelix, `Mod+N` noctalia notes, `Mod+T` terminal) and disabled kzzzt palette overrides so its signature neon cyan/magenta colors are preserved; updated `nfp-check.sh`, `AGENTS.md`, and `.agents/rules/nix-resource-safety.md` to offload heavy Nix evaluations from `sanji` to `z0r0`/`luffy`; balanced distributed builders equally across `luffy`, `z0r0`, and `sanji` (`maxJobs = 8`, `speedFactor = 2`) with declarative SSH `knownHosts` in `builders.nix`; implemented build-time English translation override (`translate-anilibria.py`) for `anilibria-winmaclinux` in `packages-media.nix`.
+- **Verification:** `./layers/00-cyberia/06-scripts/nfp-check.sh static` passed with 0 formatting changes; `translate-anilibria.py` verified across 36 source files; `./layers/00-cyberia/06-scripts/nfp-check.sh eval sanji` offloaded to `100.64.0.1` (`z0r0`) and succeeded cleanly; `feature_list.json` maintained at 262 lines (<300 line cap).
+- **State change:** passing (evidence recorded in feature_list.json)
+- **Next action:** Commit changes and deploy to `sanji` via `clan machines update sanji`.
