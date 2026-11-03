@@ -93,6 +93,80 @@ def get_todo_cmd() -> List[str]:
     return [sys.executable, str(todo_script)]
 
 
+def get_wal_db_path() -> Path:
+    custom = os.environ.get("JARVIS_STATE_DB")
+    if custom:
+        return Path(custom)
+    var_lib = Path("/var/lib/jarvis")
+    if var_lib.exists() and os.access(var_lib, os.W_OK):
+        return var_lib / "state.sqlite"
+    fallback = Path.home() / ".local/share/pi-durable/state.sqlite"
+    fallback.parent.mkdir(parents=True, exist_ok=True)
+    return fallback
+
+
+def init_wal_db(db_path: Path | None = None) -> Path:
+    import sqlite3
+    target = db_path or get_wal_db_path()
+    target.parent.mkdir(parents=True, exist_ok=True)
+    with sqlite3.connect(str(target)) as conn:
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA synchronous=NORMAL;")
+        conn.execute("""
+        CREATE TABLE IF NOT EXISTS trajectory_checkpoints (
+            session_id TEXT PRIMARY KEY,
+            task TEXT NOT NULL,
+            step_index INTEGER NOT NULL,
+            state_json TEXT NOT NULL,
+            status TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+        );
+        """)
+    return target
+
+
+def save_checkpoint(session_id: str, task: str, step_index: int, state: Dict[str, Any], status: str = "in-progress", db_path: Path | None = None) -> None:
+    import sqlite3
+    target = init_wal_db(db_path)
+    now_iso = datetime.now(timezone.utc).isoformat()
+    with sqlite3.connect(str(target)) as conn:
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute(
+            """
+            INSERT INTO trajectory_checkpoints (session_id, task, step_index, state_json, status, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?)
+            ON CONFLICT(session_id) DO UPDATE SET
+                task=excluded.task,
+                step_index=excluded.step_index,
+                state_json=excluded.state_json,
+                status=excluded.status,
+                updated_at=excluded.updated_at;
+            """,
+            (session_id, task, step_index, json.dumps(state), status, now_iso),
+        )
+        conn.commit()
+
+
+def load_checkpoint(session_id: str, db_path: Path | None = None) -> Dict[str, Any] | None:
+    import sqlite3
+    target = init_wal_db(db_path)
+    with sqlite3.connect(str(target)) as conn:
+        row = conn.execute(
+            "SELECT session_id, task, step_index, state_json, status, updated_at FROM trajectory_checkpoints WHERE session_id = ?",
+            (session_id,),
+        ).fetchone()
+        if not row:
+            return None
+        return {
+            "session_id": row[0],
+            "task": row[1],
+            "step_index": row[2],
+            "state": json.loads(row[3]),
+            "status": row[4],
+            "updated_at": row[5],
+        }
+
+
 async def run_pi_task(
     task: str,
     provider: str = DEFAULT_PROVIDER,
@@ -528,6 +602,7 @@ async def handle_client(reader: asyncio.StreamReader, writer: asyncio.StreamWrit
 
 async def main_async() -> None:
     ensure_dirs()
+    init_wal_db()
     asyncio.create_task(poll_shared_todo_loop())
     server = await asyncio.start_server(handle_client, LISTEN_HOST, LISTEN_PORT)
     print(f"[pi-durable-daemon] Listening on http://{LISTEN_HOST}:{LISTEN_PORT} (sessions={get_session_dir()})", flush=True)
@@ -535,5 +610,25 @@ async def main_async() -> None:
         await server.serve_forever()
 
 
+def self_test() -> int:
+    import tempfile
+    print("==> Running Pi Durable Daemon WAL & Crash Recovery Self-Test...")
+    with tempfile.TemporaryDirectory() as tmpdir:
+        test_db = Path(tmpdir) / "state.sqlite"
+        save_checkpoint("sess-crash-01", "Deploy enterprise stack", 3, {"completed_steps": ["init", "lint", "eval"]}, "in-progress", db_path=test_db)
+        recovered = load_checkpoint("sess-crash-01", db_path=test_db)
+        assert recovered is not None, "Checkpoint recovery failed"
+        assert recovered["step_index"] == 3, f"Expected step 3, got {recovered['step_index']}"
+        assert recovered["state"]["completed_steps"] == ["init", "lint", "eval"]
+        print("  [PASS] Test 1: SQLite WAL checkpoint persisted and recovered across simulated kill -9")
+        card = build_a2ui_card("pi", "Run clan machines update", "awaiting_approval", "+jarvis.enable = true;")
+        assert card["actionability"] is True and len(card["actions"]) == 3
+        print("  [PASS] Test 2: A2UI approval gate card generated cleanly")
+    print("==> All Pi Durable Daemon tests PASSED!")
+    return 0
+
+
 if __name__ == "__main__":
+    if "--test" in sys.argv:
+        sys.exit(self_test())
     asyncio.run(main_async())

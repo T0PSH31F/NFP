@@ -330,6 +330,40 @@ class JevHandler(BaseHTTPRequestHandler):
             self.send_header("Content-Type", "application/json")
             self.end_headers()
             self.wfile.write(json.dumps(result, indent=2).encode("utf-8"))
+        elif self.path.startswith("/webhooks/"):
+            channel = self.path.split("/webhooks/")[-1].strip("/") or "generic"
+            try:
+                data = json.loads(raw_body) if raw_body else {}
+                text = (
+                    data.get("Body")
+                    or data.get("text")
+                    or data.get("content")
+                    or data.get("event", {}).get("text")
+                    or str(data)
+                )
+            except Exception:
+                text = raw_body
+
+            result = run_triage(f"[{channel.upper()}] {text}")
+            result["channel"] = channel
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps(result, indent=2).encode("utf-8"))
+        elif self.path in ("/guard/command", "/v1/guard/command"):
+            try:
+                from damage_control import DamageControlGuard
+                data = json.loads(raw_body) if raw_body else {}
+                cmd_str = data.get("command", "")
+                agent_id = data.get("agent_id", "jarvis-agent")
+                guard = DamageControlGuard()
+                res = guard.inspect_command(cmd_str, agent_id=agent_id)
+            except Exception as e:
+                res = {"allowed": False, "verdict": "BLOCK", "error": str(e)}
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps(res, indent=2).encode("utf-8"))
         elif self.path in ("/v1/chat/completions", "/chat/completions"):
             # Check prompt: if trivial ping, drop or return instant response; otherwise proxy
             try:

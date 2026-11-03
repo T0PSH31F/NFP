@@ -23,7 +23,29 @@ import subprocess
 from pathlib import Path
 from datetime import datetime, timezone
 
-REPO_ROOT = Path(__file__).resolve().parents[3]
+def _find_repo_root() -> Path:
+    env_root = os.environ.get("NFP_REPO_ROOT") or os.environ.get("REPO_ROOT")
+    if env_root:
+        candidate = Path(env_root).resolve()
+        if candidate.is_dir():
+            return candidate
+    file_path = Path(__file__).resolve()
+    for parent in file_path.parents:
+        if (parent / "layers/70-agents/79-skills").is_dir():
+            return parent
+    cwd = Path.cwd().resolve()
+    if (cwd / "layers/70-agents/79-skills").is_dir():
+        return cwd
+    for parent in cwd.parents:
+        if (parent / "layers/70-agents/79-skills").is_dir():
+            return parent
+    fallback = Path.home() / "Clan/NFP"
+    if fallback.is_dir():
+        return fallback
+    return Path("/home/t0psh31f/Clan/NFP")
+
+
+REPO_ROOT = _find_repo_root()
 SKILLS_DIR = REPO_ROOT / "layers/70-agents/79-skills"
 OPENCODE_SKILLS_DIR = REPO_ROOT / "layers/70-agents/71-harness/opencode/skills"
 GLADOS_TTS_BIN = Path.home() / ".local/bin/glados-tts-cli"

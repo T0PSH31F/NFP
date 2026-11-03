@@ -59,8 +59,10 @@
       mobile.android.enable = true;
       config = {
         impermanence.enable = true;
+        jarvis-core.enable = true;
         nas-mount.enable = false;
         nas-mounts.enable = true;
+        security-hardening.enable = true;
       };
       virtualization.enable = true;
       sessionResilience.enable = true;
@@ -145,6 +147,8 @@
   layers.layer-71.harness.dream-cycle.enable = true;
 
   layers.layer-73.memory.task-watcher.enable = true;
+
+  layers.layer-77.dash-desk-ui.jarvis-pwa.enable = true;
 
   layers.layer-40.desktop.screenpipe.enable = true;
 

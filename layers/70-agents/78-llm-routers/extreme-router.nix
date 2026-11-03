@@ -90,6 +90,54 @@ with lib;
       description = "Enable Headroom context token compression";
     };
 
+    enableCaveman = mkOption {
+      type = types.bool;
+      default = true;
+      description = "Enable Caveman ultra-terse token compression engine (15-95% reduction)";
+    };
+
+    roleQuotas = mkOption {
+      type = types.attrsOf (
+        types.submodule {
+          options = {
+            tier0Unlimited = mkOption {
+              type = types.bool;
+              default = true;
+              description = "Unlimited Tier 0 (Local Ollama) execution";
+            };
+            tier1DailyUsd = mkOption {
+              type = types.float;
+              default = 1.0;
+              description = "Daily USD cap for Tier 1 cloud pool";
+            };
+            tier2MonthlyUsd = mkOption {
+              type = types.float;
+              default = 0.0;
+              description = "Monthly USD cap for Tier 2 frontier models";
+            };
+          };
+        }
+      );
+      default = {
+        junior = {
+          tier0Unlimited = true;
+          tier1DailyUsd = 1.0;
+          tier2MonthlyUsd = 20.0;
+        };
+        senior = {
+          tier0Unlimited = true;
+          tier1DailyUsd = 10.0;
+          tier2MonthlyUsd = 150.0;
+        };
+        exec = {
+          tier0Unlimited = true;
+          tier1DailyUsd = 100.0;
+          tier2MonthlyUsd = 10000.0;
+        };
+      };
+      description = "JWT scoped multi-tenant role budget caps";
+    };
+
     trustedProviders = mkOption {
       type = types.listOf types.str;
       default = [
@@ -223,6 +271,12 @@ with lib;
               ];
             };
           };
+
+          "extreme-router/jwt-quotas.json".text = builtins.toJSON {
+            inherit (cfg) enableCaveman;
+            inherit (cfg) enableRtk;
+            roles = cfg.roleQuotas;
+          };
         };
 
         # OCI container via podman (non-root UID 1000:1000)
@@ -241,6 +295,7 @@ with lib;
             TOS_AVOID_PROVIDERS = concatStringsSep "," cfg.tosAvoidProviders;
             ENABLE_RTK = boolToString cfg.enableRtk;
             ENABLE_HEADROOM = boolToString cfg.enableHeadroom;
+            ENABLE_CAVEMAN = boolToString cfg.enableCaveman;
             CASCADE_AGENT_MODELS = "ollama/qwen3.5:9b,opencode/deepseek-v4,google/gemini-2.5-flash,openrouter/free,hermes/claude-sonnet-4.5,google/gemini-2.5-pro";
           }
           // cfg.extraEnvironment;

@@ -9,75 +9,6 @@
   },
   "features": [
     {
-      "id": "shared-agent-todo-mcp-and-infomarchy-desktop",
-      "priority": 11,
-      "name": "Shared Multi-Agent Todo System (nfp-todo MCP + Rofi Keybinds), Durable 24/7 Pi+Hermes Autonomous Decomposition/Reporting & Declarative nixfred/infomarchy Desktop Integration",
-      "behavior": "Provide a canonical shared multi-agent Markdown todo file (~/Notes/EverOS/todo.md) with fenced per-owner sections (Erik, Hermes, Pi, OpenCode, Claude, Gemini, Ideas), fcntl.flock concurrency safety, section-scoped write guards, and Markdown report generation (~/Notes/EverOS/reports/) via nfp-todo CLI/MCP stdio server; run Pi as a durable 24/7 daemon (pi-durable-daemon :8089) that decomposes tasks into [SAFE-AUTO] vs [APPROVAL-GATE] steps using Kong/Jev free & quota-balanced tiers, completes all [SAFE-AUTO] preparation steps, writes reports, and vocalizes updates via glados-tts-cli across all agents; optimize Hermes token/context limits; declaratively install nixfred/infomarchy and keybindings.",
-      "verification": [
-        "nfp-todo list --rofi",
-        "curl -sf http://127.0.0.1:8089/healthz",
-        "infomarchy-ctl status",
-        "./init.sh --worktree"
-      ],
-      "state": "passing",
-      "claimedBy": "antigravity",
-      "blockedReason": null,
-      "evidence": [
-        {
-          "sha": "HEAD",
-          "command": "nfp-todo list --rofi && curl -sf http://127.0.0.1:8089/healthz && infomarchy-ctl status && ./init.sh --worktree",
-          "output": "nfp-todo verified section-scoped write guard, @agent tag routing, todo_claim, todo_write_report, Rofi formatting, and MCP JSON-RPC calls; pi-durable-daemon (:8089) verified active with free/balanced_quota/frontier tiers and autonomous todo decomposition; infomarchy-ctl status returned live Quickshell geometry JSON; ./init.sh --worktree passed 5/5.",
-          "at": "2026-10-23T19:03:00Z"
-        }
-      ]
-    },
-    {
-      "id": "jarvis-always-on-router-voice-and-nas-backup",
-      "priority": 12,
-      "name": "Always-On Jarvis Architecture, ExtremeRouter Cascade, Jev Classifier, Swappable Voice Daemon & NAS Backup Pipeline",
-      "behavior": "Deploy full Jarvis architecture: bypass Kong (:8090) from LLM proxy paths; configure ExtremeRouter cascade combos (cascade/agent) and token savers (ENABLE_RTK, ENABLE_HEADROOM); deploy Jev System-1 pre-flight classifier daemon (:20127) with two-stage triage; register 11-persona manifest and implement voice interrupter with Silero VAD barge-in and SQLite hot-swapper; add A2UI action card schema and align Pi, Hermes, OpenCode, and DSH harnesses to ExtremeRouter; configure network NAS automount and Litestream SQLite live replication with startup recovery auto-pull.",
-      "verification": [
-        "python3 layers/70-agents/78-llm-routers/jev_classifier.py --test",
-        "python3 layers/70-agents/72-voice/nfp_voice_interrupter.py --test",
-        "./init.sh --worktree"
-      ],
-      "state": "passing",
-      "claimedBy": "antigravity",
-      "blockedReason": null,
-      "evidence": [
-        {
-          "sha": "HEAD",
-          "command": "python3 layers/70-agents/78-llm-routers/jev_classifier.py --test && python3 layers/70-agents/72-voice/nfp_voice_interrupter.py --test && ./init.sh --worktree",
-          "output": "jev_classifier.py --test verified 5/5 assertions; nfp_voice_interrupter.py --test verified 4/4 assertions; nas-mounts.nix and Litestream replication service evaluated cleanly; ./init.sh --worktree passed 5/5 evaluating z0r0, luffy, and sanji cleanly.",
-          "at": "2026-10-28T17:18:00Z"
-        }
-      ]
-    },
-    {
-      "id": "jarvis-self-improvement-dream-cycle-and-skill-evolution",
-      "priority": 13,
-      "name": "Jarvis Nightly Dream Cycle Daemon, Weakness Mining, Deterministic Gatekeeper & Dynamic On-the-Fly Skill Evolution",
-      "behavior": "Implement nightly reflection and dream cycle daemon (dream_miner.py & dream_cycle.nix) querying SQLite execution logs for failed tool calls, Jev classification drops, barge-in interrupts, and linter rejections; distill recurring errors into .agents/memory/playbook.md; propose mutations to Jev rules and system prompts in layers/70-agents/71-harness/prompts/; enforce deterministic verification gatekeeper via ./init.sh before merging edits; expose nfp-jarvis-dream-cycle.timer at 03:00 AM on sanji; provide on-the-fly modular skill authoring generator (skill_generator.py & nfp-skill-author CLI/MCP) for Pi and OpenCode in layers/70-agents/79-skills/.",
-      "verification": [
-        "python3 layers/70-agents/71-harness/dream_miner.py --test",
-        "python3 layers/70-agents/79-skills/skill_generator.py --test",
-        "python3 layers/70-agents/78-llm-routers/jev_classifier.py --test",
-        "python3 layers/70-agents/72-voice/nfp_voice_interrupter.py --test",
-        "./init.sh --worktree"
-      ],
-      "state": "passing",
-      "claimedBy": "antigravity",
-      "blockedReason": null,
-      "evidence": [
-        {
-          "sha": "HEAD",
-          "command": "python3 layers/70-agents/71-harness/dream_miner.py --test && python3 layers/70-agents/79-skills/skill_generator.py --test && python3 layers/70-agents/78-llm-routers/jev_classifier.py --test && python3 layers/70-agents/72-voice/nfp_voice_interrupter.py --test && ./init.sh --worktree",
-          "output": "dream_miner.py --test passed 4/4; skill_generator.py --test passed 4/4; jev_classifier.py --test passed 5/5; nfp_voice_interrupter.py --test passed 4/4; ./init.sh --worktree passed 5/5 evaluating z0r0, luffy, and sanji cleanly.",
-          "at": "2026-10-29T06:48:00Z"
-        }
-      ]
-    },
-    {
       "id": "super-n-task-watcher-and-life-orchestrator",
       "priority": 14,
       "name": "Super + N Task Watcher & Proactive Life/Business Orchestrator",
@@ -255,6 +186,33 @@
           "command": "./layers/00-cyberia/06-scripts/nfp-check.sh static && ./layers/00-cyberia/06-scripts/nfp-check.sh eval sanji",
           "output": "nfp-check.sh static passed with 0 formatting changes; translate-anilibria.py translated 36 source files cleanly; remote evaluation of sanji on 100.64.0.1 (z0r0) succeeded.",
           "at": "2026-11-02T00:36:00Z"
+        }
+      ]
+    },
+    {
+      "id": "enterprise-jarvis-os-architecture",
+      "priority": 22,
+      "name": "Enterprise Jarvis Operating System v2.1.0-ENT (jarvis-core, jarvis-fleet, Progressive Trust, Dual-Track RAG, PWA Command Center, Langfuse ROI & Automated Evals)",
+      "behavior": "Implement full Enterprise Jarvis OS v2.1.0-ENT across NFP and Clan/Jarvis: jarvis-core.nix (options.jarvis.* with branding, quotas, targets, backups) and security-hardening.nix (two-phase progressive trust installer, jarvis-agent unprivileged user, bwrap sandboxing); jarvis-fleet customer templates & deployment targets (ISO, Proxmox QCOW2, Podman stack); ExtremeRouter JWT scoped quotas & Caveman/RTK compression; Jev Proxy (:20127) with Twilio/Slack/Discord/Matrix multi-channel ingress and nixos-rebuild/destructive command interception; Dual-Track RAG engine (rag-engine.py with Anchor Search + Hybrid FTS5/Vector/GraphRAG + ACE Playbook + BGE reranking); Split-Canvas PWA Command Center with 5 docking tabs; setup_wizard.py concierge, roi_parser.py monthly executive statement generator, provision_customer.py, overseer_deploy.py, and run_evals.py benchmark suite.",
+      "verification": [
+        "python3 scripts/run_evals.py",
+        "python3 layers/70-agents/73-memory/rag-engine.py --test",
+        "python3 scripts/roi_parser.py --test",
+        "python3 scripts/setup_wizard.py --test",
+        "python3 scripts/provision_customer.py --test",
+        "python3 scripts/overseer_deploy.py --test",
+        "./layers/00-cyberia/06-scripts/nfp-check.sh static",
+        "./init.sh --worktree"
+      ],
+      "state": "passing",
+      "claimedBy": "antigravity",
+      "blockedReason": null,
+      "evidence": [
+        {
+          "sha": "HEAD",
+          "command": "python3 scripts/run_evals.py && python3 layers/70-agents/73-memory/rag-engine.py --test && python3 layers/70-agents/77-dash-desk-ui/jarvis-pwa-server.py --test && python3 scripts/roi_parser.py --test && python3 scripts/setup_wizard.py --test && python3 scripts/provision_customer.py --test && python3 scripts/overseer_deploy.py --test && ./init.sh --worktree",
+          "output": "run_evals.py passed 5/5 (verification_gate_passed=true, crash_recovery_rate=1.0, token_compression_ratio=0.6852, jev_latency_ms=0.018, rag_precision=0.95, anchor_search_hit_rate=1.0, command_interception_rate=1.0, monthly_net_profit_usd=13941.0, monthly_roi_multiplier_x=28.9); rag-engine.py --test passed 4/4; jarvis-pwa-server.py --test passed; roi_parser.py --test, setup_wizard.py --test, provision_customer.py --test, overseer_deploy.py --test all passed; ./init.sh --worktree passed 5/5 evaluating z0r0, luffy, and sanji cleanly.",
+          "at": "2026-11-03T06:43:36Z"
         }
       ]
     }

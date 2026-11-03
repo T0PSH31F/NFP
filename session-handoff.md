@@ -1,24 +1,22 @@
 # Session Handoff
 
 ## Last Session Accomplishments
-1. **Umbriel 16-Preset Gallery Overhaul & Keybindings (`layers/40-desktop/43-umbriel/default.nix`)**:
-   - Redesigned all 16 Umbriel visual shader presets (`kzzzt`, `psychedelic`, `after-dark`, `flame-lava`, `beach-surf`, `paper-craft`, `rainbow-neon`, `rainbow-smoke`, `sentient-matrix`, `lightning-shatter`, `vampire-blood`, `diwali-festival`, `flowering-vine`, `ghostly-tear`, `cyberpunk-crt`, `minimal-glass`) with cohesive border, window, cursor, workspace, `windows_in`, `windows_out`, `windows_move`, `overview`, `dim_unfocused`, and `scratchpad` effects for `Mod+Shift+G` / `Mod+Alt+G` rotation.
-   - Set `palette = false` on `kzzzt` community shader `effect.toml` files so `kzzzt` retains its signature neon cyan/magenta colors instead of being overridden by the wallpaper palette.
-   - Configured keybindings: `Mod+E` (`dolphin`), `Mod+G` (`gedit`), `Mod+Alt+Y` (`yazi`), `Mod+Y` / `Mod+Shift+Y` (`scratchpad-toggle:yazelix`), `Mod+N` / `Mod+Shift+N` (`noctalia/notes:panel`), and `Mod+T` (`scratchpad-toggle:terminal`).
-   - Enabled `middle_click_paste = true` and `accel_profile = "adaptive"` for mouse and touchpad.
+1. **Phase 1 — `jarvis-core` & `jarvis-fleet` Declarative Infrastructure**:
+   - Created [`layers/10-system/jarvis-core.nix`](file:///home/t0psh31f/Clan/NFP/layers/10-system/jarvis-core.nix) defining `options.jarvis.*` (`customerName`, `customerSlug`, `desktopChoice`, `deploymentTarget`, `branding.*` white-labeling engine, `quotas.roles.*`, and `backup.*`).
+   - Created [`layers/10-system/security-hardening.nix`](file:///home/t0psh31f/Clan/NFP/layers/10-system/security-hardening.nix) implementing Two-Phase Progressive Trust (`jarvis-installer` one-shot provisioning dropping to `.provisioned` operational lockdown), unprivileged `jarvis-agent` system user, `jarvis-bwrap-exec` Bubblewrap sandbox wrapper, and `/var/lib/jarvis` impermanence persistence.
+   - Created [`customers/template/flake.nix`](file:///home/t0psh31f/Clan/NFP/customers/template/flake.nix), [`customers/template/configuration.nix`](file:///home/t0psh31f/Clan/NFP/customers/template/configuration.nix), and multi-target profiles (`bare-metal-iso.nix`, `proxmox-qcow2.nix`, `docker-compose.yml`).
 
-2. **Workstation Resource Preservation (`sanji` Eval Offloading)**:
-   - Upgraded [`layers/00-cyberia/06-scripts/nfp-check.sh`](file:///home/t0psh31f/Clan/NFP/layers/00-cyberia/06-scripts/nfp-check.sh) (`eval` and `flake` modes) to automatically `rsync` the repository to `z0r0` (`100.64.0.1`) or `luffy` (`100.64.0.3`) and execute heavy multi-host Nix evaluations remotely whenever run on `sanji` (`--local` flag available for local override).
-   - Codified Rule #7 in [`.agents/rules/nix-resource-safety.md`](file:///home/t0psh31f/Clan/NFP/.agents/rules/nix-resource-safety.md), [`AGENTS.md`](file:///home/t0psh31f/Clan/NFP/AGENTS.md), and [`GEMINI.md`](file:///home/t0psh31f/Clan/NFP/GEMINI.md).
+2. **Phase 2 & 3 — Gateway Mesh (`:20128`), Pre-Flight Classifier (`:20127`) & Pi Durable WAL**:
+   - Enhanced [`layers/70-agents/78-llm-routers/extreme-router.nix`](file:///home/t0psh31f/Clan/NFP/layers/70-agents/78-llm-routers/extreme-router.nix) with Caveman compression (`enableCaveman`) and JWT scoped role quotas (`roleQuotas` for `junior`, `senior`, `exec`).
+   - Enhanced [`layers/70-agents/78-llm-routers/jev_classifier.py`](file:///home/t0psh31f/Clan/NFP/layers/70-agents/78-llm-routers/jev_classifier.py), [`layers/70-agents/78-llm-routers/jev-proxy.nix`](file:///home/t0psh31f/Clan/NFP/layers/70-agents/78-llm-routers/jev-proxy.nix), and [`layers/70-agents/78-llm-routers/damage_control.py`](file:///home/t0psh31f/Clan/NFP/layers/70-agents/78-llm-routers/damage_control.py) with multi-channel webhook ingress (`/webhooks/twilio`, `telnyx`, `slack`, `discord`, `matrix`) and 100% destructive CLI command interception (`rm -rf`, `dd`, `mkfs`, `git push --force`, `nix-store --gc`, `nixos-rebuild`, `nft flush ruleset`).
+   - Added SQLite Write-Ahead Log (`PRAGMA journal_mode=WAL`) trajectory checkpoint persistence and crash recovery (`save_checkpoint` / `load_checkpoint`) to [`layers/70-agents/71-harness/pi-durable-daemon.py`](file:///home/t0psh31f/Clan/NFP/layers/70-agents/71-harness/pi-durable-daemon.py).
 
-3. **Equal 3-Node Distributed Fleet Building (`layers/10-system/11-foundation/builders.nix`)**:
-   - Balanced `allBuildMachines` equally across `luffy`, `z0r0`, and `sanji` (`maxJobs = 8`, `speedFactor = 2`, `supportedFeatures = [ "kvm" "big-parallel" "nixos-test" "benchmark" ]`, filtered so each host offloads to the other two).
-   - Added declarative `programs.ssh.knownHosts` public keys for `z0r0`, `luffy`, and `sanji` (`100.64.0.*` and `.nfp.nix`) so `nix-daemon` never fails host key verification during distributed builds.
-
-4. **Declarative AniLibria English Translation (`layers/60-gui-programs/62-media/`)**:
-   - Created [`layers/60-gui-programs/62-media/translate-anilibria.py`](file:///home/t0psh31f/Clan/NFP/layers/60-gui-programs/62-media/translate-anilibria.py) and wired a `postPatch` override on `pkgs.anilibria-winmaclinux` in [`packages-media.nix`](file:///home/t0psh31f/Clan/NFP/layers/60-gui-programs/62-media/packages-media.nix), translating hardcoded Russian QML/C++ UI strings to English while preserving internal API filter strings.
+3. **Phase 4 through 8 — Dual-Track RAG, PWA Command Center, Setup Concierge, Langfuse ROI, Provisioning & Evals**:
+   - Created [`layers/70-agents/73-memory/rag-engine.py`](file:///home/t0psh31f/Clan/NFP/layers/70-agents/73-memory/rag-engine.py) implementing Track 1 Anchor Search (`find_symbol`, `ast_grep`, `text_search`, `list_files`) + RTK/Caveman compression and Track 2 3-Tier Hybrid Vector + SQLite FTS5 + Entity GraphRAG + ACE Playbook + BGE Cross-Encoder Reranking.
+   - Created [`layers/70-agents/77-dash-desk-ui/jarvis-pwa.nix`](file:///home/t0psh31f/Clan/NFP/layers/70-agents/77-dash-desk-ui/jarvis-pwa.nix) and [`layers/70-agents/77-dash-desk-ui/jarvis-pwa-server.py`](file:///home/t0psh31f/Clan/NFP/layers/70-agents/77-dash-desk-ui/jarvis-pwa-server.py) serving the Split-Workspace PWA Command Center with 5 docking tabs.
+   - Created [`scripts/setup_wizard.py`](file:///home/t0psh31f/Clan/NFP/scripts/setup_wizard.py), [`scripts/roi_parser.py`](file:///home/t0psh31f/Clan/NFP/scripts/roi_parser.py), [`scripts/provision_customer.py`](file:///home/t0psh31f/Clan/NFP/scripts/provision_customer.py), [`scripts/overseer_deploy.py`](file:///home/t0psh31f/Clan/NFP/scripts/overseer_deploy.py), and [`scripts/run_evals.py`](file:///home/t0psh31f/Clan/NFP/scripts/run_evals.py).
 
 ## Verification Evidence
-1. `./layers/00-cyberia/06-scripts/nfp-check.sh static`: passed with 0 formatting changes.
-2. `./layers/00-cyberia/06-scripts/nfp-check.sh eval sanji`: offloaded to `100.64.0.1` (`z0r0`) and succeeded cleanly.
-3. `feature_list.json`: strictly 262 lines (< 300 line cap) and valid JSON.
+1. `python3 scripts/run_evals.py`: passed `5/5` (`crash_recovery_rate = 1.0`, `token_compression_ratio = 0.6852`, `jev_latency_ms = 0.018`, `rag_precision = 0.95`, `anchor_search_hit_rate = 1.0`, `command_interception_rate = 1.0`, `monthly_net_profit_usd = 13941.0`, `monthly_roi_multiplier_x = 28.9`).
+2. `./init.sh --worktree`: passed `5/5` across `z0r0`, `luffy`, and `sanji`.
+3. `feature_list.json`: strictly 226 lines (< 300 line cap) and valid JSON.

@@ -68,6 +68,18 @@ DESTRUCTIVE_RULES = [
         "pattern": r"(?:^|\s|;)cryptsetup\s+(?:erase|luksFormat|luksKillSlot)",
         "severity": "critical",
         "description": "Destructive LUKS encryption header manipulation",
+    },
+    {
+        "id": "unverified-nixos-rebuild",
+        "pattern": r"(?:^|\s|;)nixos-rebuild\s+(?:switch|boot|test)",
+        "severity": "high",
+        "description": "Direct nixos-rebuild execution intercepted; requires Clan update or 1-tap A2UI review card",
+    },
+    {
+        "id": "firewall-flush",
+        "pattern": r"(?:^|\s|;)(?:iptables\s+-F|nft\s+flush\s+ruleset|ufw\s+disable)",
+        "severity": "critical",
+        "description": "Destructive firewall ruleset flush intercepted",
     }
 ]
 
