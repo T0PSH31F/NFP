@@ -292,6 +292,11 @@ in
             # Regenerate noctalia-colors.conf from current wallpaper
             noctalia-regen-colors 2>/dev/null || true
 
+            # Sanitize ~/.config/umbriel/noctalia.toml (strip unsupported [colors.title_bar] section)
+            if [ -f "$HOME/.config/umbriel/noctalia.toml" ] && grep -q '^\[colors\.title_bar\]' "$HOME/.config/umbriel/noctalia.toml"; then
+              ${pkgs.gnused}/bin/sed -i '/^\[colors\.title_bar\]/,/^\[/{/^\[colors\.title_bar\]/d; /^\[/!d;}' "$HOME/.config/umbriel/noctalia.toml"
+            fi
+
             # Reload Hyprland config to pick up new colors from noctalia-colors.conf
             hyprctl reload 2>/dev/null || true
 

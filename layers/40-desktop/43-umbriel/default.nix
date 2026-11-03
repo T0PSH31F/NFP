@@ -1055,7 +1055,7 @@ let
       "Mod+A" = "spawn:noctalia msg panel-toggle launcher"
       "Mod+X" = "spawn:noctalia msg panel-toggle control-center"
       "Mod+E" = { action = "spawn:dolphin", repeat = false }
-      "Mod+G" = { action = "spawn:gedit", repeat = false }
+      "Mod+G" = { action = "spawn:gedit --new-window", repeat = false }
       "Mod+Alt+Y" = { action = "spawn:yazi", repeat = false }
       "Mod+N" = { action = "spawn:noctalia msg panel-toggle noctalia/notes:panel", repeat = false }
       "Mod+Shift+N" = { action = "spawn:noctalia msg panel-toggle noctalia/notes:panel", repeat = false }
@@ -1423,12 +1423,11 @@ let
       fi
 
       echo "Switching Umbriel shader theme to: $target..."
+      if [ -f "''${HOME}/.config/umbriel/noctalia.toml" ] && grep -q '^\[colors\.title_bar\]' "''${HOME}/.config/umbriel/noctalia.toml"; then
+        ${pkgs.gnused}/bin/sed -i '/^\[colors\.title_bar\]/,/^\[/{/^\[colors\.title_bar\]/d; /^\[/!d;}' "''${HOME}/.config/umbriel/noctalia.toml"
+      fi
       ${cfg.package}/bin/umbriel config-replace "$preset_file"
       echo "$target" > "$ACTIVE_FLAG"
-
-      if [ -x "/home/t0psh31f/.local/bin/glados-tts-cli" ]; then
-        /home/t0psh31f/.local/bin/glados-tts-cli "Umbriel visual shader preset updated to $target." >/dev/null 2>&1 &
-      fi
 
       if command -v ${pkgs.libnotify}/bin/notify-send >/dev/null 2>&1; then
         ${pkgs.libnotify}/bin/notify-send -a "Umbriel Compositor" "Theme Updated" "Active preset: $target" -i preferences-desktop-theme 2>/dev/null || true
