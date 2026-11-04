@@ -1,0 +1,92 @@
+{
+  "title": "Fleet Orchestrators (luffy)",
+  "uid": "fleet-orchestrators",
+  "tags": ["orchestrators", "paperclip", "aionui", "mission-control", "langfuse"],
+  "timezone": "browser",
+  "refresh": "30s",
+  "panels": [
+    {
+      "title": "Paperclip",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 },
+      "targets": [
+        { "expr": "probe_success{service=\"paperclip\"}", "legendFormat": "Paperclip :3101", "datasource": { "type": "prometheus", "uid": "prometheus" } }
+      ],
+      "fieldConfig": { "defaults": {
+        "thresholds": { "mode": "absolute", "steps": [ { "color": "red", "value": null }, { "color": "green", "value": 1 } ] },
+        "mappings": [ { "type": "value", "options": { "0": { "text": "DOWN" }, "1": { "text": "UP" } } } ]
+      } }
+    },
+    {
+      "title": "AionUI",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 },
+      "targets": [
+        { "expr": "probe_success{service=\"aionui\"}", "legendFormat": "AionUI :3006", "datasource": { "type": "prometheus", "uid": "prometheus" } }
+      ],
+      "fieldConfig": { "defaults": {
+        "thresholds": { "mode": "absolute", "steps": [ { "color": "red", "value": null }, { "color": "green", "value": 1 } ] },
+        "mappings": [ { "type": "value", "options": { "0": { "text": "DOWN" }, "1": { "text": "UP" } } } ]
+      } }
+    },
+    {
+      "title": "Mission Control",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 0 },
+      "targets": [
+        { "expr": "probe_success{service=\"mission-control\"}", "legendFormat": "Mission Control :3099", "datasource": { "type": "prometheus", "uid": "prometheus" } }
+      ],
+      "fieldConfig": { "defaults": {
+        "thresholds": { "mode": "absolute", "steps": [ { "color": "red", "value": null }, { "color": "green", "value": 1 } ] },
+        "mappings": [ { "type": "value", "options": { "0": { "text": "DOWN" }, "1": { "text": "UP" } } } ]
+      } }
+    },
+    {
+      "title": "Langfuse",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 0 },
+      "targets": [
+        { "expr": "probe_success{service=\"langfuse\"}", "legendFormat": "Langfuse :3005", "datasource": { "type": "prometheus", "uid": "prometheus" } }
+      ],
+      "fieldConfig": { "defaults": {
+        "thresholds": { "mode": "absolute", "steps": [ { "color": "red", "value": null }, { "color": "green", "value": 1 } ] },
+        "mappings": [ { "type": "value", "options": { "0": { "text": "DOWN" }, "1": { "text": "UP" } } } ]
+      } }
+    },
+    {
+      "title": "Probe Latency (s)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
+      "targets": [
+        { "expr": "probe_duration_seconds{service=~\"paperclip|aionui|mission-control|langfuse\"}", "legendFormat": "{{service}}", "datasource": { "type": "prometheus", "uid": "prometheus" } }
+      ]
+    },
+    {
+      "title": "HTTP Status Codes",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
+      "targets": [
+        { "expr": "probe_http_status_code{service=~\"paperclip|aionui|mission-control|langfuse\"}", "legendFormat": "{{service}}", "datasource": { "type": "prometheus", "uid": "prometheus" } }
+      ]
+    },
+    {
+      "title": "Langfuse Exporter Up / Traces / Cost",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 24, "x": 0, "y": 12 },
+      "targets": [
+        { "expr": "langfuse_up", "legendFormat": "up", "datasource": { "type": "prometheus", "uid": "prometheus" } },
+        { "expr": "langfuse_traces_total", "legendFormat": "traces", "datasource": { "type": "prometheus", "uid": "prometheus" } },
+        { "expr": "langfuse_cost_dollars", "legendFormat": "cost USD", "datasource": { "type": "prometheus", "uid": "prometheus" } }
+      ]
+    },
+    {
+      "title": "Orchestrator Logs (Loki)",
+      "type": "logs",
+      "gridPos": { "h": 12, "w": 24, "x": 0, "y": 16 },
+      "targets": [
+        { "expr": "{job=\"systemd-journal\", unit=~\"paperclip.service|aionui.service|podman-mission-control.service|podman-langfuse.service\"}", "datasource": { "type": "loki", "uid": "loki" } }
+      ],
+      "options": { "showTime": true, "wrapLogMessage": true, "sortOrder": "Descending" }
+    }
+  ]
+}

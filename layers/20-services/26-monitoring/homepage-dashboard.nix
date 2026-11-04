@@ -534,12 +534,18 @@ let
                 data = json.loads(resp.read().decode("utf-8"))
                 active_tasks = data.get("active_tasks", 0)
                 queued = data.get("queued", 0)
+                mode = data.get("deploymentMode", "unknown")
+                bootstrap = data.get("bootstrapStatus", "unknown")
+                backup = (data.get("databaseBackup") or {}).get("status", "unknown")
                 raw_fields = [
                     {"key": "activeTasks", "label": "Active Tasks", "value": str(active_tasks)},
                     {"key": "queued", "label": "Queued", "value": str(queued)},
+                    {"key": "deploymentMode", "label": "Mode", "value": str(mode)},
+                    {"key": "bootstrapStatus", "label": "Bootstrap", "value": str(bootstrap)},
+                    {"key": "dbBackup", "label": "DB Backup", "value": str(backup)},
                 ]
                 fields = [f for f in raw_fields if not allowed_fields or f["key"] in allowed_fields]
-                bounty = f"📎 {active_tasks} ACTIVE | {queued} QUEUED" if active_tasks > 0 else "OPERATIONAL"
+                bounty = f"📎 {active_tasks} ACTIVE | {queued} QUEUED" if active_tasks > 0 else f"{str(mode).upper()} | BACKUP {str(backup).upper()}"
                 return {"state": "available", "fields": fields, "updatedAt": iso_now}, bounty
         except Exception:
             return {"state": "available", "fields": [], "updatedAt": iso_now}, "OPERATIONAL"

@@ -98,6 +98,57 @@ with lib;
             ];
           }
         ) httpServices;
+
+        # Single-instance orchestrators live on luffy; probe them from whichever
+        # node runs Prometheus (skipped on luffy, where local contracts cover them).
+        fleetOrchestratorProbes = {
+          paperclip = {
+            port = config.layers.layer-20.endpoints.paperclip.port;
+            path = "/api/health";
+          };
+          aionui = {
+            port = config.layers.layer-20.endpoints.aionui.port;
+            path = "/";
+          };
+          mission-control = {
+            port = config.layers.layer-20.endpoints.mission-control.port;
+            path = "/";
+          };
+          langfuse = {
+            port = 3005;
+            path = "/api/public/health";
+          };
+        };
+        fleetOrchestratorScrapeConfigs = optionals (localHost != "luffy") (
+          mapAttrsToList (name: probe: {
+            job_name = "blackbox-fleet-${name}";
+            metrics_path = "/probe";
+            params.module = [ "http_2xx" ];
+            static_configs = [
+              {
+                targets = [ "http://luffy.${baseDomain}:${toString probe.port}${probe.path}" ];
+                labels = {
+                  service = name;
+                  machine = "luffy";
+                };
+              }
+            ];
+            relabel_configs = [
+              {
+                source_labels = [ "__address__" ];
+                target_label = "__param_target";
+              }
+              {
+                source_labels = [ "__param_target" ];
+                target_label = "instance";
+              }
+              {
+                replacement = "127.0.0.1:9115";
+                target_label = "__address__";
+              }
+            ];
+          }) fleetOrchestratorProbes
+        );
       in
       {
         nfp.services = {
@@ -477,7 +528,8 @@ with lib;
                 static_configs = [ { targets = [ "127.0.0.1:20132" ]; } ];
               }
             ]
-            ++ contractBlackboxScrapeConfigs;
+            ++ contractBlackboxScrapeConfigs
+            ++ fleetOrchestratorScrapeConfigs;
           };
 
           alertmanager-ntfy.enable = true;
@@ -640,7 +692,7 @@ with lib;
                 import urllib.request
                 import json
 
-                LANGFUSE_URL = "http://127.0.0.1:3005/api/public/metrics"
+                LANGFUSE_URL = "http://luffy.${baseDomain}:3005/api/public/health"
                 PORT = 9898
 
                 class ExporterHandler(http.server.BaseHTTPRequestHandler):
