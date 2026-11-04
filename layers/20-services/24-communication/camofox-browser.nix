@@ -79,6 +79,24 @@ in
     };
     users.groups.camofox = { };
 
+    # ── Gmail session cookies (SOPS-encrypted, never plaintext) ──────────
+    # Each secret holds a JSON array of browser cookies for the account.
+    # Populate with:
+    #   sops layers/00-cyberia/03-treasure/secrets/external_services.yaml
+    # and paste the cookie JSON array.  Empty values disable import.
+    sops.secrets.gmail_cookies_wrighterik77 = {
+      sopsFile = ../../../00-cyberia/03-treasure/secrets/external_services.yaml;
+      owner = "camofox";
+      group = "camofox";
+      mode = "0400";
+    };
+    sops.secrets.gmail_cookies_lovelainautomations = {
+      sopsFile = ../../../00-cyberia/03-treasure/secrets/external_services.yaml;
+      owner = "camofox";
+      group = "camofox";
+      mode = "0400";
+    };
+
     systemd = {
       tmpfiles.rules = [
         "d ${cfg.dataDir} 0755 camofox camofox -"
@@ -102,6 +120,46 @@ in
               fi
               exec ${camofoxPkg}/bin/jo-camofox-browser
             '';
+
+            # Deterministic Gmail session provisioning.  Each account's cookie
+            # jar is supplied as a SOPS-encrypted secret (never plaintext in the
+            # repo) and injected into the browser only when non-empty.  Cookies
+            # are persisted by the persistence plugin under CAMOFOX_PROFILE_DIR,
+            # so subsequent boots reuse them without re-importing.
+            importCookies = pkgs.writeShellScript "camofox-import-cookies" ''
+              set -eu
+              api_key="''${CAMOFOX_API_KEY:-}"
+              [ -n "$api_key" ] || exit 0
+              base="http://127.0.0.1:${toString cfg.port}"
+
+              # Wait for the browser server to answer /health (max ~30s).
+              i=0
+              while [ "$i" -lt 30 ]; do
+                if ${pkgs.curl}/bin/curl -sf "$base/health" >/dev/null 2>&1; then
+                  break
+                fi
+                i=$((i + 1))
+                sleep 1
+              done
+
+              for acct in wrighterik77 lovelainautomations; do
+                f="''${CREDENTIALS_DIRECTORY:-}/gmail_cookies_$acct"
+                [ -s "$f" ] || continue
+                # Skip empty placeholder values ("" or []).
+                normalized="$(tr -d '[:space:]' < "$f")"
+                if [ -z "$normalized" ]; then
+                  continue
+                fi
+                if [ "$normalized" = "[]" ] || [ "$normalized" = "\"\"" ]; then
+                  continue
+                fi
+                ${pkgs.curl}/bin/curl -sf -X POST "$base/sessions/$acct/cookies" \
+                  -H "Authorization: Bearer $api_key" \
+                  -H "Content-Type: application/json" \
+                  --data-binary "{\"cookies\":$(cat "$f")}" \
+                  >/dev/null 2>&1 || true
+              done
+            '';
           in
           {
             description = "Camofox anti-detection browser server (jo-inc fork)";
@@ -118,12 +176,16 @@ in
               pkgs.which
               pkgs.nettools
               pkgs.procps
+              pkgs.coreutils
+              pkgs.curl
             ];
             serviceConfig = {
               Type = "simple";
               User = "camofox";
               Group = "camofox";
               ExecStart = startScript;
+              # Provision HTTPS session cookies after the server is healthy.
+              ExecStartPost = [ importCookies ];
               Restart = "on-failure";
               RestartSec = 5;
               StateDirectory = "camofox";
@@ -148,6 +210,10 @@ in
                 ]
                 ++ lib.optionals (cfg.accessKey != "") [
                   "camofox_access_key:${cfg.accessKey}"
+                ]
+                ++ [
+                  "gmail_cookies_wrighterik77:${config.sops.secrets.gmail_cookies_wrighterik77.path}"
+                  "gmail_cookies_lovelainautomations:${config.sops.secrets.gmail_cookies_lovelainautomations.path}"
                 ];
             };
           };

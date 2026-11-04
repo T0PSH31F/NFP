@@ -184,7 +184,7 @@ final: prev: {
         stripRoot = false;
       };
 
-      nativeBuildInputs = [ final.makeWrapper ];
+      nativeBuildInputs = [ final.makeWrapper final.patchelf ];
       dontBuild = true;
       dontConfigure = true;
       dontFixup = true;
@@ -195,6 +195,21 @@ final: prev: {
         # Copy all files (preserves the upstream camoufox-bin wrapper script
         # and the pre-patched ELF binaries / .so files).
         cp -r . $out/share/camoufox/
+
+        # Fix the PT_INTERP of the prebuilt executables for NixOS.
+        # The upstream ELF still points at /lib64/ld-linux-x86-64.so.2, which
+        # on NixOS resolves to the stub-ld shim; the stub refuses to start the
+        # binary from a systemd service because NIX_LD is not exported into
+        # the unit environment.  We rewrite ONLY the interpreter entry point
+        # (not RUNPATH), so the pre-patched RUNPATH entries that the bundled
+        # .so files depend on remain untouched.
+        for exe in camoufox-bin camoufox; do
+          if [ -f "$out/share/camoufox/$exe" ]; then
+            patchelf --set-interpreter \
+              ${final.stdenv.cc.bintools.dynamicLinker} \
+              "$out/share/camoufox/$exe"
+          fi
+        done
 
         # Symlink every .so into $out/lib so the dynamic linker can find them
         # via the LD_LIBRARY_PATH prepend below.
