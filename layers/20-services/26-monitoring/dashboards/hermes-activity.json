@@ -10,7 +10,7 @@
       "gridPos": { "h": 4, "w": 4, "x": 0, "y": 0 },
       "targets": [
         {
-          "expr": "probe_success{target=\"http://127.0.0.1:8642/health\"}",
+          "expr": "probe_success{service=\"hermes-gateway\"}",
           "legendFormat": "Hermes API",
           "datasource": { "type": "prometheus", "uid": "prometheus" }
         }
@@ -34,7 +34,7 @@
       "gridPos": { "h": 4, "w": 4, "x": 4, "y": 0 },
       "targets": [
         {
-          "expr": "probe_success{target=\"http://127.0.0.1:8010/health\"}",
+          "expr": "probe_success{service=\"brain-service\"}",
           "legendFormat": "Brain Service",
           "datasource": { "type": "prometheus", "uid": "prometheus" }
         }
@@ -53,19 +53,20 @@
       }
     },
     {
-      "title": "Hermes Service Uptime",
+      "title": "Pi Durable Daemon",
       "type": "stat",
       "gridPos": { "h": 4, "w": 4, "x": 8, "y": 0 },
       "targets": [
         {
-          "expr": "count(probe_success{job=\"blackbox-hermes\"})",
-          "legendFormat": "Probes",
+          "expr": "probe_success{service=\"pi-durable-daemon\"}",
+          "legendFormat": "Pi Daemon",
           "datasource": { "type": "prometheus", "uid": "prometheus" }
         }
       ],
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "fixed", "fixedColor": "blue" }
+          "thresholds": { "mode": "absolute", "steps": [ { "color": "red", "value": null }, { "color": "green", "value": 1 } ] },
+          "mappings": [ { "type": "value", "options": { "0": { "text": "DOWN" }, "1": { "text": "UP" } } } ]
         }
       }
     },

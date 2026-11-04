@@ -115,9 +115,28 @@
   # Primary ExtremeRouter instance on z0r0
   layers.layer-78.llm-routers.extreme-router.enable = true;
 
-  # Langfuse LLM Observability suite
+  # Patch into central fleet orchestrators hosted on luffy (single instance)
+  layers.layer-76.orchestrators = {
+    paperclip = {
+      enable = false;
+      client.enable = true;
+      remoteHost = "luffy.nfp.nix";
+    };
+    aionui = {
+      enable = false;
+      client.enable = true;
+      remoteHost = "luffy.nfp.nix";
+    };
+    mission-control = {
+      enable = false;
+      client.enable = true;
+      remoteHost = "luffy.nfp.nix";
+    };
+  };
+
+  # Langfuse LLM Observability suite (Centralized on luffy 100.64.0.3)
   services.infrastructure.langfuse = {
-    enable = true;
+    enable = false;
     port = 3005;
   };
 

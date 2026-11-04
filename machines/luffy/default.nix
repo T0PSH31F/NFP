@@ -117,8 +117,24 @@ in
   layers.layer-20.services.config.jackett.enable = false;
   layers.layer-20.services.config.netdata.enable = true;
 
-  # Paperclip orchestrator online on luffy
-  layers.layer-76.orchestrators.paperclip.enable = true;
+  # Central fleet orchestrators hosted strictly on luffy (single instance for all 3 machines)
+  layers.layer-76.orchestrators = {
+    paperclip = {
+      enable = true;
+      client.enable = true;
+      remoteHost = "luffy.nfp.nix";
+    };
+    aionui = {
+      enable = true;
+      client.enable = true;
+      remoteHost = "luffy.nfp.nix";
+    };
+    mission-control = {
+      enable = true;
+      client.enable = true;
+      remoteHost = "luffy.nfp.nix";
+    };
+  };
 
   # Keep extreme-router strictly on z0r0
   layers.layer-78.llm-routers.extreme-router.enable = false;
@@ -169,7 +185,7 @@ in
 
   layers.layer-20.services.config = {
     monitoring = {
-      enable = false;
+      enable = true; # central Prometheus/Loki/Grafana for the whole fleet (role = server)
       domain = "grafana.lovelain.duckdns.org";
       prometheus.port = 9090;
     };
@@ -242,6 +258,7 @@ in
     searxng.enable = true;
     calibre-web-app.enable = true;
     jev-engine.enable = true;
+    jev-exporter.enable = true;
     wyoming-services.enable = true;
     lead-triage-webhook.enable = true;
     ad-hook-miner.enable = true;
@@ -452,7 +469,13 @@ in
             handle @spotify { reverse_proxy localhost:3457 }
 
             @missionctrl host mission-control.lovelain.duckdns.org
-            handle @missionctrl { reverse_proxy http://47.254.90.69:3099 }
+            handle @missionctrl { reverse_proxy localhost:3099 }
+
+            @paperclip host paperclip.lovelain.duckdns.org
+            handle @paperclip { reverse_proxy localhost:3101 }
+
+            @aionui host aionui.lovelain.duckdns.org
+            handle @aionui { reverse_proxy localhost:3006 }
           '';
         };
         "element.local" = {

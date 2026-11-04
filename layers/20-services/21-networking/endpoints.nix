@@ -48,11 +48,24 @@ in
         if config.services ? polyfloor then config.services.polyfloor.port else 7777
       ) "";
       gno = mkEndpoint "127.0.0.1" (config.layers.layer-73.memory.gno.port or 3456) "";
+      paperclip = mkEndpoint "luffy.nfp.nix" (config.layers.layer-76.orchestrators.paperclip.port or 3101
+      ) "";
+      aionui = mkEndpoint "luffy.nfp.nix" (config.layers.layer-76.orchestrators.aionui.port or 3006) "";
+      mission-control =
+        mkEndpoint "luffy.nfp.nix" (config.layers.layer-76.orchestrators.mission-control.port or 3099)
+          "";
     };
     description = "Central registry for service network endpoints across the fleet.";
   };
 
   config = {
+    environment.variables = {
+      PAPERCLIP_URL = config.layers.layer-20.endpoints.paperclip.baseUrl;
+      PAPERCLIP_API_URL = config.layers.layer-20.endpoints.paperclip.baseUrl;
+      AIONUI_URL = config.layers.layer-20.endpoints.aionui.baseUrl;
+      AIONUI_SERVER_URL = config.layers.layer-20.endpoints.aionui.baseUrl;
+      MISSION_CONTROL_URL = config.layers.layer-20.endpoints.mission-control.baseUrl;
+    };
     # Static Headscale tailnet host mappings so container --network=host and CLI harnesses
     # resolve fleet nodes (and legacy `nami` router alias -> sanji) in <1ms without DNS recursion lag.
     networking.extraHosts = mkAfter ''

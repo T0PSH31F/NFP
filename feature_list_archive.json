@@ -1874,6 +1874,27 @@
           "at": "2026-10-29T06:48:00Z"
         }
       ]
+    },
+    {
+      "id": "super-n-task-watcher-and-life-orchestrator",
+      "priority": 14,
+      "name": "Super + N Task Watcher & Proactive Life/Business Orchestrator",
+      "behavior": "Implement always-on task watcher daemon (task_watcher.py & task_watcher.nix) monitoring tasklist.md and EverOS (:8092) for unchecked tasks (- [ ]); automatically decompose tasks into actionable steps and execute preparations via pi-durable daemon (:8089); update tasklist.md checkboxes to completed (- [x]) or awaiting-approval (- [>]) with reports linked; bind Super + N in Hyprland to quickly view and edit tasklist.md in Ghostty/Neovim scratchpad; register GLaDOS vocal alerts for completions and approval gates.",
+      "verification": [
+        "python3 layers/70-agents/73-memory/task_watcher.py --test",
+        "./init.sh --worktree"
+      ],
+      "state": "passing",
+      "claimedBy": "antigravity",
+      "blockedReason": null,
+      "evidence": [
+        {
+          "sha": "HEAD",
+          "command": "python3 layers/70-agents/73-memory/task_watcher.py --test && ./init.sh --worktree",
+          "output": "task_watcher.py --test verified 5/5 assertions (SQLite tracking, markdown parsing, in-place checkbox flip with nested subtasks, decomposition, end-to-end watcher cycle); ./init.sh --worktree passed 5/5 evaluating z0r0, luffy, and sanji cleanly.",
+          "at": "2026-10-29T07:01:00Z"
+        }
+      ]
     }
   ]
 }

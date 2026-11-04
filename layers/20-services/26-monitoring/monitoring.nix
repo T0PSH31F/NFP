@@ -5,9 +5,37 @@
   ...
 }:
 with lib;
+let
+  cfg = config.layers.layer-20.services.config.monitoring;
+  localHost = config.networking.hostName;
+  isServer = cfg.enable && cfg.role == "server";
+  baseDomain =
+    config.layers.meta.tailnetDomain or config.services.headscale-server.baseDomain or "nfp.nix";
+  fleetHosts = [
+    "luffy"
+    "z0r0"
+    "sanji"
+  ];
+in
 {
   options.layers.layer-20.services.config.monitoring = {
     enable = mkEnableOption "Comprehensive monitoring stack with Prometheus, Loki, and Grafana";
+    role = mkOption {
+      type = types.enum [
+        "server"
+        "agent"
+      ];
+      default = if localHost == "luffy" then "server" else "agent";
+      description = ''
+        server: runs the single central Prometheus/Loki/Grafana stack (luffy).
+        agent: only exports node metrics (scraped by the server) and ships the journal to the server's Loki.
+      '';
+    };
+    serverHost = mkOption {
+      type = types.str;
+      default = "luffy";
+      description = "Fleet host that runs the central monitoring stack";
+    };
     domain = mkOption {
       type = types.str;
       default = "localhost";
@@ -36,27 +64,155 @@ with lib;
   };
 
   config = mkMerge [
-    (mkIf true {
+    # Every node exports host metrics; the central server scrapes them over the tailnet.
+    {
       services.prometheus.exporters.node = {
         enable = true;
         port = 9100;
         enabledCollectors = [
           "systemd"
           "processes"
+          "cpu"
+          "diskstats"
+          "filesystem"
+          "btrfs"
+          "loadavg"
+          "meminfo"
+          "netdev"
         ];
+        # eval results written by scripts/run_evals.py land here
+        extraFlags = [ "--collector.textfile.directory=/var/lib/node-exporter-textfile" ];
       };
+      systemd.tmpfiles.rules = [ "d /var/lib/node-exporter-textfile 0775 root root -" ];
+      networking.firewall.interfaces."tailscale0".allowedTCPPorts = [ 9100 ];
+    }
+
+    # Journal shipping (agents push to the server's Loki, the server pushes locally).
+    (mkIf cfg.enable {
+      services.alloy = {
+        enable = true;
+        configPath = "/etc/alloy";
+      };
+      systemd.services.alloy.serviceConfig = {
+        DynamicUser = lib.mkForce false;
+        User = "alloy";
+        Group = "alloy";
+        ConfigurationDirectory = lib.mkForce "alloy";
+      };
+      users = {
+        users.alloy = {
+          isSystemUser = true;
+          group = "alloy";
+          uid = 985;
+          description = "Grafana Alloy Daemon";
+        };
+        groups.alloy = { };
+      };
+      environment.etc."alloy/config.alloy".text = ''
+        logging {
+          level = "warn"
+        }
+        loki.source.journal "hermes"  {
+          max_age = "12h"
+          forward_to = [loki.relabel.journal.receiver]
+          labels = {
+            job     = "systemd-journal",
+            host    = "${localHost}",
+          }
+        }
+        loki.relabel "journal" {
+          forward_to = [loki.write.default.receiver]
+          rule {
+            source_labels = ["__journal__systemd_unit"]
+            target_label  = "unit"
+          }
+          rule {
+            source_labels = ["__journal__hostname"]
+            target_label  = "hostname"
+          }
+        }
+        loki.write "default" {
+          endpoint {
+            url = "http://${
+              if isServer then "127.0.0.1" else "${cfg.serverHost}.${baseDomain}"
+            }:${toString cfg.loki.port}/loki/api/v1/push"
+          }
+        }
+      '';
     })
-    (mkIf config.layers.layer-20.services.config.monitoring.enable (
+
+    (mkIf isServer (
       let
-        # Tailnet authority: Prometheus blackbox probes use MagicDNS (nfp.nix)
-        baseDomain =
-          config.layers.meta.tailnetDomain or config.services.headscale-server.baseDomain or "nfp.nix";
         enabledServices = filterAttrs (_name: svc: svc.enable) (config.nfp.services or { });
         httpServices = filterAttrs (
           _name: svc: svc.healthcheck.enable && svc.healthcheck.skipReason == null
         ) enabledServices;
 
-        localHost = config.networking.hostName;
+        # AI services without a native /metrics endpoint: probe their health URLs.
+        # Loopback-bound services run on the server, so they are probed locally.
+        aiProbes = {
+          hermes-gateway = {
+            host = "luffy";
+            port = 8642;
+            path = "/health";
+          };
+          brain-service = {
+            host = "luffy";
+            port = 8010;
+            path = "/health";
+          };
+          pi-durable-daemon = {
+            host = "luffy";
+            port = 8089;
+            path = "/health";
+          };
+          omniroute = {
+            host = "luffy";
+            port = 20129;
+            path = "/";
+            module = "http_alive";
+          };
+          extreme-router = {
+            host = "z0r0";
+            port = 20128;
+            path = "/v1/models";
+            module = "http_alive";
+          };
+        };
+        aiProbeScrapeConfigs = mapAttrsToList (name: p: {
+          job_name = "blackbox-ai-${name}";
+          metrics_path = "/probe";
+          params.module = [ (p.module or "http_2xx") ];
+          static_configs = [
+            {
+              targets = [
+                "http://${
+                  if p.host == localHost then "127.0.0.1" else "${p.host}.${baseDomain}"
+                }:${toString p.port}${p.path}"
+              ];
+              labels = {
+                service = name;
+                machine = p.host;
+                tier = "ai";
+              };
+            }
+          ];
+          relabel_configs = [
+            {
+              source_labels = [ "__address__" ];
+              target_label = "__param_target";
+            }
+            {
+              source_labels = [ "__param_target" ];
+              target_label = "instance";
+            }
+            {
+              replacement = "127.0.0.1:9115";
+              target_label = "__address__";
+            }
+          ];
+        }) aiProbes;
+
         contractBlackboxScrapeConfigs = mapAttrsToList (
           name: svc:
           let
@@ -99,56 +255,6 @@ with lib;
           }
         ) httpServices;
 
-        # Single-instance orchestrators live on luffy; probe them from whichever
-        # node runs Prometheus (skipped on luffy, where local contracts cover them).
-        fleetOrchestratorProbes = {
-          paperclip = {
-            port = config.layers.layer-20.endpoints.paperclip.port;
-            path = "/api/health";
-          };
-          aionui = {
-            port = config.layers.layer-20.endpoints.aionui.port;
-            path = "/";
-          };
-          mission-control = {
-            port = config.layers.layer-20.endpoints.mission-control.port;
-            path = "/";
-          };
-          langfuse = {
-            port = 3005;
-            path = "/api/public/health";
-          };
-        };
-        fleetOrchestratorScrapeConfigs = optionals (localHost != "luffy") (
-          mapAttrsToList (name: probe: {
-            job_name = "blackbox-fleet-${name}";
-            metrics_path = "/probe";
-            params.module = [ "http_2xx" ];
-            static_configs = [
-              {
-                targets = [ "http://luffy.${baseDomain}:${toString probe.port}${probe.path}" ];
-                labels = {
-                  service = name;
-                  machine = "luffy";
-                };
-              }
-            ];
-            relabel_configs = [
-              {
-                source_labels = [ "__address__" ];
-                target_label = "__param_target";
-              }
-              {
-                source_labels = [ "__param_target" ];
-                target_label = "instance";
-              }
-              {
-                replacement = "127.0.0.1:9115";
-                target_label = "__address__";
-              }
-            ];
-          }) fleetOrchestratorProbes
-        );
       in
       {
         nfp.services = {
@@ -262,19 +368,6 @@ with lib;
             port = config.layers.layer-20.services.config.monitoring.prometheus.port;
             retentionTime = "30d";
             exporters = {
-              node = {
-                enable = true;
-                port = 9100;
-                enabledCollectors = [
-                  "cpu"
-                  "diskstats"
-                  "filesystem"
-                  "btrfs"
-                  "loadavg"
-                  "meminfo"
-                  "netdev"
-                ];
-              };
               postgres = {
                 enable = true;
                 port = 9187;
@@ -290,6 +383,20 @@ with lib;
                     modules.http_2xx = {
                       prober = "http";
                       http.valid_status_codes = [ 200 ];
+                    };
+                    # Authenticated/API-only services: any non-5xx answer means the process is alive.
+                    modules.http_alive = {
+                      prober = "http";
+                      http.valid_status_codes = [
+                        200
+                        204
+                        301
+                        302
+                        307
+                        401
+                        403
+                        404
+                      ];
                     };
                   }
                 );
@@ -406,7 +513,10 @@ with lib;
               {
                 job_name = "node-fleet";
                 static_configs = [
-                  { targets = config.layers.layer-20.services.config.monitoring.fleetNodeTargets; }
+                  {
+                    targets =
+                      map (h: "${h}.${baseDomain}:9100") (filter (h: h != localHost) fleetHosts) ++ cfg.fleetNodeTargets;
+                  }
                 ];
               }
               {
@@ -471,56 +581,6 @@ with lib;
                   }
                 ];
               })
-              # Exportarr - Sonarr / Radarr / Lidarr / Readarr / Bazarr / Prowlarr
-              {
-                job_name = "exportarr-sonarr";
-                static_configs = [ { targets = [ "127.0.0.1:9707" ]; } ];
-              }
-              {
-                job_name = "exportarr-radarr";
-                static_configs = [ { targets = [ "127.0.0.1:9708" ]; } ];
-              }
-              {
-                job_name = "exportarr-lidarr";
-                static_configs = [ { targets = [ "127.0.0.1:9709" ]; } ];
-              }
-              {
-                job_name = "exportarr-readarr";
-                static_configs = [ { targets = [ "127.0.0.1:9710" ]; } ];
-              }
-              {
-                job_name = "exportarr-bazarr";
-                static_configs = [ { targets = [ "127.0.0.1:9711" ]; } ];
-              }
-              {
-                job_name = "exportarr-prowlarr";
-                static_configs = [ { targets = [ "127.0.0.1:9712" ]; } ];
-              }
-              # qBittorrent exporter
-              {
-                job_name = "qbittorrent";
-                static_configs = [ { targets = [ "127.0.0.1:8095" ]; } ];
-              }
-              # Cloudflare exporter
-              {
-                job_name = "cloudflare";
-                static_configs = [ { targets = [ "127.0.0.1:9199" ]; } ];
-              }
-              # Restic exporter
-              {
-                job_name = "restic";
-                static_configs = [ { targets = [ "127.0.0.1:9753" ]; } ];
-              }
-              # Smokeping prober
-              {
-                job_name = "smokeping";
-                static_configs = [ { targets = [ "127.0.0.1:9374" ]; } ];
-              }
-              # Tailscale exporter
-              {
-                job_name = "tailscale";
-                static_configs = [ { targets = [ "127.0.0.1:9095" ]; } ];
-              }
               # Jev System-1 decision & telemetry exporter
               {
                 job_name = "jev";
@@ -529,18 +589,10 @@ with lib;
               }
             ]
             ++ contractBlackboxScrapeConfigs
-            ++ fleetOrchestratorScrapeConfigs;
+            ++ aiProbeScrapeConfigs;
           };
 
           alertmanager-ntfy.enable = true;
-
-          # ============================================================================
-          # ALLOY - Log Shipper (journald → Loki) — Promtail successor
-          # ============================================================================
-          alloy = {
-            enable = true;
-            configPath = "/etc/alloy";
-          };
 
           # ============================================================================
           # LOKI - Log Aggregation
@@ -621,6 +673,7 @@ with lib;
           grafana = {
             enable = true;
             settings = {
+              dashboards.default_home_dashboard_path = "${./dashboards/fleet-status.json}";
               server = {
                 http_addr = "0.0.0.0";
                 http_port = config.layers.layer-20.services.config.monitoring.grafana.port;
@@ -680,6 +733,13 @@ with lib;
         # Enable ntfy-sh and alertmanager-ntfy bridge
         layers.layer-20.services.config.ntfy-sh.enable = true;
 
+        # Agents push logs to Loki and operators reach Prometheus/Grafana over the tailnet
+        networking.firewall.interfaces."tailscale0".allowedTCPPorts = [
+          cfg.loki.port
+          cfg.prometheus.port
+          cfg.grafana.port
+        ];
+
         # Custom Exporter for Langfuse metrics & Alloy service config
         systemd.services = {
           langfuse-exporter = {
@@ -692,7 +752,7 @@ with lib;
                 import urllib.request
                 import json
 
-                LANGFUSE_URL = "http://luffy.${baseDomain}:3005/api/public/health"
+                LANGFUSE_URL = "http://127.0.0.1:3005/api/public/health"
                 PORT = 9898
 
                 class ExporterHandler(http.server.BaseHTTPRequestHandler):
@@ -745,27 +805,10 @@ with lib;
               DynamicUser = true;
             };
           };
-
-          alloy.serviceConfig = {
-            DynamicUser = lib.mkForce false;
-            User = "alloy";
-            Group = "alloy";
-            ConfigurationDirectory = lib.mkForce "alloy";
-          };
-        };
-
-        users = {
-          users.alloy = {
-            isSystemUser = true;
-            group = "alloy";
-            uid = 985;
-            description = "Grafana Alloy Daemon";
-          };
-          groups.alloy = { };
         };
 
         # ============================================================================
-        # Environment - Packages, Alloy config, Persistence
+        # Environment - Packages, Persistence
         # ============================================================================
         environment = {
           # Include notification and exporter packages
@@ -774,36 +817,6 @@ with lib;
             prometheus
             prometheus-node-exporter
           ];
-
-          etc."alloy/config.alloy".text = ''
-            logging {
-              level = "warn"
-            }
-            loki.source.journal "hermes"  {
-              max_age = "12h"
-              forward_to = [loki.relabel.journal.receiver]
-              labels = {
-                job     = "systemd-journal",
-                host    = "${config.networking.hostName}",
-              }
-            }
-            loki.relabel "journal" {
-              forward_to = [loki.write.default.receiver]
-              rule {
-                source_labels = ["__journal__systemd_unit"]
-                target_label  = "unit"
-              }
-              rule {
-                source_labels = ["__journal__hostname"]
-                target_label  = "hostname"
-              }
-            }
-            loki.write "default" {
-              endpoint {
-                url = "http://127.0.0.1:${toString config.layers.layer-20.services.config.monitoring.loki.port}/loki/api/v1/push"
-              }
-            }
-          '';
 
           # Ensure data is persisted
           persistence."/persist" = mkIf config.layers.layer-10.system.config.impermanence.enable {

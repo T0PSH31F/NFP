@@ -136,7 +136,7 @@
     };
 
     infrastructure.langfuse = {
-      enable = true;
+      enable = false; # Centralized on luffy (100.64.0.3)
       port = 3005;
     };
 
@@ -166,7 +166,23 @@
   };
 
   layers.layer-20.services.config.netdata.enable = true;
-  layers.layer-76.orchestrators.paperclip.enable = false;
+  layers.layer-76.orchestrators = {
+    paperclip = {
+      enable = false;
+      client.enable = true;
+      remoteHost = "luffy.nfp.nix";
+    };
+    aionui = {
+      enable = false;
+      client.enable = true;
+      remoteHost = "luffy.nfp.nix";
+    };
+    mission-control = {
+      enable = false;
+      client.enable = true;
+      remoteHost = "luffy.nfp.nix";
+    };
+  };
   layers.layer-78.llm-routers.extreme-router.enable = false;
 
   # ============================================================================

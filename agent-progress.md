@@ -653,3 +653,37 @@ No modifications produced by worker.
 ```
 No modifications produced by worker.
 ```
+
+- **Date / Agent:** 2026-11-03 / antigravity
+- **Feature:** fleet-orchestrators-single-instance-luffy
+- **Work done:**
+  1. Single-Instance Server Placement on `luffy` (`100.64.0.3`):
+     - Scoped `layers.layer-76.orchestrators.{paperclip,aionui,mission-control}.enable` to `luffy` in `layers/90-profiles/tags/ai-agent.nix`, `layers/90-profiles/tags/agent-orchestrator.nix`, and `machines/{luffy,z0r0,sanji}/default.nix`.
+     - Stopped and disabled duplicate `paperclip`, `aionui`, and `mission-control` instances on `z0r0` and `sanji`.
+  2. 3-Machine Client Wiring (`luffy`, `z0r0`, `sanji` -> `luffy.nfp.nix`):
+     - Added `paperclip` (`http://luffy.nfp.nix:3101`), `aionui` (`http://luffy.nfp.nix:3006`), and `mission-control` (`http://luffy.nfp.nix:3099`) to `layers/20-services/21-networking/endpoints.nix` and exported `PAPERCLIP_URL`, `PAPERCLIP_API_URL`, `AIONUI_URL`, `AIONUI_SERVER_URL`, and `MISSION_CONTROL_URL` across all machines.
+     - Added `client.enable = true` and `remoteHost = "luffy.nfp.nix"` in `paperclip.nix`, `aionui.nix`, and `mission-control.nix`, writing `/etc/{paperclip,aionui,mission-control}/fleet-client.json` and `~/.paperclip/context.json` across `luffy`, `z0r0`, and `sanji`.
+  3. Clan Vars & Runtime Fixes:
+     - Declared `clan.core.vars.generators.{paperclip,aionui,mission-control}` and provisioned SOPS-encrypted secrets in `vars/per-machine/luffy/{paperclip,aionui,mission-control}/` and `/run/secrets/vars/` on `luffy`.
+     - Updated Paperclip's `config.json` with valid Zod schema (`server.bind = "lan"`, `server.host = "0.0.0.0"`, `server.allowedHostnames`, `database.mode = "postgres"`).
+     - Patched `aionui` `better-sqlite3` C++ addon in `preBuild` for Electron 43 V8 headers, packaged `aioncore-0.2.2` wrapped with `dynamicLinker` + `zlib`/`xz`/`libstdc++` via `AIONUI_BACKEND_BIN`, and launched with `--ozone-platform=headless --disable-gpu --no-sandbox --webui --remote --port=3006`.
+     - Added `MC_ALLOW_ANY_HOST = "true"` and `MC_ALLOWED_HOSTS` to Mission Control so tailnet and reverse-proxy requests from `sanji` and `z0r0` return HTTP 200 instead of 403.
+- **Verification:**
+  - `./layers/00-cyberia/06-scripts/nfp-check.sh static` and `./layers/00-cyberia/06-scripts/nfp-check.sh eval` passed across `z0r0`, `luffy`, and `sanji`.
+  - Live fleet check confirmed `active` on `luffy`, `inactive` on `z0r0` and `sanji`, and HTTP 200 from all 3 machines to `luffy` (`:3101`, `:3006`, `:3099`).
+- **State change:** passing (evidence recorded in feature_list.json)
+- **Next action:** Commit changes with git identity `t0psh31f <wrighterik77@gmail.com>`.
+
+
+- **Date / Agent:** 2026-11-04 / antigravity
+- **Feature:** fleet-monitoring-observability-consolidation
+- **Work done:**
+  1. Centralized Prometheus (:9090), Grafana (:3008), Loki (:3100), and Langfuse (:3005) on `luffy` (`role = "server"`). Configured `sanji` and `z0r0` as monitoring agents (`role = "agent"`) running `node-exporter` (:9100) and shipping journal logs via Alloy to `luffy:3100`.
+  2. Consolidated Langfuse LLM Observability strictly on `luffy` (`100.64.0.3:3005`), disabling duplicate instances on `sanji` and `z0r0`.
+  3. Made Prometheus exporter scrapes conditional (`caddy`, `matrix-synapse`, `n8n`, `langgraph`), enabled `jev-exporter` (:20132) on `luffy`, and added health probes for `extreme-router`, `omniroute`, `hermes-gateway`, `brain-service`, and `pi-durable-daemon`.
+  4. Created unified `fleet-status.json` landing dashboard, removed dead `kong-ai-gateway.json`, and fixed metric queries in `hermes-activity.json`.
+  5. Wired `scripts/run_evals.py` to write test pass rates and ROI cost metrics into `/var/lib/node-exporter-textfile/jarvis_evals.prom`.
+- **Verification:**
+  - `./layers/00-cyberia/06-scripts/nfp-check.sh static`: Clean exit (code 0).
+  - `./layers/00-cyberia/06-scripts/nfp-check.sh eval`: Remote evaluation on `100.64.0.1` (`z0r0`) passed across `z0r0`, `luffy`, and `sanji`.
+- **State change:** passing

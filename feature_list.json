@@ -9,27 +9,6 @@
   },
   "features": [
     {
-      "id": "super-n-task-watcher-and-life-orchestrator",
-      "priority": 14,
-      "name": "Super + N Task Watcher & Proactive Life/Business Orchestrator",
-      "behavior": "Implement always-on task watcher daemon (task_watcher.py & task_watcher.nix) monitoring tasklist.md and EverOS (:8092) for unchecked tasks (- [ ]); automatically decompose tasks into actionable steps and execute preparations via pi-durable daemon (:8089); update tasklist.md checkboxes to completed (- [x]) or awaiting-approval (- [>]) with reports linked; bind Super + N in Hyprland to quickly view and edit tasklist.md in Ghostty/Neovim scratchpad; register GLaDOS vocal alerts for completions and approval gates.",
-      "verification": [
-        "python3 layers/70-agents/73-memory/task_watcher.py --test",
-        "./init.sh --worktree"
-      ],
-      "state": "passing",
-      "claimedBy": "antigravity",
-      "blockedReason": null,
-      "evidence": [
-        {
-          "sha": "HEAD",
-          "command": "python3 layers/70-agents/73-memory/task_watcher.py --test && ./init.sh --worktree",
-          "output": "task_watcher.py --test verified 5/5 assertions (SQLite tracking, markdown parsing, in-place checkbox flip with nested subtasks, decomposition, end-to-end watcher cycle); ./init.sh --worktree passed 5/5 evaluating z0r0, luffy, and sanji cleanly.",
-          "at": "2026-10-29T07:01:00Z"
-        }
-      ]
-    },
-    {
       "id": "screenpipe-desktop-perception-and-memory-reflection",
       "priority": 15,
       "name": "Screen-Pipe Desktop Perception & Personal Memory Reflection Daemon",
@@ -213,6 +192,28 @@
           "command": "python3 scripts/run_evals.py && python3 layers/70-agents/73-memory/rag-engine.py --test && python3 layers/70-agents/77-dash-desk-ui/jarvis-pwa-server.py --test && python3 scripts/roi_parser.py --test && python3 scripts/setup_wizard.py --test && python3 scripts/provision_customer.py --test && python3 scripts/overseer_deploy.py --test && ./init.sh --worktree",
           "output": "run_evals.py passed 5/5 (verification_gate_passed=true, crash_recovery_rate=1.0, token_compression_ratio=0.6852, jev_latency_ms=0.018, rag_precision=0.95, anchor_search_hit_rate=1.0, command_interception_rate=1.0, monthly_net_profit_usd=13941.0, monthly_roi_multiplier_x=28.9); rag-engine.py --test passed 4/4; jarvis-pwa-server.py --test passed; roi_parser.py --test, setup_wizard.py --test, provision_customer.py --test, overseer_deploy.py --test all passed; ./init.sh --worktree passed 5/5 evaluating z0r0, luffy, and sanji cleanly.",
           "at": "2026-11-03T06:43:36Z"
+        }
+      ]
+    },
+    {
+      "id": "fleet-orchestrators-single-instance-luffy",
+      "priority": 23,
+      "name": "Single-Instance Paperclip (:3101), AionUI (:3006), and Mission Control (:3099) on luffy with 3-Machine Client Wiring & Clan Vars",
+      "behavior": "Run single central instances of Paperclip (:3101), AionUI (:3006), and Mission Control (:3099) exclusively on luffy (0.0.0.0) while disabling server instances on z0r0 and sanji; configure client.enable across all 3 machines (luffy, z0r0, sanji) with fleet-client.json and environment variables (PAPERCLIP_URL, PAPERCLIP_API_URL, AIONUI_URL, AIONUI_SERVER_URL, MISSION_CONTROL_URL) pointing to luffy.nfp.nix; declare and provision SOPS-encrypted clan.core.vars.generators.{paperclip,aionui,mission-control} secrets; patch AionUI better-sqlite3 against Electron 43 V8 headers and bundle aioncore 0.2.2 for headless WebUI operation.",
+      "verification": [
+        "./layers/00-cyberia/06-scripts/nfp-check.sh static",
+        "./layers/00-cyberia/06-scripts/nfp-check.sh eval",
+        "curl -sf http://100.64.0.3:3101/api/health && curl -sf http://100.64.0.3:3006/ >/dev/null && curl -sL http://100.64.0.3:3099/ >/dev/null"
+      ],
+      "state": "passing",
+      "claimedBy": "antigravity",
+      "blockedReason": null,
+      "evidence": [
+        {
+          "sha": "HEAD",
+          "command": "./layers/00-cyberia/06-scripts/nfp-check.sh static && ./layers/00-cyberia/06-scripts/nfp-check.sh eval && curl checks across sanji, z0r0, and luffy",
+          "output": "nfp-check.sh static and eval passed across z0r0, luffy, and sanji; paperclip.service, aionui.service, and podman-mission-control.service confirmed active on luffy and inactive on z0r0 and sanji; HTTP 200 reachability verified from all 3 machines to luffy (:3101, :3006, :3099) with Clan vars decrypted in /run/secrets/vars/{paperclip,aionui,mission-control}.",
+          "at": "2026-11-03T20:08:38Z"
         }
       ]
     }

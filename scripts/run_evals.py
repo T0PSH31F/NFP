@@ -183,9 +183,29 @@ def run_evaluation_suite() -> Dict[str, Any]:
     results["elapsed_ms"] = round((time.perf_counter() - t_start) * 1000.0, 2)
     print("✅ Evaluation Complete. Summary:")
     print(json.dumps(results, indent=2))
+    _export_prometheus(results)
     if results["tests_passed"] != results["tests_run"]:
         sys.exit(1)
     return results
+
+
+def _export_prometheus(results: Dict[str, Any]) -> None:
+    """Write results for node-exporter's textfile collector (best effort)."""
+    out_dir = Path(os.environ.get("EVAL_PROM_DIR", "/var/lib/node-exporter-textfile"))
+    lines = [
+        f"jarvis_eval_tests_passed {results['tests_passed']}",
+        f"jarvis_eval_tests_total {results['tests_run']}",
+        f"jarvis_eval_last_run_timestamp_seconds {int(time.time())}",
+    ]
+    for key, val in results["metrics"].items():
+        if isinstance(val, (int, float)):
+            lines.append(f"jarvis_eval_{key} {float(val)}")
+    try:
+        tmp = out_dir / "jarvis_evals.prom.tmp"
+        tmp.write_text("\n".join(lines) + "\n")
+        tmp.replace(out_dir / "jarvis_evals.prom")
+    except OSError:
+        pass
 
 
 if __name__ == "__main__":

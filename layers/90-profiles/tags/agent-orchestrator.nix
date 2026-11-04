@@ -15,8 +15,18 @@
         # Agent control-plane services
         orchestrators = {
           executor.enable = lib.mkDefault true;
-          mission-control.enable = lib.mkDefault true;
-          paperclip.enable = lib.mkDefault true;
+          mission-control = {
+            enable = lib.mkDefault (config.networking.hostName == "luffy");
+            client.enable = lib.mkDefault true;
+          };
+          aionui = {
+            enable = lib.mkDefault (config.networking.hostName == "luffy");
+            client.enable = lib.mkDefault true;
+          };
+          paperclip = {
+            enable = lib.mkDefault (config.networking.hostName == "luffy");
+            client.enable = lib.mkDefault true;
+          };
           polyfloor.enable = lib.mkDefault true;
           hermes-ratchet.enable = lib.mkDefault true;
         };
