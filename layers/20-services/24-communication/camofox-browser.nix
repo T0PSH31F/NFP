@@ -79,6 +79,13 @@ in
     };
     users.groups.camofox = { };
 
+    # Xvfb is launched with -shmem; a SIGKILLed browser/Xvfb leaks its SysV
+    # shared-memory segment. At the stock kernel.shmmni=4096 the machine wedges
+    # after ~4k launch attempts ("shmget: No space left on device") and Camofox
+    # silently stops starting its browser. Raise the ceiling and reap orphans
+    # on every start (see ExecStartPre below).
+    boot.kernel.sysctl."kernel.shmmni" = 32768;
+
     # ── Gmail session cookies (SOPS-encrypted, never plaintext) ──────────
     # Each secret holds a JSON array of browser cookies for the account.
     # Populate with:
@@ -160,6 +167,20 @@ in
                   >/dev/null 2>&1 || true
               done
             '';
+
+            # Reap orphaned SysV shared-memory segments owned by camofox before
+            # the browser starts. A segment with zero attached processes is
+            # guaranteed dead; removing it prevents the shmmni exhaustion above.
+            cleanShm = pkgs.writeShellScript "camofox-clean-shm" ''
+              ${pkgs.util-linux}/bin/ipcs -m 2>/dev/null \
+                | awk '$3 == "camofox" && $6 == 0 { print $2 }' \
+                | while read -r id; do
+                    if [ -n "$id" ]; then
+                      ${pkgs.util-linux}/bin/ipcrm -m "$id" 2>/dev/null || true
+                    fi
+                  done
+              exit 0
+            '';
           in
           {
             description = "Camofox anti-detection browser server (jo-inc fork)";
@@ -178,11 +199,13 @@ in
               pkgs.procps
               pkgs.coreutils
               pkgs.curl
+              pkgs.util-linux
             ];
             serviceConfig = {
               Type = "simple";
               User = "camofox";
               Group = "camofox";
+              ExecStartPre = [ cleanShm ];
               ExecStart = startScript;
               # Provision HTTPS session cookies after the server is healthy.
               ExecStartPost = [ importCookies ];
