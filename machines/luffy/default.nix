@@ -383,7 +383,14 @@ in
       facebook.enable = true;
       gmessages.enable = true;
       gvoice.enable = true;
-      linkedin.enable = true;
+      # Disabled 2026-11-04: enabled but never configured. /var/lib/mautrix-linkedin
+      # holds the stock upstream sample (domain example.com, placeholder as_token,
+      # public_address bridge.example.com), there is no registration.yaml, and no
+      # Synapse appservice registration exists — so the container exited 20 on
+      # every boot ("Homeserver domain is not set") and hit start-limit-hit.
+      # Re-enable only together with a real bridge setup (tokens in SOPS +
+      # Synapse app_service_config_files entry).
+      linkedin.enable = false;
     };
 
     # Bind SearXNG to LAN so dashboard search works from z0r0
