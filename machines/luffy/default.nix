@@ -381,8 +381,11 @@ in
       discord.enable = true;
       instagram.enable = true;
       facebook.enable = true;
-      gmessages.enable = true;
-      gvoice.enable = true;
+      # Disabled 2026-11-04: same unconfigured-bridge failure as linkedin —
+      # stock sample config, no appservice registration, exit 20
+      # "Homeserver domain is not set" on every boot.
+      gmessages.enable = false;
+      gvoice.enable = false;
       # Disabled 2026-11-04: enabled but never configured. /var/lib/mautrix-linkedin
       # holds the stock upstream sample (domain example.com, placeholder as_token,
       # public_address bridge.example.com), there is no registration.yaml, and no
