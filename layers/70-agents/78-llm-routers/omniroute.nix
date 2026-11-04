@@ -94,6 +94,10 @@ with lib;
           fi
         ''}
         chmod 600 "$ENV_FILE"
+        # The container runs as 1000:1000 and reads /app/data/.env at runtime.
+        # The chown -R above runs BEFORE this file is rewritten as root, so it
+        # must be re-owned here or the app dies on boot with EACCES.
+        chown 1000:1000 "$ENV_FILE" 2>/dev/null || true
 
         case "''${1:-up}" in
           up)
