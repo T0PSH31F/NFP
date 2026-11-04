@@ -85,13 +85,13 @@ in
     #   sops layers/00-cyberia/03-treasure/secrets/external_services.yaml
     # and paste the cookie JSON array.  Empty values disable import.
     sops.secrets.gmail_cookies_wrighterik77 = {
-      sopsFile = ../../../00-cyberia/03-treasure/secrets/external_services.yaml;
+      sopsFile = ../../../layers/00-cyberia/03-treasure/secrets/external_services.yaml;
       owner = "camofox";
       group = "camofox";
       mode = "0400";
     };
     sops.secrets.gmail_cookies_lovelainautomations = {
-      sopsFile = ../../../00-cyberia/03-treasure/secrets/external_services.yaml;
+      sopsFile = ../../../layers/00-cyberia/03-treasure/secrets/external_services.yaml;
       owner = "camofox";
       group = "camofox";
       mode = "0400";
