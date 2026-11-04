@@ -13,25 +13,33 @@ _:
       ports = [ "32776:8080" ];
     };
 
-    skyvern-api = {
-      image = "public.ecr.aws/skyvern/skyvern@sha256:d52b7ddc32301f46de09ed340ab3097b22a2c13e4b3d99b76273a03c92fc7960";
-      ports = [ "32779:8000" ];
-      volumes = [
-        "/var/lib/skyvern/data:/data"
-        "/var/lib/skyvern/.skyvern:/app/.skyvern"
-      ];
-      environment = {
-        DATABASE_STRING = "sqlite+aiosqlite:////data/skyvern.db";
-        BROWSER_REMOTE_DEBUGGING_URL = "http://skyvern-chrome:3000";
-        DOWNLOAD_PATH = "/data/downloads";
-        BROWSER_SESSION_BASE_PATH = "/data/browser_sessions";
-        CREDENTIAL_VAULT_TYPE = "skyvern";
-        ENABLE_LOCAL_CREDENTIAL_VAULT = "true";
-        LOCAL_CREDENTIAL_VAULT_PATH = "/data/credential_vault";
-        ENABLE_CODE_BLOCK = "true";
-        LOG_LEVEL = "INFO";
-      };
-    };
+    # Disabled 2026-11-04: the pinned Skyvern image (digest d52b7ddc; :latest is
+    # the same image ID fd9e14f63e0f) fails its own startup migrations on every
+    # boot, even against a brand-new empty database:
+    #   sqlalchemy.exc.OperationalError: duplicate column name: title
+    #   [SQL: ALTER TABLE tasks ADD COLUMN title VARCHAR]
+    # `alembic heads` reports a single head (78a8db531e69), so this is an
+    # upstream schema/migration inconsistency, not corrupted local state.
+    # Re-enable after pinning a fixed image, or migrate to Postgres.
+    # skyvern-api = {
+    #   image = "public.ecr.aws/skyvern/skyvern@sha256:d52b7ddc32301f46de09ed340ab3097b22a2c13e4b3d99b76273a03c92fc7960";
+    #   ports = [ "32779:8000" ];
+    #   volumes = [
+    #     "/var/lib/skyvern/data:/data"
+    #     "/var/lib/skyvern/.skyvern:/app/.skyvern"
+    #   ];
+    #   environment = {
+    #     DATABASE_STRING = "sqlite+aiosqlite:////data/skyvern.db";
+    #     BROWSER_REMOTE_DEBUGGING_URL = "http://skyvern-chrome:3000";
+    #     DOWNLOAD_PATH = "/data/downloads";
+    #     BROWSER_SESSION_BASE_PATH = "/data/browser_sessions";
+    #     CREDENTIAL_VAULT_TYPE = "skyvern";
+    #     ENABLE_LOCAL_CREDENTIAL_VAULT = "true";
+    #     LOCAL_CREDENTIAL_VAULT_PATH = "/data/credential_vault";
+    #     ENABLE_CODE_BLOCK = "true";
+    #     LOG_LEVEL = "INFO";
+    #   };
+    # };
 
     skyvern-chrome = {
       image = "ghcr.io/browserless/chromium@sha256:8fb011d07d4f469ea936a0605b4705c7b585108a095d598fcd27b7bef9597caa";
