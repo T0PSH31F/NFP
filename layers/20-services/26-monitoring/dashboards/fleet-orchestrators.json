@@ -70,12 +70,14 @@
       ]
     },
     {
-      "title": "Langfuse Exporter Up / Traces / Cost",
+      "title": "Langfuse Telemetry (Traces, Observations, Tokens & Spend)",
       "type": "stat",
       "gridPos": { "h": 4, "w": 24, "x": 0, "y": 12 },
       "targets": [
         { "expr": "langfuse_up", "legendFormat": "up", "datasource": { "type": "prometheus", "uid": "prometheus" } },
         { "expr": "langfuse_traces_total", "legendFormat": "traces", "datasource": { "type": "prometheus", "uid": "prometheus" } },
+        { "expr": "langfuse_observations_total", "legendFormat": "observations", "datasource": { "type": "prometheus", "uid": "prometheus" } },
+        { "expr": "langfuse_tokens_total", "legendFormat": "tokens", "datasource": { "type": "prometheus", "uid": "prometheus" } },
         { "expr": "langfuse_cost_dollars", "legendFormat": "cost USD", "datasource": { "type": "prometheus", "uid": "prometheus" } }
       ]
     },

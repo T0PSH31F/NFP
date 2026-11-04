@@ -65,12 +65,11 @@ in
     # ── mrVanDalo/nixos-telemetry Integration ──────────────────────────
     telemetry = {
       enable = true;
-      alloy.enable = true; # Scrapes journal logs via Grafana Alloy
-
-      # Server role runs local sinks (Prometheus, Loki, Grafana)
-      prometheus.enable = mkDefault (cfg.role == "server" || cfg.role == "standalone");
-      loki.enable = mkDefault (cfg.role == "server" || cfg.role == "standalone");
-      grafana.enable = mkDefault (cfg.role == "server" || cfg.role == "standalone");
+      # Core observability sinks and journal scraping are managed by monitoring.nix
+      alloy.enable = false;
+      prometheus.enable = false;
+      loki.enable = false;
+      grafana.enable = false;
 
       opentelemetry = {
         receiver.endpoint = mkIf (
@@ -109,19 +108,13 @@ in
       };
       homepage = {
         enable = true;
-        category = "monitoring";
+        category = "usopp";
         order = 45;
         title = "OpenTelemetry";
         subtitle = "Fleet Telemetry Hub";
         icon = "opentelemetry";
         metric = {
-          mode = "contract-sensor";
-          adapter = "otel";
-          fields = [
-            "spans_received"
-            "metrics_exported"
-            "active_nodes"
-          ];
+          mode = "health-only";
         };
       };
     };

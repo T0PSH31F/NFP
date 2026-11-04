@@ -89,6 +89,7 @@ in
 
     # Journal shipping (agents push to the server's Loki, the server pushes locally).
     (mkIf cfg.enable {
+      layers.layer-20.services.config.telemetry.enable = lib.mkDefault true;
       services.alloy = {
         enable = true;
         configPath = "/etc/alloy";
@@ -587,6 +588,11 @@ in
                 metrics_path = "/metrics";
                 static_configs = [ { targets = [ "127.0.0.1:20132" ]; } ];
               }
+              # OpenTelemetry Collector internal metrics
+              (mkIf (config.layers.layer-20.services.config.telemetry.enable or false) {
+                job_name = "otel-collector";
+                static_configs = [ { targets = [ "127.0.0.1:8888" ]; } ];
+              })
             ]
             ++ contractBlackboxScrapeConfigs
             ++ aiProbeScrapeConfigs;
@@ -745,15 +751,21 @@ in
           langfuse-exporter = {
             description = "Langfuse Metrics Exporter for Prometheus";
             wantedBy = [ "multi-user.target" ];
-            after = [ "network.target" ];
+            after = [
+              "network.target"
+              "postgresql.service"
+            ];
             serviceConfig = {
               ExecStart = "${pkgs.python3}/bin/python3 ${pkgs.writeText "langfuse-exporter.py" ''
                 import http.server
                 import urllib.request
+                import subprocess
                 import json
+                import os
 
                 LANGFUSE_URL = "http://127.0.0.1:3005/api/public/health"
                 PORT = 9898
+                PSQL_BIN = "${pkgs.postgresql}/bin/psql"
 
                 class ExporterHandler(http.server.BaseHTTPRequestHandler):
                     def do_GET(self):
@@ -761,30 +773,55 @@ in
                             traces_count = 0
                             total_tokens = 0
                             total_cost = 0.0
+                            observations_count = 0
                             status_up = 0
                             try:
                                 req = urllib.request.Request(LANGFUSE_URL, headers={"User-Agent": "Langfuse-Exporter/1.0"})
-                                with urllib.request.urlopen(req, timeout=5) as response:
+                                with urllib.request.urlopen(req, timeout=4) as response:
                                     if response.status == 200:
                                         status_up = 1
-                                        data = json.loads(response.read().decode('utf-8'))
-                                        traces_count = data.get("count", data.get("traces", 0))
-                                        total_tokens = data.get("tokens", data.get("total_tokens", 0))
-                                        total_cost = data.get("cost", data.get("total_cost", 0.0))
                             except Exception:
                                 status_up = 0
 
+                            if os.path.exists(PSQL_BIN):
+                                try:
+                                    cmd = [
+                                        PSQL_BIN,
+                                        "-q", "-X",
+                                        "-h", "127.0.0.1",
+                                        "-U", "postgres",
+                                        "-d", "langfuse",
+                                        "-t", "-A", "-F", ",",
+                                        "-c", "SELECT count(*) FROM traces; SELECT count(*), coalesce(sum(total_tokens), 0), coalesce(sum(calculated_total_cost), 0) FROM observations;"
+                                    ]
+                                    env = os.environ.copy()
+                                    env["PGOPTIONS"] = "--client-min-messages=error"
+                                    res = subprocess.run(cmd, capture_output=True, text=True, timeout=5, env=env)
+                                    if res.returncode == 0:
+                                        lines = [l.strip() for l in res.stdout.strip().splitlines() if l.strip()]
+                                        if len(lines) >= 2:
+                                            traces_count = int(lines[0])
+                                            parts = lines[1].split(',')
+                                            observations_count = int(parts[0])
+                                            total_tokens = int(float(parts[1]))
+                                            total_cost = float(parts[2])
+                                except Exception:
+                                    pass
+
                             output = (
-                                f"# HELP langfuse_up Reachability of Langfuse metrics API\n"
+                                f"# HELP langfuse_up Reachability of Langfuse health API\n"
                                 f"# TYPE langfuse_up gauge\n"
                                 f"langfuse_up {status_up}\n"
                                 f"# HELP langfuse_traces_total Total trace count\n"
                                 f"# TYPE langfuse_traces_total gauge\n"
                                 f"langfuse_traces_total {traces_count}\n"
-                                f"# HELP langfuse_tokens_total Total tokens\n"
+                                f"# HELP langfuse_observations_total Total observation count\n"
+                                f"# TYPE langfuse_observations_total gauge\n"
+                                f"langfuse_observations_total {observations_count}\n"
+                                f"# HELP langfuse_tokens_total Total tokens consumed\n"
                                 f"# TYPE langfuse_tokens_total gauge\n"
                                 f"langfuse_tokens_total {total_tokens}\n"
-                                f"# HELP langfuse_cost_dollars Total cost in USD\n"
+                                f"# HELP langfuse_cost_dollars Total calculated cost in USD\n"
                                 f"# TYPE langfuse_cost_dollars gauge\n"
                                 f"langfuse_cost_dollars {total_cost}\n"
                             )
@@ -802,7 +839,8 @@ in
               ''}";
               Restart = "always";
               RestartSec = "5s";
-              DynamicUser = true;
+              DynamicUser = false;
+              User = "postgres";
             };
           };
         };

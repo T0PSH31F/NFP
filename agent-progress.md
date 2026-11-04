@@ -687,3 +687,14 @@ No modifications produced by worker.
   - `./layers/00-cyberia/06-scripts/nfp-check.sh static`: Clean exit (code 0).
   - `./layers/00-cyberia/06-scripts/nfp-check.sh eval`: Remote evaluation on `100.64.0.1` (`z0r0`) passed across `z0r0`, `luffy`, and `sanji`.
 - **State change:** passing
+
+- **Date / Agent:** 2026-11-04 / antigravity
+- **Feature:** fleet-monitoring-telemetry-and-langfuse-db-wiring
+- **Work done:**
+  1. Connected `langfuse-exporter` directly to local PostgreSQL on `luffy` (`127.0.0.1:5432/langfuse`) under user `postgres`, extracting live `traces_total`, `observations_total`, `tokens_total`, and `cost_dollars`.
+  2. Integrated OpenTelemetry fleet collector pipeline (`telemetry.nix`) with receiver on `luffy` (`:4317` gRPC / `:4318` HTTP), agents exporting from `z0r0` and `sanji`, internal Prometheus scrape on port `8888`, and valid homepage category `usopp` with `health-only` mode.
+  3. Updated `fleet-orchestrators.json` Grafana dashboard with observations and token telemetry panels.
+- **Verification:**
+  - `./layers/00-cyberia/06-scripts/nfp-check.sh static`: Clean exit (code 0).
+  - `./layers/00-cyberia/06-scripts/nfp-check.sh eval`: Remote evaluation on `100.64.0.1` passed across `z0r0`, `luffy`, and `sanji`.
+- **State change:** passing
