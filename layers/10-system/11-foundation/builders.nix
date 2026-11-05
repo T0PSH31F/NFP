@@ -30,6 +30,7 @@ let
         "benchmark"
       ];
       sshUser = "root";
+      sshKey = "/etc/ssh/ssh_host_ed25519_key";
     }
     {
       hostName = "z0r0.${baseDomain}";
@@ -44,6 +45,7 @@ let
         "benchmark"
       ];
       sshUser = "root";
+      sshKey = "/etc/ssh/ssh_host_ed25519_key";
     }
     {
       hostName = "sanji.${baseDomain}";
@@ -58,6 +60,7 @@ let
         "benchmark"
       ];
       sshUser = "root";
+      sshKey = "/etc/ssh/ssh_host_ed25519_key";
     }
     # RETIRED 2026-10-13: nami removed as a distributed builder. The instance
     # (47.254.90.69) went permanently unreachable on 2026-10-12, so every build
@@ -118,9 +121,17 @@ in
           speedFactor
           supportedFeatures
           sshUser
+          sshKey
           ;
       }) (filter (m: m.machineId != "phone" || cfg.enablePhoneBuilder) remoteBuildMachines);
     };
+
+    # Force identities-only and use host ed25519 key for fleet SSH connections to prevent agent key exhaustion
+    programs.ssh.extraConfig = ''
+      Host *.${baseDomain} 100.64.0.*
+        IdentitiesOnly yes
+        IdentityFile /etc/ssh/ssh_host_ed25519_key
+    '';
 
     # Declarative host keys for all fleet machines to eliminate "Host key verification failed" in nix-daemon
     programs.ssh.knownHosts = {
@@ -129,7 +140,7 @@ in
           "z0r0.${baseDomain}"
           "100.64.0.1"
         ];
-        publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDFylABIGcvVqbGUT+y8lQZRty0/BeCTGs9QHwqzdzrb";
+        publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBbma86jIAHhoKLb7xDbXqTxofk0dz3BnuZEXmQQokRo";
       };
       luffy = {
         hostNames = [
@@ -137,7 +148,7 @@ in
           "100.64.0.3"
           "192.168.1.54"
         ];
-        publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIED0hTwN/NTxlnnnFc1/3oDOOQmsG8Nw/oZin+s9mdxx";
+        publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILq2CNXMpVIOPv3byApLfUgbhSYYXWVjeYA19bpjJuMz";
       };
       sanji = {
         hostNames = [

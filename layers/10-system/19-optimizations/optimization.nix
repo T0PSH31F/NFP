@@ -106,6 +106,12 @@
       maxretry = lib.mkDefault 3;
       bantime = lib.mkDefault "1h";
       bantime-increment.enable = true;
+      ignoreIP = [
+        "127.0.0.1/8"
+        "::1"
+        "100.64.0.0/10"
+        "192.168.0.0/16"
+      ];
     };
   };
 }
