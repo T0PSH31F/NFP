@@ -93,6 +93,8 @@ in
                 enable = true;
                 settings = {
                   server_name = settings.server_tld;
+                  enable_registration = true;
+                  registration_requires_token = true;
                   database = {
                     name = "psycopg2";
                     allow_unsafe_locale = true; # Critical for existing database compatibility
@@ -131,7 +133,7 @@ in
                           builtins.toJSON {
                             default_server_config = {
                               "${"m.homeserver"}" = {
-                                base_url = "https://${settings.app_domain}:443";
+                                base_url = "https://${settings.server_tld}:443";
                                 server_name = settings.server_tld;
                               };
                             };

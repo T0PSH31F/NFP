@@ -377,10 +377,10 @@ in
       homeserverDomain = "matrix.lovelain.duckdns.org";
       whatsapp.enable = true;
       signal.enable = true;
-      telegram.enable = true;
+      telegram.enable = false; # Unconfigured: telegram.api_id not configured
       discord.enable = true;
-      instagram.enable = true;
-      facebook.enable = true;
+      instagram.enable = false; # Unconfigured: tokens/migration not configured
+      facebook.enable = false; # Unconfigured: tokens/migration not configured
       # Disabled 2026-11-04: same unconfigured-bridge failure as linkedin —
       # stock sample config, no appservice registration, exit 20
       # "Homeserver domain is not set" on every boot.
