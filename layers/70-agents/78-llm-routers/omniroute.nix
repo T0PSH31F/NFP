@@ -129,6 +129,16 @@ with lib;
             ;;
         esac
       '';
+
+      # Declarative, idempotent provisioning of provider connections + combo.
+      # Runs after `omniroute-ctl up`; converges the running instance to the
+      # desired provider set on every start.
+      provisionScript = pkgs.writeShellScript "omniroute-provision" ''
+        exec ${pkgs.python3}/bin/python3 ${./omniroute-provision.py} \
+          --base "http://127.0.0.1:${toString cfg.port}" \
+          --admin-password-file "${config.sops.secrets.omniroute_admin_password.path}" \
+          --env-file "${cfg.dataDir}/.env"
+      '';
     in
     mkMerge [
       {
@@ -157,6 +167,14 @@ with lib;
       }
       (mkIf cfg.enable {
         networking.firewall.allowedTCPPorts = [ cfg.port ];
+
+        # Dashboard/admin password (SOPS key: omniroute_api_key). Consumed only
+        # by the provisioning script, never placed in the environment.
+        sops.secrets.omniroute_admin_password = {
+          sopsFile = ../../../layers/00-cyberia/03-treasure/secrets/external_services.yaml;
+          key = "omniroute_api_key";
+          mode = "0400";
+        };
 
         environment.systemPackages = [
           pkgs.podman-compose
@@ -197,6 +215,9 @@ with lib;
 
           script = ''
             ${helperPkg}/bin/omniroute-ctl up
+            # Converge providers/combo to the declarative desired state.
+            # Never fail the unit: the container is already running by now.
+            ${provisionScript} || true
           '';
           preStop = ''
             ${helperPkg}/bin/omniroute-ctl down
