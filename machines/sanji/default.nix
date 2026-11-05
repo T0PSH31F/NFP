@@ -73,8 +73,8 @@
       lockIgnoreAc = true; # Never lock screen while plugged in to AC power
     };
     desktop = {
-      experience = "noctalia";
-      noctalia.defaultCompositor = "hyprland";
+      experience = "noctalia-umbriel";
+      noctalia.defaultCompositor = "umbriel";
     };
   };
 

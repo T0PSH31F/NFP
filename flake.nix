@@ -93,6 +93,10 @@
       url = "github:noctalia-dev/noctalia-greeter";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    gslapper = {
+      url = "github:Nomadcxx/gSlapper";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     yazelix = {
       url = "github:Yazelix/nova";
     };

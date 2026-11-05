@@ -13,42 +13,80 @@
 # shredded on exit. Cookie values are never printed.
 set -euo pipefail
 
-ACCOUNT="${1:-}"; BROWSER="${2:-}"
-[ -n "$ACCOUNT" ] && [ -n "$BROWSER" ] || { sed -n '2,12p' "$0" | sed 's/^# \{0,1\}//'; exit 1; }
-case "$ACCOUNT" in wrighterik77|lovelainautomations) ;; *) echo "bad account" >&2; exit 2;; esac
-case "$BROWSER" in chrome|brave) ;; *) echo "bad browser" >&2; exit 2;; esac
+ACCOUNT="${1:-}"
+BROWSER="${2:-}"
+[ -n "$ACCOUNT" ] && [ -n "$BROWSER" ] || {
+  sed -n '2,12p' "$0" | sed 's/^# \{0,1\}//'
+  exit 1
+}
+case "$ACCOUNT" in wrighterik77 | lovelainautomations) ;; *)
+  echo "bad account" >&2
+  exit 2
+  ;;
+esac
+case "$BROWSER" in chrome | brave) ;; *)
+  echo "bad browser" >&2
+  exit 2
+  ;;
+esac
 
-PROFILE="Default"; DRY=0; IMP=0
+PROFILE="Default"
+DRY=0
+IMP=0
 shift 2
 while [ $# -gt 0 ]; do
   case "$1" in
-    --profile) PROFILE="$2"; shift 2;;
-    --dry-run) DRY=1; shift;;
-    --import) IMP=1; shift;;
-    *) echo "unknown option: $1" >&2; exit 2;;
+  --profile)
+    PROFILE="$2"
+    shift 2
+    ;;
+  --dry-run)
+    DRY=1
+    shift
+    ;;
+  --import)
+    IMP=1
+    shift
+    ;;
+  *)
+    echo "unknown option: $1" >&2
+    exit 2
+    ;;
   esac
 done
 
 case "$BROWSER" in
-  chrome) ROOT="$HOME/.config/google-chrome";;
-  brave)  ROOT="$HOME/.config/BraveSoftware/Brave-Browser";;
+chrome) ROOT="$HOME/.config/google-chrome" ;;
+brave) ROOT="$HOME/.config/BraveSoftware/Brave-Browser" ;;
 esac
 DB="$ROOT/$PROFILE/Cookies"
-[ -f "$DB" ] || { echo "ERROR: no cookie DB at $DB" >&2; exit 3; }
+[ -f "$DB" ] || {
+  echo "ERROR: no cookie DB at $DB" >&2
+  exit 3
+}
 
 # Pick an interpreter that actually has `cryptography` (the bare system
 # python3 does not; the Hermes agent venv does).
 PY=""
 for cand in python3 python3.12 /nix/store/*-hermes-agent-env/bin/python3.12; do
   if [ -x "$(command -v "$cand" 2>/dev/null || echo "$cand")" ] 2>/dev/null; then
-    if "$cand" -c 'import cryptography' >/dev/null 2>&1; then PY="$cand"; break; fi
+    if "$cand" -c 'import cryptography' >/dev/null 2>&1; then
+      PY="$cand"
+      break
+    fi
   fi
 done
-[ -n "$PY" ] || { echo "ERROR: no Python with 'cryptography' found" >&2; exit 3; }
+[ -n "$PY" ] || {
+  echo "ERROR: no Python with 'cryptography' found" >&2
+  exit 3
+}
 
 umask 077
 WORK="$(mktemp -d /dev/shm/gmailcookies.XXXXXX)"
-cleanup(){ find "$WORK" -type f -exec shred -u {} + 2>/dev/null || true; rm -rf "$WORK"; }
+cleanup() {
+  find "$WORK" -type f -exec shred -u {} + 2>/dev/null || true
+  rm -rf "$WORK"
+}
 trap cleanup EXIT INT TERM
 
 "$PY" - "$DB" "$BROWSER" "$WORK/cookies.json" <<'PY'

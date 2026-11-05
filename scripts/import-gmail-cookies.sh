@@ -23,36 +23,59 @@
 #
 set -euo pipefail
 
-usage() { sed -n '2,30p' "$0" | sed 's/^# \{0,1\}//'; exit "${1:-0}"; }
+usage() {
+  sed -n '2,30p' "$0" | sed 's/^# \{0,1\}//'
+  exit "${1:-0}"
+}
 
-ACCOUNT="${1:-}"; INPUT="${2:-}"
+ACCOUNT="${1:-}"
+INPUT="${2:-}"
 [ -n "${ACCOUNT}" ] && [ -n "${INPUT}" ] || usage 1
 [ "${ACCOUNT}" = "-h" ] || [ "${ACCOUNT}" = "--help" ] && usage 0
 
 case "${ACCOUNT}" in
-  wrighterik77|lovelainautomations) : ;;
-  *) echo "ERROR: account must be wrighterik77 or lovelainautomations" >&2; exit 2 ;;
+wrighterik77 | lovelainautomations) : ;;
+*)
+  echo "ERROR: account must be wrighterik77 or lovelainautomations" >&2
+  exit 2
+  ;;
 esac
 
-DO_IMPORT=0; DRY_RUN=0
+DO_IMPORT=0
+DRY_RUN=0
 for arg in "${@:3}"; do
   case "$arg" in
-    --import) DO_IMPORT=1 ;;
-    --dry-run) DRY_RUN=1 ;;
-    *) echo "ERROR: unknown option: $arg" >&2; usage 2 ;;
+  --import) DO_IMPORT=1 ;;
+  --dry-run) DRY_RUN=1 ;;
+  *)
+    echo "ERROR: unknown option: $arg" >&2
+    usage 2
+    ;;
   esac
 done
 
-[ -f "$INPUT" ] || { echo "ERROR: cookie file not found: $INPUT" >&2; exit 2; }
+[ -f "$INPUT" ] || {
+  echo "ERROR: cookie file not found: $INPUT" >&2
+  exit 2
+}
 
 REPO="${NFP_REPO:-$HOME/Clan/NFP}"
 SOPS_FILE="$REPO/layers/00-cyberia/03-treasure/secrets/external_services.yaml"
 KEY="gmail_cookies_${ACCOUNT}"
 export SOPS_AGE_KEY_FILE="${SOPS_AGE_KEY_FILE:-$HOME/.config/sops/age/keys.txt}"
 
-[ -f "$SOPS_FILE" ] || { echo "ERROR: SOPS file missing: $SOPS_FILE" >&2; exit 2; }
-command -v sops >/dev/null || { echo "ERROR: sops not in PATH" >&2; exit 2; }
-command -v python3 >/dev/null || { echo "ERROR: python3 not in PATH" >&2; exit 2; }
+[ -f "$SOPS_FILE" ] || {
+  echo "ERROR: SOPS file missing: $SOPS_FILE" >&2
+  exit 2
+}
+command -v sops >/dev/null || {
+  echo "ERROR: sops not in PATH" >&2
+  exit 2
+}
+command -v python3 >/dev/null || {
+  echo "ERROR: python3 not in PATH" >&2
+  exit 2
+}
 
 umask 077
 WORK="$(mktemp -d /dev/shm/gmailcookies.XXXXXX)"
@@ -191,8 +214,9 @@ if ! sops set --value-file "$SOPS_FILE" "[\"$KEY\"]" "$WORK/sops-value.json"; th
 fi
 
 # ── 4. Verify round-trip without printing the value ───────────────────────
-sops -d --extract "[\"$KEY\"]" "$SOPS_FILE" > "$WORK/verify.txt" 2>/dev/null || true
-COUNT="$(python3 - "$WORK/verify.txt" <<'PY'
+sops -d --extract "[\"$KEY\"]" "$SOPS_FILE" >"$WORK/verify.txt" 2>/dev/null || true
+COUNT="$(
+  python3 - "$WORK/verify.txt" <<'PY'
 import json, sys
 raw = open(sys.argv[1], encoding="utf-8", errors="replace").read().strip()
 try:
@@ -223,11 +247,15 @@ if [ "$DO_IMPORT" -eq 1 ]; then
   if [ -z "${CAMOFOX_API_KEY:-}" ]; then
     echo "WARN: CAMOFOX_API_KEY unset; skipping live import." >&2
   else
-    { printf '{"cookies":'; cat "$WORK/normalized.json"; printf '}'; } > "$WORK/body.json"
+    {
+      printf '{"cookies":'
+      cat "$WORK/normalized.json"
+      printf '}'
+    } >"$WORK/body.json"
     if curl -sf -X POST "$CAMOFOX_URL/sessions/${ACCOUNT}/cookies" \
-        -H "Authorization: Bearer ${CAMOFOX_API_KEY}" \
-        -H "Content-Type: application/json" \
-        --data-binary @"$WORK/body.json" >/dev/null; then
+      -H "Authorization: Bearer ${CAMOFOX_API_KEY}" \
+      -H "Content-Type: application/json" \
+      --data-binary @"$WORK/body.json" >/dev/null; then
       echo "OK: cookies imported into live Camofox session '${ACCOUNT}'."
     else
       echo "WARN: live import failed (is Camofox running on ${CAMOFOX_URL}?)." >&2

@@ -184,7 +184,10 @@ final: prev: {
         stripRoot = false;
       };
 
-      nativeBuildInputs = [ final.makeWrapper final.patchelf ];
+      nativeBuildInputs = [
+        final.makeWrapper
+        final.patchelf
+      ];
       dontBuild = true;
       dontConfigure = true;
       dontFixup = true;

@@ -228,6 +228,8 @@ in
           linux-wallpaperengine
           ffmpeg
           mpvpaper
+          inputs.gslapper.packages.${pkgs.stdenv.hostPlatform.system}.default
+          socat
           libsecret
           python3
           ai-usagebar

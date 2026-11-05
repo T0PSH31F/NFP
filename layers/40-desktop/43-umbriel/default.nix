@@ -1580,7 +1580,7 @@ in
             [Desktop Entry]
             Name=Umbriel (UWSM)
             Comment=Umbriel Wayland compositor managed by UWSM
-            Exec=''${pkgs.uwsm}/bin/uwsm start -F -N "Umbriel" -D Umbriel -C "Umbriel Wayland compositor managed by UWSM" -- /run/current-system/sw/bin/umbriel
+            Exec=${pkgs.uwsm}/bin/uwsm start -F -N "Umbriel" -D Umbriel -C "Umbriel Wayland compositor managed by UWSM" -- /run/current-system/sw/bin/umbriel
             Type=Application
             DesktopNames=Umbriel
           '';

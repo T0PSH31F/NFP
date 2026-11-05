@@ -841,9 +841,15 @@
           # ExtremeRouter integration
           OPENAI_API_KEY=${config.sops.placeholder.extremerouter_api_key}
           EXTREMEROUTER_API_KEY=${config.sops.placeholder.extremerouter_api_key}
-          EXTREMEROUTER_BASE_URL=http://${if config.networking.hostName == "z0r0" then "127.0.0.1" else "z0r0.nfp.nix"}:20128/v1
-          OPENAI_BASE_URL=http://${if config.networking.hostName == "z0r0" then "127.0.0.1" else "z0r0.nfp.nix"}:20128/v1
-          ANTHROPIC_BASE_URL=http://${if config.networking.hostName == "z0r0" then "127.0.0.1" else "z0r0.nfp.nix"}:20128/v1
+          EXTREMEROUTER_BASE_URL=http://${
+            if config.networking.hostName == "z0r0" then "127.0.0.1" else "z0r0.nfp.nix"
+          }:20128/v1
+          OPENAI_BASE_URL=http://${
+            if config.networking.hostName == "z0r0" then "127.0.0.1" else "z0r0.nfp.nix"
+          }:20128/v1
+          ANTHROPIC_BASE_URL=http://${
+            if config.networking.hostName == "z0r0" then "127.0.0.1" else "z0r0.nfp.nix"
+          }:20128/v1
 
           # Kong AI Gateway — unified LLM routing (routes to ExtremeRouter, FreeLLMAPI, etc.)
           KONG_API_KEY=${config.sops.placeholder.kong_key_hermes}
