@@ -103,7 +103,7 @@ in
       wantedBy = [ "timers.target" ];
       timerConfig = {
         OnBootSec = "2m";
-        OnUnitActiveSec = cfg.interval;
+        OnUnitInactiveSec = cfg.interval;
         Persistent = true;
       };
     };
