@@ -464,11 +464,11 @@ with lib;
           ensureDBOwnership = true;
         })
         ++ (optional config.services.mautrix-bridges.instagram.enable {
-          name = "mautrix-instagram";
+          name = "mautrix-meta-instagram";
           ensureDBOwnership = true;
         })
         ++ (optional config.services.mautrix-bridges.facebook.enable {
-          name = "mautrix-facebook";
+          name = "mautrix-meta-facebook";
           ensureDBOwnership = true;
         });
     };
