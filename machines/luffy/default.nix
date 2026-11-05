@@ -379,8 +379,8 @@ in
       signal.enable = true;
       telegram.enable = true;
       discord.enable = true;
-      instagram.enable = false; # Unconfigured: tokens/migration not configured
-      facebook.enable = false; # Unconfigured: tokens/migration not configured
+      instagram.enable = true;
+      facebook.enable = true;
       # Disabled 2026-11-04: same unconfigured-bridge failure as linkedin —
       # stock sample config, no appservice registration, exit 20
       # "Homeserver domain is not set" on every boot.

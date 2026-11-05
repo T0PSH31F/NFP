@@ -267,17 +267,26 @@ with lib;
           domain = config.services.mautrix-bridges.homeserverDomain;
         };
         appservice = {
+          id = "instagram";
+          bot = {
+            username = "instagrambot";
+            displayname = "Instagram bridge bot";
+          };
           address = "http://localhost:${toString config.services.mautrix-bridges.instagram.port}";
           port = config.services.mautrix-bridges.instagram.port;
-          database = {
-            type = "postgres";
-            uri = "postgresql:///mautrix-instagram?host=/run/postgresql";
-          };
+        };
+        network = {
+          mode = "instagram";
+        };
+        database = {
+          type = "postgres";
+          uri = "postgresql:///mautrix-instagram?host=/run/postgresql";
         };
         bridge = {
           permissions = {
             "*" = "relay";
             ${config.services.mautrix-bridges.homeserverDomain} = "user";
+            "@t0psh31f:${config.services.mautrix-bridges.homeserverDomain}" = "admin";
           };
         };
       };
@@ -292,17 +301,26 @@ with lib;
           domain = config.services.mautrix-bridges.homeserverDomain;
         };
         appservice = {
+          id = "facebook";
+          bot = {
+            username = "facebookbot";
+            displayname = "Facebook bridge bot";
+          };
           address = "http://localhost:${toString config.services.mautrix-bridges.facebook.port}";
           port = config.services.mautrix-bridges.facebook.port;
-          database = {
-            type = "postgres";
-            uri = "postgresql:///mautrix-facebook?host=/run/postgresql";
-          };
+        };
+        network = {
+          mode = "facebook";
+        };
+        database = {
+          type = "postgres";
+          uri = "postgresql:///mautrix-facebook?host=/run/postgresql";
         };
         bridge = {
           permissions = {
             "*" = "relay";
             ${config.services.mautrix-bridges.homeserverDomain} = "user";
+            "@t0psh31f:${config.services.mautrix-bridges.homeserverDomain}" = "admin";
           };
         };
       };
