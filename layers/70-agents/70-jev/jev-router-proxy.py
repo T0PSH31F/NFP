@@ -46,6 +46,13 @@ LANGFUSE_HOST = os.environ.get("LANGFUSE_HOST", "http://127.0.0.1:3005")
 JEV_ENGINE_TIMEOUT_MS = float(os.environ.get("JEV_ENGINE_TIMEOUT_MS", "50.0"))
 MAX_ATTEMPTS = int(os.environ.get("JEV_MAX_ATTEMPTS", "3"))
 
+# Confidence gating. The Jev engine can return a flat prior (e.g. 0.25 across
+# four tiers) when it cannot discriminate; gating on that would escalate every
+# request. We therefore only act on the engine when its distribution is
+# non-uniform, and only for requests that had no explicit tier/voice hint.
+JEV_CONFIDENCE_THRESHOLD = float(os.environ.get("JEV_CONFIDENCE_THRESHOLD", "0.60"))
+JEV_UNIFORM_EPS = float(os.environ.get("JEV_UNIFORM_EPS", "0.001"))
+
 # ── Canonical Tier Definitions & Router Combo Mapping ─────────────────────
 TIER_ORDER = ["voice-fast", "free-first", "cascade-balanced", "frontier"]
 
@@ -314,6 +321,36 @@ def select_tier_and_model(
     else:
         tier = "free-first"
         reason = "short_general_turn"
+
+    # 1b. Confidence-gated use of the Jev engine (opt-in by distribution).
+    # Deterministic rules above stay authoritative: we only adopt the engine's
+    # tier when it actually discriminates (non-uniform prior), and we escalate
+    # one tier when its confidence is below threshold. A flat 0.25 prior is
+    # ignored rather than treated as "low confidence", which would otherwise
+    # escalate every request and defeat the budget goal.
+    if (
+        engine_result
+        and requested_model not in TIER_ORDER
+        and consumer not in ("voice", "hermes-voice")
+        and headers_lower.get("x-voice-turn") != "true"
+    ):
+        dec = (engine_result.get("decisions") or {}).get("target_tier") or {}
+        val = dec.get("value")
+        conf = dec.get("confidence")
+        probs = dec.get("probabilities") or {}
+        if val in TIER_ORDER and isinstance(conf, (int, float)) and probs:
+            top = max(probs.values())
+            uniform = top <= (1.0 / len(TIER_ORDER)) + JEV_UNIFORM_EPS
+            if not uniform:
+                tier = val
+                reason = f"jev_engine:{val}({conf:.2f})"
+                if conf < JEV_CONFIDENCE_THRESHOLD:
+                    # Move exactly one tier. escalate_tier() intentionally jumps
+                    # voice-fast -> cascade-balanced on *failure*, which would
+                    # skip the free tier here; confidence escalation should not.
+                    nxt_idx = min(len(TIER_ORDER) - 1, TIER_ORDER.index(tier) + 1)
+                    tier = TIER_ORDER[nxt_idx]
+                    reason += f"+low_confidence(<{JEV_CONFIDENCE_THRESHOLD:.2f})"
 
     # 2. Enforce tool-bearing guardrail: never route tools to free-first
     if has_tools and tier in ("free-first", "voice-fast"):
