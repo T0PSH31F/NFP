@@ -15,6 +15,7 @@ Usage:
 import argparse
 import datetime
 import json
+import os
 import shutil
 import sqlite3
 import sys
@@ -65,6 +66,12 @@ def main():
     ap.add_argument("--db", required=True)
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
+
+    # Never create the DB: sqlite would happily make an empty one and the
+    # container would then start against a blank schema.
+    if not os.path.exists(args.db):
+        print(f"db not found at {args.db}; nothing to do")
+        return 0
 
     stamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
     backup = f"{args.db}.bak-{stamp}"

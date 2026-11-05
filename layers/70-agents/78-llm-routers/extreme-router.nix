@@ -317,6 +317,24 @@ with lib;
         };
 
         # Firewall: open port on tailscale0 interface ONLY (loopback is allowed by default)
+        # Converge combo definitions (free-tier connectors) before the container
+        # starts. Idempotent: appends only models that are missing, and exits
+        # harmlessly when the DB does not exist yet. Placed before the podman
+        # unit because SQLite must not be written while the app is running.
+        systemd.services.extreme-router-combos = {
+          description = "ExtremeRouter — merge free-tier connectors into combos";
+          before = [ "podman-extreme-router.service" ];
+          wantedBy = [ "multi-user.target" ];
+          serviceConfig = {
+            Type = "oneshot";
+            RemainAfterExit = true;
+          };
+          script = ''
+            ${pkgs.python3}/bin/python3 ${./extreme-router-combos.py} \
+              --db ${cfg.dataDir}/db/data.sqlite || true
+          '';
+        };
+
         networking.firewall.interfaces."tailscale0".allowedTCPPorts = [ cfg.port ];
 
         # MITM proxy root CA certificate trust
