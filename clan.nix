@@ -140,6 +140,7 @@ in
               inputs.nixarr.nixosModules.default
               inputs.nixos-telemetry.nixosModules.default
               inputs.nixos-passthru-cache.nixosModules.nixos-passthru-cache
+              inputs.jarvis.nixosModules.default
             ];
           }
         )
@@ -163,6 +164,7 @@ in
               inputs.nixarr.nixosModules.default
               inputs.nixos-telemetry.nixosModules.default
               inputs.nixos-passthru-cache.nixosModules.nixos-passthru-cache
+              inputs.jarvis.nixosModules.default
             ];
 
             # nixarr-py rebuild: nixarr/lib/nixarr-py/python-deps.nix keys a
@@ -207,6 +209,7 @@ in
               inputs.nixarr.nixosModules.default
               inputs.nixos-telemetry.nixosModules.default
               inputs.nixos-passthru-cache.nixosModules.nixos-passthru-cache
+              inputs.jarvis.nixosModules.default
             ];
           }
         )

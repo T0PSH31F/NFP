@@ -1533,6 +1533,26 @@
         "type": "github"
       }
     },
+    "jarvis": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "systems": [
+          "systems"
+        ]
+      },
+      "locked": {
+        "lastModified": 1793913530,
+        "narHash": "sha256-38ZAgrVFJqIYZl9vyQlEO6DFdQdkxMO4JMFmQU3HJdY=",
+        "path": "/home/t0psh31f/Clan/Jarvis",
+        "type": "path"
+      },
+      "original": {
+        "path": "/home/t0psh31f/Clan/Jarvis",
+        "type": "path"
+      }
+    },
     "jerry": {
       "inputs": {
         "flake-parts": [
@@ -3228,6 +3248,7 @@
         "hister": "hister",
         "home-manager": "home-manager",
         "impermanence": "impermanence",
+        "jarvis": "jarvis",
         "jerry": "jerry",
         "llm-agents": "llm-agents",
         "lobster": "lobster",

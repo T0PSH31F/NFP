@@ -11,8 +11,6 @@
     ./17-app-runtimes
     ./18-peripherals
     ./19-optimizations
-    ./jarvis-core.nix
     ./nas-mounts.nix
-    ./security-hardening.nix
   ];
 }

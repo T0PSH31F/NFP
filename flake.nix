@@ -191,6 +191,13 @@
         sops-nix.follows = "sops-nix";
       };
     };
+    jarvis = {
+      url = "path:/home/t0psh31f/Clan/Jarvis";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        systems.follows = "systems";
+      };
+    };
     lxconnect = {
       url = "github:olafkfreund/lxconnect";
       inputs = {
