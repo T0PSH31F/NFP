@@ -377,7 +377,7 @@ in
       homeserverDomain = "matrix.lovelain.duckdns.org";
       whatsapp.enable = true;
       signal.enable = true;
-      telegram.enable = false; # Unconfigured: telegram.api_id not configured
+      telegram.enable = true;
       discord.enable = true;
       instagram.enable = false; # Unconfigured: tokens/migration not configured
       facebook.enable = false; # Unconfigured: tokens/migration not configured

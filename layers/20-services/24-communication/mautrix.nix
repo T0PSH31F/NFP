@@ -163,6 +163,10 @@ with lib;
             port = config.services.mautrix-bridges.telegram.port;
             database = "postgresql:///mautrix-telegram?host=/run/postgresql";
           };
+          telegram = {
+            api_id = 31390088;
+            api_hash = "c84e2a4b7418a4c28739477465759eae";
+          };
           bridge = {
             permissions = {
               "*" = "relay";
