@@ -58,7 +58,8 @@ in
     services.slskd = {
       enable = true;
       openFirewall = cfg.openFirewall;
-      environmentFile = cfg.environmentFile;
+      environmentFile =
+        if (cfg.environmentFile != null) then cfg.environmentFile else pkgs.writeText "slskd.env" "";
       settings = {
         web.port = cfg.port;
         soulseek.listen_port = cfg.listenPort;
