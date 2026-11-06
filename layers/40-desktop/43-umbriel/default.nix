@@ -556,12 +556,10 @@ let
 
     lightning-shatter = {
       name = "lightning-shatter";
-      description = "Lightning & Kinetic Shatter (lightning border, liquid-glass, shockwave, shattered-glass, workspace-shatter)";
+      description = "Lightning & Kinetic Shatter (lightning border, shattered-glass, workspace-shatter)";
       effects = ''
         [effects]
         border = "lightning"
-        window = "window.liquid-glass"
-        cursor = "cursor.shockwave"
         screen = "vignette"
         max_fps = 120
 
