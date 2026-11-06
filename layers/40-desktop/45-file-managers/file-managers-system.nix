@@ -53,6 +53,8 @@
     # Dolphin File Manager (KDE)
     kdePackages.dolphin
     kdePackages.dolphin-plugins
+    kdePackages.konsole # Embedded terminal (F4) in Dolphin
+    kdePackages.ark # Archive management (zip, 7z, tar, rar context menus)
     kdePackages.kio-extras # Extra protocols support
     kdePackages.kio-admin # Admin support
     kdePackages.kdegraphics-thumbnailers # Image metadata & previews (dimensions, EXIF)

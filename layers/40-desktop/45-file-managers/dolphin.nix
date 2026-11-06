@@ -17,6 +17,14 @@
     home.packages = with pkgs; [
       kdePackages.dolphin
       kdePackages.dolphin-plugins
+      kdePackages.konsole # Embedded terminal panel (F4) & konsolepart
+      kdePackages.ark # Archive manager & context menu compression/extraction
+      kdePackages.kio-admin # Admin actions (Open/Edit as Root)
+      kdePackages.kio-extras # Advanced protocols (SFTP, MTP, SMB)
+      kdePackages.kdegraphics-thumbnailers # Graphics/photo previews
+      kdePackages.ffmpegthumbs # Video thumbnails (mp4, mkv, webm)
+      kdePackages.kimageformats # Additional image formats (AVIF, HEIF, WebP, JXL)
+      kdePackages.svgpart # Vector SVG preview panel
       kdePackages.kservice
     ];
 
