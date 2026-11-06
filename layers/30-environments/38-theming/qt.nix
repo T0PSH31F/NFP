@@ -49,7 +49,7 @@
           ${colorSchemeLine5}
           icon_theme=whitesur-icons
           standard_dialogs=default
-          style=Fusion
+          style=kvantum
 
           [Fonts]
           fixed="JetBrainsMono Nerd Font,11,-1,5,50,0,0,0,0,0"
@@ -77,7 +77,7 @@
           ${colorSchemeLine6}
           icon_theme=whitesur-icons
           standard_dialogs=default
-          style=Fusion
+          style=kvantum
 
           [Fonts]
           fixed="JetBrainsMono Nerd Font,11,-1,5,50,0,0,0,0,0"
