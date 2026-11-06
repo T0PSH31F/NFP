@@ -47,7 +47,7 @@
         text = ''
           [Appearance]
           ${colorSchemeLine5}
-          icon_theme=whitesur-icons
+          icon_theme="Acid for Inkscape"
           standard_dialogs=default
           style=kvantum
 
@@ -75,7 +75,7 @@
         text = ''
           [Appearance]
           ${colorSchemeLine6}
-          icon_theme=whitesur-icons
+          icon_theme="Acid for Inkscape"
           standard_dialogs=default
           style=kvantum
 

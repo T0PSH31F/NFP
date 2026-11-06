@@ -34,8 +34,8 @@
           package = pkgs.adw-gtk3;
         };
         iconTheme = {
-          name = "whitesur-icons";
-          package = pkgs.whitesur-icon-theme;
+          name = "Acid for Inkscape";
+          package = null;
         };
         font = {
           name = "JetBrainsMono Nerd Font";
@@ -57,7 +57,7 @@
       dconf.settings."org/gnome/desktop/interface" = {
         color-scheme = "prefer-dark";
         gtk-theme = "adw-gtk3-dark";
-        icon-theme = "whitesur-icons";
+        icon-theme = "Acid for Inkscape";
         font-name = "JetBrainsMono Nerd Font 15";
       };
     };
