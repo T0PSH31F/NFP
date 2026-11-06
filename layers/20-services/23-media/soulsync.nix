@@ -52,7 +52,7 @@ in
     ];
 
     virtualisation.oci-containers.containers.soulsync = {
-      image = "boulderbadgedad/soulsync:latest";
+      image = "docker.io/boulderbadgedad/soulsync:latest";
       autoStart = true;
       ports = [
         "${toString cfg.port}:8008"
