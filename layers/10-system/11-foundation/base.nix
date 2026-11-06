@@ -33,6 +33,11 @@
   # Ensure user local bin (~/.local/bin) is available in system environment PATH
   environment.localBinInPath = true;
 
+  # Fix Realtek RTS5260 PCIe card reader I/O timeouts by disabling MSI
+  boot.extraModprobeConfig = ''
+    options rtsx_pci msi_en=0
+  '';
+
   imports = [
     inputs.home-manager.nixosModules.home-manager
     inputs.sops-nix.nixosModules.sops
