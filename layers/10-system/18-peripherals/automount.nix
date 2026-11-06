@@ -11,7 +11,7 @@ in
   config = lib.mkIf cfg.enable {
     services = {
       udisks2.enable = true;
-      devmon.enable = true;
+      devmon.enable = false;
       gvfs.enable = true;
       udev.extraRules = ''
         # Poll removable block devices (USB hubs/readers) every 2s for partition changes

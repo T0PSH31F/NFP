@@ -87,6 +87,7 @@ with lib;
       systemd.services.libvirtd = {
         after = [ "network-online.target" ];
         wants = [ "network-online.target" ];
+        wantedBy = lib.mkForce [ ]; # Start on-demand via libvirtd.socket, not at boot
         serviceConfig = {
           # libvirtd exits with status 1 after 120s idle timeout.
           # Socket activation restarts it on demand.

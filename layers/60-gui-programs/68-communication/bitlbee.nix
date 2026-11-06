@@ -105,6 +105,9 @@ in
       inherit (cfg) extraDefaults;
     };
 
+    # Do not auto-start at boot; start manually on-demand via systemctl start bitlbee
+    systemd.services.bitlbee.wantedBy = lib.mkForce [ ];
+
     # Open firewall only on loopback — IRC clients connect locally.
     # Uncomment and adjust if you expose BitlBee to a LAN IRC client:
     # networking.firewall.allowedTCPPorts = [ cfg.port ];
