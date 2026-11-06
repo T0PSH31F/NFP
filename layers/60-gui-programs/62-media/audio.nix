@@ -62,6 +62,7 @@
         musikcube
         clementine
         strawberry
+        feishin # Modern desktop Navidrome/Jellyfin/Subsonic client
         wrtag
       ];
     };

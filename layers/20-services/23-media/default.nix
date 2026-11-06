@@ -10,5 +10,7 @@
     ./romm.nix
     ./feishin.nix
     ./navidrome.nix
+    ./slskd.nix
+    ./soulsync.nix
   ];
 }

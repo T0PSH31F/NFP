@@ -76,6 +76,8 @@
       sessionResilience.enable = true;
     };
     layer-20.services.media.navidrome.enable = true;
+    layer-20.services.media.slskd.enable = true;
+    layer-20.services.media.soulsync.enable = true;
     layer-60.gui.media-packages.enable = true;
     layer-60.gui.qutebrowser.enable = true;
     layer-75.mcp.lxconnect.enable = true;
