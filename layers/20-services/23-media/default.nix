@@ -9,5 +9,6 @@
     ./usenet.nix
     ./romm.nix
     ./feishin.nix
+    ./navidrome.nix
   ];
 }

@@ -50,6 +50,16 @@
 
   programs.herdr.enable = true;
 
+  services.feishin = {
+    enable = true;
+    mode = "desktop";
+    serverConnection = {
+      url = "http://100.64.0.1:4533";
+      serverType = "navidrome";
+      name = "z0r0 Navidrome";
+    };
+  };
+
   # ============================================================================
   # 02 - LAYERED FEATURE FLAGS (Overrides)
   # ============================================================================
