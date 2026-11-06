@@ -1051,7 +1051,7 @@ let
       [keybinds]
       "Mod+Return" = { action = "spawn:ghostty", repeat = false }
       "Mod" = { action = "overview-toggle", repeat = false }
-      "Mod+Space" = "spawn:noctalia msg panel-toggle launcher"
+      "Mod+Space" = { action = "spawn:vicinae toggle", repeat = false }
       "Mod+A" = "spawn:noctalia msg panel-toggle launcher"
       "Mod+X" = "spawn:noctalia msg panel-toggle control-center"
       "Mod+E" = { action = "spawn:dolphin", repeat = false }
@@ -1106,7 +1106,7 @@ let
       "Mod+Print" = { action = "spawn:/home/t0psh31f/.local/bin/hypr-screenshot menu", repeat = false }
       "Mod+Ctrl+S" = { action = "spawn:/home/t0psh31f/.local/bin/hypr-screenshot region", repeat = false }
       "Mod+T" = { action = "scratchpad-toggle:terminal", repeat = false }
-      "Mod+Y" = { action = "scratchpad-toggle:yazelix", repeat = false }
+      "Mod+Y" = { action = "scratchpad-toggle:yazi", repeat = false }
       "Mod+Shift+Y" = { action = "scratchpad-toggle:yazelix", repeat = false }
       "Mod+F" = { action = "window-toggle-fullscreen", repeat = false }
       "Mod+M" = { action = "window-toggle-maximize-to-edges", repeat = false }
@@ -1221,6 +1221,10 @@ let
       spawn_when_empty = "ghostty --title='Dropdown Terminal'"
 
       [[scratchpad]]
+      name = "yazi"
+      spawn_when_empty = "ghostty --title='Yazi Sidebar' -e yazi"
+
+      [[scratchpad]]
       name = "yazelix"
       spawn_when_empty = "ghostty --title='Yazelix Workspace' -e yazelix-workspace"
 
@@ -1246,7 +1250,20 @@ let
       blur = true
 
       [[window_rule]]
-      match.title = "^Yazelix Workspace$"
+      match.title = "^Yazi Sidebar$"
+      default_scratchpad = "yazi"
+      default_floating = true
+      default_floating_size_px = { width = 860, height = 1026 }
+      default_position = { anchor = "left", x = 0, y = 0 }
+      border_effect = "off"
+      window_effect = "off"
+      border_width = 0
+      corner_radius = 20
+      opacity = 0.90
+      blur = true
+
+      [[window_rule]]
+      match.title = "^Yazelix (Workspace|Sidebar)$"
       default_scratchpad = "yazelix"
       default_floating = true
       default_floating_size_px = { width = 860, height = 1026 }
