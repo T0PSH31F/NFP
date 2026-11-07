@@ -57,7 +57,7 @@ in
   config = mkIf cfg.enable {
     services.slskd = {
       enable = true;
-      openFirewall = cfg.openFirewall;
+      inherit (cfg) openFirewall;
       environmentFile =
         if (cfg.environmentFile != null) then cfg.environmentFile else pkgs.writeText "slskd.env" "";
       settings = {
@@ -98,7 +98,7 @@ in
     nfp.services.slskd = {
       enable = true;
       host = config.networking.hostName;
-      port = cfg.port;
+      inherit (cfg) port;
       homepage = {
         enable = true;
         category = "brook";

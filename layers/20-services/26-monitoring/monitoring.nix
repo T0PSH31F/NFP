@@ -588,11 +588,6 @@ in
                 metrics_path = "/metrics";
                 static_configs = [ { targets = [ "127.0.0.1:20132" ]; } ];
               }
-              # OpenTelemetry Collector internal metrics
-              (mkIf (config.layers.layer-20.services.config.telemetry.enable or false) {
-                job_name = "otel-collector";
-                static_configs = [ { targets = [ "127.0.0.1:8888" ]; } ];
-              })
             ]
             ++ contractBlackboxScrapeConfigs
             ++ aiProbeScrapeConfigs;

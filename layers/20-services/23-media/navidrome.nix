@@ -39,7 +39,7 @@ in
   config = mkIf cfg.enable {
     services.navidrome = {
       enable = true;
-      openFirewall = cfg.openFirewall;
+      inherit (cfg) openFirewall;
       settings = {
         Address = "0.0.0.0";
         Port = cfg.port;
@@ -62,7 +62,7 @@ in
     nfp.services.navidrome = {
       enable = true;
       host = config.networking.hostName;
-      port = cfg.port;
+      inherit (cfg) port;
       homepage = {
         enable = true;
         category = "brook";

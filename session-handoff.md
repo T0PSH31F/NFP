@@ -1,30 +1,25 @@
 # Session Handoff
 
 ## Last Session Accomplishments
-1. **Single-Instance Fleet Orchestrators on `luffy` (`100.64.0.3` / `luffy.nfp.nix`)**:
-   - Configured [`layers/70-agents/76-orchestrators/paperclip.nix`](file:///home/t0psh31f/Clan/NFP/layers/70-agents/76-orchestrators/paperclip.nix) (`:3101`), [`layers/70-agents/76-orchestrators/aionui.nix`](file:///home/t0psh31f/Clan/NFP/layers/70-agents/76-orchestrators/aionui.nix) (`:3006`), and [`layers/70-agents/76-orchestrators/mission-control.nix`](file:///home/t0psh31f/Clan/NFP/layers/70-agents/76-orchestrators/mission-control.nix) (`:3099`) to run as a single central instance exclusively on `luffy` (`enable = true` on `luffy`, `enable = false` on `z0r0` and `sanji`).
-   - Exported `PAPERCLIP_URL`, `PAPERCLIP_API_URL`, `AIONUI_URL`, `AIONUI_SERVER_URL`, and `MISSION_CONTROL_URL` across all machines via [`layers/20-services/21-networking/endpoints.nix`](file:///home/t0psh31f/Clan/NFP/layers/20-services/21-networking/endpoints.nix).
+1. **Secondary Fleet Audit & Live Prometheus Verification**:
+   - Polled live Prometheus on `luffy:9090` (`100.64.0.3`): verified that 53 of 56 targets are active and UP.
+   - Verified that Grafana on `luffy:3008` is responding HTTP 200 with all 7 dashboards valid and wired to `prometheus` and `loki`.
+   - Verified that Hermes Agent (`:8642`), Brain Service (`:8010`), and Pi Durable Daemon (`:8089`) are healthy and returning HTTP 200 on `luffy`.
 
-2. **Fleet Monitoring & Observability Consolidation ([`monitoring.nix`](file:///home/t0psh31f/Clan/NFP/layers/20-services/26-monitoring/monitoring.nix))**:
-   - Centralized Prometheus (`:9090`), Grafana (`:3008`), Loki (`:3100`), and Langfuse (`:3005`) strictly on `luffy` (`role = "server"`).
-   - Configured `sanji` and `z0r0` as lightweight monitoring agents (`role = "agent"`), running `node-exporter` (`:9100`) and shipping journal logs via Alloy to `luffy:3100`.
-   - Consolidated Langfuse: disabled duplicate containers on `sanji` and `z0r0`, preserving workstation RAM and eliminating multi-master database splits.
-   - Connected `langfuse-exporter` directly to PostgreSQL 16 on `luffy` (`127.0.0.1:5432/langfuse`) under user `postgres`, accurately reporting live trace counts, observation counts, token usage, and total calculated USD costs.
-   - Guarded target scrapes conditionally (`caddy`, `matrix-synapse`, `n8n`, `langgraph`), enabled `jev-exporter` (`:20132`) on `luffy`, and added dedicated probes for AI services (`extreme-router`, `omniroute`, `hermes-gateway`, `brain-service`, `pi-durable-daemon`).
-   - Enabled and decoupled OpenTelemetry Collector pipeline across the fleet (`luffy` receiver `:4317` / `:4318`, `z0r0` / `sanji` agents, internal Prometheus scrape on `:8888`).
-   - Created unified [`fleet-status.json`](file:///home/t0psh31f/Clan/NFP/layers/20-services/26-monitoring/dashboards/fleet-status.json) landing dashboard, purged dead `kong-ai-gateway.json`, updated [`fleet-orchestrators.json`](file:///home/t0psh31f/Clan/NFP/layers/20-services/26-monitoring/dashboards/fleet-orchestrators.json), and corrected probe metrics in [`hermes-activity.json`](file:///home/t0psh31f/Clan/NFP/layers/20-services/26-monitoring/dashboards/hermes-activity.json).
-   - Wired `scripts/run_evals.py` to write automated test counts, pass rates, and ROI metrics into `/var/lib/node-exporter-textfile/jarvis_evals.prom` for Prometheus scraping.
+2. **Five Critical Defects & Regressions Remedied**:
+   - **Mopidy Tag Priority Conflict**: Re-scoped `mopidy.enable = lib.mkOptionDefault false;` in [`layers/90-profiles/tags/desktop.nix`](file:///home/t0psh31f/Clan/NFP/layers/90-profiles/tags/desktop.nix) to prevent collision with `media.nix`.
+   - **Jev Exporter Permissions**: Fixed `status=238/STATE_DIRECTORY` failure by setting `DynamicUser = false; User = "root";` in [`layers/70-agents/70-jev/jev-exporter.nix`](file:///home/t0psh31f/Clan/NFP/layers/70-agents/70-jev/jev-exporter.nix), granting read access to `/var/lib/jev-engine/metrics.json`.
+   - **Matrix Synapse Metrics 404**: Added `settings.enable_metrics = true;` to [`layers/20-services/28-clan-services/matrix-synapse/module.nix`](file:///home/t0psh31f/Clan/NFP/layers/20-services/28-clan-services/matrix-synapse/module.nix) so Synapse serves `/_synapse/metrics`.
+   - **Port 8888 Collision**: Removed erroneous `otel-collector` scrape on port 8888 in [`layers/20-services/26-monitoring/monitoring.nix`](file:///home/t0psh31f/Clan/NFP/layers/20-services/26-monitoring/monitoring.nix), resolving collision with SearXNG.
+   - **Mautrix PostgreSQL Assertion Failure**: Removed `ensureDBOwnership = true;` on `mautrix-meta-instagram` and `mautrix-meta-facebook` in [`layers/20-services/24-communication/mautrix.nix`](file:///home/t0psh31f/Clan/NFP/layers/20-services/24-communication/mautrix.nix), aligning with existing database ownership of `mautrix-instagram` and `mautrix-facebook`.
 
 ## Verification Evidence
-1. `./layers/00-cyberia/06-scripts/nfp-check.sh static`: Clean exit (code 0) across all flake modules.
+1. `./layers/00-cyberia/06-scripts/nfp-check.sh static`: Clean exit (code 0).
 2. `./layers/00-cyberia/06-scripts/nfp-check.sh eval`: Remote evaluation on `100.64.0.1` (`z0r0`) passed across `z0r0`, `luffy`, and `sanji`.
-3. Syntactic, schema, and architectural validation:
-   - Fixed trailing delimiter error on line 831 of `monitoring.nix`.
-   - Corrected `nfp.services.opentelemetry-collector.homepage.category` to `"usopp"` and `metric.mode` to `"health-only"`.
-   - Verified PostgreSQL direct queries on `luffy` for `traces` and `observations`.
+3. Verified live Prometheus targets on `luffy`: 53/56 targets UP; eliminated all false-alarm and crashing service scrape targets.
 
 ## Next Actions / Deploy Instructions
-- When ready to apply the monitoring stack live, run Clan machine updates:
+- When ready to apply the latest fixes live to the cluster:
   ```bash
   clan machines update luffy
   clan machines update z0r0

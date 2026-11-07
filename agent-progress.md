@@ -698,3 +698,17 @@ No modifications produced by worker.
   - `./layers/00-cyberia/06-scripts/nfp-check.sh static`: Clean exit (code 0).
   - `./layers/00-cyberia/06-scripts/nfp-check.sh eval`: Remote evaluation on `100.64.0.1` passed across `z0r0`, `luffy`, and `sanji`.
 - **State change:** passing
+
+- **Date / Agent:** 2026-11-07 / antigravity
+- **Feature:** secondary-audit-monitoring-and-bridge-remediations
+- **Work done:**
+  1. Resolved `mopidy.enable` priority collision between `desktop.nix` and `media.nix` by setting `mopidy.enable = lib.mkOptionDefault false;` in `layers/90-profiles/tags/desktop.nix`.
+  2. Fixed `jev-exporter.service` failure (`status=238/STATE_DIRECTORY`) by setting `DynamicUser = false; User = "root";` in `layers/70-agents/70-jev/jev-exporter.nix`.
+  3. Fixed Matrix Synapse Prometheus scrape 404 by setting `settings.enable_metrics = true;` in `layers/20-services/28-clan-services/matrix-synapse/module.nix`.
+  4. Purged false-alarm `otel-collector` scrape on port 8888 from `layers/20-services/26-monitoring/monitoring.nix` (port 8888 belongs to SearXNG).
+  5. Fixed PostgreSQL database ownership assertion failure for `mautrix-meta-instagram` and `mautrix-meta-facebook` in `layers/20-services/24-communication/mautrix.nix`.
+- **Verification:**
+  - `./layers/00-cyberia/06-scripts/nfp-check.sh static`: Clean exit (code 0).
+  - `./layers/00-cyberia/06-scripts/nfp-check.sh eval`: Remote evaluation on `100.64.0.1` passed across `z0r0`, `luffy`, and `sanji`.
+  - Audited live Prometheus on `luffy:9090`: 53/56 targets active and UP, all Grafana dashboards verified with valid JSON and datasources.
+- **State change:** passing

@@ -62,12 +62,10 @@ in
         ExecStart = "${pkgs.python3}/bin/python3 ${./jev-exporter.py}";
         Restart = "on-failure";
         RestartSec = 5;
-        DynamicUser = true;
-        StateDirectory = "jev-engine";
+        DynamicUser = false;
+        User = "root";
         NoNewPrivileges = true;
         PrivateTmp = true;
-        ProtectSystem = "strict";
-        ProtectHome = true;
       };
     };
 

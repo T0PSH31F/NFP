@@ -82,7 +82,7 @@ in
     nfp.services.soulsync = {
       enable = true;
       host = config.networking.hostName;
-      port = cfg.port;
+      inherit (cfg) port;
       homepage = {
         enable = true;
         category = "brook";
