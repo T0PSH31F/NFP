@@ -105,7 +105,7 @@ in
       tls = "headscale";
       healthcheck = {
         enable = true;
-        path = "/admin";
+        path = "/admin/";
         expectedStatus = [
           200
           302
@@ -114,11 +114,12 @@ in
       };
       homepage = {
         enable = true;
-        category = "nami";
+        category = "luffy";
         order = 15;
         title = "Headplane";
         subtitle = "Tailnet Web Console";
         icon = "headplane";
+        dashboardUrl = "http://${config.networking.hostName}.nfp.nix:${toString cfg.port}/admin/";
         metric = {
           mode = "health-only";
         };

@@ -253,7 +253,7 @@ run_mesh() {
     "luffy:9090:Prometheus:/-/healthy"
     "luffy:3100:Loki:/ready"
     "sanji:8090:Kong-Gateway:/status"
-    "sanji:3050:Headplane:/"
+    "luffy:3050:Headplane:/admin/"
     "z0r0:4318:OpenTelemetry-Collector:/"
   )
 

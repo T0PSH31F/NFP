@@ -177,10 +177,18 @@ in
   # Explicit machine boundary selection required for hybrid server+desktop.
   layers.desktop.experience = "noctalia";
 
-  # Antigravity IDE & CLI suite with FHS environment
-  layers.layer-71.harness.antigravity = {
-    enable = true;
-    enableIde = true;
+  # Agent harnesses available on central orchestrator node
+  layers.layer-71.harness = {
+    antigravity = {
+      enable = true;
+      enableIde = true;
+    };
+    claude-code.enable = true;
+    opencode.enable = true;
+    gemini-cli.enable = true;
+    herdr.enable = true;
+    pi-coding-agent.enable = true;
+    aider-chat.enable = true;
   };
 
   # Greeter follows desktop tag default (noctalia-greeter / hyprland-uwsm);

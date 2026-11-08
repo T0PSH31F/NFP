@@ -121,11 +121,15 @@ with lib;
             "${cfg.dataDir}:/app/.data"
             "/home/t0psh31f/.gemini/config/skills:/app/skills:ro"
             "/var/lib/hermes:/var/lib/hermes:ro"
+            "/run/current-system/sw/bin:/host/bin:ro"
+            "/nix/store:/nix/store:ro"
+            "/etc/profiles/per-user:/host/profiles:ro"
           ];
           environmentFiles = [
             config.clan.core.vars.generators.mission-control.files."mission-control.env".path
           ];
           environment = {
+            PATH = "/host/bin:/host/profiles/t0psh31f/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin";
             MISSION_CONTROL_DATA_DIR = "/app/.data";
             MC_ALLOW_ANY_HOST = "true";
             MC_ALLOWED_HOSTS = "luffy,luffy.nfp.nix,mission-control.nfp.nix,mission.lovelain.duckdns.org,100.64.0.3,192.168.1.54,localhost,127.0.0.1";

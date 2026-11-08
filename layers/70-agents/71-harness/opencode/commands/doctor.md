@@ -36,7 +36,7 @@ Probes the end-to-end Tailnet communication fabric across all fleet machines:
    - Prometheus Metrics (`luffy.nfp.nix:9090`)
    - Loki Log Ingestion (`luffy.nfp.nix:3100`)
    - Kong Gateway (`sanji.nfp.nix:8090`)
-   - Headplane Management (`sanji.nfp.nix:3050`)
+   - Headplane Management (`luffy.nfp.nix:3050/admin/`)
    - OpenTelemetry Collector (`z0r0.nfp.nix:4318`)
 
 ---

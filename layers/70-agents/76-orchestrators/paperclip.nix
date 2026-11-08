@@ -78,6 +78,7 @@ with lib;
   config =
     let
       cfg = config.layers.layer-76.orchestrators.paperclip;
+      primaryUser = config.layers.meta.primaryUser or "t0psh31f";
       remoteUrl = "http://${cfg.remoteHost}:${toString cfg.port}";
       allowedHosts = [
         "luffy"
@@ -259,6 +260,8 @@ with lib;
               "PAPERCLIP_AUTH_PUBLIC_BASE_URL=http://${config.networking.hostName}.nfp.nix:${toString cfg.port}"
               "BETTER_AUTH_URL=http://${config.networking.hostName}.nfp.nix:${toString cfg.port}"
               "PAPERCLIP_ALLOWED_HOSTNAMES=${lib.concatStringsSep "," allowedHosts}"
+              "PATH=/run/current-system/sw/bin:/etc/profiles/per-user/${primaryUser}/bin:/home/${primaryUser}/.nix-profile/bin:/home/${primaryUser}/.local/bin:/run/wrappers/bin:/usr/bin:/bin"
+              "HOME=/home/${primaryUser}"
             ];
           };
         };

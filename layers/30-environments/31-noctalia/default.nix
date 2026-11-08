@@ -536,6 +536,7 @@ in
                   "snappy-switcher"
                   "hyprtoolkit"
                   "opencode"
+                  "feishin"
                 ];
               };
 

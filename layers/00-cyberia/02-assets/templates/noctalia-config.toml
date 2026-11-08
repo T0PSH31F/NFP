@@ -572,7 +572,8 @@ wallpaper_scheme = "m3-content"
         "yazi",
         "zathura",
         "snappy-switcher",
-        "hyprtoolkit"
+        "hyprtoolkit",
+        "feishin"
     ]
     enable_builtin_templates = true
     enable_community_templates = true
