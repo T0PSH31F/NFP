@@ -1,27 +1,31 @@
 # Session Handoff
 
 ## Last Session Accomplishments
-1. **Secondary Fleet Audit & Live Prometheus Verification**:
-   - Polled live Prometheus on `luffy:9090` (`100.64.0.3`): verified that 53 of 56 targets are active and UP.
-   - Verified that Grafana on `luffy:3008` is responding HTTP 200 with all 7 dashboards valid and wired to `prometheus` and `loki`.
-   - Verified that Hermes Agent (`:8642`), Brain Service (`:8010`), and Pi Durable Daemon (`:8089`) are healthy and returning HTTP 200 on `luffy`.
+1. **LoveLain Cyberia Guest Portal & Authenticated Launchpad**:
+   - Designed and built a responsive, accessible single-page portal at [`layers/20-services/21-networking/portal/`](file:///home/t0psh31f/Clan/NFP/layers/20-services/21-networking/portal/) containing `index.html`, `style.css`, and `app.js`.
+   - **Guest / Unauthenticated View**: Modern dark Cyberia aesthetic with Erik Wright (`t0psh31f`) bio & portfolio, facility overview, and prominent "Access Facility // Authenticate" CTA linking to `https://auth.lovelain.duckdns.org`.
+   - **Member / Authenticated View**: Interrogates Authentik session API (`/api/v3/core/users/me/`) and unlocks the Member Launchpad featuring large interactive service cards for:
+     - **Jellyfin Cinema**: `https://jellyfin.lovelain.duckdns.org`
+     - **Audiobookshelf**: `https://audiobooks.lovelain.duckdns.org`
+     - **Komga Comics & Manga**: `https://komga.lovelain.duckdns.org`
+     - **Calibre-Web Literature**: `https://calibre.lovelain.duckdns.org`
+     - **Navidrome & Feishin Hi-Fi**: `https://navidrome.lovelain.duckdns.org`
+     - **SearXNG Metasearch**: `https://search.lovelain.duckdns.org`
+   - **Evaluator Mode Toggle**: Interactive pill button allowing instantaneous preview switching between Guest View and Member View.
+   - **Operator Subpath**: Caddy route `@internalDash path /dash*` preserves access to internal Homepage (:3007) while keeping the root domain purely for guests and members.
 
-2. **Five Critical Defects & Regressions Remedied**:
-   - **Mopidy Tag Priority Conflict**: Re-scoped `mopidy.enable = lib.mkOptionDefault false;` in [`layers/90-profiles/tags/desktop.nix`](file:///home/t0psh31f/Clan/NFP/layers/90-profiles/tags/desktop.nix) to prevent collision with `media.nix`.
-   - **Jev Exporter Permissions**: Fixed `status=238/STATE_DIRECTORY` failure by setting `DynamicUser = false; User = "root";` in [`layers/70-agents/70-jev/jev-exporter.nix`](file:///home/t0psh31f/Clan/NFP/layers/70-agents/70-jev/jev-exporter.nix), granting read access to `/var/lib/jev-engine/metrics.json`.
-   - **Matrix Synapse Metrics 404**: Added `settings.enable_metrics = true;` to [`layers/20-services/28-clan-services/matrix-synapse/module.nix`](file:///home/t0psh31f/Clan/NFP/layers/20-services/28-clan-services/matrix-synapse/module.nix) so Synapse serves `/_synapse/metrics`.
-   - **Port 8888 Collision**: Removed erroneous `otel-collector` scrape on port 8888 in [`layers/20-services/26-monitoring/monitoring.nix`](file:///home/t0psh31f/Clan/NFP/layers/20-services/26-monitoring/monitoring.nix), resolving collision with SearXNG.
-   - **Mautrix PostgreSQL Assertion Failure**: Removed `ensureDBOwnership = true;` on `mautrix-meta-instagram` and `mautrix-meta-facebook` in [`layers/20-services/24-communication/mautrix.nix`](file:///home/t0psh31f/Clan/NFP/layers/20-services/24-communication/mautrix.nix), aligning with existing database ownership of `mautrix-instagram` and `mautrix-facebook`.
+2. **Authentik Declarative Application Catalog Blueprint**:
+   - In [`layers/20-services/21-networking/authentik.nix`](file:///home/t0psh31f/Clan/NFP/layers/20-services/21-networking/authentik.nix), provisioned `/etc/authentik/blueprints/media-suite.yaml` and wired container volume `/var/lib/authentik/blueprints:/blueprints/custom`.
+   - Automatically populates Authentik's native User Library (`/if/user/#/library`) with all 6 media applications upon user sign-in.
 
 ## Verification Evidence
 1. `./layers/00-cyberia/06-scripts/nfp-check.sh static`: Clean exit (code 0).
-2. `./layers/00-cyberia/06-scripts/nfp-check.sh eval`: Remote evaluation on `100.64.0.1` (`z0r0`) passed across `z0r0`, `luffy`, and `sanji`.
-3. Verified live Prometheus targets on `luffy`: 53/56 targets UP; eliminated all false-alarm and crashing service scrape targets.
+2. `./layers/00-cyberia/06-scripts/nfp-check.sh eval`: Evaluated all 3 machines (`z0r0`, `luffy`, `sanji`) remotely on builder `100.64.0.1` with exit code 0.
+3. `nix build .#nixosConfigurations.luffy.config.layers.layer-20.services.networking.portal.package --no-link`: Built successfully in `/nix/store/7za2svc4ylc416sqbx0hfsnvk9g279p1-lovelain-cyberia-portal`.
+4. `feature_list.json`: 243 lines (under 300 cap), feature `lovelain-guest-portal-and-authenticated-launchpad` marked `passing`.
 
-## Next Actions / Deploy Instructions
-- When ready to apply the latest fixes live to the cluster:
-  ```bash
-  clan machines update luffy
-  clan machines update z0r0
-  clan machines update sanji
-  ```
+## Live Fleet Deployment
+When ready to deploy the portal live to the server:
+```bash
+clan machines update luffy
+```

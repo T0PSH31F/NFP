@@ -712,3 +712,9 @@ No modifications produced by worker.
   - `./layers/00-cyberia/06-scripts/nfp-check.sh eval`: Remote evaluation on `100.64.0.1` passed across `z0r0`, `luffy`, and `sanji`.
   - Audited live Prometheus on `luffy:9090`: 53/56 targets active and UP, all Grafana dashboards verified with valid JSON and datasources.
 - **State change:** passing
+
+- **Date / Agent:** 2026-11-08 / antigravity
+- **Feature:** lovelain-guest-portal-and-authenticated-launchpad
+- **Work done:** Designed and deployed LoveLain Cyberia Guest Portal and Authenticated Launchpad at `lovelain.duckdns.org` with responsive dark UI, Erik Wright portfolio & bio, public guest preview vs member authenticated state awareness via Authentik SSO, big fancy launch cards for shared media services (Jellyfin, Audiobookshelf, Komga, Calibre-Web, Navidrome, SearXNG), automated Authentik application catalog blueprint, and protected operator routing (`@internalDash` -> Homepage :3007).
+- **Verification:** `./layers/00-cyberia/06-scripts/nfp-check.sh static` passed clean; `./layers/00-cyberia/06-scripts/nfp-check.sh eval` remotely evaluated all 3 fleet machines (z0r0, luffy, sanji) cleanly on 100.64.0.1; `nix build .#nixosConfigurations.luffy.config.layers.layer-20.services.networking.portal.package` realized `/nix/store/7za2svc4ylc416sqbx0hfsnvk9g279p1-lovelain-cyberia-portal` containing `index.html`, `style.css`, and `app.js`.
+- **State change:** passing (evidence recorded in feature_list.json)

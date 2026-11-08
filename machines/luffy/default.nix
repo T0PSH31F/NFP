@@ -166,6 +166,9 @@ in
     server.enable = true;
   };
 
+  # LoveLain Cyberia Guest Portal & Authenticated Media Launchpad
+  layers.layer-20.services.networking.portal.enable = true;
+
   # Desktop experience: owned by tag/profile architecture.
   # luffy is hybrid server+desktop: desktop tag enables base Hyprland/Noctalia
   # via layers/90-profiles/tags/desktop.nix, and experience selector owns the
@@ -410,14 +413,7 @@ in
         email admin@lovelain.duckdns.org
       '';
       virtualHosts = {
-        "lovelain.duckdns.org" = {
-          useACMEHost = "lovelain.duckdns.org";
-          extraConfig = ''
-            encode zstd gzip
-            header Strict-Transport-Security "max-age=31536000; includeSubDomains"
-            reverse_proxy localhost:3007
-          '';
-        };
+        # lovelain.duckdns.org root domain is managed by layers.layer-20.services.networking.portal
         "*.lovelain.duckdns.org" = {
           useACMEHost = "lovelain.duckdns.org";
           extraConfig = ''

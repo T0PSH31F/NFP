@@ -85,22 +85,44 @@ in
       databases.authentik.create.enable = true;
     };
 
-    systemd.services.postgresql-authentik-setup = {
-      description = "Ensure Postgres permissions for Authentik";
-      wantedBy = [ "multi-user.target" ];
-      before = [ "podman-authentik-server.service" ];
-      after = [ "postgresql.service" ];
-      requires = [ "postgresql.service" ];
-      serviceConfig = {
-        User = "postgres";
-        Type = "oneshot";
-        RemainAfterExit = true;
-        ExecStart = pkgs.writeShellScript "setup-authentik-db" ''
-          until ${pkgs.postgresql_16}/bin/pg_isready -q; do
-            sleep 1
-          done
-          ${pkgs.postgresql_16}/bin/psql -d authentik -c "GRANT ALL ON SCHEMA public TO postgres; ALTER SCHEMA public OWNER TO postgres;" || true
-        '';
+    systemd = {
+      services.postgresql-authentik-setup = {
+        description = "Ensure Postgres permissions for Authentik";
+        wantedBy = [ "multi-user.target" ];
+        before = [ "podman-authentik-server.service" ];
+        after = [ "postgresql.service" ];
+        requires = [ "postgresql.service" ];
+        serviceConfig = {
+          User = "postgres";
+          Type = "oneshot";
+          RemainAfterExit = true;
+          ExecStart = pkgs.writeShellScript "setup-authentik-db" ''
+            until ${pkgs.postgresql_16}/bin/pg_isready -q; do
+              sleep 1
+            done
+            ${pkgs.postgresql_16}/bin/psql -d authentik -c "GRANT ALL ON SCHEMA public TO postgres; ALTER SCHEMA public OWNER TO postgres;" || true
+          '';
+        };
+      };
+
+      tmpfiles.rules = [
+        "d /var/lib/authentik 0755 root root -"
+        "d /var/lib/authentik/media 0755 root root -"
+        "d /var/lib/authentik/custom-templates 0755 root root -"
+        "d /var/lib/authentik/blueprints 0755 root root -"
+      ];
+
+      services.authentik-blueprint-sync = {
+        description = "Synchronize Authentik Media Suite Blueprints";
+        wantedBy = [ "multi-user.target" ];
+        before = [ "podman-authentik-server.service" ];
+        serviceConfig = {
+          Type = "oneshot";
+          ExecStart = pkgs.writeShellScript "sync-authentik-blueprints" ''
+            mkdir -p /var/lib/authentik/blueprints
+            cp -f /etc/authentik/blueprints/media-suite.yaml /var/lib/authentik/blueprints/media-suite.yaml
+          '';
+        };
       };
     };
 
@@ -142,6 +164,7 @@ in
         volumes = [
           "/var/lib/authentik/media:/media"
           "/var/lib/authentik/custom-templates:/templates"
+          "/var/lib/authentik/blueprints:/blueprints/custom"
           "/run/postgresql:/run/postgresql"
         ];
         extraOptions = [
@@ -162,6 +185,7 @@ in
         volumes = [
           "/var/lib/authentik/media:/media"
           "/var/lib/authentik/custom-templates:/templates"
+          "/var/lib/authentik/blueprints:/blueprints/custom"
           "/run/postgresql:/run/postgresql"
         ];
         extraOptions = [
@@ -177,11 +201,75 @@ in
       ];
     };
 
-    systemd.tmpfiles.rules = [
-      "d /var/lib/authentik 0755 root root -"
-      "d /var/lib/authentik/media 0755 root root -"
-      "d /var/lib/authentik/custom-templates 0755 root root -"
-    ];
+    # Provision default application catalog blueprint for user dashboard
+    environment.etc."authentik/blueprints/media-suite.yaml" = {
+      text = ''
+        version: 1
+        metadata:
+          name: LoveLain Media Suite
+        entries:
+          - model: authentik_core.application
+            identifiers:
+              slug: jellyfin
+            attrs:
+              name: Jellyfin Cinema
+              slug: jellyfin
+              meta_launch_url: https://jellyfin.${publicDomain}
+              meta_description: 4K HDR Movie & Television Streaming
+              meta_publisher: LoveLain Cyberia
+              open_in_new_tab: true
+          - model: authentik_core.application
+            identifiers:
+              slug: audiobookshelf
+            attrs:
+              name: Audiobookshelf
+              slug: audiobookshelf
+              meta_launch_url: https://audiobooks.${publicDomain}
+              meta_description: Unabridged Audiobooks & Podcasts
+              meta_publisher: LoveLain Cyberia
+              open_in_new_tab: true
+          - model: authentik_core.application
+            identifiers:
+              slug: komga
+            attrs:
+              name: Komga Manga & Comics
+              slug: komga
+              meta_launch_url: https://komga.${publicDomain}
+              meta_description: Digital Manga & Graphic Novels
+              meta_publisher: LoveLain Cyberia
+              open_in_new_tab: true
+          - model: authentik_core.application
+            identifiers:
+              slug: calibre-web
+            attrs:
+              name: Calibre-Web Literature
+              slug: calibre-web
+              meta_launch_url: https://calibre.${publicDomain}
+              meta_description: E-Books & Literary Manuscripts
+              meta_publisher: LoveLain Cyberia
+              open_in_new_tab: true
+          - model: authentik_core.application
+            identifiers:
+              slug: navidrome
+            attrs:
+              name: Navidrome & Feishin
+              slug: navidrome
+              meta_launch_url: https://navidrome.${publicDomain}
+              meta_description: High-Fidelity Lossless Music Streaming
+              meta_publisher: LoveLain Cyberia
+              open_in_new_tab: true
+          - model: authentik_core.application
+            identifiers:
+              slug: searxng
+            attrs:
+              name: SearXNG Metasearch
+              slug: searxng
+              meta_launch_url: https://search.${publicDomain}
+              meta_description: Private Decentralized Search Engine
+              meta_publisher: LoveLain Cyberia
+              open_in_new_tab: true
+      '';
+    };
 
     # Public Caddy Virtual Hosts
     # Strict Boundary: Only Authentik, the shared media suite, and SearXNG receive public routes.

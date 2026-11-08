@@ -9,6 +9,7 @@
     ./gateway.nix
     ./headplane.nix
     ./headscale.nix
+    ./portal.nix
     ./ssh-agent.nix
     ./tailscale.nix
     ./tailscale-sidecar.nix

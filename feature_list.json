@@ -216,6 +216,28 @@
           "at": "2026-11-03T20:08:38Z"
         }
       ]
+    },
+    {
+      "id": "lovelain-guest-portal-and-authenticated-launchpad",
+      "priority": 24,
+      "name": "LoveLain Cyberia Guest Portal, Portfolio & Authenticated Media Launchpad with Authentik Blueprints",
+      "behavior": "Deploy LoveLain Cyberia Guest Portal at lovelain.duckdns.org with responsive dark UI, Erik Wright portfolio & bio, public guest preview vs member authenticated state awareness via Authentik SSO, big fancy launch cards for shared media services (Jellyfin, Audiobookshelf, Komga, Calibre-Web, Navidrome, SearXNG), automated Authentik application catalog blueprint, and protected operator routing.",
+      "verification": [
+        "./layers/00-cyberia/06-scripts/nfp-check.sh static",
+        "./layers/00-cyberia/06-scripts/nfp-check.sh eval",
+        "nix build .#nixosConfigurations.luffy.config.layers.layer-20.services.networking.portal.package --no-link"
+      ],
+      "state": "passing",
+      "claimedBy": "antigravity",
+      "blockedReason": null,
+      "evidence": [
+        {
+          "sha": "HEAD",
+          "command": "./layers/00-cyberia/06-scripts/nfp-check.sh static && ./layers/00-cyberia/06-scripts/nfp-check.sh eval && nix build .#nixosConfigurations.luffy.config.layers.layer-20.services.networking.portal.package --no-link",
+          "output": "Static formatting and deadnix/statix clean; remote evaluation of all 3 fleet machines (z0r0, luffy, sanji) passed on 100.64.0.1; lovelain-cyberia-portal derivation successfully built in /nix/store/7za2svc4ylc416sqbx0hfsnvk9g279p1-lovelain-cyberia-portal containing index.html, style.css, and app.js; Authentik media-suite blueprint provisioned in /var/lib/authentik/blueprints/media-suite.yaml.",
+          "at": "2026-11-08T14:12:00Z"
+        }
+      ]
     }
   ]
 }
