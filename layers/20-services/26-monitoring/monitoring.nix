@@ -41,6 +41,19 @@ in
       default = "localhost";
       description = "Domain for Grafana access";
     };
+    backend = mkOption {
+      type = types.enum [
+        "prometheus"
+        "victoriametrics"
+      ];
+      default = "victoriametrics";
+      description = "Metrics storage backend: victoriametrics (recommended, ultra-low RAM) or prometheus";
+    };
+    victoriametrics.port = mkOption {
+      type = types.port;
+      default = 8428;
+      description = "VictoriaMetrics single-node port";
+    };
     prometheus.port = mkOption {
       type = types.port;
       default = 9090;
@@ -256,6 +269,199 @@ in
           }
         ) httpServices;
 
+        alertRuleGroups = [
+          {
+            name = "service-alerts";
+            rules = [
+              {
+                alert = "ServiceDown";
+                expr = "up == 0";
+                for = "5m";
+                labels = {
+                  severity = "critical";
+                };
+                annotations = {
+                  summary = "Instance {{ $labels.instance }} down";
+                  description = "Service {{ $labels.job }} target {{ $labels.instance }} is down.";
+                };
+              }
+              {
+                alert = "ServiceProbeFailed";
+                expr = "probe_success == 0";
+                for = "5m";
+                labels = {
+                  severity = "critical";
+                };
+                annotations = {
+                  summary = "Blackbox probe failed for {{ $labels.service }}";
+                  description = "Service {{ $labels.service }} target {{ $labels.instance }} probe failed.";
+                };
+              }
+              {
+                alert = "FleetHealthcheckStalled";
+                expr = "node_systemd_unit_state{name=\"fleet-healthcheck.service\", state=\"active\"} == 0";
+                for = "15m";
+                labels = {
+                  severity = "warning";
+                };
+                annotations = {
+                  summary = "Fleet healthcheck runner stalled or inactive";
+                  description = "fleet-healthcheck.service on {{ $labels.instance }} is not active.";
+                };
+              }
+              {
+                alert = "JevEngineDown";
+                expr = "jev_engine_up == 0";
+                for = "2m";
+                labels = {
+                  severity = "critical";
+                };
+                annotations = {
+                  summary = "Jev Decision Engine down";
+                  description = "Jev Decision Engine daemon on {{ $labels.instance }} is unreachable.";
+                };
+              }
+              {
+                alert = "DecisionConfidenceAnomaly";
+                expr = "rate(jev_decision_confidence_score_sum[10m]) / rate(jev_decision_confidence_score_count[10m]) < 0.60";
+                for = "10m";
+                labels = {
+                  severity = "warning";
+                };
+                annotations = {
+                  summary = "Jev decision confidence anomaly";
+                  description = "Average Jev decision confidence dropped below 0.60 over 10 minutes.";
+                };
+              }
+              {
+                alert = "HotEnterpriseLeadDetected";
+                expr = "increase(jev_decisions_total{workflow=\"lead_triage\"}[5m]) > 0";
+                labels = {
+                  severity = "critical";
+                };
+                annotations = {
+                  summary = "High-priority enterprise lead triaged";
+                  description = "New enterprise lead evaluated and staged by Jev System-1.";
+                };
+              }
+              {
+                alert = "SecurityMaliciousEmailDetected";
+                expr = "increase(jev_decisions_total{workflow=\"email_triage\"}[5m]) > 0";
+                labels = {
+                  severity = "warning";
+                };
+                annotations = {
+                  summary = "Security alert from Jev email triage";
+                  description = "Jev email triage flagged security or action-required email.";
+                };
+              }
+            ];
+          }
+        ];
+
+        allScrapeConfigs = [
+          {
+            job_name = if cfg.backend == "victoriametrics" then "victoriametrics" else "prometheus";
+            static_configs = [
+              {
+                targets = [
+                  "localhost:${
+                    toString (
+                      if cfg.backend == "victoriametrics" then
+                        cfg.victoriametrics.port
+                      else
+                        config.layers.layer-20.services.config.monitoring.prometheus.port
+                    )
+                  }"
+                ];
+              }
+            ];
+          }
+          {
+            job_name = "node";
+            static_configs = [ { targets = [ "localhost:9100" ]; } ];
+          }
+          {
+            job_name = "node-fleet";
+            static_configs = [
+              {
+                targets =
+                  map (h: "${h}.${baseDomain}:9100") (filter (h: h != localHost) fleetHosts) ++ cfg.fleetNodeTargets;
+              }
+            ];
+          }
+          {
+            job_name = "postgres";
+            static_configs = [ { targets = [ "localhost:9187" ]; } ];
+          }
+          {
+            job_name = "wireguard";
+            static_configs = [ { targets = [ "localhost:9586" ]; } ];
+          }
+          {
+            job_name = "langfuse";
+            static_configs = [ { targets = [ "localhost:9898" ]; } ];
+          }
+          {
+            job_name = "loki";
+            static_configs = [
+              {
+                targets = [
+                  "localhost:${toString config.layers.layer-20.services.config.monitoring.loki.port}"
+                ];
+              }
+            ];
+          }
+          {
+            job_name = "grafana";
+            static_configs = [
+              {
+                targets = [
+                  "localhost:${toString config.layers.layer-20.services.config.monitoring.grafana.port}"
+                ];
+              }
+            ];
+          }
+          # Caddy metrics
+          (mkIf (config.services.caddy.enable or false) {
+            job_name = "caddy";
+            metrics_path = "/metrics";
+            static_configs = [ { targets = [ "127.0.0.1:2019" ]; } ];
+          })
+          # Matrix Synapse metrics
+          (mkIf (config.services.matrix-synapse.enable or false) {
+            job_name = "matrix-synapse";
+            metrics_path = "/_synapse/metrics";
+            static_configs = [ { targets = [ "127.0.0.1:8008" ]; } ];
+          })
+          # n8n metrics
+          (mkIf (config.services.n8n.enable or false) {
+            job_name = "n8n";
+            metrics_path = "/metrics";
+            static_configs = [ { targets = [ "127.0.0.1:5678" ]; } ];
+          })
+          # LangGraph metrics
+          (mkIf (config.services.ai-services.langgraph.enable or false) {
+            job_name = "langgraph";
+            metrics_path = "/metrics";
+            static_configs = [
+              {
+                targets = [
+                  "127.0.0.1:${toString config.services.ai-services.langgraph.port}"
+                ];
+              }
+            ];
+          })
+          # Jev System-1 decision & telemetry exporter
+          {
+            job_name = "jev";
+            metrics_path = "/metrics";
+            static_configs = [ { targets = [ "127.0.0.1:20132" ]; } ];
+          }
+        ]
+        ++ contractBlackboxScrapeConfigs
+        ++ aiProbeScrapeConfigs;
+
       in
       {
         nfp.services = {
@@ -263,7 +469,7 @@ in
             enable = true;
             host = config.networking.hostName;
             bind = "127.0.0.1";
-            port = config.layers.layer-20.services.config.monitoring.prometheus.port;
+            port = if cfg.backend == "victoriametrics" then cfg.victoriametrics.port else cfg.prometheus.port;
             tailnetName = "prometheus";
             tls = "headscale";
             healthcheck = {
@@ -275,9 +481,10 @@ in
               enable = true;
               category = "usopp";
               order = 10;
-              title = "Prometheus";
-              subtitle = "Tactical Metric Radar";
-              icon = "prometheus";
+              title = if cfg.backend == "victoriametrics" then "VictoriaMetrics" else "Prometheus";
+              subtitle =
+                if cfg.backend == "victoriametrics" then "Ultra-Low RAM TSDB Radar" else "Tactical Metric Radar";
+              icon = if cfg.backend == "victoriametrics" then "victoriametrics" else "prometheus";
               metric = {
                 mode = "native-api";
                 adapter = "prometheus";
@@ -365,7 +572,7 @@ in
         # ============================================================================
         services = {
           prometheus = {
-            enable = true;
+            enable = cfg.backend == "prometheus";
             port = config.layers.layer-20.services.config.monitoring.prometheus.port;
             retentionTime = "30d";
             exporters = {
@@ -405,192 +612,32 @@ in
             };
             rules = [
               (builtins.toJSON {
-                groups = [
-                  {
-                    name = "service-alerts";
-                    rules = [
-                      {
-                        alert = "ServiceDown";
-                        expr = "up == 0";
-                        for = "5m";
-                        labels = {
-                          severity = "critical";
-                        };
-                        annotations = {
-                          summary = "Instance {{ $labels.instance }} down";
-                          description = "Service {{ $labels.job }} target {{ $labels.instance }} is down.";
-                        };
-                      }
-                      {
-                        alert = "ServiceProbeFailed";
-                        expr = "probe_success == 0";
-                        for = "5m";
-                        labels = {
-                          severity = "critical";
-                        };
-                        annotations = {
-                          summary = "Blackbox probe failed for {{ $labels.service }}";
-                          description = "Service {{ $labels.service }} target {{ $labels.instance }} probe failed.";
-                        };
-                      }
-                      {
-                        alert = "FleetHealthcheckStalled";
-                        expr = "node_systemd_unit_state{name=\"fleet-healthcheck.service\", state=\"active\"} == 0";
-                        for = "15m";
-                        labels = {
-                          severity = "warning";
-                        };
-                        annotations = {
-                          summary = "Fleet healthcheck runner stalled or inactive";
-                          description = "fleet-healthcheck.service on {{ $labels.instance }} is not active.";
-                        };
-                      }
-                      {
-                        alert = "JevEngineDown";
-                        expr = "jev_engine_up == 0";
-                        for = "2m";
-                        labels = {
-                          severity = "critical";
-                        };
-                        annotations = {
-                          summary = "Jev Decision Engine down";
-                          description = "Jev Decision Engine daemon on {{ $labels.instance }} is unreachable.";
-                        };
-                      }
-                      {
-                        alert = "DecisionConfidenceAnomaly";
-                        expr = "rate(jev_decision_confidence_score_sum[10m]) / rate(jev_decision_confidence_score_count[10m]) < 0.60";
-                        for = "10m";
-                        labels = {
-                          severity = "warning";
-                        };
-                        annotations = {
-                          summary = "Jev decision confidence anomaly";
-                          description = "Average Jev decision confidence dropped below 0.60 over 10 minutes.";
-                        };
-                      }
-                      {
-                        alert = "HotEnterpriseLeadDetected";
-                        expr = "increase(jev_decisions_total{workflow=\"lead_triage\"}[5m]) > 0";
-                        labels = {
-                          severity = "critical";
-                        };
-                        annotations = {
-                          summary = "High-priority enterprise lead triaged";
-                          description = "New enterprise lead evaluated and staged by Jev System-1.";
-                        };
-                      }
-                      {
-                        alert = "SecurityMaliciousEmailDetected";
-                        expr = "increase(jev_decisions_total{workflow=\"email_triage\"}[5m]) > 0";
-                        labels = {
-                          severity = "warning";
-                        };
-                        annotations = {
-                          summary = "Security alert from Jev email triage";
-                          description = "Jev email triage flagged security or action-required email.";
-                        };
-                      }
-                    ];
-                  }
-                ];
+                groups = alertRuleGroups;
               })
             ];
-            scrapeConfigs = [
-              {
-                job_name = "prometheus";
-                static_configs = [
-                  {
-                    targets = [
-                      "localhost:${toString config.layers.layer-20.services.config.monitoring.prometheus.port}"
-                    ];
+            scrapeConfigs = mkIf (cfg.backend == "prometheus") allScrapeConfigs;
+          };
+
+          victoriametrics = mkIf (cfg.backend == "victoriametrics") {
+            enable = true;
+            listenAddress = "127.0.0.1:${toString cfg.victoriametrics.port}";
+            retentionPeriod = "30d";
+            prometheusConfig.scrape_configs = allScrapeConfigs;
+          };
+
+          vmalert.instances.main = mkIf (cfg.backend == "victoriametrics") {
+            enable = true;
+            settings = {
+              "datasource.url" = "http://127.0.0.1:${toString cfg.victoriametrics.port}";
+              "notifier.url" = [ "http://127.0.0.1:9093" ];
+              rule = [
+                (pkgs.writeText "vmalert-rules.json" (
+                  builtins.toJSON {
+                    groups = alertRuleGroups;
                   }
-                ];
-              }
-              {
-                job_name = "node";
-                static_configs = [ { targets = [ "localhost:9100" ]; } ];
-              }
-              {
-                job_name = "node-fleet";
-                static_configs = [
-                  {
-                    targets =
-                      map (h: "${h}.${baseDomain}:9100") (filter (h: h != localHost) fleetHosts) ++ cfg.fleetNodeTargets;
-                  }
-                ];
-              }
-              {
-                job_name = "postgres";
-                static_configs = [ { targets = [ "localhost:9187" ]; } ];
-              }
-              {
-                job_name = "wireguard";
-                static_configs = [ { targets = [ "localhost:9586" ]; } ];
-              }
-              {
-                job_name = "langfuse";
-                static_configs = [ { targets = [ "localhost:9898" ]; } ];
-              }
-              {
-                job_name = "loki";
-                static_configs = [
-                  {
-                    targets = [
-                      "localhost:${toString config.layers.layer-20.services.config.monitoring.loki.port}"
-                    ];
-                  }
-                ];
-              }
-              {
-                job_name = "grafana";
-                static_configs = [
-                  {
-                    targets = [
-                      "localhost:${toString config.layers.layer-20.services.config.monitoring.grafana.port}"
-                    ];
-                  }
-                ];
-              }
-              # Caddy metrics
-              (mkIf (config.services.caddy.enable or false) {
-                job_name = "caddy";
-                metrics_path = "/metrics";
-                static_configs = [ { targets = [ "127.0.0.1:2019" ]; } ];
-              })
-              # Matrix Synapse metrics
-              (mkIf (config.services.matrix-synapse.enable or false) {
-                job_name = "matrix-synapse";
-                metrics_path = "/_synapse/metrics";
-                static_configs = [ { targets = [ "127.0.0.1:8008" ]; } ];
-              })
-              # n8n metrics
-              (mkIf (config.services.n8n.enable or false) {
-                job_name = "n8n";
-                metrics_path = "/metrics";
-                static_configs = [ { targets = [ "127.0.0.1:5678" ]; } ];
-              })
-              # LangGraph metrics
-              (mkIf (config.services.ai-services.langgraph.enable or false) {
-                job_name = "langgraph";
-                metrics_path = "/metrics";
-                static_configs = [
-                  {
-                    targets = [
-                      "127.0.0.1:${toString config.services.ai-services.langgraph.port}"
-                    ];
-                  }
-                ];
-              })
-              # Jev System-1 decision & telemetry exporter
-              {
-                job_name = "jev";
-                metrics_path = "/metrics";
-                static_configs = [ { targets = [ "127.0.0.1:20132" ]; } ];
-              }
-            ]
-            ++ contractBlackboxScrapeConfigs
-            ++ aiProbeScrapeConfigs;
+                ))
+              ];
+            };
           };
 
           alertmanager-ntfy.enable = true;
@@ -694,7 +741,11 @@ in
                   type = "prometheus";
                   uid = "prometheus";
                   access = "proxy";
-                  url = "http://127.0.0.1:${toString config.layers.layer-20.services.config.monitoring.prometheus.port}";
+                  url =
+                    if cfg.backend == "victoriametrics" then
+                      "http://127.0.0.1:${toString cfg.victoriametrics.port}"
+                    else
+                      "http://127.0.0.1:${toString config.layers.layer-20.services.config.monitoring.prometheus.port}";
                   isDefault = true;
                   editable = true;
                 }
@@ -737,7 +788,7 @@ in
         # Agents push logs to Loki and operators reach Prometheus/Grafana over the tailnet
         networking.firewall.interfaces."tailscale0".allowedTCPPorts = [
           cfg.loki.port
-          cfg.prometheus.port
+          (if cfg.backend == "victoriametrics" then cfg.victoriametrics.port else cfg.prometheus.port)
           cfg.grafana.port
         ];
 
@@ -849,6 +900,7 @@ in
             ntfy-sh
             prometheus
             prometheus-node-exporter
+            victoriametrics
           ];
 
           # Ensure data is persisted

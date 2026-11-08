@@ -74,6 +74,7 @@
 | **8096** | Jellyfin               | luffy  | `layers/20-services/23-media/media-stack.nix`     | Media Streaming Server          |
 | **8098** | RomM                   | luffy  | `layers/20-services/23-media/romm.nix`             | ROM Manager & Web Emulator      |
 | **8099** | ntfy-sh                | Both   | `layers/20-services/26-monitoring/ntfy-sh.nix`     | Push Notification Service       |
+| **8428** | VictoriaMetrics        | luffy  | `layers/20-services/26-monitoring/monitoring.nix` | High-efficiency single-node TSDB (:8428)|
 | **8443** | HTTPS Alt 1            | luffy  | `machines/luffy/default.nix`                       | Secondary TLS Ingress           |
 | **8444** | Element Web            | luffy  | `machines/luffy/default.nix`                       | Matrix Client Web App           |
 | **8686** | Lidarr                 | luffy  | `layers/20-services/23-media/media-stack.nix`     | Music Collection Manager        |
@@ -82,17 +83,20 @@
 | **8880** | Hermes Live Voice      | z0r0   | `layers/70-agents/76-hermes-agent/`                | Real-time Voice Control Gateway |
 | **8888** | SearXNG                | luffy  | `layers/20-services/27-automation/`               | Meta Search Engine              |
 | **8989** | Sonarr                 | luffy  | `layers/20-services/23-media/media-stack.nix`     | TV Series Management            |
-| **9090** | Prometheus             | Both   | `machines/*/default.nix`                           | Metrics Collection Daemon       |
+| **9000** | Authentik Web / OIDC   | luffy  | `layers/20-services/21-networking/authentik.nix`  | Identity Provider & SSO Gateway |
+| **9090** | Prometheus (Legacy)    | Both   | `machines/*/default.nix`                           | Replaced by VictoriaMetrics on luffy |
 | **9100** | Glances / Node Exporter| z0r0   | `layers/20-services/26-monitoring/`                | Node Hardware Stats Daemon      |
 | **8384** | Syncthing Web GUI      | Both   | `layers/20-services/25-data/syncthing.nix`         | Syncthing Web Management UI     |
 | **9115** | Blackbox Exporter      | z0r0   | `layers/20-services/26-monitoring/`                | HTTP Probe Exporter             |
 | **9119** | Hermes Dashboard       | z0r0   | `layers/70-agents/76-hermes-agent/`                | Hermes Agent Control Center     |
 | **9187** | Postgres Exporter      | Both   | `layers/20-services/26-monitoring/`                | PostgreSQL Database Metrics     |
+| **9443** | Authentik HTTPS        | luffy  | `layers/20-services/21-networking/authentik.nix`  | Authentik HTTPS / Outpost       |
 | **9586** | WireGuard Exporter     | Both   | `layers/20-services/26-monitoring/`                | WireGuard Mesh VPN Metrics      |
 | **9898** | Langfuse Exporter      | z0r0   | `layers/20-services/26-monitoring/`                | Custom Langfuse Metrics Exporter|
 | **9377** | Camofox Browser        | z0r0   | `machines/z0r0/default.nix`                        | Anti-Detection Browser CDP      |
 | **9696** | Prowlarr               | luffy  | `layers/20-services/23-media/media-stack.nix`     | Indexer Proxy Manager           |
 | **11434**| Ollama                 | Both   | `layers/20-services/22-ai/ollama.nix`              | Local LLM Inference Engine      |
+| **13378**| Audiobookshelf         | luffy  | `layers/20-services/23-media/nixarr.nix`          | Audiobooks & Podcasts Server    |
 | **20127**| Jev Router Pre-Flight  | z0r0   | `layers/70-agents/78-llm-routers/jev-router-plugin.nix`| Jev LLM router pre-flight optimization hook (`:20127`) |
 | **20128**| ExtremeRouter          | z0r0   | `layers/70-agents/78-llm-routers/extreme-router.nix` | Coding LLM router — 154+ providers, web UI + `/v1/*` API |
 | **20129**| OmniRoute              | luffy  | `layers/70-agents/78-llm-routers/omniroute.nix`      | Next.js LLM router & RTK compressor (moved off nami 2026-10-13) |

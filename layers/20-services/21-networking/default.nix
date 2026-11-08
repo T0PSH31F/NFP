@@ -2,6 +2,7 @@
 {
   imports = [
     ./adguard.nix
+    ./authentik.nix
     ./avahi.nix
     ./caddy.nix
     ./endpoints.nix

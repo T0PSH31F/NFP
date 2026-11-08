@@ -54,9 +54,19 @@ in
       services.caddy.virtualHosts = contractVirtualHosts;
     })
 
-    (mkIf ((config.services.prometheus.enable or false) && contractScrapeConfigs != [ ]) {
-      services.prometheus.scrapeConfigs = contractScrapeConfigs;
-    })
+    (mkIf
+      (
+        ((config.services.prometheus.enable or false) || (config.services.victoriametrics.enable or false))
+        && contractScrapeConfigs != [ ]
+      )
+      {
+        services.prometheus.scrapeConfigs = mkIf (config.services.prometheus.enable or false
+        ) contractScrapeConfigs;
+        services.victoriametrics.prometheusConfig.scrape_configs =
+          mkIf (config.services.victoriametrics.enable or false)
+            contractScrapeConfigs;
+      }
+    )
 
     (mkIf
       ((config.layers.layer-20.services.backups.restic.enable or false) && contractBackupPaths != [ ])

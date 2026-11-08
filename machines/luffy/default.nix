@@ -105,6 +105,7 @@ in
     };
   };
   layers.layer-20.services.config.your-spotify.enable = true;
+  layers.layer-20.services.auth.authentik.enable = true;
   layers.layer-76.hermes-live-voice.enable = true;
   layers.layer-78.llm-routers.jev-router-plugin = {
     enable = true;
