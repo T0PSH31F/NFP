@@ -139,6 +139,10 @@
     vim
     wget
     ghostty.terminfo
+    grafana
+    (writeShellScriptBin "grafana-cli" ''
+      exec ${grafana}/bin/grafana cli "$@"
+    '')
   ];
 
   programs.zsh.enable = true;
