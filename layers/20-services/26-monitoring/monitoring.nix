@@ -458,6 +458,20 @@ in
             metrics_path = "/metrics";
             static_configs = [ { targets = [ "127.0.0.1:20132" ]; } ];
           }
+          # Netdata metrics across the fleet
+          {
+            job_name = "netdata";
+            metrics_path = "/api/v1/allmetrics";
+            params.format = [ "prometheus" ];
+            static_configs = [
+              {
+                targets = [
+                  "localhost:19999"
+                ]
+                ++ map (h: "${h}.${baseDomain}:19999") (filter (h: h != localHost) fleetHosts);
+              }
+            ];
+          }
         ]
         ++ contractBlackboxScrapeConfigs
         ++ aiProbeScrapeConfigs;

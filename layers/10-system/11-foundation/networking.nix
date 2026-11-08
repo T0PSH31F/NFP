@@ -6,6 +6,12 @@
   networking = {
     networkmanager.enable = true;
 
+    # Prefer IPv4 over IPv6 when dual-stack is present to avoid blackhole timeouts
+    getaddrinfo.enable = true;
+    getaddrinfo.precedence = {
+      "::ffff:0:0/96" = 100;
+    };
+
     # Fleet DNS: AdGuard Home primary with Cloudflare fallback
     nameservers = [
       "192.168.1.54"

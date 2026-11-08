@@ -80,6 +80,7 @@
 | **8686** | Lidarr                 | luffy  | `layers/20-services/23-media/media-stack.nix`     | Music Collection Manager        |
 | **8787** | Readarr                | luffy  | `layers/20-services/23-media/media-stack.nix`     | Book Collection Manager         |
 | **8788** | Hermes Standalone WebUI| z0r0   | `layers/20-services/26-monitoring/`                | Hermes Standalone Web UI        |
+| **8789** | Headroom Proxy         | Both   | `layers/70-agents/75-mcp/headroom.nix`             | Context Compression Proxy       |
 | **8880** | Hermes Live Voice      | z0r0   | `layers/70-agents/76-hermes-agent/`                | Real-time Voice Control Gateway |
 | **8888** | SearXNG                | luffy  | `layers/20-services/27-automation/`               | Meta Search Engine              |
 | **8989** | Sonarr                 | luffy  | `layers/20-services/23-media/media-stack.nix`     | TV Series Management            |

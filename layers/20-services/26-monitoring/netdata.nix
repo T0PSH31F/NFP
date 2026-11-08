@@ -17,6 +17,12 @@ in
       default = 19999;
       description = "Netdata web dashboard port";
     };
+
+    homepage.enable = mkOption {
+      type = types.bool;
+      default = false;
+      description = "Show individual Netdata card on Homepage dashboard";
+    };
   };
 
   config = mkIf cfg.enable {
@@ -26,6 +32,7 @@ in
         global = {
           "default port" = toString cfg.port;
           "bind socket to IP" = "0.0.0.0";
+          "memory mode" = "ram";
         };
       };
     };
@@ -45,7 +52,7 @@ in
         expectedStatus = [ 200 ];
       };
       homepage = {
-        enable = true;
+        enable = cfg.homepage.enable;
         category = "usopp";
         order = 40;
         title = "Netdata (${config.networking.hostName})";

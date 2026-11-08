@@ -24,7 +24,7 @@ with lib;
 
     port = mkOption {
       type = types.port;
-      default = 8787;
+      default = 8789;
       description = "Port for Headroom proxy";
     };
 

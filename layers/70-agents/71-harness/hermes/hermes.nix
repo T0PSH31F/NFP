@@ -39,6 +39,10 @@
         default = "hermes";
       };
     };
+
+    signalBot = {
+      enable = lib.mkEnableOption "Signal bot channel for Hermes (requires registered signal-cli account)";
+    };
   };
 
   imports = [
@@ -888,12 +892,14 @@
           MATRIX_ALLOW_ALL_USERS=false
           MATRIX_ENCRYPTION=true
 
-          # ── Signal ───────────────────────────────────────────────────
-          SIGNAL_HTTP_URL=http://127.0.0.1:8080
-          SIGNAL_ACCOUNT=${config.sops.placeholder.signal_account}
-          SIGNAL_ALLOWED_USERS=${config.sops.placeholder.signal_allowed_users}
-          SIGNAL_ALLOW_ALL_USERS=false
-          SIGNAL_IGNORE_STORIES=true
+          ${lib.optionalString cfg.signalBot.enable ''
+            # ── Signal ───────────────────────────────────────────────────
+            SIGNAL_HTTP_URL=http://127.0.0.1:8080
+            SIGNAL_ACCOUNT=''${config.sops.placeholder.signal_account}
+            SIGNAL_ALLOWED_USERS=''${config.sops.placeholder.signal_allowed_users}
+            SIGNAL_ALLOW_ALL_USERS=false
+            SIGNAL_IGNORE_STORIES=true
+          ''}
 
           # ── Camofox Browser ────────────────────────────────────────────
           CAMOFOX_API_KEY=${config.sops.placeholder.camofox_api_key}

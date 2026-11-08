@@ -253,7 +253,7 @@ def triage_himalaya_account(account, args, processed_keys, history):
     """Triage remote IMAP account via himalaya CLI."""
     cmd = ["himalaya", "-a", account, "envelope", "list", "--page-size", "25", "--json"]
     try:
-        res = subprocess.run(cmd, capture_output=True, text=True, timeout=15)
+        res = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
         if res.returncode != 0:
             sys.stderr.write(f"Himalaya envelope list failed for {account}: {res.stderr}\n")
             return 0, 0
