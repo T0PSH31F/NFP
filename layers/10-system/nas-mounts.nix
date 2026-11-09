@@ -223,8 +223,8 @@ in
               "x-systemd.automount"
               "noauto"
               "x-systemd.idle-timeout=60"
-              "x-systemd.device-timeout=10s"
-              "x-systemd.mount-timeout=15s"
+              "x-systemd.device-timeout=3s"
+              "x-systemd.mount-timeout=3s"
               "_netdev"
               "x-systemd.before=shutdown.target"
             ]
