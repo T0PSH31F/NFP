@@ -46,6 +46,8 @@ in
         host    langfuse        all             ::1/128                 trust
         host    paperclip       all             127.0.0.1/32            trust
         host    paperclip       all             ::1/128                 trust
+        host    polyfloor       all             127.0.0.1/32            trust
+        host    polyfloor       all             ::1/128                 trust
         # scram-sha-256 for loopback TCP connections (services using a password)
         host    all             all             127.0.0.1/32            scram-sha-256
         host    all             all             ::1/128                 scram-sha-256

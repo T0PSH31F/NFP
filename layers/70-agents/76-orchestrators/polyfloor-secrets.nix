@@ -48,7 +48,7 @@ with lib;
       sops.templates."polyfloor-env" = {
         content = ''
           # Database — PostgreSQL (overrides upstream SQLite default)
-          POLYFLOOR_DATABASE_URL=postgresql://polyfloor:${config.sops.placeholder.postgres-password}@localhost:5432/polyfloor
+          POLYFLOOR_DATABASE_URL=postgresql+asyncpg://polyfloor:${config.sops.placeholder.postgres-password}@localhost:5432/polyfloor
 
           # Polyfloor platform API token (read by config.py as api_token_file)
           POLYFLOOR_API_TOKEN_FILE=${config.sops.placeholder.polyfloor_api_token}

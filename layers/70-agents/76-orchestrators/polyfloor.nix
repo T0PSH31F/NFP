@@ -138,6 +138,16 @@ in
           enable = config.services.polyfloor.enable;
           port = config.services.polyfloor.port;
         };
+
+        postgresql = mkIf (config.services.postgresql.enable or false) {
+          ensureDatabases = [ "polyfloor" ];
+          ensureUsers = [
+            {
+              name = "polyfloor";
+              ensureDBOwnership = true;
+            }
+          ];
+        };
       };
 
       # Persist per-company state across reboots when impermanence is enabled
