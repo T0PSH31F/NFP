@@ -173,6 +173,17 @@ in
       netcat
     ];
 
+    networking.networkmanager.dispatcherScripts = mkIf (lib.hasPrefix "169.254." cfg.host) [
+      {
+        source = pkgs.writeShellScript "nas-link-local-dispatcher" ''
+          if [ "$2" = "up" ] || [ "$2" = "dhcp4-change" ]; then
+            ${pkgs.iproute2}/bin/ip route replace 169.254.0.0/16 dev "$1" scope link metric 1000 || true
+          fi
+        '';
+        type = "basic";
+      }
+    ];
+
     # Automount filesystem declaration
     fileSystems."${cfg.mountPoint}" = {
       device =
