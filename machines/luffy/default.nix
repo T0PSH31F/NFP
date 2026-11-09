@@ -427,69 +427,11 @@ in
             encode zstd gzip
             header Strict-Transport-Security "max-age=31536000; includeSubDomains"
 
-            @crawl4ai host crawl4ai.lovelain.duckdns.org
-            handle @crawl4ai { reverse_proxy localhost:32775 }
-
-            @skyvernui host skyvern.lovelain.duckdns.org
-            handle @skyvernui { reverse_proxy localhost:32776 }
-
-            @skyvernapi host skyvernapi.lovelain.duckdns.org
-            handle @skyvernapi { reverse_proxy localhost:32779 }
-
-            @skyvernchrome host skyvernchrome.lovelain.duckdns.org
-            handle @skyvernchrome { reverse_proxy localhost:32780 }
-
-            @simstudio host simstudio.lovelain.duckdns.org
-            handle @simstudio { reverse_proxy localhost:32790 }
-
-            @simstudiort host simstudiort.lovelain.duckdns.org
-            handle @simstudiort { reverse_proxy localhost:32789 }
-
-            @spacedrive host spacedrive.lovelain.duckdns.org
-            handle @spacedrive { reverse_proxy localhost:32768 }
-
-            @spacedriveapi host spacedriveapi.lovelain.duckdns.org
-            handle @spacedriveapi { reverse_proxy localhost:32769 }
-
-            @vault host vault.lovelain.duckdns.org
-            handle @vault { reverse_proxy localhost:8222 }
-
-            @kavita host kavita.lovelain.duckdns.org
-            handle @kavita { reverse_proxy localhost:5000 }
-
-            # Headscale now on luffy (tailnet authority luffy.nfp.nix:8086). Public Caddy route remains on lovelain.
+            # Headscale control plane: public route required for mobile WAN WireGuard handshakes.
+            # All internal admin dashboards (aionui, paperclip, mission-control, adguard, etc.)
+            # are strictly gated to the encrypted Tailnet (*.nfp.nix / 100.64.0.0/10).
             @headscale host headscale.lovelain.duckdns.org
             handle @headscale { reverse_proxy localhost:8086 }
-
-            @chat host chat.lovelain.duckdns.org
-            handle @chat { reverse_proxy localhost:3004 }
-
-            @beszel host beszel.lovelain.duckdns.org
-            # handle @beszel { reverse_proxy localhost:32772 }  # removed — beszel dropped
-
-            @adguard host adguard.lovelain.duckdns.org
-            handle @adguard { reverse_proxy localhost:3002 }
-
-            @openclaw host openclaw.lovelain.duckdns.org
-            handle @openclaw { reverse_proxy localhost:59879 }
-
-            @n8n host n8n.lovelain.duckdns.org
-            # handle @n8n { reverse_proxy localhost:5678 }  # deactivated
-
-            @komga host komga.lovelain.duckdns.org
-            # handle @komga { reverse_proxy localhost:25600 }  # removed — komga dropped
-
-            @spotify host spotify.lovelain.duckdns.org
-            handle @spotify { reverse_proxy localhost:3457 }
-
-            @missionctrl host mission-control.lovelain.duckdns.org
-            handle @missionctrl { reverse_proxy localhost:3099 }
-
-            @paperclip host paperclip.lovelain.duckdns.org
-            handle @paperclip { reverse_proxy localhost:3101 }
-
-            @aionui host aionui.lovelain.duckdns.org
-            handle @aionui { reverse_proxy localhost:3006 }
           '';
         };
         "element.local" = {

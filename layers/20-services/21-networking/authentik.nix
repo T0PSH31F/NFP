@@ -275,51 +275,72 @@ in
     # Strict Boundary: Only Authentik, the shared media suite, and SearXNG receive public routes.
     # Everything else is strictly Tailnet-only.
     services.caddy.virtualHosts = {
-      "http://${cfg.domain}" = {
+      "${cfg.domain}" = {
+        useACMEHost = publicDomain;
         extraConfig = ''
+          encode zstd gzip
+          header Strict-Transport-Security "max-age=31536000; includeSubDomains"
           reverse_proxy localhost:${toString cfg.port}
         '';
       };
     }
     // (mkIf cfg.publicMediaServices {
       # Calibre-Web
-      "http://calibre.${publicDomain}" = {
+      "calibre.${publicDomain}" = {
+        useACMEHost = publicDomain;
         extraConfig = ''
+          encode zstd gzip
+          header Strict-Transport-Security "max-age=31536000; includeSubDomains"
           reverse_proxy localhost:${toString (config.services.calibre-web-app.port or 7119)}
         '';
       };
 
       # Komga
-      "http://komga.${publicDomain}" = {
+      "komga.${publicDomain}" = {
+        useACMEHost = publicDomain;
         extraConfig = ''
+          encode zstd gzip
+          header Strict-Transport-Security "max-age=31536000; includeSubDomains"
           reverse_proxy localhost:25600
         '';
       };
 
       # Audiobookshelf
-      "http://audiobooks.${publicDomain}" = {
+      "audiobooks.${publicDomain}" = {
+        useACMEHost = publicDomain;
         extraConfig = ''
-          reverse_proxy localhost:13378
+          encode zstd gzip
+          header Strict-Transport-Security "max-age=31536000; includeSubDomains"
+          reverse_proxy localhost:9292
         '';
       };
 
       # Jellyfin
-      "http://jellyfin.${publicDomain}" = {
+      "jellyfin.${publicDomain}" = {
+        useACMEHost = publicDomain;
         extraConfig = ''
+          encode zstd gzip
+          header Strict-Transport-Security "max-age=31536000; includeSubDomains"
           reverse_proxy localhost:8096
         '';
       };
 
-      # Navidrome
-      "http://navidrome.${publicDomain}" = {
+      # Navidrome (hosted on z0r0 via encrypted Tailnet)
+      "navidrome.${publicDomain}" = {
+        useACMEHost = publicDomain;
         extraConfig = ''
-          reverse_proxy localhost:${toString (config.layers.layer-20.services.media.navidrome.port or 4533)}
+          encode zstd gzip
+          header Strict-Transport-Security "max-age=31536000; includeSubDomains"
+          reverse_proxy http://100.64.0.1:4533
         '';
       };
 
       # SearXNG
-      "http://search.${publicDomain}" = {
+      "search.${publicDomain}" = {
+        useACMEHost = publicDomain;
         extraConfig = ''
+          encode zstd gzip
+          header Strict-Transport-Security "max-age=31536000; includeSubDomains"
           reverse_proxy localhost:8888
         '';
       };
