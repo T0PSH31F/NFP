@@ -32,7 +32,7 @@ in
     enableCodingAgents = mkOption {
       type = types.bool;
       default = true;
-      description = "Enable CLI coding agents (claude-code, opencode, goose-cli, jules, pi, ccusage)";
+      description = "Enable CLI coding agents (claude-code, opencode, goose-cli, pi, ccusage)";
     };
 
     enableServerTools = mkEnableOption "AI server tools (ollama, espeak-ng, pipx)";
@@ -62,7 +62,6 @@ in
             skills
             ai-usagebar
             openshell
-            # gemini-cli removed from nixpkgs — superseded by Antigravity CLI
             # jan
             cherry-studio
             lmstudio

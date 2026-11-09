@@ -147,9 +147,6 @@
           sops.secrets.hf_token = {
             sopsFile = ../../../layers/00-cyberia/03-treasure/secrets/external_services.yaml;
           };
-          sops.secrets.jules_api_key_ll = {
-            sopsFile = ../../../layers/00-cyberia/03-treasure/secrets/external_services.yaml;
-          };
           sops.secrets.v0_api_key_we77 = {
             sopsFile = ../../../layers/00-cyberia/03-treasure/secrets/external_services.yaml;
           };
@@ -396,7 +393,6 @@
               AI21_API_KEY=${config.sops.placeholder.ai21_api_key}
               COHERE_API_KEY=${config.sops.placeholder.cohere_api_key}
               HF_TOKEN=${config.sops.placeholder.hf_token}
-              JULES_API_KEY_LL=${config.sops.placeholder.jules_api_key_ll}
               V0_API_KEY_WE=${config.sops.placeholder.v0_api_key_we77}
               GITHUB_MODELS_API=${config.sops.placeholder.github_models_api}
 

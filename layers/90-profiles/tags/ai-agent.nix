@@ -20,7 +20,6 @@
       layer-71.harness = {
         opencode.enable = lib.mkDefault true;
         claude-code.enable = lib.mkDefault true;
-        gemini-cli.enable = lib.mkDefault true;
         codegraph.enable = lib.mkDefault true;
         kiro-cli.enable = lib.mkDefault true;
         dsh.enable = lib.mkDefault true;

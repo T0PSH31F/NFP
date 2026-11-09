@@ -13,7 +13,6 @@ The `71-harness` tier is responsible for agent execution harnesses, Interactive 
 | `codegraph.nix` | CodeGraph code indexing and graph intelligence tool. | `layers.layer-70.agent.codegraph` | None | On-demand CLI | `ai-agent`, `development` |
 | `codex.nix` | OpenAI Codex CLI terminal harness tool. | `layers.layer-70.agent.codex` | None | On-demand CLI | `ai-agent`, `development` |
 | `dsh.nix` | Dendritic Shell (DSH) AI terminal shell environment. | `layers.layer-71.harness.dsh` | None | On-demand TUI | `ai-agent`, `desktop`, `workstation` |
-| `gemini-cli.nix` | Google Gemini CLI harness for command line generation. | `layers.layer-70.agent.gemini-cli` | None | On-demand CLI | `ai-agent`, `development` |
 | `kilocode.nix` | Kilo Code AI terminal agent & IDE extension harness. | `layers.layer-71.harness.kilocode` | None | On-demand CLI | `ai-agent`, `development` |
 | `kiro-cli.nix` | Kiro autonomous agent CLI tool. | `layers.layer-70.agent.kiro-cli` | None | On-demand CLI | `ai-agent`, `development` |
 | `pi-coding-agent.nix` | Pi Durable AI coding agent harness (earendil-works/Pi). | `layers.layer-71.harness.pi-coding-agent` | None | On-demand CLI | `ai-agent`, `development` |

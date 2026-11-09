@@ -185,7 +185,6 @@ in
     };
     claude-code.enable = true;
     opencode.enable = true;
-    gemini-cli.enable = true;
     herdr.enable = true;
     pi-coding-agent.enable = true;
     aider-chat.enable = true;

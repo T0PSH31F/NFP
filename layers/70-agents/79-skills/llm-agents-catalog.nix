@@ -22,7 +22,6 @@ let
       "bb-app"
       "freebuff"
       "jcode"
-      "jules"
       "kilocode-cli" # — The open-source AI coding agent. Now available in your terminal.
       "kimi-code" # - The Starting Point for Next-Gen Agents
       "letta-code"

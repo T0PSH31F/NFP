@@ -79,7 +79,7 @@
 - **Path:** `layers/70-agents/71-coding/antigravity.nix`
 - **Option:** `layers.layer-70.agent.antigravity.enable`
 - **Packages:** `google-antigravity-cli` (FHS env) + `google-antigravity-ide` (Noctalia-themed)
-- **Former name:** was exposed as `programs.gemini-cli` — now `programs.antigravity-cli` in home-manager
+- **Home config:** `programs.antigravity-cli` in home-manager
 
 ### 2.8 Supergraph
 - **Path:** `layers/70-agents/71-coding/supergraph.nix`

@@ -46,7 +46,7 @@ Tags are explicitly matched via `clan.nix`. Ensure your tags in `clan.nix` perfe
 | `development` | Coding and software engineering | `pythonTools`, `vscode`, `dev-tools`, `antigravity`, `opencode` |
 | `gaming` | Emulators and native PC gaming | `gui.gaming` |
 | `ai-server` | Running LLMs and AI infrastructure | `homepage-dashboard`, `llm-agents`, `sillytavern`, `wyoming-services`, `ai-services.*`, `mcp`, `claude-code`, `ai-agent-stack` |
-| `ai-agent` | Coding & autonomous agent tooling | `opencode`, `mcp`, `claude-code`, `gemini-cli`, `codegraph`, `kiro-cli`, `hermes`, `hermes-workspace` |
+| `ai-agent` | Coding & autonomous agent tooling | `opencode`, `mcp`, `claude-code`, `antigravity`, `codegraph`, `kiro-cli`, `hermes`, `hermes-workspace` |
 | `homelab` | Internal network hosting suite | `searxng`, `home-assistant-server`, `headscale-server`, `vaultwarden-server`, `filebrowser-app`, `glances-server` |
 | `media` | Consuming and hosting media | `media-stack` (Jellyfin, Deluge, Radarr, Sonarr, Prowlarr), `media-packages`, `audio`, `mpv` |
 | `cache-server` | Nix binary cache | `harmonia.cache` |

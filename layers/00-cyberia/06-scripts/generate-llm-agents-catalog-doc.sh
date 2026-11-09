@@ -7,8 +7,8 @@ nix eval --impure --json --expr '
     flake = builtins.getFlake (toString ./.);
     pkgs = flake.inputs.llm-agents.packages.x86_64-linux;
     excluded = [
-      "claude-code" "goose-cli" "jules" "opencode" "pi" "ccusage"
-      "codex" "gemini-cli" "antigravity-cli" "hermes-agent"
+      "claude-code" "goose-cli" "opencode" "pi" "ccusage"
+      "codex" "antigravity-cli" "hermes-agent"
     ];
     unfreeSet = [
       "amp" "grok" "cursor-agent" "droid" "cubic" "coderabbit-cli"

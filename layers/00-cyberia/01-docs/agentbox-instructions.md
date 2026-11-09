@@ -32,9 +32,7 @@ reproducible and easy to customise.
 | `droid`          | [Droid](https://factory.ai)                                       | `nix build .#droid`          |
 | `eca`            | [ECA](https://github.com/editor-code-assistant/eca)               | `nix build .#eca`            |
 | `forge`          | [Forgecode](https://github.com/tailcallhq/forgecode)              | `nix build .#forge`          |
-| `gemini-cli`     | [Gemini CLI](https://github.com/google-gemini/gemini-cli)         | `nix build .#gemini-cli`     |
 | `goose-cli`      | [Goose](https://github.com/block/goose)                           | `nix build .#goose-cli`      |
-| `jules`          | [Jules](https://jules.google)                                     | `nix build .#jules`          |
 | `kilocode-cli`   | [Kilocode CLI](https://kilocode.ai/cli)                           | `nix build .#kilocode-cli`   |
 | `letta-code`     | [Letta Code](https://github.com/letta-ai/letta-code)              | `nix build .#letta-code`     |
 | `mistral-vibe`   | [Mistral Vibe](https://github.com/mistralai/mistral-vibe)         | `nix build .#mistral-vibe`   |
