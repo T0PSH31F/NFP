@@ -642,6 +642,7 @@ in
           vmalert.instances.main = mkIf (cfg.backend == "victoriametrics") {
             enable = true;
             settings = {
+              "httpListenAddr" = "127.0.0.1:8881";
               "datasource.url" = "http://127.0.0.1:${toString cfg.victoriametrics.port}";
               "notifier.url" = [ "http://127.0.0.1:9093" ];
               rule = [

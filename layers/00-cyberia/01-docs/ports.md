@@ -49,6 +49,7 @@
 | **6333** | Qdrant HTTP            | z0r0   | `layers/20-services/25-data/qdrant.nix`             | Vector Database REST API        |
 | **6334** | Qdrant gRPC            | z0r0   | `layers/20-services/25-data/qdrant.nix`             | Vector Database gRPC            |
 | **6380** | Nextcloud              | luffy  | `layers/20-services/25-data/nextcloud.nix`         | Cloud File Synchronization      |
+| **6381** | Redis (Authentik)      | luffy  | `layers/20-services/21-networking/authentik.nix`   | Dedicated Redis session store   |
 | **6767** | Bazarr                 | luffy  | `layers/20-services/23-media/media-stack.nix`     | Subtitle Manager                |
 | **6800** | Aria2                  | luffy  | `layers/20-services/23-media/download-clients.nix`| Download Daemon RPC             |
 | **7878** | Radarr                 | luffy  | `layers/20-services/23-media/media-stack.nix`     | Movie Management                |
@@ -75,6 +76,7 @@
 | **8098** | RomM                   | luffy  | `layers/20-services/23-media/romm.nix`             | ROM Manager & Web Emulator      |
 | **8099** | ntfy-sh                | Both   | `layers/20-services/26-monitoring/ntfy-sh.nix`     | Push Notification Service       |
 | **8428** | VictoriaMetrics        | luffy  | `layers/20-services/26-monitoring/monitoring.nix` | High-efficiency single-node TSDB (:8428)|
+| **8429** | vmalert                | luffy  | `layers/20-services/26-monitoring/monitoring.nix` | VictoriaMetrics alerting engine |
 | **8443** | HTTPS Alt 1            | luffy  | `machines/luffy/default.nix`                       | Secondary TLS Ingress           |
 | **8444** | Element Web            | luffy  | `machines/luffy/default.nix`                       | Matrix Client Web App           |
 | **8686** | Lidarr                 | luffy  | `layers/20-services/23-media/media-stack.nix`     | Music Collection Manager        |

@@ -73,9 +73,10 @@ in
     };
 
     # Redis backend instance dedicated to Authentik session caching & task queue
+    # Port 6381 chosen to avoid collision with honcho-redis (6379) and Nextcloud (6380)
     services.redis.servers.authentik = {
       enable = true;
-      port = 6379;
+      port = 6381;
       bind = "127.0.0.1";
     };
 
@@ -139,7 +140,7 @@ in
         AUTHENTIK_POSTGRESQL__NAME=authentik
         AUTHENTIK_POSTGRESQL__USER=postgres
         AUTHENTIK_REDIS__HOST=127.0.0.1
-        AUTHENTIK_REDIS__PORT=6379
+        AUTHENTIK_REDIS__PORT=6381
         AUTHENTIK_REDIS__DB=0
         AUTHENTIK_DISABLE_STARTUP_ANALYTICS=true
         AUTHENTIK_DISABLE_UPDATE_CHECK=true
@@ -159,6 +160,7 @@ in
         ];
         environment = {
           AUTHENTIK_REDIS__HOST = "127.0.0.1";
+          AUTHENTIK_REDIS__PORT = "6381";
           AUTHENTIK_POSTGRESQL__HOST = "127.0.0.1";
         };
         volumes = [
@@ -180,6 +182,7 @@ in
         ];
         environment = {
           AUTHENTIK_REDIS__HOST = "127.0.0.1";
+          AUTHENTIK_REDIS__PORT = "6381";
           AUTHENTIK_POSTGRESQL__HOST = "127.0.0.1";
         };
         volumes = [
