@@ -47,21 +47,9 @@ let
       sshUser = "root";
       sshKey = "/etc/ssh/ssh_host_ed25519_key";
     }
-    {
-      hostName = "sanji.${baseDomain}";
-      machineId = "sanji";
-      system = "x86_64-linux";
-      maxJobs = 8;
-      speedFactor = 2;
-      supportedFeatures = [
-        "kvm"
-        "big-parallel"
-        "nixos-test"
-        "benchmark"
-      ];
-      sshUser = "root";
-      sshKey = "/etc/ssh/ssh_host_ed25519_key";
-    }
+    # sanji (workstation/laptop) is explicitly excluded as a build machine
+    # per workstation resource preservation rules (GEMINI.md section 5).
+    # sanji offloads builds to z0r0/luffy; other machines must never build on sanji.
     # RETIRED 2026-10-13: nami removed as a distributed builder. The instance
     # (47.254.90.69) went permanently unreachable on 2026-10-12, so every build
     # paid a full SSH connect-timeout before falling through to a real builder.
