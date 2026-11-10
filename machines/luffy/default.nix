@@ -289,6 +289,7 @@ in
     # DuckDNS Auto-Updater using ddclient
     ddclient = {
       enable = true;
+      usev6 = "";
       domains = [
         "lovelain.duckdns.org"
         "t0psh31f.duckdns.org"
@@ -711,6 +712,9 @@ in
 
     # Fix ad-hook-miner StateDirectory migration error
     ad-hook-miner.serviceConfig.DynamicUser = lib.mkForce false;
+
+    # VictoriaMetrics impermanence bind-mount compatibility
+    victoriametrics.serviceConfig.DynamicUser = lib.mkForce false;
 
     # Filebrowser data directory permissions
     filebrowser.preStart = ''
