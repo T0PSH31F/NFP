@@ -6,8 +6,8 @@ _: {
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPpWmwkiOcnicpKOcE3kiJ4bYgiawDBQpcnmm1Ljics7 t0psh31f@sanji"
     # Fleet distributed build host keys (sanji, luffy, z0r0)
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB7VxJTk07Z8WIcBoBFzqOy2TyEhypZmHDsGJeZzKFqa root@sanji"
-    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILq2CNXMpVIOPv3byApLfUgbhSYYXWVjeYA19bpjJuMz root@luffy"
-    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBbma86jIAHhoKLb7xDbXqTxofk0dz3BnuZEXmQQokRo root@z0r0"
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIED0hTwN/NTxlnnnFc1/3oDOOQmsG8Nw/oZin+s9mdxx root@luffy"
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDFylABIGcvVqbGUT+y8lQZRty0/BeCTGs9QHwqzdzrb root@z0r0"
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJxCZSHtsjhrP4LqoteoVKwohyMwy9WQ/9o0BgvGQydj luffy-to-nami"
   ];
 }

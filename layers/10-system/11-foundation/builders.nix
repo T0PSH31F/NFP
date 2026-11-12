@@ -119,6 +119,7 @@ in
       Host *.${baseDomain} 100.64.0.*
         IdentitiesOnly yes
         IdentityFile /etc/ssh/ssh_host_ed25519_key
+        IdentityFile ~/.ssh/id_ed25519
     '';
 
     # Declarative host keys for all fleet machines to eliminate "Host key verification failed" in nix-daemon
@@ -128,7 +129,7 @@ in
           "z0r0.${baseDomain}"
           "100.64.0.1"
         ];
-        publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBbma86jIAHhoKLb7xDbXqTxofk0dz3BnuZEXmQQokRo";
+        publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDFylABIGcvVqbGUT+y8lQZRty0/BeCTGs9QHwqzdzrb";
       };
       luffy = {
         hostNames = [
@@ -136,7 +137,7 @@ in
           "100.64.0.3"
           "192.168.1.54"
         ];
-        publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILq2CNXMpVIOPv3byApLfUgbhSYYXWVjeYA19bpjJuMz";
+        publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIED0hTwN/NTxlnnnFc1/3oDOOQmsG8Nw/oZin+s9mdxx";
       };
       sanji = {
         hostNames = [
