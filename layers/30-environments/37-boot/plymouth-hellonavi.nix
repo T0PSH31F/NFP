@@ -73,12 +73,6 @@ in
 
     # Boot configuration
     boot = {
-      # Enable systemd initrd for proper Plymouth support
-      initrd = {
-        systemd.enable = lib.mkDefault true;
-        verbose = false;
-      };
-
       # Enable Plymouth
       plymouth = {
         enable = true;

@@ -145,11 +145,6 @@ in
     environment.systemPackages = [ onepiece-theme ];
 
     boot = {
-      initrd = {
-        systemd.enable = lib.mkDefault true;
-        verbose = false;
-      };
-
       plymouth = {
         enable = true;
         theme = "onePiece-plymouth";

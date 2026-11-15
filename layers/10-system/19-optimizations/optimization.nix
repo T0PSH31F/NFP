@@ -41,7 +41,6 @@
     };
 
     initrd = {
-      systemd.enable = lib.mkForce true;
       compressor = lib.mkDefault "zstd";
     };
 
