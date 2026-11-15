@@ -410,9 +410,9 @@
         # Harness skill packs — symlinked from the Nix store into HERMES_HOME/skills.
         # Upstream bundled skills ship in $out/share/hermes-agent/skills via HERMES_BUNDLED_SKILLS;
         # repository skills linked here are additive and take precedence for custom workflows.
-        "L+ /var/lib/hermes/.hermes/skills/harness-session-protocol - hermes hermes - ${../opencode/skills/harness-session-protocol}"
-        "L+ /var/lib/hermes/.hermes/skills/nfp-module-authoring - hermes hermes - ${../opencode/skills/nfp-module-authoring}"
-        "L+ /var/lib/hermes/.hermes/skills/persistence-audit - hermes hermes - ${../opencode/skills/persistence-audit}"
+        "L+ /var/lib/hermes/.hermes/skills/harness-session-protocol - hermes hermes - ${../../79-skills/harness-session-protocol}"
+        "L+ /var/lib/hermes/.hermes/skills/nfp-module-authoring - hermes hermes - ${../../79-skills/nfp-module-authoring}"
+        "L+ /var/lib/hermes/.hermes/skills/persistence-audit - hermes hermes - ${../../79-skills/persistence-audit}"
         "L+ /var/lib/hermes/.hermes/skills/desktop-customization - hermes hermes - ${../../79-skills/desktop-customization}"
         # Harness HERMES.md workspace pointer file
         "L+ /var/lib/hermes/.hermes/HERMES.md - hermes hermes - ${pkgs.writeText "HERMES.md" ''
