@@ -106,7 +106,7 @@ jobs:
         run: |
           install -d -m 700 "$HOME/.ssh"
           install -m 600 "$CREDENTIALS_DIRECTORY/ci-deploy-ssh-key" "$HOME/.ssh/id_ed25519"
-          self=$(hostname)
+          self=$(uname -n)
           for host in sanji luffy z0r0; do
             if [ "$host" != "$self" ]; then
               clan machines update --host-key-check accept-new --build-host localhost --option builders "" "$host"
