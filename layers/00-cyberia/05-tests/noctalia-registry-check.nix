@@ -20,6 +20,7 @@ pkgs.runCommand "check-noctalia-registry-compatibility"
 
         ${pkgs.python3}/bin/python3 -c '
     import os
+    import re
     import sys
     import tomllib
 
@@ -37,15 +38,21 @@ pkgs.runCommand "check-noctalia-registry-compatibility"
         print(f"ERROR: Missing plugin_api.h in shell source at {api_header}", file=sys.stderr)
         sys.exit(1)
 
-    min_api = 3
-    max_api = 32
+    constants = {}
     with open(api_header, "r") as f:
-        content = f.read()
-        for line in content.splitlines():
-            if "kOldestSupportedPluginApiVersion =" in line:
-                min_api = int(line.split("=")[1].strip().rstrip(";"))
-            elif "kContainerTooltipPluginApiVersion =" in line:
-                max_api = int(line.split("=")[1].strip().rstrip(";"))
+        for match in re.finditer(r"\b(k[A-Za-z0-9_]+)\s*=\s*([A-Za-z0-9_]+)\s*;", f.read()):
+            name, raw_val = match.group(1), match.group(2)
+            if raw_val.isdigit():
+                constants[name] = int(raw_val)
+            elif raw_val in constants:
+                constants[name] = constants[raw_val]
+
+    if "kOldestSupportedPluginApiVersion" not in constants or "kCurrentPluginApiVersion" not in constants:
+        print(f"ERROR: Could not resolve plugin API range in {api_header}", file=sys.stderr)
+        sys.exit(1)
+
+    min_api = constants["kOldestSupportedPluginApiVersion"]
+    max_api = constants["kCurrentPluginApiVersion"]
 
     print(f"Shell Manifest Protocol: plugin_api (Supported Range: {min_api} .. {max_api})")
 

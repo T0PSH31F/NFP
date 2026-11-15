@@ -115,7 +115,7 @@ with lib;
           glib
           # gnome2.GConf removed from nixpkgs (long deprecated) — dropped 2026-10-13
           pango
-          gtk2
+          # gtk2 marked broken in nixpkgs 26.11 (final release 2020-12) — dropped
           gtk3
           icu
           libGL
@@ -137,7 +137,6 @@ with lib;
           libnotify
           libogg
           libpng
-          libpng12
           libpulseaudio
           librsvg
           libsamplerate

@@ -35,7 +35,8 @@
   boot = {
     kernelPackages = pkgs.linuxPackages_latest;
     zfs.forceImportRoot = false;
-    supportedFilesystems = [
+    # Disable ZFS to avoid broken kernel package errors on latest kernels
+    supportedFilesystems = lib.mkForce [
       "btrfs"
       "vfat"
       "ext4"

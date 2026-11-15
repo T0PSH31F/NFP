@@ -115,12 +115,22 @@ in
       noctaliaPluginDoctor = pkgs.writeShellScriptBin "noctalia-plugin-doctor" ''
         set -euo pipefail
         PLUGINS_DIR="$HOME/.config/noctalia/plugins"
+        API_HEADER="${inputs.noctalia}/src/scripting/plugin_api.h"
+        MIN_API=$(grep -E "kOldestSupportedPluginApiVersion =" "$API_HEADER" | sed -E 's/.*=[[:space:]]*([0-9]+);/\1/' || echo 3)
+        CURRENT_ALIAS=$(grep -E "kCurrentPluginApiVersion =" "$API_HEADER" | sed -E 's/.*=[[:space:]]*([A-Za-z0-9_]+);/\1/' || echo "")
+        if [[ "$CURRENT_ALIAS" =~ ^[0-9]+$ ]]; then
+          MAX_API="$CURRENT_ALIAS"
+        elif [ -n "$CURRENT_ALIAS" ]; then
+          MAX_API=$(grep -E "$CURRENT_ALIAS =" "$API_HEADER" | sed -E 's/.*=[[:space:]]*([0-9]+);/\1/' || echo 55)
+        else
+          MAX_API=55
+        fi
 
         echo "=========================================================================="
         echo " 🩺 NOCTALIA PLUGIN DOCTOR — COMPATIBILITY AUDIT"
         echo "=========================================================================="
         echo "Pinned Shell: ${cfg.package.name or "noctalia"}"
-        echo "Expected Manifest Protocol: plugin_api (Supported Range: 3 .. 32)"
+        echo "Expected Manifest Protocol: plugin_api (Supported Range: $MIN_API .. $MAX_API)"
         echo "Configured Official Plugins Rev: ${inputs.noctalia-official-plugins.rev or "flake.lock"}"
         echo "Configured Community Plugins Rev: ${inputs.noctalia-community-plugins.rev or "flake.lock"}"
         echo "UI Plugins Directory: $PLUGINS_DIR"
@@ -166,8 +176,8 @@ in
             continue
           fi
 
-          if [ "$api_val" -lt 3 ] || [ "$api_val" -gt 32 ]; then
-            echo "❌ [$pname]: INCOMPATIBLE plugin_api=$api_val (supported range: 3..32)"
+          if [ "$api_val" -lt "$MIN_API" ] || [ "$api_val" -gt "$MAX_API" ]; then
+            echo "❌ [$pname]: INCOMPATIBLE plugin_api=$api_val (supported range: $MIN_API..$MAX_API)"
             FAILED=$((FAILED + 1))
             continue
           fi

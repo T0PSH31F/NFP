@@ -183,7 +183,7 @@ in
           {
             name = "markdown";
             language-servers = [
-              "ltex-ls"
+              "ltex-ls-plus"
               "markdown-oxide"
               "typos"
               "wakatime"
@@ -307,8 +307,8 @@ in
             }";
             args = [ "--jvm-arg=-javaagent:${pkgs.lombok}/share/java/lombok.jar" ];
           };
-          ltex-ls = {
-            command = lib.getExe' pkgs.ltex-ls "ltex-ls";
+          ltex-ls-plus = {
+            command = lib.getExe' pkgs.ltex-ls-plus "ltex-ls-plus";
             config.ltex = {
               disabledRules.en = [ "ARROWS" ];
               disabledRules.fr = [ "FLECHES" ];

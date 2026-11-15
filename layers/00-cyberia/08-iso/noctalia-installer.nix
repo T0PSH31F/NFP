@@ -23,6 +23,14 @@
   # Kernel
   boot.kernelPackages = pkgs.linuxPackages_latest;
   boot.zfs.forceImportRoot = false;
+  # Disable ZFS to avoid broken kernel package errors on latest kernels
+  boot.supportedFilesystems = lib.mkForce [
+    "btrfs"
+    "exfat"
+    "ext4"
+    "ntfs"
+    "vfat"
+  ];
 
   # Include desktop environment components
   programs.hyprland.enable = true;

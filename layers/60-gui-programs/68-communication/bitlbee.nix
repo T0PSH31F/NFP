@@ -59,8 +59,8 @@ in
 
     facebook = lib.mkOption {
       type = lib.types.bool;
-      default = true;
-      description = "Install bitlbee-facebook plugin (Messenger MQTT gateway).";
+      default = false;
+      description = "Install bitlbee-facebook plugin (disabled: requires libpurple/pidgin, removed from nixpkgs).";
     };
 
     mastodon = lib.mkOption {
@@ -96,10 +96,8 @@ in
         (lib.optional cfg.mastodon pkgs.bitlbee-mastodon)
       ];
 
-      # libpurple plugins (Facebook uses the purple ABI)
-      libpurple_plugins = lib.flatten [
-        (lib.optional cfg.facebook pkgs.bitlbee-facebook)
-      ];
+      # libpurple plugins removed: nixpkgs dropped pidgin (gtk2)
+      libpurple_plugins = [ ];
 
       inherit (cfg) extraSettings;
       inherit (cfg) extraDefaults;

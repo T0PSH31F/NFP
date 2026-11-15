@@ -75,6 +75,8 @@
     "nodejs-20.20.2"
     "nodejs-slim-20.20.2"
     "webull-desktop-9.3.0"
+    "webull-desktop-9.15.0"
+    "qutebrowser-3.7.0" # eMudhra TLS advisory in nixpkgs 26.11 (enabled on z0r0)
     "electron-40.10.5"
     "electron-41.10.3"
     "electron-41.10.6"
