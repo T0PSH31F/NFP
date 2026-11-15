@@ -21,6 +21,8 @@ let
   userHome = "/home/${user}";
   todoBackend = ../../70-agents/75-mcp/nfp-todo-mcp.py;
   pythonBin = "${pkgs.python3}/bin/python3";
+  rofiBin = "${pkgs.rofi}/bin/rofi";
+  jqBin = "${pkgs.jq}/bin/jq";
 
   # Rofi multi-agent to-do launcher & quick-add popup
   rofi-todo = pkgs.writeShellScriptBin "rofi-todo" ''
@@ -43,10 +45,143 @@ let
     quick_add_prompt() {
       local default_tag="''${1:-}"
       local new_task
-      new_task=$(rofi -dmenu -i -p "Quick Add (@hermes/@pi/@opencode/@me):" -filter "$default_tag" -theme-str 'window {width: 48%; listview {lines: 0;}}') || true
+      new_task=$("${rofiBin}" -dmenu -i -p "Quick Add (@hermes/@pi/@opencode/@claude/@agy/@me):" -filter "$default_tag" -theme-str 'window {width: 48%; listview {lines: 0;}}') || true
       if [ -n "''${new_task:-}" ]; then
         "${pythonBin}" "${todoBackend}" --file "$TODO_FILE" --agent erik add "$new_task" >/dev/null
       fi
+    }
+
+    task_action_menu() {
+      local sec="$1"
+      local desc="$2"
+
+      local inspect_json
+      inspect_json=$("${pythonBin}" "${todoBackend}" --file "$TODO_FILE" inspect --section "$sec" "$desc" 2>/dev/null || echo '{"actions":[],"task":{"status":" "}}')
+
+      local cur_status
+      cur_status=$(echo "$inspect_json" | "${jqBin}" -r '.task.status // " "')
+
+      local action_items=()
+
+      # 1. Contextual Jump / Action items (URLs, files, dirs)
+      local targets_raw
+      targets_raw=$(echo "$inspect_json" | "${jqBin}" -r '.actions[]? | "\(.label)\t\(.type)\t\(.target)"')
+
+      local target_entries=()
+      if [ -n "$targets_raw" ]; then
+        while IFS= read -r line; do
+          [ -n "$line" ] && target_entries+=("$line")
+        done <<< "$targets_raw"
+      fi
+
+      for entry in "''${target_entries[@]}"; do
+        local lbl
+        lbl=$(echo "$entry" | cut -f1)
+        action_items+=("$lbl")
+      done
+
+      # 2. Status Transitions
+      if [ "$cur_status" = "x" ]; then
+        action_items+=("🔄 Re-Open Task (mark [ ])")
+      else
+        action_items+=("✓ Mark Completed ([x])")
+        if [ "$cur_status" != ">" ]; then
+          action_items+=("▶ Mark In-Progress ([>])")
+        else
+          action_items+=("☐ Mark as Open ([ ])")
+        fi
+      fi
+
+      # 3. Actions & Management
+      action_items+=("🤖 Reassign to Agent...")
+      action_items+=("📝 Open Shared Todo in Editor")
+      action_items+=("🗑️ Delete Task")
+      action_items+=("⬅ Back to Task List")
+
+      local short_desc
+      short_desc=$(echo "$desc" | cut -c1-50)
+      [ ''${#desc} -gt 50 ] && short_desc="''${short_desc}..."
+
+      local action_choice
+      action_choice=$(printf '%s\n' "''${action_items[@]}" | "${rofiBin}" -dmenu -i -p "Action [$sec]: $short_desc" -theme-str 'window {width: 60%;}') || true
+
+      [ -z "''${action_choice:-}" ] || [ "$action_choice" = "⬅ Back to Task List" ] && return 0
+
+      # Check if user picked an actionable target
+      for entry in "''${target_entries[@]}"; do
+        local lbl t_type target
+        lbl=$(echo "$entry" | cut -f1)
+        t_type=$(echo "$entry" | cut -f2)
+        target=$(echo "$entry" | cut -f3)
+
+        if [ "$action_choice" = "$lbl" ]; then
+          case "$t_type" in
+            url)
+              if command -v brave >/dev/null 2>&1; then
+                brave "$target" >/dev/null 2>&1 &
+              else
+                xdg-open "$target" >/dev/null 2>&1 &
+              fi
+              exit 0
+              ;;
+            file)
+              if command -v ghostty >/dev/null 2>&1; then
+                ghostty -e "$EDITOR_CMD" "$target" >/dev/null 2>&1 &
+              else
+                xdg-open "$target" >/dev/null 2>&1 &
+              fi
+              exit 0
+              ;;
+            dir)
+              if command -v dolphin >/dev/null 2>&1; then
+                dolphin "$target" >/dev/null 2>&1 &
+              elif command -v ghostty >/dev/null 2>&1; then
+                ghostty --working-directory="$target" >/dev/null 2>&1 &
+              else
+                xdg-open "$target" >/dev/null 2>&1 &
+              fi
+              exit 0
+              ;;
+          esac
+        fi
+      done
+
+      case "$action_choice" in
+        "✓ Mark Completed"*)
+          "${pythonBin}" "${todoBackend}" --file "$TODO_FILE" --agent erik toggle --section "$sec" "$desc" --state x >/dev/null || true
+          ;;
+        "🔄 Re-Open Task"*)
+          "${pythonBin}" "${todoBackend}" --file "$TODO_FILE" --agent erik toggle --section "$sec" "$desc" --state " " >/dev/null || true
+          ;;
+        "▶ Mark In-Progress"*)
+          "${pythonBin}" "${todoBackend}" --file "$TODO_FILE" --agent erik toggle --section "$sec" "$desc" --state ">" >/dev/null || true
+          ;;
+        "☐ Mark as Open"*)
+          "${pythonBin}" "${todoBackend}" --file "$TODO_FILE" --agent erik toggle --section "$sec" "$desc" --state " " >/dev/null || true
+          ;;
+        "🤖 Reassign to Agent...")
+          local target_agent
+          target_agent=$(printf '%s\n' "hermes" "pi" "opencode" "claude" "agy" "erik" | "${rofiBin}" -dmenu -i -p "Reassign to Agent:" -theme-str 'window {width: 25%;}') || true
+          if [ -n "''${target_agent:-}" ]; then
+            "${pythonBin}" "${todoBackend}" --file "$TODO_FILE" --agent erik reassign --from-section "$sec" --to-section "$target_agent" "$desc" >/dev/null || true
+          fi
+          ;;
+        "📝 Open Shared Todo in Editor")
+          if command -v ghostty >/dev/null 2>&1; then
+            ghostty -e "$EDITOR_CMD" "$TODO_FILE" >/dev/null 2>&1 &
+          else
+            "$EDITOR_CMD" "$TODO_FILE"
+          fi
+          exit 0
+          ;;
+        "🗑️ Delete Task")
+          local confirm
+          confirm=$(printf '%s\n' "Yes, delete task" "Cancel" | "${rofiBin}" -dmenu -i -p "Confirm Deletion:" -theme-str 'window {width: 25%;}') || true
+          if [ "$confirm" = "Yes, delete task" ]; then
+            "${pythonBin}" "${todoBackend}" --file "$TODO_FILE" --agent erik delete --section "$sec" "$desc" >/dev/null || true
+          fi
+          ;;
+      esac
     }
 
     if [ "''${1:-}" = "--quick-add" ] || [ "''${1:-}" = "-a" ]; then
@@ -73,6 +208,9 @@ let
       else
         menu_items+=("🔎 Filter by Agent / Section...")
       fi
+      menu_items+=("🌐 Open Hermes Agent UI (z0r0:3000)")
+      menu_items+=("🦊 Open Live Browser Automation (Camoufox:9377)")
+      menu_items+=("📁 Open Agent Reports (~/Notes/EverOS/reports)")
       menu_items+=("📝 Open Shared Todo in Editor")
       menu_items+=("❌ Quit")
 
@@ -81,7 +219,7 @@ let
         prompt_label="Todo [$SECTION_FILTER]:"
       fi
 
-      choice=$(printf '%s\n' "''${menu_items[@]}" | rofi -dmenu -i -p "$prompt_label" -theme-str 'window {width: 52%;}') || true
+      choice=$(printf '%s\n' "''${menu_items[@]}" | "''${rofiBin}" -dmenu -i -p "$prompt_label" -theme-str 'window {width: 52%;}') || true
 
       [ -z "''${choice:-}" ] && exit 0
 
@@ -93,12 +231,37 @@ let
           SECTION_FILTER=""
           ;;
         "🔎 Filter by Agent / Section...")
-          sec_choice=$(printf '%s\n' "all" "erik" "hermes" "pi" "opencode" "claude" "gemini" "ideas" | rofi -dmenu -i -p "Section:" -theme-str 'window {width: 30%;}') || true
+          sec_choice=$(printf '%s\n' "all" "erik" "hermes" "pi" "opencode" "claude" "agy" "ideas" | "''${rofiBin}" -dmenu -i -p "Section:" -theme-str 'window {width: 30%;}') || true
           if [ -z "''${sec_choice:-}" ] || [ "$sec_choice" = "all" ]; then
             SECTION_FILTER=""
           else
             SECTION_FILTER="$sec_choice"
           fi
+          ;;
+        "🌐 Open Hermes Agent UI"*)
+          if command -v brave >/dev/null 2>&1; then
+            brave "http://100.64.0.1:3000" >/dev/null 2>&1 &
+          else
+            xdg-open "http://100.64.0.1:3000" >/dev/null 2>&1 &
+          fi
+          exit 0
+          ;;
+        "🦊 Open Live Browser Automation"*)
+          if command -v brave >/dev/null 2>&1; then
+            brave "http://127.0.0.1:9377" >/dev/null 2>&1 &
+          else
+            xdg-open "http://127.0.0.1:9377" >/dev/null 2>&1 &
+          fi
+          exit 0
+          ;;
+        "📁 Open Agent Reports"*)
+          mkdir -p "$HOME/Notes/EverOS/reports"
+          if command -v dolphin >/dev/null 2>&1; then
+            dolphin "$HOME/Notes/EverOS/reports" >/dev/null 2>&1 &
+          else
+            xdg-open "$HOME/Notes/EverOS/reports" >/dev/null 2>&1 &
+          fi
+          exit 0
           ;;
         "📝 Open Shared Todo in Editor")
           if command -v ghostty >/dev/null 2>&1; then
@@ -115,7 +278,7 @@ let
           sec_raw=$(echo "$choice" | sed -E 's/^[✓☐▶] \[([^]]+)\].*$/\1/' | tr '[:upper:]' '[:lower:]')
           desc=$(echo "$choice" | sed -E 's/^[✓☐▶] \[[^]]+\][[:space:]]+//')
           if [ -n "$desc" ]; then
-            "${pythonBin}" "${todoBackend}" --file "$TODO_FILE" --agent erik toggle --section "$sec_raw" "$desc" >/dev/null || true
+            task_action_menu "$sec_raw" "$desc"
           fi
           ;;
         *)
@@ -134,7 +297,7 @@ let
     BREAKDOWN_FILE="''${BREAKDOWN_FILE:-$HOME/Notes/EverOS/todo-breakdown.md}"
     STATE_FILE="''${STATE_FILE:-$HOME/.local/share/todo-hook-state.txt}"
     LOG_FILE="''${LOG_FILE:-$HOME/.local/share/todo-hook.log}"
-    LOCK_FILE="/tmp/todo-hermes-hook.lock"
+    LOCK_FILE="''${XDG_RUNTIME_DIR:-/tmp}/todo-hermes-hook.lock"
 
     mkdir -p "$(dirname "$LOG_FILE")" "$(dirname "$STATE_FILE")"
 
@@ -150,10 +313,7 @@ let
     fi
     [ ! -f "$STATE_FILE" ] && touch "$STATE_FILE"
 
-    open_tasks=$("${pythonBin}" "${todoBackend}" --file "$TODO_FILE" list --section erik --status open --rofi | sed -E 's/^[✓☐▶] \[[^]]+\][[:space:]]+//' || true)
-    if [ -z "$open_tasks" ]; then
-      exit 0
-    fi
+    raw_json=$("${pythonBin}" "${todoBackend}" --file "$TODO_FILE" list --section erik --status open --json 2>/dev/null || echo '{"tasks":[]}')
 
     new_tasks=()
     while IFS= read -r t; do
@@ -161,7 +321,7 @@ let
       if ! grep -Fxq "$t" "$STATE_FILE" 2>/dev/null; then
         new_tasks+=("$t")
       fi
-    done <<< "$open_tasks"
+    done < <(echo "$raw_json" | ${pkgs.jq}/bin/jq -r '.tasks[]? | select(.status == " " and (.text | test("\\(claimed by @") | not)) | .text')
 
     if [ ''${#new_tasks[@]} -eq 0 ]; then
       exit 0
@@ -175,6 +335,8 @@ let
         "${pythonBin}" "${todoBackend}" --file "$TODO_FILE" --agent pi claim "$task" >/dev/null 2>&1 || true
       elif [[ "$task" =~ @opencode ]]; then
         "${pythonBin}" "${todoBackend}" --file "$TODO_FILE" --agent opencode claim "$task" >/dev/null 2>&1 || true
+      elif [[ "$task" =~ @agy || "$task" =~ @antigravity || "$task" =~ @gemini ]]; then
+        "${pythonBin}" "${todoBackend}" --file "$TODO_FILE" --agent agy claim "$task" >/dev/null 2>&1 || true
       fi
     done
   '';
@@ -206,7 +368,7 @@ let
   todoTemplate = ''
     # NFP Shared Todo List
 
-    > Shared between Erik and NFP AI Agents. Tag tasks with `@hermes`, `@pi`, `@opencode`, `@claude`, or `@gemini`.
+    > Shared between Erik and NFP AI Agents. Tag tasks with `@hermes`, `@pi`, `@opencode`, `@claude`, or `@agy`.
 
     ## Erik
     - [ ] Review agent progress and daily priorities
@@ -219,7 +381,7 @@ let
 
     ## Claude
 
-    ## Gemini
+    ## Antigravity
 
     ## Ideas
   '';
@@ -228,6 +390,7 @@ in
 {
   config = lib.mkIf cfg.enable {
     environment.systemPackages = [
+      pkgs.rofi
       rofi-todo
       todo-hermes-hook
       todo-morning-roundup

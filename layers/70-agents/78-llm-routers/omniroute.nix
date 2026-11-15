@@ -102,7 +102,9 @@ with lib;
         case "''${1:-up}" in
           up)
             cd "$DATA_DIR"
-            ${pkgs.podman-compose}/bin/podman-compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" up -d --remove-orphans 2>&1
+            ${pkgs.podman}/bin/podman network exists omniroute_default || ${pkgs.podman}/bin/podman network create omniroute_default
+            ${pkgs.podman-compose}/bin/podman-compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" down --remove-orphans >/dev/null 2>&1 || true
+            ${pkgs.podman-compose}/bin/podman-compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" up -d --remove-orphans --force-recreate 2>&1
             ;;
           down)
             cd "$DATA_DIR"

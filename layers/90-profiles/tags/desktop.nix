@@ -28,9 +28,12 @@
         };
       };
       desktop.experience = lib.mkDefault "noctalia";
-      layer-50.cli = {
-        terminal-toys.enable = lib.mkDefault true;
-        yazelix-nova.enable = lib.mkDefault true;
+      layer-50 = {
+        cli = {
+          terminal-toys.enable = lib.mkDefault true;
+          yazelix-nova.enable = lib.mkDefault true;
+        };
+        home.cli.services.rclone.enable = lib.mkDefault true;
       };
       layer-60.gui = {
         gedit.enable = lib.mkDefault true;

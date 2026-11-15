@@ -28,7 +28,11 @@ from typing import Any, Dict, List, Optional
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [REFLECTION] %(message)s")
 
-REPO_ROOT = Path(__file__).resolve().parents[3]
+_file_parents = Path(__file__).resolve().parents
+REPO_ROOT = Path(
+    os.environ.get("NFP_REPO_DIR")
+    or (_file_parents[3] if len(_file_parents) > 3 else Path.cwd())
+)
 DEFAULT_PI_DURABLE_DB = Path(os.environ.get("PI_STATE_DB", Path.home() / ".local/share/pi-durable/state.sqlite"))
 DEFAULT_SCREENPIPE_DB = Path(os.environ.get("SCREENPIPE_DB", Path.home() / ".local/share/jarvis/screenpipe.db"))
 DEFAULT_PROFILE_MD = Path(os.environ.get("USER_PROFILE_PATH", REPO_ROOT / ".agents/memory/user_profile.md"))

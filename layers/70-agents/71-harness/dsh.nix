@@ -90,6 +90,8 @@ in
 
       sessionVariables = {
         OPENAI_BASE_URL = lib.mkDefault "http://127.0.0.1:20128/v1";
+        OPENAI_MODEL = lib.mkDefault "Free";
+        DSH_MODEL = lib.mkDefault "Free";
         ANTHROPIC_BASE_URL = lib.mkDefault "http://127.0.0.1:20128/v1";
         OPENAI_BASE_URL_EXTREME_ROUTER = lib.mkDefault "http://127.0.0.1:20128/v1";
         OPENAI_BASE_URL_KONG_ER = "http://luffy.nfp.nix:8090/v1";
@@ -118,6 +120,23 @@ in
       ];
 
       config = mkIf (cfg.enable or false) {
+        home.file = {
+          ".dsh/profiles/headless/cordis.patch.yml".text = ''
+            - id: agent-default-model
+              name: '@deepseek-ai/dsh-agent-default-model'
+              config:
+                provider: openai
+                model: Free
+          '';
+          ".dsh/profiles/web/cordis.patch.yml".text = ''
+            - id: agent-default-model
+              name: '@deepseek-ai/dsh-agent-default-model'
+              config:
+                provider: openai
+                model: Free
+          '';
+        };
+
         programs.dsh = {
           enable = true;
           inherit (cfg) package;

@@ -1,0 +1,42 @@
+{
+    "hk55": {
+        "file": "f5_hk55.wav",
+        "text": "Conclusion: you have just shown me your soft, meatbag-like underbellies and said, HK-47, please shoot me repeatedly there until I die."
+    },
+    "jarvis": {
+        "file": "f5_jarvis.wav",
+        "text": "Oh, good day, sir. I hope you are well today. We have visitors."
+    },
+    "cortana": {
+        "file": "f5_cortana.wav",
+        "text": "A dozen Covenant superior battleships against a single Halcyon class cruiser. According to my analysis of the available data, I believe the best course of action is somewhat risky."
+    },
+    "vince_noir": {
+        "file": "f5_vince_noir.wav",
+        "text": "I love hanging out with Ferry. We used to go hunting, fishing. We lived in a small house made out of bus tickets."
+    },
+    "prinnies": {
+        "file": "f5_prinnies.wav",
+        "text": "Lord Valvatorez, all of the Prinnies have been gathered! Please come to the Prinny Factory!"
+    },
+    "roll_casket": {
+        "file": "f5_roll_casket.wav",
+        "text": "Megaman, can you hear me? The Mayor says there is something real important she has to talk with you."
+    },
+    "navi": {
+        "file": "f5_navi.wav",
+        "text": "Log in, Lain. Authorized."
+    },
+    "lain": {
+        "file": "f5_lain.wav",
+        "text": "Okay, let us see. I guess that I am confused again. Am I here or am I there? I do not know. Over there, I am everywhere."
+    },
+    "adjutant": {
+        "file": "f5_adjutant.wav",
+        "text": "Add on, complete. Our allies base is under attack. Our allies are being attacked."
+    },
+    "paimon": {
+        "file": "f5_paimon.wav",
+        "text": "Hello, my name is Paimon. Oh, Paimon already learned some unique conversation!"
+    }
+}

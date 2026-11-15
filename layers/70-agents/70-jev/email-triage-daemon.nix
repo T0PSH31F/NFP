@@ -26,8 +26,8 @@ in
 
     himalayaAccount = lib.mkOption {
       type = lib.types.str;
-      default = "wrighterik77";
-      description = "Himalaya email account name";
+      default = "wrighterik77,lovelainautomations";
+      description = "Comma-separated Himalaya email account name(s)";
     };
 
     jevUrl = lib.mkOption {
@@ -73,7 +73,17 @@ in
       path = [
         pkgs.himalaya
         pkgs.coreutils
+        pkgs.bash
+        pkgs.python3
+        pkgs.libnotify
+        pkgs.pipewire
+        pkgs.util-linux
       ];
+      environment = {
+        XDG_RUNTIME_DIR = "/run/user/1000";
+        DBUS_SESSION_BUS_ADDRESS = "unix:path=/run/user/1000/bus";
+        PIPEWIRE_RUNTIME_DIR = "/run/user/1000";
+      };
       serviceConfig = {
         Type = "oneshot";
         User = user;

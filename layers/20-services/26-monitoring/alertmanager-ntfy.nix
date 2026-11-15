@@ -33,6 +33,12 @@ in
       default = "http://localhost:9093";
       description = "Prometheus Alertmanager URL";
     };
+
+    port = mkOption {
+      type = types.port;
+      default = 8094;
+      description = "HTTP listen port for alertmanager-ntfy webhook receiver (avoids :8000 collision with honcho-api)";
+    };
   };
 
   config = mkIf cfg.enable {
@@ -55,7 +61,7 @@ in
         wantedBy = [ "multi-user.target" ];
 
         serviceConfig = {
-          ExecStart = "${pkgs.alertmanager-ntfy}/bin/alertmanager-ntfy --configs ${configFile} --ntfy-baseurl ${cfg.ntfyUrl} --ntfy-topic ${cfg.ntfyTopic}";
+          ExecStart = "${pkgs.alertmanager-ntfy}/bin/alertmanager-ntfy --http-addr 127.0.0.1:${toString cfg.port} --configs ${configFile} --ntfy-baseurl ${cfg.ntfyUrl} --ntfy-topic ${cfg.ntfyTopic}";
           Restart = "always";
           RestartSec = 5;
         };

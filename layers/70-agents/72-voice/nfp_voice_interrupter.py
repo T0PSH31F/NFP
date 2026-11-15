@@ -20,10 +20,18 @@ from datetime import datetime, timezone
 PERSONAS_MANIFEST = Path(__file__).parent / "personas.json"
 DEFAULT_STATE_DB = Path.home() / ".local/share/pi-durable/state.sqlite"
 
+if str(Path(__file__).resolve().parent) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+from persona_manager import PersonaManager
+
 # Subprocess names to terminate upon barge-in interrupt
 TTS_TARGET_BINARIES = ("glados-tts-cli", "pw-play", "piper", "paplay", "aplay", "whisper-server")
 
 def load_personas() -> dict:
+    mgr = PersonaManager()
+    loaded = {p["id"]: p for p in mgr.list_personas()}
+    if loaded:
+        return loaded
     if not PERSONAS_MANIFEST.exists():
         return {}
     with open(PERSONAS_MANIFEST, "r", encoding="utf-8") as f:

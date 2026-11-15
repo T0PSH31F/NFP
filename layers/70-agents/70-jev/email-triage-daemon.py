@@ -249,7 +249,85 @@ def update_maildir_flags(file_path, action_required):
     return file_path
 
 
-def triage_himalaya_account(account, args, processed_keys, history):
+def _invoke_glados_alert(title, risk, verdict, approval, message):
+    glados_alert = "/home/t0psh31f/.local/bin/glados-alert.sh"
+    if not os.path.exists(glados_alert):
+        return
+    cmd = [
+        glados_alert,
+        "--title",
+        title,
+        "--source",
+        "jev-email-triage",
+        "--risk",
+        risk,
+        "--verdict",
+        verdict,
+    ]
+    if approval:
+        cmd.append("--approval")
+    cmd.append(message)
+    try:
+        subprocess.Popen(cmd)
+    except Exception as exc:
+        sys.stderr.write(f"glados-alert dispatch failed: {exc}\n")
+
+
+def flush_email_alerts(pending_alerts):
+    """Dispatch individual alerts for small counts, or coalesce bursts into a clean summary."""
+    if not pending_alerts:
+        return
+    action_items = [a for a in pending_alerts if a["action_required"]]
+    if len(pending_alerts) <= 2:
+        for item in pending_alerts:
+            sender_short = (item["sender"] or "unknown")[:35]
+            subj_short = (item["subject"] or "(no subject)")[:60]
+            reason = "action required" if item["action_required"] else "low-confidence triage"
+            msg = (
+                f"Attention. {reason.capitalize()} in {item['source']} [{item['category']}] "
+                f"from {sender_short}. Subject: {subj_short}."
+            )
+            _invoke_glados_alert(
+                f"Jev Email Triage ({item['category']})",
+                "high" if item["action_required"] else "medium",
+                "DISPATCH_AGENT" if item["action_required"] else "NOTIFY",
+                item["action_required"],
+                msg,
+            )
+        return
+
+    for item in action_items[:2]:
+        sender_short = (item["sender"] or "unknown")[:35]
+        subj_short = (item["subject"] or "(no subject)")[:60]
+        msg = (
+            f"Urgent email in {item['source']} [{item['category']}] "
+            f"from {sender_short}. Subject: {subj_short}."
+        )
+        _invoke_glados_alert(
+            f"Jev Urgent Email ({item['category']})",
+            "high",
+            "DISPATCH_AGENT",
+            True,
+            msg,
+        )
+
+    remaining = len(pending_alerts) - min(len(action_items), 2)
+    if remaining > 0:
+        sample = "; ".join(a["subject"][:32] for a in pending_alerts[:3])
+        msg = (
+            f"Inbox triage notice. {len(pending_alerts)} emails need review "
+            f"({len(action_items)} action-required). Recent subjects: {sample}."
+        )
+        _invoke_glados_alert(
+            f"Jev Email Batch ({len(pending_alerts)} items)",
+            "high" if action_items else "medium",
+            "DISPATCH_AGENT" if action_items else "NOTIFY",
+            bool(action_items),
+            msg,
+        )
+
+
+def triage_himalaya_account(account, args, processed_keys, history, pending_alerts=None):
     """Triage remote IMAP account via himalaya CLI."""
     cmd = ["himalaya", "-a", account, "envelope", "list", "--page-size", "25", "--json"]
     try:
@@ -322,6 +400,15 @@ def triage_himalaya_account(account, args, processed_keys, history):
             processed_keys.add(unique_key)
             triaged += 1
 
+            if (is_escalation or action_req) and pending_alerts is not None:
+                pending_alerts.append({
+                    "source": f"Himalaya:{account}",
+                    "sender": from_str,
+                    "subject": subject,
+                    "category": category,
+                    "action_required": bool(action_req),
+                })
+
             send_langfuse_trace(
                 name="jev-email-triage",
                 input_data={"subject": subject, "from": from_str, "account": account},
@@ -364,6 +451,7 @@ def run_triage(args):
 
     total_scanned = 0
     total_triaged = 0
+    pending_alerts = []
 
     for md in maildir_paths:
         sys.stderr.write(f"Scanning Maildir: {md}\n")
@@ -411,16 +499,14 @@ def run_triage(args):
                 history.append(record)
                 total_triaged += 1
 
-                if is_escalation:
-                    glados_alert = "/home/t0psh31f/.local/bin/glados-alert.sh"
-                    if os.path.exists(glados_alert):
-                        sender_short = parsed["from"][:25]
-                        subj_short = parsed["subject"][:40]
-                        alert_msg = f"Attention. Urgent email requiring triage from {sender_short}. Subject: {subj_short}."
-                        try:
-                            subprocess.Popen([glados_alert, alert_msg])
-                        except Exception:
-                            pass
+                if is_escalation or action_req:
+                    pending_alerts.append({
+                        "source": "Maildir",
+                        "sender": parsed["from"],
+                        "subject": parsed["subject"],
+                        "category": category,
+                        "action_required": bool(action_req),
+                    })
 
                 send_langfuse_trace(
                     name="jev-email-triage-maildir",
@@ -431,14 +517,19 @@ def run_triage(args):
 
     # Always check himalaya if available and either no maildir or himalaya-account requested
     if args.himalaya_account or not maildir_paths:
-        accounts = [args.himalaya_account] if args.himalaya_account else ["wrighterik77", "lovelainautomations"]
+        accounts = (
+            [a.strip() for a in args.himalaya_account.split(",") if a.strip()]
+            if args.himalaya_account
+            else ["wrighterik77", "lovelainautomations"]
+        )
         for acct in accounts:
             sys.stderr.write(f"Scanning Himalaya account: {acct}\n")
-            h_scanned, h_triaged = triage_himalaya_account(acct, args, processed_keys, history)
+            h_scanned, h_triaged = triage_himalaya_account(acct, args, processed_keys, history, pending_alerts)
             total_scanned += h_scanned
             total_triaged += h_triaged
 
     if not args.dry_run:
+        flush_email_alerts(pending_alerts)
         # Keep last 500 history entries
         processed_data["processed_files"] = list(processed_keys)[-2000:]
         processed_data["history"] = history[-500:]
@@ -455,7 +546,7 @@ def run_triage(args):
 def main():
     parser = argparse.ArgumentParser(description="Jev Email Triage Daemon")
     parser.add_argument("--maildir", help="Path to local Maildir root")
-    parser.add_argument("--himalaya-account", default="wrighterik77", help="Himalaya account name")
+    parser.add_argument("--himalaya-account", default="wrighterik77,lovelainautomations", help="Comma-separated Himalaya account name(s)")
     parser.add_argument("--jev-url", default=DEFAULT_JEV_URL, help="Jev engine URL")
     parser.add_argument("--scan-all", action="store_true", help="Historical backfill: scan all messages")
     parser.add_argument("--dry-run", action="store_true", help="Dry run mode: do not alter mail flags")

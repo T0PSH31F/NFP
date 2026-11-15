@@ -1,0 +1,177 @@
+{
+    "glados": {
+        "description": "GLaDOS (Portal / Aperture Science)",
+        "refs": [
+            {
+                "file": "glados_01.wav",
+                "text": "This was a triumph. I am making a note here. Huge success.",
+                "source_query": "GLaDOS Portal voice lines"
+            },
+            {
+                "file": "glados_02.wav",
+                "text": "The Enrichment Center reminds you that the weighted companion cube cannot speak.",
+                "source_query": "GLaDOS Portal 2 quotes"
+            }
+        ]
+    },
+    "hk55": {
+        "description": "HK-55 Assassin Droid (Star Wars: KOTOR / SWTOR)",
+        "refs": [
+            {
+                "file": "hk55_01.wav",
+                "text": "So, I cannot harm you, statement. That is correct.",
+                "source_query": "HK 55 voice lines KOTOR"
+            },
+            {
+                "file": "hk55_02.wav",
+                "text": "conclusion and you cannot harm me irritated statement that is what we said obsolete unit there must be a delay in your processors statement then that is all I need to know confused query where are you going in effect you will command stop ineffectual command we command you to stop statement but you said so yourself you have just admitted your own",
+                "source_query": "Best HK-47 Line"
+            },
+            {
+                "file": "hk55_03.wav",
+                "text": "to stop statement but you said so yourself you have just admitted your own weakness conclusion you have just shown me your soft meatbag like underbelly's and said HK 47 please shoot me repeatedly there until I die statement you cannot stop me you cannot harm me in order to",
+                "source_query": "Best HK-47 Line"
+            }
+        ]
+    },
+    "jarvis": {
+        "description": "British Butler / J.A.R.V.I.S. (Refined English Gentleman)",
+        "refs": [
+            {
+                "file": "jarvis_01.wav",
+                "text": "Ahem. Oh, good day, sir. I hope you are well today. We have visitors. Yes, indeed, sir. We have been planning for the spa-ray all day, and everything must be absolutely perfect for the-",
+                "source_query": "British Butler Voice style PETER BAKER UK VOICEOVER"
+            },
+            {
+                "file": "jarvis_02.wav",
+                "text": "and everything must be absolutely perfect for the guest's arrival. Yes, you must be careful around those two. I think I will sit this one out for my own safety. Yes, a bow tie is a mandatory...",
+                "source_query": "British Butler Voice style PETER BAKER UK VOICEOVER"
+            }
+        ]
+    },
+    "cortana": {
+        "description": "Cortana AI (Halo Series)",
+        "refs": [
+            {
+                "file": "cortana_01.wav",
+                "text": "A dozen Covenant superior battleships against a single Halcyon class cruiser. According to my analysis of the available data, I believe the best course of action is somewhat risky. An explosion of sufficient size will help destabilize the ring, and will cut through a number of primary systems. We need to trigger a detonation on a large scale, however.",
+                "source_query": "Halo Combat Evolved - Cortana Voice Lines"
+            },
+            {
+                "file": "cortana_02.wav",
+                "text": "here until she can move in alert a covenant is making a run for that stationary gun take him out alert covenant dropship has detected us here they come alert covenant dropship inbound they must be looking for survivors I recommend immediate evasion alert come",
+                "source_query": "Halo Combat Evolved - Cortana Voice Lines"
+            }
+        ]
+    },
+    "adjutant": {
+        "description": "Terran Adjutant (StarCraft II)",
+        "refs": [
+            {
+                "file": "adjutant_01.wav",
+                "text": "Add on, complete. Our allies base is under attack. Our allies are being attacked.",
+                "source_query": "StarCraft Adjutant voice lines"
+            },
+            {
+                "file": "adjutant_02.wav",
+                "text": "Add on, complete. Our allies base is under attack. Our allies are being attacked.",
+                "source_query": "StarCraft 2 Adjutant alert"
+            }
+        ]
+    },
+    "vince_noir": {
+        "description": "Vince Noir (The Mighty Boosh)",
+        "refs": [
+            {
+                "file": "vince_01.wav",
+                "text": "raised in the forests by Brian Ferrie. It was amazing. Magic times. I love hanging out with Ferrie. We used to go hunting, fishing. We lived in a small house made out of bus tickets.",
+                "source_query": "Vince's story (Mighty Boosh)"
+            },
+            {
+                "file": "vince_02.wav",
+                "text": "bits are all on the stage you make really, otherwise you don't learn anything. I'd probably tell myself to stop showing off, stop showing off, what are you doing? I'd probably just be embarrassed by my younger self, what were you thinking? But it was good because it was sort of the bush was...",
+                "source_query": "Interview 5: Noel Fielding on The Mighty Boosh"
+            },
+            {
+                "file": "vince_03.wav",
+                "text": "Brilliant. The problem was Brian used to go and talk quite a lot so he used to leave me with various different animals I remember one time he left me with Jahoulie the leopard who was pretty irresponsible He used to take me out killing gazelles Knowing full well that Brian was a strict",
+                "source_query": "Vince's story (Mighty Boosh)"
+            }
+        ]
+    },
+    "paimon": {
+        "description": "Paimon (Genshin Impact)",
+        "refs": [
+            {
+                "file": "paimon_01.wav",
+                "text": "Hello, my name is Paimon.",
+                "source_query": "Paimon voice lines Genshin Impact"
+            },
+            {
+                "file": "paimon_02.wav",
+                "text": "Oh, Paimon's already learned some unique conversation. Mark my words! Vengeance will be mine!",
+                "source_query": "Paimon emergency food quote"
+            }
+        ]
+    },
+    "prinnies": {
+        "description": "Prinnies (Disgaea Series)",
+        "refs": [
+            {
+                "file": "prinnies_01.wav",
+                "text": "dude i know it's way dangerous we're not cut out for this dude hey i'm here to pick up your recyclables dude",
+                "source_query": "Prinny PSP: Over 100 favorite DOOD clips!"
+            },
+            {
+                "file": "prinnies_02.wav",
+                "text": "Perfect timing. Let's get this thing's opinion. Um, excuse me, dude. Can I just grab something real quick? That sounds pretty lazy, dude. You don't mind if I keep this, right? See ya, dude!",
+                "source_query": "Prinny PSP: Over 100 favorite DOOD clips!"
+            }
+        ]
+    },
+    "roll_casket": {
+        "description": "Roll Casket (Mega Man Legends)",
+        "refs": [
+            {
+                "file": "roll_01.wav",
+                "text": "It looks like you didn't get all the fires, Mega Man. I don't think that's where the fire started, Mega Man. Why did you do that?",
+                "source_query": "Roll Casket voice clips Mega Man Legends"
+            },
+            {
+                "file": "roll_02.wav",
+                "text": "Megaman, can you hear me? The Mayor says there's something real important she has to talk with you.",
+                "source_query": "Roll Casket dialogue"
+            }
+        ]
+    },
+    "navi": {
+        "description": "Navi OS (Serial Experiments Lain)",
+        "refs": [
+            {
+                "file": "navi_01.wav",
+                "text": "Lane. Please state your name. User Lane has new email. Who's it from?",
+                "source_query": "Navi Progression: Serial Experiments Lain"
+            },
+            {
+                "file": "navi_02.wav",
+                "text": "in log in who is the user",
+                "source_query": "NAVI Logon First Model Serial Experiments Lain"
+            }
+        ]
+    },
+    "lain": {
+        "description": "Lain Iwakura (Serial Experiments Lain - English Dub)",
+        "refs": [
+            {
+                "file": "lain_01.wav",
+                "text": "Okay, let's see. I guess that I'm confused again. Am I here or am I there? I don't know. Over there, I'm everywhere. I know that, but here is connected to over there. Is that right?",
+                "source_query": "lain am i me"
+            },
+            {
+                "file": "lain_02.wav",
+                "text": "No, that's not it. I don't have mail. I don't get it.",
+                "source_query": "Unedited scene from Serial Experiments Lain Dub"
+            }
+        ]
+    }
+}

@@ -71,7 +71,7 @@ in
 
     defaultModel = mkOption {
       type = types.str;
-      default = "Coding";
+      default = "Free";
       description = "Default model or router combo for Pi coding agent";
     };
 
@@ -181,7 +181,7 @@ in
     home-manager.users.${user} =
       { pkgs, ... }:
       let
-        piApiKeyCmd = "!cat /home/t0psh31f/.config/sops-nix/secrets/kong_key_pi 2>/dev/null || cat /run/secrets/kong_key_pi 2>/dev/null || printf '%s' \"$KONG_KEY_PI\"";
+        piApiKeyCmd = "!cat /home/t0psh31f/.config/sops-nix/secrets/extremerouter_api_key 2>/dev/null || cat /run/secrets/extremerouter_api_key 2>/dev/null || cat /home/t0psh31f/.config/sops-nix/secrets/kong_key_pi 2>/dev/null || cat /run/secrets/kong_key_pi 2>/dev/null || printf '%s' \"$KONG_KEY_PI\"";
 
         # Explicit model IDs pulled from Kong/ExtremeRouter /v1/models (combos + top providers)
         explicitKongModels = [

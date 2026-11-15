@@ -37,7 +37,7 @@ CANONICAL_SECTIONS: Dict[str, str] = {
     "pi": "Pi",
     "opencode": "OpenCode",
     "claude": "Claude",
-    "gemini": "Gemini",
+    "agy": "Antigravity",
     "ideas": "Ideas",
 }
 
@@ -48,7 +48,9 @@ TAG_TO_SECTION: Dict[str, str] = {
     "@pi": "pi",
     "@opencode": "opencode",
     "@claude": "claude",
-    "@gemini": "gemini",
+    "@agy": "agy",
+    "@antigravity": "agy",
+    "@gemini": "agy",
     "@idea": "ideas",
     "@ideas": "ideas",
 }
@@ -69,6 +71,8 @@ def normalize_section_slug(raw_heading: str) -> Optional[str]:
     # Map legacy '# Tasks' to 'erik'
     if clean in ("tasks", "erik", "inbox", "erik / inbox"):
         return "erik"
+    if clean in ("gemini", "antigravity", "agy", "antigravity (agy)"):
+        return "agy"
     for slug, title in CANONICAL_SECTIONS.items():
         if clean == slug or clean == title.lower():
             return slug
@@ -78,14 +82,14 @@ def normalize_section_slug(raw_heading: str) -> Optional[str]:
 def default_template() -> str:
     return (
         "# NFP Shared Todo List\n\n"
-        "> Shared between Erik and NFP AI Agents. Tag tasks with `@hermes`, `@pi`, `@opencode`, `@claude`, or `@gemini`.\n\n"
+        "> Shared between Erik and NFP AI Agents. Tag tasks with `@hermes`, `@pi`, `@opencode`, `@claude`, or `@agy`.\n\n"
         "## Erik\n"
         "- [ ] Review agent progress and daily priorities\n\n"
         "## Hermes\n\n"
         "## Pi\n\n"
         "## OpenCode\n\n"
         "## Claude\n\n"
-        "## Gemini\n\n"
+        "## Antigravity\n\n"
         "## Ideas\n"
     )
 
@@ -173,11 +177,30 @@ def parse_document(content: str) -> Tuple[List[str], Dict[str, List[Dict[str, An
         m_task = TASK_RE.match(raw_line)
         if m_task:
             indent, status_ch, text = m_task.group(1), m_task.group(2), m_task.group(3)
-            sections[current_section].append({
-                "status": "x" if status_ch in ("x", "X") else status_ch,
-                "text": text.strip(),
-                "indent": indent,
-            })
+            clean_text = text.strip()
+            norm_status = "x" if status_ch in ("x", "X") else status_ch
+
+            # Deduplicate within the section (case-insensitive task text):
+            existing_idx: Optional[int] = None
+            clean_lower = clean_text.lower()
+            for idx, existing in enumerate(sections[current_section]):
+                if existing["text"].strip().lower() == clean_lower:
+                    existing_idx = idx
+                    break
+
+            if existing_idx is not None:
+                # If existing task has same text, preserve whichever status is more progressed (x > > > ' ')
+                existing = sections[current_section][existing_idx]
+                if existing["status"] == " " and norm_status in (">", "x"):
+                    existing["status"] = norm_status
+                elif existing["status"] == ">" and norm_status == "x":
+                    existing["status"] = "x"
+            else:
+                sections[current_section].append({
+                    "status": norm_status,
+                    "text": clean_text,
+                    "indent": indent,
+                })
 
     if not preamble:
         preamble = [
@@ -210,11 +233,15 @@ def check_write_permission(caller_agent: str, target_section: str) -> Tuple[bool
     """
     Enforce section-scoped write guard:
     - 'erik' (human / rofi keybind) can modify any section.
-    - An AI agent ('hermes', 'pi', 'opencode', 'claude', 'gemini') can ONLY modify
+    - An AI agent ('hermes', 'pi', 'opencode', 'claude', 'agy') can ONLY modify
       its own matching section (and 'ideas' if adding an idea).
     """
     caller = caller_agent.strip().lower()
     target = target_section.strip().lower()
+    if caller in ("gemini", "antigravity"):
+        caller = "agy"
+    if target in ("gemini", "antigravity"):
+        target = "agy"
     if caller in ("erik", "human", "user", "t0psh31f", "root"):
         return True, "ok"
     if caller == target:
@@ -262,7 +289,14 @@ def op_list(
         filtered_items = []
         for idx, it in enumerate(items):
             is_done = it["status"] == "x"
-            if status_filter == "open" and is_done:
+            is_in_progress = it["status"] == ">"
+            is_open = it["status"] == " "
+
+            if status_filter == "open" and not is_open:
+                continue
+            if status_filter == "in_progress" and not is_in_progress:
+                continue
+            if status_filter == "pending" and is_done:
                 continue
             if status_filter == "done" and not is_done:
                 continue
@@ -313,6 +347,18 @@ def op_add(
         ensure_todo_file(todo_path)
         with open(todo_path, "r", encoding="utf-8") as f:
             preamble, sections = parse_document(f.read())
+
+        clean_lower = clean_text.lower()
+        for it in sections[target_sec]:
+            if it["text"].strip().lower() == clean_lower:
+                return {
+                    "status": "ok",
+                    "action": "noop_already_exists",
+                    "caller": caller,
+                    "section": target_sec,
+                    "section_title": CANONICAL_SECTIONS[target_sec],
+                    "text": clean_text,
+                }
 
         sections[target_sec].append({
             "status": " ",
@@ -400,10 +446,12 @@ def op_claim(
     caller_agent: str,
 ) -> Dict[str, Any]:
     """
-    Allow an AI agent (`hermes`, `pi`, `opencode`, `claude`, `gemini`) to claim an open task
+    Allow an AI agent (`hermes`, `pi`, `opencode`, `claude`, `agy`) to claim an open task
     from `## Erik` (especially one tagged `@<agent>`) and copy it into `## <Agent>`.
     """
     caller = caller_agent.strip().lower()
+    if caller in ("gemini", "antigravity"):
+        caller = "agy"
     if caller not in CANONICAL_SECTIONS or caller in ("erik", "ideas"):
         return {"status": "error", "error": f"Agent '{caller}' cannot claim tasks into a dedicated agent section."}
 
@@ -423,15 +471,39 @@ def op_claim(
             return {"status": "error", "error": f"Open task matching '{target_query}' not found in ## Erik."}
 
         orig_text = matched_item["text"]
+        clean_task_text = re.sub(r"\s*\(claimed by @[a-zA-Z0-9_-]+\)\s*$", "", orig_text).strip()
+        clean_lower = clean_task_text.lower()
+
+        is_already_claimed = (
+            matched_item["status"] == ">"
+            or f"(claimed by @{caller})" in orig_text.lower()
+        )
+
+        has_in_caller_section = any(
+            it["text"].strip().lower() == clean_lower
+            for it in sections[caller]
+        )
+
+        # Idempotence: if already claimed and present in caller section, noop without file write
+        if is_already_claimed and has_in_caller_section:
+            return {
+                "status": "ok",
+                "action": "already_claimed",
+                "agent": caller,
+                "section": caller,
+                "text": orig_text,
+            }
+
         matched_item["status"] = ">"
         if f"(claimed by @{caller})" not in orig_text:
-            matched_item["text"] = f"{orig_text} (claimed by @{caller})"
+            matched_item["text"] = f"{clean_task_text} (claimed by @{caller})"
 
-        sections[caller].append({
-            "status": " ",
-            "text": orig_text,
-            "indent": "",
-        })
+        if not has_in_caller_section:
+            sections[caller].append({
+                "status": " ",
+                "text": clean_task_text,
+                "indent": "",
+            })
 
         rendered = render_document(preamble, sections)
         with open(todo_path, "w", encoding="utf-8") as f:
@@ -446,8 +518,221 @@ def op_claim(
     }
 
 
-def format_rofi_lines(todo_path: str, section_filter: Optional[str] = None) -> str:
-    data = op_list(todo_path, section_filter=section_filter)
+def op_dedup(todo_path: str) -> Dict[str, Any]:
+    """Deduplicate all tasks across all sections in the todo list."""
+    with FileLock():
+        ensure_todo_file(todo_path)
+        with open(todo_path, "r", encoding="utf-8") as f:
+            raw_content = f.read()
+
+        preamble, sections = parse_document(raw_content)
+        rendered = render_document(preamble, sections)
+        changed = (rendered != raw_content)
+        if changed:
+            with open(todo_path, "w", encoding="utf-8") as f:
+                f.write(rendered)
+
+    return {
+        "status": "ok",
+        "action": "dedup",
+        "file": todo_path,
+        "modified": changed,
+    }
+
+
+def extract_actionable_targets(text: str) -> List[Dict[str, str]]:
+    actions: List[Dict[str, str]] = []
+    seen = set()
+
+    # 1. Markdown links [label](target)
+    for m in re.finditer(r"\[([^\]]+)\]\(([^)]+)\)", text):
+        lbl, target = m.group(1), m.group(2)
+        if target.startswith("file://"):
+            target = target[7:]
+        if target not in seen:
+            seen.add(target)
+            t = "file" if not target.startswith("http") else "url"
+            icon = "🌐" if t == "url" else "📄"
+            actions.append({"label": f"{icon} Open: {lbl}", "type": t, "target": target})
+
+    # 2. Web URLs
+    for m in re.finditer(r"https?://[a-zA-Z0-9_.:/=?&%#~-]+", text):
+        url = m.group(0).rstrip(").,;`")
+        if url not in seen:
+            seen.add(url)
+            actions.append({"label": f"🌐 Open URL: {url}", "type": "url", "target": url})
+
+    # 3. Known web domains
+    for m in re.finditer(r"\b([a-zA-Z0-9-]+\.(?:proton\.me|usenetjunction\.com|github\.com|google\.com|windscribe\.com|ultra\.cc|whatbox\.ca)[a-zA-Z0-9_./=?&%#~-]*)\b", text):
+        dom = m.group(1).rstrip(").,;`")
+        url = "https://" + dom
+        if url not in seen and dom not in seen:
+            seen.add(url)
+            actions.append({"label": f"🌐 Open: {dom}", "type": "url", "target": url})
+
+    # 4. Absolute paths
+    for m in re.finditer(r"(?:file://)?(/[a-zA-Z0-9_.-]+(?:/[a-zA-Z0-9_.-]+)+)", text):
+        path = m.group(1).rstrip(").,;`")
+        if os.path.exists(path) and path not in seen:
+            seen.add(path)
+            is_dir = os.path.isdir(path)
+            t = "dir" if is_dir else "file"
+            icon = "📁" if is_dir else "📄"
+            actions.append({"label": f"{icon} Open {t.capitalize()}: {os.path.basename(path)}", "type": t, "target": path})
+
+    # 5. Relative paths (from home, workspace, or notes)
+    for m in re.finditer(r"\b(Projects/[a-zA-Z0-9_.-]+(?:/[a-zA-Z0-9_.-]+)*|scripts/[a-zA-Z0-9_.-]+|layers/[a-zA-Z0-9_.-]+(?:/[a-zA-Z0-9_.-]+)*|machines/[a-zA-Z0-9_.-]+(?:/[a-zA-Z0-9_.-]+)*)\b", text):
+        rel = m.group(1).rstrip(").,;`")
+        for base in ["/home/t0psh31f", "/home/t0psh31f/Clan/NFP", "/home/t0psh31f/Projects/Streaming_Liberation", "/home/t0psh31f/Notes"]:
+            full = os.path.join(base, rel)
+            if os.path.exists(full) and full not in seen:
+                seen.add(full)
+                is_dir = os.path.isdir(full)
+                t = "dir" if is_dir else "file"
+                icon = "📁" if is_dir else "📄"
+                actions.append({"label": f"{icon} Open {t.capitalize()}: {rel}", "type": t, "target": full})
+                break
+
+    return actions
+
+
+def op_inspect_task(
+    todo_path: str,
+    target_query: str,
+    explicit_section: Optional[str] = None,
+) -> Dict[str, Any]:
+    with FileLock():
+        ensure_todo_file(todo_path)
+        with open(todo_path, "r", encoding="utf-8") as f:
+            _, sections = parse_document(f.read())
+
+    target_sec = normalize_section_slug(explicit_section) if explicit_section else None
+    matched_item = None
+    matched_sec = None
+    q_clean = target_query.strip().lower()
+
+    for sec, items in sections.items():
+        if target_sec and sec != target_sec:
+            continue
+        for it in items:
+            if q_clean in it["text"].lower():
+                matched_item = it
+                matched_sec = sec
+                break
+        if matched_item:
+            break
+
+    if not matched_item:
+        return {"status": "error", "error": f"Task matching '{target_query}' not found."}
+
+    text = matched_item["text"]
+    actions = extract_actionable_targets(text)
+
+    return {
+        "status": "ok",
+        "task": {
+            "section": matched_sec,
+            "section_title": CANONICAL_SECTIONS.get(matched_sec, matched_sec),
+            "text": text,
+            "status": matched_item["status"],
+            "done": matched_item["status"] == "x",
+        },
+        "actions": actions,
+    }
+
+
+def op_delete(
+    todo_path: str,
+    target_query: str,
+    caller_agent: str = "erik",
+    explicit_section: Optional[str] = None,
+) -> Dict[str, Any]:
+    with FileLock():
+        ensure_todo_file(todo_path)
+        with open(todo_path, "r", encoding="utf-8") as f:
+            preamble, sections = parse_document(f.read())
+
+        target_sec = normalize_section_slug(explicit_section) if explicit_section else None
+        deleted_item = None
+        q_clean = target_query.strip().lower()
+
+        for sec, items in sections.items():
+            if target_sec and sec != target_sec:
+                continue
+            for idx, it in enumerate(items):
+                if q_clean in it["text"].lower():
+                    deleted_item = items.pop(idx)
+                    break
+            if deleted_item:
+                break
+
+        if not deleted_item:
+            return {"status": "error", "error": f"Task matching '{target_query}' not found."}
+
+        rendered = render_document(preamble, sections)
+        with open(todo_path, "w", encoding="utf-8") as f:
+            f.write(rendered)
+
+    return {"status": "ok", "action": "deleted", "task": deleted_item}
+
+
+def op_reassign(
+    todo_path: str,
+    target_query: str,
+    to_section: str,
+    caller_agent: str = "erik",
+    from_section: Optional[str] = None,
+) -> Dict[str, Any]:
+    to_sec = normalize_section_slug(to_section)
+    if not to_sec or to_sec not in CANONICAL_SECTIONS:
+        return {"status": "error", "error": f"Invalid destination section: '{to_section}'"}
+
+    with FileLock():
+        ensure_todo_file(todo_path)
+        with open(todo_path, "r", encoding="utf-8") as f:
+            preamble, sections = parse_document(f.read())
+
+        from_sec = normalize_section_slug(from_section) if from_section else None
+        moved_item = None
+        q_clean = target_query.strip().lower()
+
+        for sec, items in sections.items():
+            if from_sec and sec != from_sec:
+                continue
+            for idx, it in enumerate(items):
+                if q_clean in it["text"].lower():
+                    moved_item = items.pop(idx)
+                    break
+            if moved_item:
+                break
+
+        if not moved_item:
+            return {"status": "error", "error": f"Task matching '{target_query}' not found."}
+
+        text = moved_item["text"]
+        text = re.sub(r"@(?:hermes|pi|opencode|claude|gemini|antigravity|agy|erik)\b", "", text).strip()
+        if to_sec != "erik":
+            text = f"@{to_sec} {text}"
+
+        sections[to_sec].append({
+            "status": moved_item["status"],
+            "text": text,
+            "indent": moved_item.get("indent", ""),
+        })
+
+        rendered = render_document(preamble, sections)
+        with open(todo_path, "w", encoding="utf-8") as f:
+            f.write(rendered)
+
+    return {"status": "ok", "action": "reassigned", "to_section": to_sec, "text": text}
+
+
+def format_rofi_lines(
+    todo_path: str,
+    section_filter: Optional[str] = None,
+    status_filter: Optional[str] = None,
+) -> str:
+    data = op_list(todo_path, section_filter=section_filter, status_filter=status_filter)
     lines: List[str] = []
     for t in data["tasks"]:
         mark = "✓" if t["done"] else ("▶" if t["status"] == ">" else "☐")
@@ -524,8 +809,13 @@ def detect_default_agent() -> str:
     for env_k in ("NFP_AGENT_ID", "AGENT_NAME", "MCP_CLIENT_NAME"):
         if os.environ.get(env_k):
             val = os.environ[env_k].strip().lower()
+            if val in ("gemini", "antigravity"):
+                return "agy"
             if val in CANONICAL_SECTIONS:
                 return val
+    # If running under Antigravity CLI / IDE
+    if os.environ.get("ANTIGRAVITY_AGENT") or os.environ.get("GEMINI_CLI") or "antigravity" in os.environ.get("PATH", "").lower():
+        return "agy"
     return "hermes"
 
 
@@ -533,13 +823,13 @@ def run_mcp_stdio(todo_path: str, default_agent: str) -> None:
     tools = [
         {
             "name": "todo_list",
-            "description": "Read the shared NFP Todo list across Erik and all AI agent sections (## Erik, ## Hermes, ## Pi, ## OpenCode, ## Claude, ## Gemini, ## Ideas).",
+            "description": "Read the shared NFP Todo list across Erik and all AI agent sections (## Erik, ## Hermes, ## Pi, ## OpenCode, ## Claude, ## Antigravity, ## Ideas).",
             "inputSchema": {
                 "type": "object",
                 "properties": {
                     "section": {
                         "type": "string",
-                        "description": "Optional section slug filter: erik, hermes, pi, opencode, claude, gemini, ideas",
+                        "description": "Optional section slug filter: erik, hermes, pi, opencode, claude, agy, ideas",
                     },
                     "status": {
                         "type": "string",
@@ -558,7 +848,7 @@ def run_mcp_stdio(todo_path: str, default_agent: str) -> None:
                     "text": {"type": "string", "description": "Task description to add"},
                     "agent": {
                         "type": "string",
-                        "description": "Your agent identity (hermes, pi, opencode, claude, gemini, or erik)",
+                        "description": "Your agent identity (hermes, pi, opencode, claude, agy, or erik)",
                     },
                     "section": {
                         "type": "string",
@@ -577,7 +867,7 @@ def run_mcp_stdio(todo_path: str, default_agent: str) -> None:
                     "query": {"type": "string", "description": "Exact or substring match of the task text"},
                     "agent": {
                         "type": "string",
-                        "description": "Your agent identity (hermes, pi, opencode, claude, gemini, or erik)",
+                        "description": "Your agent identity (hermes, pi, opencode, claude, agy, or erik)",
                     },
                     "done": {"type": "boolean", "description": "True to mark [x], False to reopen [ ] (default: True)"},
                 },
@@ -593,10 +883,18 @@ def run_mcp_stdio(todo_path: str, default_agent: str) -> None:
                     "query": {"type": "string", "description": "Task text substring in ## Erik to claim"},
                     "agent": {
                         "type": "string",
-                        "description": "Your agent identity (hermes, pi, opencode, claude, gemini)",
+                        "description": "Your agent identity (hermes, pi, opencode, claude, agy)",
                     },
                 },
                 "required": ["query", "agent"],
+            },
+        },
+        {
+            "name": "todo_dedup",
+            "description": "Deduplicate all tasks across all sections in the shared NFP Todo list and clean up redundant entries.",
+            "inputSchema": {
+                "type": "object",
+                "properties": {},
             },
         },
         {
@@ -690,6 +988,8 @@ def run_mcp_stdio(todo_path: str, default_agent: str) -> None:
                     target_query=str(args.get("query", "")),
                     caller_agent=caller,
                 )
+            elif tname == "todo_dedup":
+                res = op_dedup(todo_path)
             elif tname == "todo_write_report":
                 res = op_write_report(
                     todo_path,
@@ -726,7 +1026,7 @@ def run_mcp_stdio(todo_path: str, default_agent: str) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description="NFP Shared Multi-Agent Todo CLI & MCP Server")
     parser.add_argument("--file", default=None, help="Path to todo.md (default: ~/Notes/EverOS/todo.md)")
-    parser.add_argument("--agent", default=None, help="Caller identity (erik, hermes, pi, opencode, claude, gemini)")
+    parser.add_argument("--agent", default=None, help="Caller identity (erik, hermes, pi, opencode, claude, agy)")
     parser.add_argument("--mcp", action="store_true", help="Run as MCP stdio JSON-RPC server")
 
     subparsers = parser.add_subparsers(dest="subcommand")
@@ -735,17 +1035,20 @@ def main() -> None:
 
     p_list = subparsers.add_parser("list", help="List tasks")
     p_list.add_argument("--section", default=None, help="Filter by section")
-    p_list.add_argument("--status", choices=["all", "open", "done"], default="all")
+    p_list.add_argument("--status", choices=["all", "open", "in_progress", "pending", "done"], default="all")
     p_list.add_argument("--rofi", action="store_true", help="Output formatted lines for Rofi")
     p_list.add_argument("--json", action="store_true", help="Output JSON")
 
-    p_add = subparsers.add_parser("add", help="Add a task (supports @hermes, @pi, @opencode, @claude, @gemini tags)")
+    p_dedup = subparsers.add_parser("dedup", help="Deduplicate all sections and normalize todo.md")
+
+    p_add = subparsers.add_parser("add", help="Add a task (supports @hermes, @pi, @opencode, @claude, @agy tags)")
     p_add.add_argument("text", nargs="+", help="Task text")
     p_add.add_argument("--section", default=None, help="Explicit section override")
 
     p_toggle = subparsers.add_parser("toggle", help="Toggle completion of a task")
     p_toggle.add_argument("query", nargs="+", help="Task text or substring")
     p_toggle.add_argument("--section", default=None, help="Section filter")
+    p_toggle.add_argument("--state", choices=[" ", ">", "x"], default=None, help="Explicit target state (' ', '>', 'x')")
 
     p_claim = subparsers.add_parser("claim", help="Claim an open task from ## Erik into an agent section")
     p_claim.add_argument("query", nargs="+", help="Task text substring in ## Erik")
@@ -755,6 +1058,19 @@ def main() -> None:
     p_report.add_argument("--title", required=True, help="Report title")
     p_report.add_argument("--status", choices=["completed", "awaiting_approval"], default="completed")
     p_report.add_argument("--body", required=True, help="Markdown body content")
+
+    p_inspect = subparsers.add_parser("inspect", help="Inspect a task and extract targets (URLs, files)")
+    p_inspect.add_argument("query", nargs="+", help="Task query")
+    p_inspect.add_argument("--section", default=None, help="Section filter")
+
+    p_delete = subparsers.add_parser("delete", help="Delete a task")
+    p_delete.add_argument("query", nargs="+", help="Task query")
+    p_delete.add_argument("--section", default=None, help="Section filter")
+
+    p_reassign = subparsers.add_parser("reassign", help="Reassign a task to another agent section")
+    p_reassign.add_argument("query", nargs="+", help="Task query")
+    p_reassign.add_argument("--to-section", required=True, help="Destination section (e.g. hermes, pi, opencode, erik)")
+    p_reassign.add_argument("--from-section", default=None, help="Source section filter")
 
     args = parser.parse_args()
     todo_path = os.path.expanduser(args.file) if args.file else resolve_todo_path()
@@ -776,10 +1092,11 @@ def main() -> None:
         rofi_mode = getattr(args, "rofi", False)
         sec = getattr(args, "section", None)
         st = getattr(args, "status", "all")
+        stat_filter = None if st == "all" else st
         if rofi_mode:
-            print(format_rofi_lines(todo_path, section_filter=sec))
+            print(format_rofi_lines(todo_path, section_filter=sec, status_filter=stat_filter))
             return
-        res = op_list(todo_path, section_filter=sec, status_filter=None if st == "all" else st)
+        res = op_list(todo_path, section_filter=sec, status_filter=stat_filter)
         if getattr(args, "json", False):
             print(json.dumps(res, indent=2))
         else:
@@ -790,6 +1107,11 @@ def main() -> None:
                 print()
         return
 
+    if args.subcommand == "dedup":
+        res = op_dedup(todo_path)
+        print(json.dumps(res))
+        sys.exit(0 if res.get("status") == "ok" else 1)
+
     if args.subcommand == "add":
         raw_text = " ".join(args.text)
         res = op_add(todo_path, raw_text=raw_text, caller_agent=caller, explicit_section=args.section)
@@ -798,13 +1120,37 @@ def main() -> None:
 
     if args.subcommand == "toggle":
         q = " ".join(args.query)
-        res = op_toggle(todo_path, target_query=q, caller_agent=caller, explicit_section=args.section)
+        res = op_toggle(
+            todo_path,
+            target_query=q,
+            caller_agent=caller,
+            explicit_section=args.section,
+            force_state=getattr(args, "state", None),
+        )
         print(json.dumps(res))
         sys.exit(0 if res.get("status") == "ok" else 1)
 
     if args.subcommand == "claim":
         q = " ".join(args.query)
         res = op_claim(todo_path, target_query=q, caller_agent=caller)
+        print(json.dumps(res))
+        sys.exit(0 if res.get("status") == "ok" else 1)
+
+    if args.subcommand == "inspect":
+        q = " ".join(args.query)
+        res = op_inspect_task(todo_path, target_query=q, explicit_section=args.section)
+        print(json.dumps(res))
+        sys.exit(0 if res.get("status") == "ok" else 1)
+
+    if args.subcommand == "delete":
+        q = " ".join(args.query)
+        res = op_delete(todo_path, target_query=q, caller_agent=caller, explicit_section=args.section)
+        print(json.dumps(res))
+        sys.exit(0 if res.get("status") == "ok" else 1)
+
+    if args.subcommand == "reassign":
+        q = " ".join(args.query)
+        res = op_reassign(todo_path, target_query=q, to_section=args.to_section, caller_agent=caller, from_section=args.from_section)
         print(json.dumps(res))
         sys.exit(0 if res.get("status") == "ok" else 1)
 

@@ -85,6 +85,7 @@
         };
 
         programs.opencode.settings = {
+          model = "kong/Free";
           mcp = {
             # ── CodeGraph: Semantic code intelligence ─────────────────
             codegraph = {

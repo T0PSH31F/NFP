@@ -11,5 +11,6 @@
     ./book-vault-purifier.nix
     ./fs-organizer-daemon.nix
     ./email-triage-daemon.nix
+    ./recovery-organizer.nix
   ];
 }

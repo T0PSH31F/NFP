@@ -67,7 +67,7 @@ def check_system_resources() -> Tuple[bool, str]:
         )
         for line in ps_out.splitlines():
             if re.search(r"\b(nix-build|nix eval|nix build|nixos-rebuild|clan machines update)\b", line):
-                if "grep" not in line and "hermes-ratchet" not in line:
+                if "grep" not in line and "hermes-ratchet" not in line and "earlyoom" not in line:
                     return False, f"Active nix process running: {line.strip()}"
     except Exception as e:
         return False, f"Failed to check active processes: {e}"

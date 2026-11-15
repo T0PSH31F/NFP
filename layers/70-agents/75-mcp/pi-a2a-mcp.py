@@ -23,7 +23,7 @@ TOOLS = [
             "type": "object",
             "properties": {
                 "task": {"type": "string", "description": "Clear, actionable coding or investigation task for Pi"},
-                "model": {"type": "string", "description": "Optional Kong model/combo ID (defaults to Coding)"},
+                "model": {"type": "string", "description": "Optional Kong model/combo ID (defaults to Free)"},
                 "session_id": {
                     "type": "string",
                     "description": "Durable session ID to preserve context across delegations (defaults to hermes-a2a)",
@@ -61,7 +61,7 @@ TOOLS = [
 
 def run_pi_worker(
     task: str,
-    model: str = "Coding",
+    model: str = "Free",
     session_id: str = "hermes-a2a",
     notify_voice: bool = True,
 ) -> Dict[str, Any]:
@@ -147,7 +147,7 @@ def handle_rpc(msg: Dict[str, Any]) -> Dict[str, Any]:
         if name == "pi_worker_delegate":
             res = run_pi_worker(
                 task=str(args.get("task", "")),
-                model=str(args.get("model", "Coding")),
+                model=str(args.get("model", "Free")),
                 session_id=str(args.get("session_id", "hermes-a2a")),
                 notify_voice=bool(args.get("notify_voice", True)),
             )

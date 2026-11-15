@@ -61,6 +61,17 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    users.users.lead-triage = {
+      isSystemUser = true;
+      group = "lead-triage";
+      description = "Jev Lead Triage Webhook User";
+    };
+    users.groups.lead-triage = { };
+
+    systemd.tmpfiles.rules = [
+      "d ${toString cfg.dataDir} 0750 lead-triage lead-triage -"
+    ];
+
     systemd.services.lead-triage-webhook = {
       description = "Jev Inbound Lead Qualification & Deal Triage Webhook";
       after = [
@@ -82,11 +93,12 @@ in
         ExecStart = "${pkgs.python3}/bin/python3 ${./lead-triage-webhook.py}";
         Restart = "on-failure";
         RestartSec = 5;
-        DynamicUser = true;
-        StateDirectory = "lead-triage";
+        User = "lead-triage";
+        Group = "lead-triage";
         NoNewPrivileges = true;
         PrivateTmp = true;
         ProtectSystem = "strict";
+        ReadWritePaths = [ (toString cfg.dataDir) ];
         ProtectHome = true;
       };
     };
