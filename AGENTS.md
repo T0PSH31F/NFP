@@ -94,8 +94,8 @@ clan machines update luffy     # update homelab server
      - Hermes (`:8085` gateway / `:8880` voice) acts as the 24/7 front door and delegates coding, shell, and file-modification work to the durable Pi daemon (`127.0.0.1:8089`) via the `pi_worker_delegate` MCP tool (`layers/70-agents/75-mcp/pi-a2a-mcp.py`).
      - Pi preserves durable session context in `/persist/var/lib/pi-agent/sessions` across delegations and reboots.
   2. **Shared Multi-Agent Todo Blackboard (`nfp-todo` MCP + `~/Notes/EverOS/todo.md`)**:
-     - All agents share a single canonical Markdown file (`~/Notes/EverOS/todo.md`, symlinked to `~/Notes/todo.md`) with `fcntl.flock` locking and section-scoped write guards (`## Erik`, `## Hermes`, `## Pi`, `## OpenCode`, `## Claude`, `## Gemini`, `## Ideas`).
-     - Agents read the full board via `todo_list`, update only their own fenced section via `todo_add` / `todo_complete`, and claim tasks tagged `@<agent>` from `## Erik` via `todo_claim`.
+     - All agents share a single canonical Markdown file (`~/Notes/EverOS/todo.md`, symlinked to `~/Notes/todo.md`) with `fcntl.flock` locking and section-scoped write guards (`## Erik`, `## Hermes`, `## Pi`, `## OpenCode`, `## Claude`, `## Antigravity`, `## Ideas`).
+     - Agents read the full board via `todo_list`, update only their own fenced section via `todo_add` / `todo_complete`, and claim tasks tagged `@<agent>` from `## Erik` via `todo_claim`. Antigravity (`agy`) is the canonical pair programmer and IDE harness.
   3. **Shared Semantic Memory (`OpenViking :20120` & `ContextForge :8000`)**:
      - Long-term architectural facts, session transcripts, and cross-agent artifacts are indexed in OpenViking (`http://127.0.0.1:20120`) and ContextForge (`http://127.0.0.1:8000`).
 
@@ -114,8 +114,8 @@ clan machines update luffy     # update homelab server
      - Hermes (`:8085` gateway / `:8880` voice) acts as the 24/7 front door and delegates coding, shell, and file-modification work to the durable Pi daemon (`127.0.0.1:8089`) via the `pi_worker_delegate` MCP tool (`layers/70-agents/75-mcp/pi-a2a-mcp.py`).
      - Pi preserves durable session context in `/persist/var/lib/pi-agent/sessions` across delegations and reboots.
   2. **Shared Multi-Agent Todo Blackboard (`nfp-todo` MCP + `~/Notes/EverOS/todo.md`)**:
-     - All agents share a single canonical Markdown file (`~/Notes/EverOS/todo.md`, symlinked to `~/Notes/todo.md`) with `fcntl.flock` locking and section-scoped write guards (`## Erik`, `## Hermes`, `## Pi`, `## OpenCode`, `## Claude`, `## Gemini`, `## Ideas`).
-     - Agents read the full board via `todo_list`, update only their own fenced section via `todo_add` / `todo_complete`, and claim tasks tagged `@<agent>` from `## Erik` via `todo_claim`.
+     - All agents share a single canonical Markdown file (`~/Notes/EverOS/todo.md`, symlinked to `~/Notes/todo.md`) with `fcntl.flock` locking and section-scoped write guards (`## Erik`, `## Hermes`, `## Pi`, `## OpenCode`, `## Claude`, `## Antigravity`, `## Ideas`).
+     - Agents read the full board via `todo_list`, update only their own fenced section via `todo_add` / `todo_complete`, and claim tasks tagged `@<agent>` from `## Erik` via `todo_claim`. Antigravity (`agy`) is the canonical pair programmer and IDE harness.
   3. **Shared Semantic Memory (`OpenViking :20120` & `ContextForge :8000`)**:
      - Long-term architectural facts, session transcripts, and cross-agent artifacts are indexed in OpenViking (`http://127.0.0.1:20120`) and ContextForge (`http://127.0.0.1:8000`).
 
@@ -134,8 +134,8 @@ clan machines update luffy     # update homelab server
      - Hermes (`:8085` gateway / `:8880` voice) acts as the 24/7 front door and delegates coding, shell, and file-modification work to the durable Pi daemon (`127.0.0.1:8089`) via the `pi_worker_delegate` MCP tool (`layers/70-agents/75-mcp/pi-a2a-mcp.py`).
      - Pi preserves durable session context in `/persist/var/lib/pi-agent/sessions` across delegations and reboots.
   2. **Shared Multi-Agent Todo Blackboard (`nfp-todo` MCP + `~/Notes/EverOS/todo.md`)**:
-     - All agents share a single canonical Markdown file (`~/Notes/EverOS/todo.md`, symlinked to `~/Notes/todo.md`) with `fcntl.flock` locking and section-scoped write guards (`## Erik`, `## Hermes`, `## Pi`, `## OpenCode`, `## Claude`, `## Gemini`, `## Ideas`).
-     - Agents read the full board via `todo_list`, update only their own fenced section via `todo_add` / `todo_complete`, and claim tasks tagged `@<agent>` from `## Erik` via `todo_claim`.
+     - All agents share a single canonical Markdown file (`~/Notes/EverOS/todo.md`, symlinked to `~/Notes/todo.md`) with `fcntl.flock` locking and section-scoped write guards (`## Erik`, `## Hermes`, `## Pi`, `## OpenCode`, `## Claude`, `## Antigravity`, `## Ideas`).
+     - Agents read the full board via `todo_list`, update only their own fenced section via `todo_add` / `todo_complete`, and claim tasks tagged `@<agent>` from `## Erik` via `todo_claim`. Antigravity (`agy`) is the canonical pair programmer and IDE harness.
   3. **Shared Semantic Memory (`OpenViking :20120` & `ContextForge :8000`)**:
      - Long-term architectural facts, session transcripts, and cross-agent artifacts are indexed in OpenViking (`http://127.0.0.1:20120`) and ContextForge (`http://127.0.0.1:8000`).
 
