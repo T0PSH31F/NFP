@@ -1,4 +1,13 @@
-_: {
+_:
+let
+  # Avoid `tags.all` until upstream clan-cli's InventoryStore whitelists `instances.*.roles.*.tags.*.settings`
+  allMachines = {
+    sanji = { };
+    luffy = { };
+    z0r0 = { };
+  };
+in
+{
   # Clan Inventory - Service Instance Definitions
   # Using official clan-core modules for standardized deployment
 
@@ -14,7 +23,7 @@ _: {
           input = "clan-core";
         };
         roles.server = {
-          tags.all = { }; # All machines are SSH servers
+          machines = allMachines;
           settings = {
             certificate.enable = false;
             authorizedKeys = {
@@ -28,7 +37,7 @@ _: {
           };
         };
         roles.client = {
-          tags.all = { }; # All machines are SSH clients
+          machines = allMachines;
         };
       };
 
@@ -38,7 +47,7 @@ _: {
           input = "clan-core";
         };
         roles.default = {
-          tags.all = { };
+          machines = allMachines;
           settings = {
             user = "root";
             prompt = true; # Prompt for root password during 'clan vars generate'
@@ -52,7 +61,7 @@ _: {
           input = "clan-core";
         };
         roles.default = {
-          tags.all = { }; # User on all machines
+          machines = allMachines;
           settings = {
             user = "t0psh31f";
             prompt = true; # Prompt for password during 'clan vars generate'
