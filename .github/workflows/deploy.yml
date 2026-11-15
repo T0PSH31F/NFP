@@ -15,6 +15,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
+      - name: Free disk space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v26
         with:
@@ -53,8 +57,34 @@ jobs:
           test "$(readlink GEMINI.md)" = "AGENTS.md"
       - name: Validate feature_list.json schema v2
         run: jq -e '.features | all(has("id") and has("verification") and has("state") and has("claimedBy") and has("blockedReason") and (.evidence | all(type == "object" and has("sha") and has("command") and has("output") and has("at"))))' feature_list.json
-      - name: Flake check
-        run: nix flake check
+      - name: Evaluate fleet host configurations
+        run: |
+          for host in luffy sanji z0r0; do
+            nix eval --raw ".#nixosConfigurations.${host}.config.system.build.toplevel.drvPath" > /dev/null
+          done
+      - name: Run non-VM flake checks
+        run: |
+          nix build --no-link \
+            .#checks.x86_64-linux.treefmt \
+            .#checks.x86_64-linux.feature-list-schema \
+            .#checks.x86_64-linux.docs-drift \
+            .#checks.x86_64-linux.bogus-tag-negative-test \
+            .#checks.x86_64-linux.homepage-lovable-archived \
+            .#checks.x86_64-linux.mcp-containment-check \
+            .#checks.x86_64-linux.mcp-registry-type-check \
+            .#checks.x86_64-linux.mcp-nixos-authority-check \
+            .#checks.x86_64-linux.executor-pilot-check \
+            .#checks.x86_64-linux.mcp-client-migration-check \
+            .#checks.x86_64-linux.mcp-context-budget-check \
+            .#checks.x86_64-linux.luffy-service-scope \
+            .#checks.x86_64-linux.llm-agents-catalog-completeness \
+            .#checks.x86_64-linux.dendritic-structure-test \
+            .#checks.x86_64-linux.noctalia-registry-check \
+            .#checks.x86_64-linux.nfp-motd-test \
+            .#checks.x86_64-linux.homepage-contract-coverage \
+            .#checks.x86_64-linux.layer-numbering-check \
+            .#checks.x86_64-linux.tailnet-dns-guard \
+            .#checks.x86_64-linux.bare-nami-hostname-check
 
   deploy:
     needs: validate
@@ -70,6 +100,8 @@ jobs:
           if [ -n "${JARVIS_TOKEN:-}" ]; then
             echo "NIX_CONFIG=access-tokens = github.com=${JARVIS_TOKEN}" >> "$GITHUB_ENV"
           fi
+      - name: Full flake & VM test check
+        run: nix flake check --option builders ""
       - name: Deploy entire fleet
         run: |
           install -d -m 700 "$HOME/.ssh"
