@@ -341,6 +341,8 @@ in
             doCheck = false;
             doInstallCheck = false;
           });
+        # Prefer nixpkgs voxtype-vulkan (1.1.0 with Vulkan GPU acceleration) over older CPU-only llm-agents build
+        voxtype = _: pkgs.voxtype-vulkan or pkgs.voxtype;
       };
 
       applyPackageOverride =

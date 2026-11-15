@@ -361,7 +361,7 @@ in
               models = explicitKongModels;
             };
             nami = {
-              baseUrl = "http://nami:8090/v1";
+              baseUrl = "http://nami.nfp.nix:8090/v1";
               api = "openai-completions";
               apiKey = piApiKeyCmd;
               models = explicitKongModels;

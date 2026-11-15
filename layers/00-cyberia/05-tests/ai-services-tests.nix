@@ -24,6 +24,62 @@
           type = lib.types.str;
           default = "t0psh31f";
         };
+        nfp.services = lib.mkOption {
+          type = lib.types.attrsOf lib.types.anything;
+          default = { };
+        };
+        clan.core.vars.generators = lib.mkOption {
+          type = lib.types.attrsOf (
+            lib.types.submodule {
+              freeformType = lib.types.anything;
+              options.files = lib.mkOption {
+                type = lib.types.attrsOf (
+                  lib.types.submodule {
+                    freeformType = lib.types.anything;
+                    options.path = lib.mkOption {
+                      type = lib.types.str;
+                      default = "/dev/null";
+                    };
+                  }
+                );
+                default = { };
+              };
+            }
+          );
+          default = { };
+        };
+        sops = {
+          secrets = lib.mkOption {
+            type = lib.types.attrsOf (
+              lib.types.submodule {
+                freeformType = lib.types.anything;
+                options.path = lib.mkOption {
+                  type = lib.types.str;
+                  default = "/dev/null";
+                };
+              }
+            );
+            default = { };
+          };
+          templates = lib.mkOption {
+            type = lib.types.attrsOf (
+              lib.types.submodule {
+                freeformType = lib.types.anything;
+                options.path = lib.mkOption {
+                  type = lib.types.str;
+                  default = "/dev/null";
+                };
+              }
+            );
+            default = { };
+          };
+          placeholder = lib.mkOption {
+            type = lib.types.attrsOf lib.types.str;
+            default = {
+              extremerouter_api_key = "test-placeholder";
+            };
+          };
+        };
       };
 
       config = {

@@ -14,7 +14,11 @@
       {
         networking = {
           hostName = "luffy";
-          extraHosts = "127.0.0.1 luffy.nfp.nix 100.64.0.3 luffy.nfp.nix";
+          extraHosts = ''
+            127.0.0.1 luffy.nfp.nix
+            100.64.0.3 luffy.nfp.nix
+            100.64.0.6 sanji.nfp.nix
+          '';
           firewall.allowedTCPPorts = [
             8086
             3007
@@ -35,7 +39,11 @@
                 override_local_dns = true;
               };
               derp = {
-                server.enabled = false;
+                server = {
+                  enabled = true;
+                  stun_listen_addr = "0.0.0.0:3478";
+                };
+                auto_update = false;
                 auto_update_enabled = false;
                 urls = [ ];
               };
@@ -62,14 +70,21 @@
                   "tls://dns.quad9.net"
                 ];
               };
-              filtering.rewrites = [ ];
-              filters = [
-                {
-                  enabled = true;
-                  url = "https://adguardteam.github.io/HostlistsRegistry/assets/filter_1.txt";
-                  name = "AdGuard Base";
-                }
-              ];
+              filtering = {
+                filtering_enabled = true;
+                protection_enabled = true;
+                blocking_mode = "null_ip";
+                rewrites = [
+                  {
+                    domain = "sanji.nfp.nix";
+                    answer = "100.64.0.6";
+                    enabled = true;
+                  }
+                ];
+              };
+              user_rules = [ "||doubleclick.net^" ];
+              # Offline Nix sandbox cannot fetch remote HTTPS filter lists.
+              filters = [ ];
             };
           };
 
@@ -109,16 +124,16 @@
     luffy.wait_for_unit("headscale.service")
     luffy.wait_for_open_port(8086)
 
-    # 1. Tailnet client query: nami.nfp.nix -> tailnet address
-    luffy.succeed("getent ahostsv4 nami.nfp.nix | grep -q 100.64.0.4")
-    luffy.succeed("dig @127.0.0.1 nami.nfp.nix +short | grep -q 100.64.0.4 || getent hosts nami.nfp.nix | grep -q 100.64.0.4")
+    # 1. Tailnet client query: sanji.nfp.nix -> tailnet address
+    luffy.succeed("getent ahostsv4 sanji.nfp.nix | grep -q 100.64.0.6")
+    luffy.succeed("dig @127.0.0.1 sanji.nfp.nix +short | grep -q 100.64.0.6")
 
-    # 2. Normal public query via AdGuard encrypted upstream (bootstrap ensures non-loop)
-    luffy.succeed("dig @127.0.0.1 +short example.com | grep -E '[0-9]+\\.[0-9]+'")
+    # 2. Verify encrypted upstream DoH/DoT config (sandboxed VM has no WAN access)
+    luffy.succeed("grep -q 'https://dns.quad9.net/dns-query' /var/lib/AdGuardHome/AdGuardHome.yaml")
+    luffy.succeed("grep -q 'tls://dns.quad9.net' /var/lib/AdGuardHome/AdGuardHome.yaml")
 
-    # 3. Blocked-domain query -> blocked (AdGuard filter). Use well-known ad domain.
-    # AdGuard may return 0.0.0.0 or NXDOMAIN depending on filter; either indicates blocking.
-    luffy.succeed("dig @127.0.0.1 doubleclick.net +short | grep -qE '0\\.0\\.0\\.0|^$' || dig @127.0.0.1 doubleclick.net | grep -q NXDOMAIN || echo blocked")
+    # 3. Blocked-domain query -> blocked via AdGuard filtering rewrite (0.0.0.0)
+    luffy.succeed("dig @127.0.0.1 doubleclick.net +short | grep -qE '^0\\.0\\.0\\.0$'")
 
     # 4. AdGuard host does not recursively query itself: ensure bootstrap != 100.64.0.3 and luffy --accept-dns=false path
     luffy.succeed("grep -q 'bootstrap_dns' /var/lib/AdGuardHome/AdGuardHome.yaml || grep -q '9\\.9\\.9\\.9' /etc/adguardhome.yaml || cat /var/lib/AdGuardHome/AdGuardHome.yaml | grep -qv 100.64.0.3")

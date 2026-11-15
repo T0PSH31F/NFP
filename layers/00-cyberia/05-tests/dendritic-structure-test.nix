@@ -2,10 +2,12 @@
 { pkgs, lib }:
 let
   validTags = [
+    "agent-orchestrator"
     "ai-agent"
+    "ai-inference"
     "ai-router"
     "ai-server"
-    "agent-orchestrator"
+    "ai-ui"
     "cache-server"
     "desktop"
     "development"
@@ -13,6 +15,7 @@ let
     "gpu-compute"
     "homelab"
     "intel-12th-gen"
+    "intel-13th-gen"
     "intel-9th-gen"
     "laptop"
     "media"

@@ -1582,14 +1582,17 @@
         ]
       },
       "locked": {
-        "lastModified": 1794660681,
-        "narHash": "sha256-MfaFUJfWPN5F294IeIpSrSTdVLW4B6x/44YK9R0Lfsg=",
-        "path": "/home/t0psh31f/Clan/Jarvis",
-        "type": "path"
+        "lastModified": 1794768538,
+        "narHash": "sha256-cjAUBbkI09GhqC2ETr60QBP3Nq8BNVDqJEyADtVayLs=",
+        "owner": "T0PSH31F",
+        "repo": "Jarvis",
+        "rev": "70f569cc81780d48597611e10a659595849d7cf5",
+        "type": "github"
       },
       "original": {
-        "path": "/home/t0psh31f/Clan/Jarvis",
-        "type": "path"
+        "owner": "T0PSH31F",
+        "repo": "Jarvis",
+        "type": "github"
       }
     },
     "jerry": {

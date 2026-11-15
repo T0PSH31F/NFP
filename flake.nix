@@ -196,7 +196,7 @@
       };
     };
     jarvis = {
-      url = "path:/home/t0psh31f/Clan/Jarvis";
+      url = "github:T0PSH31F/Jarvis";
       inputs = {
         nixpkgs.follows = "nixpkgs";
         systems.follows = "systems";

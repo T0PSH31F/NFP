@@ -233,8 +233,7 @@
             let
               agentSrc = inputs.hermes-agent;
               runtimePath = pkgs.lib.makeBinPath (
-                with pkgs;
-                [
+                (with pkgs; [
                   nodejs_22
                   ripgrep
                   git
@@ -243,7 +242,9 @@
                   tirith
                   wl-clipboard
                   xclip
-                ]
+                ])
+                ++ pkgs.lib.optional (pkgs ? headroom-ai) pkgs.headroom-ai
+                ++ pkgs.lib.optional (pkgs ? codegraph) pkgs.codegraph
               );
             in
             {
@@ -458,7 +459,18 @@
               -e 's|provider:.*|provider: extreme-router|g' \
               -e 's|default:.*|default: Free|g' \
               -e 's|fallback:.*|fallback: DailyDrive|g' \
-              -e 's|base_url:.*https://inference-api.*|base_url: "http://127.0.0.1:20128/v1"|g' \
+              -e 's|base_url:.*https://inference-api.*|base_url: "http://${
+                if (config.networking.hostName == "z0r0" || config.networking.hostName == "sanji") then
+                  "127.0.0.1"
+                else
+                  config.layers.meta.fleetAddresses.z0r0
+              }:20128/v1"|g' \
+              -e 's|http://127.0.0.1:20128/v1|http://${
+                if (config.networking.hostName == "z0r0" || config.networking.hostName == "sanji") then
+                  "127.0.0.1"
+                else
+                  config.layers.meta.fleetAddresses.z0r0
+              }:20128/v1|g' \
               "${config.services.hermes-agent.stateDir}/.hermes/config.yaml" || true
           fi
         '';

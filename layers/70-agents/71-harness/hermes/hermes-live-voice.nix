@@ -27,14 +27,18 @@ let
   jevLocal =
     (config.layers.layer-78.llm-routers.jev.enable or false)
     || (config.layers.layer-78.llm-routers.jev-router-plugin.enable or false);
-  jevBaseUrl = "http://127.0.0.1:${
-    toString (
-      if (config.layers.layer-78.llm-routers.jev.enable or false) then
-        config.layers.layer-78.llm-routers.jev.port
-      else
-        (config.layers.layer-78.llm-routers.jev-router-plugin.port or 20127)
-    )
-  }";
+  jevBaseUrl =
+    if jevLocal then
+      "http://127.0.0.1:${
+        toString (
+          if (config.layers.layer-78.llm-routers.jev.enable or false) then
+            config.layers.layer-78.llm-routers.jev.port
+          else
+            (config.layers.layer-78.llm-routers.jev-router-plugin.port or 20127)
+        )
+      }"
+    else
+      routerBaseUrl;
 in
 {
   options.layers.layer-76.hermes-live-voice = {

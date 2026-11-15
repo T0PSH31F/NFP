@@ -13,6 +13,14 @@ jobs:
       pull-requests: write
     steps:
       - uses: actions/checkout@v4
+      - uses: DeterminateSystems/determinate-nix-action@v3
+      - name: Configure private Jarvis flake access
+        env:
+          JARVIS_TOKEN: ${{ secrets.JARVIS_TOKEN }}
+        run: |
+          if [ -n "${JARVIS_TOKEN:-}" ]; then
+            echo "NIX_CONFIG=access-tokens = github.com=${JARVIS_TOKEN}" >> "$GITHUB_ENV"
+          fi
       - uses: DeterminateSystems/update-flake-lock@main
         id: update
         with:

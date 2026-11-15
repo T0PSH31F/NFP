@@ -60,6 +60,7 @@
   layers = {
     layer-30.theming.themes = {
       greeter.type = "sddm";
+      plymouth-onepiece.enable = false;
       plymouth-hellonavi.enable = true;
     };
     layer-40.desktop.hyprland.enable = true;

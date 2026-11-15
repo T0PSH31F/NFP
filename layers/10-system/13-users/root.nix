@@ -9,5 +9,6 @@ _: {
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIED0hTwN/NTxlnnnFc1/3oDOOQmsG8Nw/oZin+s9mdxx root@luffy"
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDFylABIGcvVqbGUT+y8lQZRty0/BeCTGs9QHwqzdzrb root@z0r0"
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJxCZSHtsjhrP4LqoteoVKwohyMwy9WQ/9o0BgvGQydj luffy-to-nami"
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPmv5RxYFgK2PFk0ijs8RhKj3DXkKuJ0EObJY3YP6B+m nfp-ci-deployer"
   ];
 }

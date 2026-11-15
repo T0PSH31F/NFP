@@ -23,7 +23,18 @@
         hooks = {
           treefmt = {
             enable = true;
-            package = config.treefmt.build.wrapper;
+            # Cap Go worker count & Rayon threads so nixf-diagnose doesn't hit
+            # RLIMIT_NPROC/WouldBlock inside parallel Nix build sandboxes.
+            package = pkgs.symlinkJoin {
+              name = "treefmt-bounded";
+              paths = [ config.treefmt.build.wrapper ];
+              nativeBuildInputs = [ pkgs.makeWrapper ];
+              postBuild = ''
+                wrapProgram $out/bin/treefmt \
+                  --set GOMAXPROCS 2 \
+                  --set RAYON_NUM_THREADS 2
+              '';
+            };
             # --fail-on-change: lint mode — exits non-zero if any file would be
             # reformatted, without modifying files. Prevents silent mass-reformat
             # of the entire project tree on every commit.

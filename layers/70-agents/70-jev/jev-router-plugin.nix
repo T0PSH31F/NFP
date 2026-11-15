@@ -76,6 +76,9 @@ in
         PrivateTmp = true;
         ProtectSystem = "strict";
         ProtectHome = true;
+        EnvironmentFile = lib.optional (
+          config.sops ? templates && config.sops.templates ? "hermes-env"
+        ) config.sops.templates."hermes-env".path;
       };
     };
 

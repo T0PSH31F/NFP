@@ -26,6 +26,25 @@ UPSTREAM_ROUTER_URL = os.environ.get("UPSTREAM_ROUTER_URL", "http://127.0.0.1:20
 STATE_DB_PATH = Path(os.environ.get("PI_STATE_DB", Path.home() / ".local/share/pi-durable/state.sqlite"))
 JEV_RULES_FILE = Path(__file__).parent / "jev_rules.json"
 
+
+def _load_upstream_api_key() -> str:
+    for env_name in ("EXTREMEROUTER_API_KEY", "OPENAI_API_KEY"):
+        val = os.environ.get(env_name, "").strip()
+        if val:
+            return val
+    for secret_path in (
+        Path.home() / ".config/sops-nix/secrets/extremerouter_api_key",
+        Path("/run/secrets/extremerouter_api_key"),
+    ):
+        try:
+            if secret_path.exists():
+                val = secret_path.read_text(encoding="utf-8").strip()
+                if val:
+                    return val
+        except OSError:
+            pass
+    return ""
+
 METRICS = {
     "total_requests": 0,
     "stage1_heuristic_drops": 0,
@@ -396,29 +415,45 @@ class JevHandler(BaseHTTPRequestHandler):
 
             # Proxy to ExtremeRouter upstream
             try:
+                proxy_headers = {"Content-Type": "application/json"}
+                incoming_auth = self.headers.get("Authorization", "").strip()
+                upstream_key = _load_upstream_api_key()
+                if upstream_key:
+                    proxy_headers["Authorization"] = f"Bearer {upstream_key}"
+                elif incoming_auth:
+                    proxy_headers["Authorization"] = incoming_auth
+
                 upstream_req = urllib.request.Request(
                     f"{UPSTREAM_ROUTER_URL}/v1/chat/completions",
                     data=raw_body.encode("utf-8"),
-                    headers={"Content-Type": "application/json"},
+                    headers=proxy_headers,
                     method="POST"
                 )
                 with urllib.request.urlopen(upstream_req, timeout=120) as upstream_resp:
                     self.send_response(upstream_resp.status)
-                    is_streaming = "stream" in raw_body and '"stream": true' in raw_body.lower()
+                    req_model = data.get("model", "Free") if isinstance(data, dict) else "Free"
+                    decision_hdr = json.dumps({
+                        "tier": "system2" if heur is None else "system1",
+                        "combo": req_model,
+                    })
+                    self.send_header("X-Jev-Decision", decision_hdr)
+                    upstream_ct = (upstream_resp.headers.get("Content-Type") or "").lower()
+                    req_streaming = isinstance(data, dict) and bool(data.get("stream"))
+                    is_streaming = req_streaming or ("text/event-stream" in upstream_ct)
                     for k, v in upstream_resp.headers.items():
-                        if k.lower() not in ("content-length", "transfer-encoding"):
+                        if k.lower() not in ("content-length", "transfer-encoding", "x-jev-decision", "connection"):
                             self.send_header(k, v)
+                    self.send_header("Connection", "close")
+                    self.close_connection = True
                     if is_streaming:
-                        self.send_header("Transfer-Encoding", "chunked")
                         self.end_headers()
+                        read_fn = getattr(upstream_resp, "read1", upstream_resp.read)
                         while True:
-                            chunk = upstream_resp.read(1024)
+                            chunk = read_fn(1024)
                             if not chunk:
                                 break
-                            self.wfile.write(f"{len(chunk):X}\r\n".encode("ascii") + chunk + b"\r\n")
+                            self.wfile.write(chunk)
                             self.wfile.flush()
-                        self.wfile.write(b"0\r\n\r\n")
-                        self.wfile.flush()
                     else:
                         resp_body = upstream_resp.read()
                         self.send_header("Content-Length", str(len(resp_body)))

@@ -15,6 +15,10 @@
           type = lib.types.attrsOf lib.types.anything;
           default = { };
         };
+        nfp.services = lib.mkOption {
+          type = lib.types.attrsOf lib.types.anything;
+          default = { };
+        };
       };
 
       config = {

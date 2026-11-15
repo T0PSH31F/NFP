@@ -21,6 +21,7 @@ let
   # Intentional omissions (backend-only services that don't need cards)
   intentionalOmissions = {
     ollama = "Backend LLM runtime — accessed through Open WebUI or oterm";
+    netdata = "Real-time node telemetry — homepage disabled on luffy per luffy-service-scope-test.nix";
   };
 
   # User-facing services that MUST have homepage contracts when enabled

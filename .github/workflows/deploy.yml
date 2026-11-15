@@ -22,6 +22,13 @@ jobs:
           extra_nix_config: |
             experimental-features = nix-command flakes
             accept-flake-config = true
+      - name: Configure private Jarvis flake access
+        env:
+          JARVIS_TOKEN: ${{ secrets.JARVIS_TOKEN }}
+        run: |
+          if [ -n "${JARVIS_TOKEN:-}" ]; then
+            echo "NIX_CONFIG=access-tokens = github.com=${JARVIS_TOKEN}" >> "$GITHUB_ENV"
+          fi
       - name: Setup Nix cache
         uses: DeterminateSystems/magic-nix-cache-action@main
       - name: Check git author identity
@@ -56,5 +63,21 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
+      - name: Configure private Jarvis flake access
+        env:
+          JARVIS_TOKEN: ${{ secrets.JARVIS_TOKEN }}
+        run: |
+          if [ -n "${JARVIS_TOKEN:-}" ]; then
+            echo "NIX_CONFIG=access-tokens = github.com=${JARVIS_TOKEN}" >> "$GITHUB_ENV"
+          fi
       - name: Deploy entire fleet
-        run: clan machines update
+        run: |
+          install -d -m 700 "$HOME/.ssh"
+          install -m 600 "$CREDENTIALS_DIRECTORY/ci-deploy-ssh-key" "$HOME/.ssh/id_ed25519"
+          self=$(hostname)
+          for host in sanji luffy z0r0; do
+            if [ "$host" != "$self" ]; then
+              clan machines update --host-key-check accept-new --build-host localhost --option builders "" "$host"
+            fi
+          done
+          clan machines update --host-key-check accept-new --build-host localhost --option builders "" "$self"

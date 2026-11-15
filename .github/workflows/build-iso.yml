@@ -4,8 +4,9 @@ on:
   workflow_dispatch:  # Manual trigger from GitHub UI
   push:
     paths:
-      - 'templates/iso/**'
-      - 'flake-parts/**'
+      - 'layers/00-cyberia/04-templates/iso/**'
+      - 'layers/00-cyberia/08-iso/**'
+      - 'flake/**'
       - 'flake.nix'
       - 'flake.lock'
     branches: [main]
@@ -39,6 +40,14 @@ jobs:
 
       - name: Setup Nix cache
         uses: DeterminateSystems/magic-nix-cache-action@main
+
+      - name: Configure private Jarvis flake access
+        env:
+          JARVIS_TOKEN: ${{ secrets.JARVIS_TOKEN }}
+        run: |
+          if [ -n "${JARVIS_TOKEN:-}" ]; then
+            echo "NIX_CONFIG=access-tokens = github.com=${JARVIS_TOKEN}" >> "$GITHUB_ENV"
+          fi
 
       - name: Check disk space
         run: df -h

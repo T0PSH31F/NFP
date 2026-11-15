@@ -114,25 +114,14 @@
             antigravityMcpText =
               builtins.unsafeDiscardStringContext
                 userConfig.xdg.configFile."antigravity/mcp_config.json".text;
-            geminiMcpText =
-              builtins.unsafeDiscardStringContext
-                userConfig.xdg.configFile."gemini/mcp_config.json".text;
-
-            antigravityMcp = builtins.fromJSON antigravityMcpText;
-            geminiMcp = builtins.fromJSON geminiMcpText;
-
             antigravityConfText =
               builtins.unsafeDiscardStringContext
                 userConfig.xdg.configFile."antigravity/config.json".text;
-            geminiConfText =
-              builtins.unsafeDiscardStringContext
-                userConfig.xdg.configFile."gemini/config.json".text;
 
+            antigravityMcp = builtins.fromJSON antigravityMcpText;
             antigravityConf = builtins.fromJSON antigravityConfText;
-            geminiConf = builtins.fromJSON geminiConfText;
 
             antigravityMcpNixos = antigravityMcp.mcpServers.mcp-nixos or null;
-            geminiMcpNixos = geminiMcp.mcpServers.mcp-nixos or null;
 
             isStorePath = path: pkgs.lib.hasPrefix "/nix/store/" path;
           in
@@ -140,14 +129,8 @@
             throw "mcp-nixos-authority-check error: antigravity mcp_config.json missing mcp-nixos server"
           else if !(isStorePath antigravityMcpNixos.command) then
             throw "mcp-nixos-authority-check error: antigravity mcp-nixos command '${antigravityMcpNixos.command}' does not point to Nix store"
-          else if geminiMcpNixos == null then
-            throw "mcp-nixos-authority-check error: gemini mcp_config.json missing mcp-nixos server"
-          else if !(isStorePath geminiMcpNixos.command) then
-            throw "mcp-nixos-authority-check error: gemini mcp-nixos command '${geminiMcpNixos.command}' does not point to Nix store"
           else if !(pkgs.lib.elem "AGENTS.md" (antigravityConf.contextFiles or [ ])) then
             throw "mcp-nixos-authority-check error: antigravity config.json missing AGENTS.md context file"
-          else if !(pkgs.lib.elem "AGENTS.md" (geminiConf.contextFiles or [ ])) then
-            throw "mcp-nixos-authority-check error: gemini config.json missing AGENTS.md context file"
           else
             pkgs.runCommand "check-mcp-nixos-authority" { } ''
               touch $out
@@ -176,20 +159,15 @@
             antigravityMcpText =
               builtins.unsafeDiscardStringContext
                 userConfig.xdg.configFile."antigravity/mcp_config.json".text;
-            geminiMcpText =
-              builtins.unsafeDiscardStringContext
-                userConfig.xdg.configFile."gemini/mcp_config.json".text;
             kiroMcpText = builtins.unsafeDiscardStringContext userConfig.xdg.configFile."kiro/mcp.json".text;
-            piMcpText = builtins.unsafeDiscardStringContext userConfig.xdg.configFile."pi/config.json".text;
+            piMcpText = builtins.unsafeDiscardStringContext userConfig.xdg.configFile."pi/agent/mcp.json".text;
 
             antigravityMcp = builtins.fromJSON antigravityMcpText;
-            geminiMcp = builtins.fromJSON geminiMcpText;
             kiroMcp = builtins.fromJSON kiroMcpText;
             piMcp = builtins.fromJSON piMcpText;
 
             allHaveNixos =
               (antigravityMcp.mcpServers ? mcp-nixos)
-              && (geminiMcp.mcpServers ? mcp-nixos)
               && (kiroMcp.mcpServers ? mcp-nixos)
               && (piMcp.mcpServers ? mcp-nixos);
           in
@@ -253,8 +231,8 @@
             throw "luffy service scope error: Netdata must be enabled on luffy"
           else if !z0r0Config.layers.layer-20.services.config.netdata.enable then
             throw "luffy service scope error: Netdata must be enabled on z0r0"
-          else if !luffyConfig.nfp.services.netdata.homepage.enable then
-            throw "luffy service scope error: Netdata homepage card must be enabled per policy update"
+          else if luffyConfig.nfp.services.netdata.homepage.enable then
+            throw "luffy service scope error: Netdata homepage card must be disabled by default"
           else
             pkgs.runCommand "check-luffy-service-scope" { } ''
               touch $out

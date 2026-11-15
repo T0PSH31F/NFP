@@ -110,7 +110,7 @@
 - `77-dash-desk-ui`: Web frontends & desktop UIs (Ollama-UI, Open-WebUI, SillyTavern, Cherry-Studio)
 - `78-llm-routers`: API routing & gateways (ExtremeRouter, FreeLLMAPI, FreeLLMPool, Kong, LiteLLM, Manifest, OmniRoute)
 - `79-skills`: Agent skills, catalog, master switches, productivity stubs (ai-packages, ai-services, Aider, Fabric AI, Jan, LM Studio, llm-agents, todo-system)
-- `jev`: Jev System-1 decision engine, router hooks, daemon pipelines, and CLI/TUI suites
+- `70-jev`: Jev System-1 decision engine, router hooks, daemon pipelines, and CLI/TUI suites
 
 ### 80-lib
 - `81-helpers`: mkDendriticModule & functional lib

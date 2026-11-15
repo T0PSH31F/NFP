@@ -62,6 +62,9 @@ in
         Restart = "always";
         RestartSec = "3s";
         User = "t0psh31f";
+        EnvironmentFile = optional (
+          config.sops ? templates && config.sops.templates ? "hermes-env"
+        ) config.sops.templates."hermes-env".path;
         Environment = [
           "JEV_PORT=${toString cfg.port}"
           "JEV_HOST=${cfg.host}"

@@ -531,7 +531,7 @@
     fleet_data = json.loads(fleet_raw)
     assert "hosts" in fleet_data, "Fleet vitals response missing 'hosts'"
     fleet_host_ids = [h["id"] for h in fleet_data["hosts"]]
-    for expected_host in ["z0r0", "luffy", "nami"]:
+    for expected_host in ["z0r0", "luffy", "sanji"]:
         assert expected_host in fleet_host_ids, f"Host '{expected_host}' missing from fleet vitals response"
 
     # Glances must be absent everywhere
