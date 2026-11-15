@@ -31,6 +31,8 @@
       file:///home/t0psh31f/Downloads Downloads
       file:///home/t0psh31f/Documents Documents
       file:///home/t0psh31f/GoogleDrive Google Drive
+      file:///mnt/NAS1 NAS1 (2TB)
+      file:///mnt/NAS2 NAS2 (1TB)
       file:///home/t0psh31f/Agents Agents
       file:///home/t0psh31f/Appimages Appimages
       file:///home/t0psh31f/Clan Clan
@@ -38,6 +40,13 @@
       file:///home/t0psh31f/Projects Projects
       file:///home/t0psh31f/.config .config
       file:///home/t0psh31f/.hermes .hermes
+    ''
+    + lib.optionalString (config.networking.hostName == "luffy") ''
+      file:///mnt/drives/backup-1/CalibreLibrary Calibre Library
+      file:///mnt/drives/backup-1/Media Luffy Media
+      file:///mnt/drives/backup-1 Backup_1 (932GB)
+      file:///storage Storage SSD
+      file:///mnt/drives/ssd-win Windows SSD (RO)
     '';
   };
 }

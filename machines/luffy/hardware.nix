@@ -117,6 +117,33 @@
         "nofail"
       ];
     };
+    # External USB 932GB Btrfs Drive (Backup_1) — hosts Media, Torrents, and Consolidated Calibre Library non-destructively alongside bkups/Games/Pictures
+    "/mnt/drives/backup-1" = {
+      device = "/dev/disk/by-uuid/d917e1ff-6eb8-46c8-aedd-24d160b0df09";
+      fsType = "btrfs";
+      options = [
+        "compress=zstd"
+        "noatime"
+        "nofail"
+        "x-systemd.device-timeout=5s"
+      ];
+    };
+    # Internal Samsung 860 EVO 250GB SSD (Windows NTFS partition) — mounted read-only to preserve data cleanly
+    "/mnt/drives/ssd-win" = {
+      device = "/dev/disk/by-uuid/62CCE32ECCE2FB65";
+      fsType = "ntfs3";
+      options = [
+        "ro"
+        "nofail"
+        "noauto"
+        "x-systemd.automount"
+        "uid=1000"
+        "gid=100"
+        "x-systemd.device-timeout=3s"
+      ];
+    };
+    # NOTE: /dev/sdc (1.8TB Hitachi HDS723020BLA642) & /dev/sde1 (NATE DRIVE F7E6-2205) are intentionally
+    # omitted from static fstab while active photorec recovery writes /dev/sdc -> NATE DRIVE/Recovered_Hitachi_2TB.
   };
 
   # Swap Configuration

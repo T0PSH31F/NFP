@@ -267,8 +267,24 @@ in
             "g"
             "n"
           ];
-          run = "cd /mnt/nas";
-          desc = "Go to Buffalo NAS (/mnt/nas)";
+          run = "cd /mnt/NAS1";
+          desc = "Go to NAS1 2TB (/mnt/NAS1)";
+        }
+        {
+          on = [
+            "g"
+            "1"
+          ];
+          run = "cd /mnt/NAS1";
+          desc = "Go to NAS1 2TB (/mnt/NAS1)";
+        }
+        {
+          on = [
+            "g"
+            "2"
+          ];
+          run = "cd /mnt/NAS2";
+          desc = "Go to NAS2 1TB (/mnt/NAS2)";
         }
         {
           on = [

@@ -86,14 +86,58 @@ in
 
     mountPoint = mkOption {
       type = types.str;
-      default = "/mnt/nas";
-      description = "System mount point for network NAS storage";
+      default = "/mnt/NAS1";
+      description = "System mount point for primary network NAS (NAS1 - 2TB Buffalo LinkStation)";
     };
 
     backupDir = mkOption {
       type = types.str;
-      default = "/mnt/nas/backups/nfp-durable";
+      default = "/mnt/NAS1/backups/nfp-durable";
       description = "Target backup directory on NAS for SQLite WAL replicas and snapshots";
+    };
+
+    nas2 = {
+      enable = mkOption {
+        type = types.bool;
+        default = true;
+        description = "Enable secondary network NAS automount (NAS2 - 1TB Buffalo TeraStation)";
+      };
+
+      host = mkOption {
+        type = types.str;
+        default = "192.168.1.225";
+        description = "NAS2 hostname or IP address (Buffalo TeraStation HD-HTGL0BB)";
+      };
+
+      share = mkOption {
+        type = types.str;
+        default = "share";
+        description = "NAS2 SMB share name to mount";
+      };
+
+      port = mkOption {
+        type = types.int;
+        default = 139;
+        description = "NAS2 SMB port (older TeraStation uses NetBIOS TCP port 139)";
+      };
+
+      smbVersion = mkOption {
+        type = types.str;
+        default = "1.0";
+        description = "NAS2 SMB protocol version (1.0 / NT1 for TeraStation HD-HTGL)";
+      };
+
+      mountPoint = mkOption {
+        type = types.str;
+        default = "/mnt/NAS2";
+        description = "System mount point for secondary network NAS (NAS2 - 1TB)";
+      };
+
+      credentialsFile = mkOption {
+        type = types.nullOr types.path;
+        default = null;
+        description = "Optional path to CIFS credentials file for NAS2";
+      };
     };
 
     databases = mkOption {
@@ -176,15 +220,21 @@ in
     networking.networkmanager.dispatcherScripts = mkIf (lib.hasPrefix "169.254." cfg.host) [
       {
         source = pkgs.writeShellScript "nas-link-local-dispatcher" ''
-          if [ "$2" = "up" ] || [ "$2" = "dhcp4-change" ]; then
-            ${pkgs.iproute2}/bin/ip route replace 169.254.0.0/16 dev "$1" scope link metric 1000 || true
+          IFACE="$1"
+          ACTION="$2"
+          case "$IFACE" in
+            wl*|en*|eth*) ;;
+            *) exit 0 ;;
+          esac
+          if [ "$ACTION" = "up" ] || [ "$ACTION" = "dhcp4-change" ]; then
+            ${pkgs.iproute2}/bin/ip route replace 169.254.0.0/16 dev "$IFACE" scope link metric 1000 || true
           fi
         '';
         type = "basic";
       }
     ];
 
-    # Automount filesystem declaration
+    # Automount filesystem declaration (NAS1 - 2TB)
     fileSystems."${cfg.mountPoint}" = {
       device =
         if cfg.protocol == "nfs" then "${cfg.host}:${cfg.nfsPath}" else "//${cfg.host}/${cfg.share}";
@@ -220,6 +270,7 @@ in
               "dir_mode=0775"
               "vers=${cfg.smbVersion}"
               "soft"
+              "nofail"
               "x-systemd.automount"
               "noauto"
               "x-systemd.idle-timeout=60"
@@ -231,16 +282,70 @@ in
           );
     };
 
+    # Secondary NAS automount declaration (NAS2 - 1TB Buffalo TeraStation)
+    fileSystems."${cfg.nas2.mountPoint}" = mkIf cfg.nas2.enable {
+      device = "//${cfg.nas2.host}/${cfg.nas2.share}";
+      fsType = "cifs";
+      options =
+        (
+          if cfg.nas2.credentialsFile != null then
+            [ "credentials=${toString cfg.nas2.credentialsFile}" ]
+          else
+            [ "guest" ]
+        )
+        ++ [
+          "uid=1000"
+          "gid=100"
+          "file_mode=0775"
+          "dir_mode=0775"
+          "port=${toString cfg.nas2.port}"
+          "vers=${cfg.nas2.smbVersion}"
+          "soft"
+          "nofail"
+          "x-systemd.automount"
+          "noauto"
+          "x-systemd.idle-timeout=60"
+          "x-systemd.device-timeout=3s"
+          "x-systemd.mount-timeout=3s"
+          "_netdev"
+          "x-systemd.before=shutdown.target"
+        ];
+    };
+
+    # Safely convert an unmounted empty legacy /mnt/nas dir to a symlink -> NAS1
+    system.activationScripts.nasCompatSymlinks = mkIf (cfg.mountPoint != "/mnt/nas") ''
+      if [ -d /mnt/nas ] && [ ! -L /mnt/nas ] && ! ${pkgs.util-linux}/bin/mountpoint -q /mnt/nas; then
+        rmdir /mnt/nas 2>/dev/null || true
+      fi
+      if [ ! -e /mnt/nas ] && [ ! -L /mnt/nas ]; then
+        ln -s "${cfg.mountPoint}" /mnt/nas
+      fi
+      if [ -d /mnt/NAS ] && [ ! -L /mnt/NAS ] && ! ${pkgs.util-linux}/bin/mountpoint -q /mnt/NAS; then
+        rmdir /mnt/NAS 2>/dev/null || true
+      fi
+      if [ ! -e /mnt/NAS ] && [ ! -L /mnt/NAS ]; then
+        ln -s "${cfg.mountPoint}" /mnt/NAS
+      fi
+    '';
+
     # Deploy system-wide litestream configuration
-    environment.etc."litestream.yml".source = litestreamConfigFile;
+    environment.etc."litestream.yml" = mkIf cfg.enableLitestream {
+      source = litestreamConfigFile;
+    };
 
     # Directory and symlink management & background sync daemons
     systemd = {
       tmpfiles.rules = [
         "d ${cfg.mountPoint} 0775 root 100 - -"
-        "d ${cfg.backupDir} 0775 1000 100 - -"
-        "L+ /mnt/NAS - - - - ${cfg.mountPoint}"
         "L+ ${userHome}/NAS - - - - ${cfg.mountPoint}"
+        "L+ ${userHome}/NAS1 - - - - ${cfg.mountPoint}"
+      ]
+      ++ optionals cfg.nas2.enable [
+        "d ${cfg.nas2.mountPoint} 0775 root 100 - -"
+        "L+ ${userHome}/NAS2 - - - - ${cfg.nas2.mountPoint}"
+      ]
+      ++ optionals cfg.enableLitestream [
+        "d ${cfg.backupDir} 0775 1000 100 - -"
       ];
 
       services = {
@@ -253,10 +358,15 @@ in
             RemainAfterExit = true;
             ExecStart = pkgs.writeShellScript "ensure-nas-route" ''
               if echo "${cfg.host}" | ${pkgs.gnugrep}/bin/grep -q '^169\.254\.'; then
-                DEFAULT_IFACE=$(${pkgs.iproute2}/bin/ip route | ${pkgs.gnugrep}/bin/grep '^default' | ${pkgs.coreutils}/bin/head -n1 | ${pkgs.gawk}/bin/awk '{print $5}')
-                if [ -n "$DEFAULT_IFACE" ]; then
-                  ${pkgs.iproute2}/bin/ip route replace 169.254.0.0/16 dev "$DEFAULT_IFACE" scope link metric 1000 || true
+                DEFAULT_IFACE=$(${pkgs.iproute2}/bin/ip route | ${pkgs.gnugrep}/bin/grep -E '^default.*dev (wl|en|eth)' | ${pkgs.coreutils}/bin/head -n1 | ${pkgs.gawk}/bin/awk '{for(i=1;i<=NF;i++) if($i=="dev") {print $(i+1); exit}}')
+                if [ -z "$DEFAULT_IFACE" ]; then
+                  DEFAULT_IFACE=$(${pkgs.iproute2}/bin/ip route | ${pkgs.gnugrep}/bin/grep '^default' | ${pkgs.coreutils}/bin/head -n1 | ${pkgs.gawk}/bin/awk '{for(i=1;i<=NF;i++) if($i=="dev") {print $(i+1); exit}}')
                 fi
+                case "$DEFAULT_IFACE" in
+                  wl*|en*|eth*)
+                    ${pkgs.iproute2}/bin/ip route replace 169.254.0.0/16 dev "$DEFAULT_IFACE" scope link metric 1000 || true
+                    ;;
+                esac
               fi
             '';
           };
@@ -268,7 +378,7 @@ in
           wantedBy = [ "multi-user.target" ];
           after = [
             "network.target"
-            "mnt-nas.mount"
+            "mnt-NAS1.mount"
           ];
           wants = [ "network.target" ];
 
@@ -310,7 +420,7 @@ in
           description = "Periodic SQLite Snapshot Sync to NAS Backup Directory";
           after = [
             "network.target"
-            "mnt-nas.mount"
+            "mnt-NAS1.mount"
           ];
           serviceConfig = {
             Type = "oneshot";

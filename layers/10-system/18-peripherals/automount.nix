@@ -19,6 +19,14 @@ in
       '';
     };
 
+    environment.etc."udisks2/mount_options.conf".text = ''
+      [defaults]
+      ntfs_defaults=uid=$UID,gid=$GID,force
+      ntfs_allow=uid=$UID,gid=$GID,umask,dmask,fmask,locale,norecover,ignore_case,windows_names,compression,nocompression,nohidden,sys_immutable,sparse,showmeta,hide_dot_files,windows_names,force
+      ntfs:ntfs3_defaults=uid=$UID,gid=$GID,force
+      ntfs:ntfs3_allow=uid=$UID,gid=$GID,umask,dmask,fmask,iocharset,discard,nodiscard,force,ro,rw
+    '';
+
     environment.systemPackages = with pkgs; [
       udisks
       udiskie
