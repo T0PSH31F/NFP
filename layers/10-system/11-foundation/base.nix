@@ -100,7 +100,6 @@
       "serial_core"
     ];
     initrd = {
-      systemd.enable = true;
       compressor = "zstd";
     };
   };
