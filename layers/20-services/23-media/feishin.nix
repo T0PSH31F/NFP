@@ -108,7 +108,7 @@ in
   config = mkMerge [
     {
       nfp.services.feishin = {
-        enable = config.services.feishin.enable;
+        enable = cfg.enable && (cfg.mode == "server" || cfg.mode == "both");
         host = config.networking.hostName;
         port = 9180;
         homepage = {

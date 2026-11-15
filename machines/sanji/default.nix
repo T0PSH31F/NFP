@@ -140,7 +140,7 @@
     email-triage-daemon = {
       enable = true;
       jevUrl = "http://127.0.0.1:20130";
-      himalayaAccount = "wrighterik77";
+      himalayaAccount = "wrighterik77,lovelainautomations";
       confidenceThreshold = 0.80;
       interval = "5m";
     };
@@ -152,6 +152,12 @@
 
     polyfloor.enable = true;
     wyoming-services.enable = true;
+
+    # NFP already runs nfp-jev-classifier (:20127) and pi-durable-daemon (:8089)
+    jarvis = {
+      core.enable = false;
+      harness.enable = false;
+    };
   };
 
   layers.layer-71.harness.dream-cycle.enable = true;
@@ -159,6 +165,10 @@
   layers.layer-73.memory.task-watcher.enable = true;
 
   layers.layer-77.dash-desk-ui.jarvis-pwa.enable = true;
+  services.jarvis.pwa.host = "0.0.0.0";
+  networking.firewall.interfaces."tailscale0".allowedTCPPorts = [ 8096 ];
+
+  layers.layer-76.hermes-dashboard.enable = true;
 
   layers.layer-40.desktop.screenpipe.enable = true;
 

@@ -96,14 +96,6 @@ in
           };
         };
 
-        nfp-jev-classifier = {
-          serviceConfig = {
-            Slice = lib.mkForce "background.slice";
-            MemoryHigh = "512M";
-            MemoryMax = "1G";
-          };
-        };
-
         nfp-jarvis-dream-cycle = {
           serviceConfig = {
             Slice = lib.mkForce "background.slice";
@@ -195,6 +187,15 @@ in
             Slice = lib.mkForce "background.slice";
             MemoryHigh = "400M";
             MemoryMax = "600M";
+          };
+        };
+      }
+      // lib.optionalAttrs (config.layers.layer-78.llm-routers.jev.enable or false) {
+        nfp-jev-classifier = {
+          serviceConfig = {
+            Slice = lib.mkForce "background.slice";
+            MemoryHigh = "512M";
+            MemoryMax = "1G";
           };
         };
       };

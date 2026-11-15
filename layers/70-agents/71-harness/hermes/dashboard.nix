@@ -1,6 +1,7 @@
 {
   config,
   lib,
+  pkgs,
   ...
 }:
 {
@@ -16,7 +17,7 @@
     host = lib.mkOption {
       type = lib.types.str;
       default = "127.0.0.1";
-      description = "Bind address (127.0.0.1 for local-only, 0.0.0.0 for LAN).";
+      description = "Bind address (127.0.0.1 required when no auth provider is configured; tailnet access is bridged via hermes-dashboard-tailnet-proxy).";
     };
   };
 
@@ -55,6 +56,75 @@
         };
       };
 
-      networking.firewall.allowedTCPPorts = [ cfg.port ];
+      # Expose hermes-dashboard securely across the Tailscale mesh (Homepage scrapes http://<host>.nfp.nix:9119)
+      # while keeping hermes-dashboard itself bound to 127.0.0.1.
+      systemd.services.hermes-dashboard-tailnet-proxy = lib.mkIf (cfg.host == "127.0.0.1") {
+        description = "Tailscale Mesh Bridge for Hermes Web Dashboard";
+        wantedBy = [ "multi-user.target" ];
+        after = [
+          "hermes-dashboard.service"
+          "tailscaled.service"
+        ];
+        wants = [ "hermes-dashboard.service" ];
+        path = [
+          pkgs.iproute2
+          pkgs.gawk
+          pkgs.coreutils
+          pkgs.caddy
+        ];
+        script = ''
+          TS_IP=""
+          for _ in $(seq 1 30); do
+            TS_IP="$(ip -o -4 addr show dev tailscale0 2>/dev/null | awk '{print $4}' | cut -d/ -f1 | head -n1 || true)"
+            if [ -n "$TS_IP" ]; then
+              break
+            fi
+            sleep 1
+          done
+          if [ -z "$TS_IP" ]; then
+            echo "tailscale0 IPv4 not ready yet"
+            exit 1
+          fi
+          mkdir -p /run/hermes-dashboard-tailnet-proxy
+          cat > /run/hermes-dashboard-tailnet-proxy/config.json <<EOF
+          {
+            "admin": { "disabled": true },
+            "apps": {
+              "http": {
+                "servers": {
+                  "hermes_proxy": {
+                    "listen": ["$TS_IP:${toString cfg.port}"],
+                    "automatic_https": { "disable": true },
+                    "routes": [{
+                      "handle": [{
+                        "handler": "reverse_proxy",
+                        "upstreams": [{ "dial": "127.0.0.1:${toString cfg.port}" }],
+                        "headers": {
+                          "request": {
+                            "set": {
+                              "Host": ["127.0.0.1:${toString cfg.port}"],
+                              "Origin": ["http://127.0.0.1:${toString cfg.port}"]
+                            }
+                          }
+                        }
+                      }]
+                    }]
+                  }
+                }
+              }
+            }
+          }
+          EOF
+          exec caddy run --config /run/hermes-dashboard-tailnet-proxy/config.json
+        '';
+        serviceConfig = {
+          Type = "simple";
+          RuntimeDirectory = "hermes-dashboard-tailnet-proxy";
+          Restart = "always";
+          RestartSec = "5s";
+        };
+      };
+
+      networking.firewall.interfaces."tailscale0".allowedTCPPorts = [ cfg.port ];
     };
 }

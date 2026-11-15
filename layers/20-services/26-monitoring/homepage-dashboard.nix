@@ -781,7 +781,10 @@ let
 
 
     def adapter_calibre_web(base_url, svc_info, allowed_fields, iso_now):
-        db_path = "/var/lib/calibre/metadata.db"
+        db_path = next(
+            (p for p in ("/mnt/drives/backup-1/CalibreLibrary/metadata.db", "/var/lib/calibre/metadata.db") if os.path.isfile(p)),
+            "/var/lib/calibre/metadata.db",
+        )
         books = 0
         authors = 0
         if os.path.isfile(db_path):
@@ -918,7 +921,7 @@ let
         disk_used_gb = 0.0
         disk_total_gb = 0.0
         disk_pct = 0.0
-        for chart in ["disk_space./nix", "disk_space./"]:
+        for chart in ["disk_space./nix", "disk_space./", "disk_space./persist", "disk_space./storage", "disk_space./var/log"]:
             try:
                 with make_http_request(f"{used_ep}/api/v1/data?chart={chart}&points=1&after=-10", timeout=timeout) as resp:
                     data = json.loads(resp.read().decode("utf-8"))

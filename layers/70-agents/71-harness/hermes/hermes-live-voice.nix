@@ -14,8 +14,19 @@
 with lib;
 let
   cfg = config.layers.layer-76.hermes-live-voice;
-  voiceDaemon = ../../72-voice/hermes-voice-daemon.py;
-  routerBaseUrl = "http://127.0.0.1:20128";
+  voiceDir = ../../72-voice;
+  voiceDaemon = "${voiceDir}/hermes-voice-daemon.py";
+  extremeLocal =
+    (config.layers.layer-78.llm-routers.extreme-router.enable or false)
+    || (config.networking.hostName == "sanji");
+  routerBaseUrl =
+    if extremeLocal then
+      "http://127.0.0.1:20128"
+    else
+      "http://${config.layers.meta.fleetAddresses.z0r0}:20128";
+  jevLocal =
+    (config.layers.layer-78.llm-routers.jev.enable or false)
+    || (config.layers.layer-78.llm-routers.jev-router-plugin.enable or false);
   jevBaseUrl = "http://127.0.0.1:${
     toString (
       if (config.layers.layer-78.llm-routers.jev.enable or false) then
@@ -46,10 +57,10 @@ in
         exec ${pkgs.python3}/bin/python3 ${voiceDaemon} --serve --port ${toString cfg.port} "$@"
       '')
       (pkgs.writeShellScriptBin "nfp-voice-demo" ''
-        exec ${pkgs.python3}/bin/python3 ${voiceDaemon} --demo --jev-url "${jevBaseUrl}" --router-url "${routerBaseUrl}" "$@"
+        exec ${pkgs.python3}/bin/python3 ${voiceDaemon} --demo --jev-url "${jevBaseUrl}" --kong-url "${routerBaseUrl}" "$@"
       '')
       (pkgs.writeShellScriptBin "nfp-voice-golden-test" ''
-        exec ${pkgs.python3}/bin/python3 ${voiceDaemon} --golden-test --jev-url "${jevBaseUrl}" --router-url "${routerBaseUrl}" "$@"
+        exec ${pkgs.python3}/bin/python3 ${voiceDaemon} --golden-test --jev-url "${jevBaseUrl}" --kong-url "${routerBaseUrl}" "$@"
       '')
     ];
 
@@ -93,6 +104,7 @@ in
               "HERMES_HOME=/var/lib/hermes/.hermes"
               "HERMES_LIVE_PORT=${toString cfg.port}"
               "HERMES_VOICE_STATE_DIR=/var/lib/hermes-voice"
+              "KONG_BASE_URL=${routerBaseUrl}"
               "ROUTER_BASE_URL=${routerBaseUrl}"
               "JEV_BASE_URL=${jevBaseUrl}"
             ];
@@ -121,10 +133,12 @@ in
               if ! curl -sf --max-time 3 "http://127.0.0.1:${toString cfg.port}/health" >/dev/null 2>&1; then
                 FAILURES+=("hermes-live-gateway:${toString cfg.port}")
               fi
-              if ! curl -sf --max-time 3 "${jevBaseUrl}/health" >/dev/null 2>&1; then
-                FAILURES+=("jev-router:${jevBaseUrl}")
-              fi
-              if ! curl -sf --max-time 3 "${routerBaseUrl}/v1/models" >/dev/null 2>&1; then
+              ${optionalString jevLocal ''
+                if ! curl -sf --max-time 3 "${jevBaseUrl}/health" >/dev/null 2>&1; then
+                  FAILURES+=("jev-router:${jevBaseUrl}")
+                fi
+              ''}
+              if ! curl -sf --max-time 3 "${routerBaseUrl}/api/health" >/dev/null 2>&1; then
                 FAILURES+=("extreme-router:${routerBaseUrl}")
               fi
               if ! curl -sf --max-time 3 "http://127.0.0.1:8089/healthz" >/dev/null 2>&1; then
@@ -139,7 +153,9 @@ in
                 FAIL_STR="''${FAILURES[*]}"
                 printf '{"timestamp":"%s","status":"degraded","failures":"%s"}\n' "$TS" "$FAIL_STR" > "$STATE_FILE"
                 logger -t hermes-voice-watchdog -p daemon.err "[APERTURE SCIENCE ADVISORY] Voice/Router stack degraded: $FAIL_STR"
-                if [ -x /home/t0psh31f/.local/bin/glados-tts-cli ]; then
+                if [ -x /home/t0psh31f/.local/bin/glados-alert.sh ]; then
+                  /home/t0psh31f/.local/bin/glados-alert.sh --title "Voice/Router Watchdog Alert" --source "hermes-voice-watchdog" --risk high "Advisory. Degraded subsystems detected: $FAIL_STR" >/dev/null 2>&1 || true
+                elif [ -x /home/t0psh31f/.local/bin/glados-tts-cli ]; then
                   /home/t0psh31f/.local/bin/glados-tts-cli "Advisory. A voice or router subsystem has failed its heartbeat check." >/dev/null 2>&1 || true
                 fi
                 exit 1
@@ -171,7 +187,7 @@ in
             EnvironmentFile = optional (
               config.sops ? templates && config.sops.templates ? "hermes-env"
             ) config.sops.templates."hermes-env".path;
-            ExecStart = "${pkgs.python3}/bin/python3 ${voiceDaemon} --golden-test --jev-url ${jevBaseUrl} --router-url ${routerBaseUrl}";
+            ExecStart = "${pkgs.python3}/bin/python3 ${voiceDaemon} --golden-test --jev-url ${jevBaseUrl} --kong-url ${routerBaseUrl}";
           };
         };
       };

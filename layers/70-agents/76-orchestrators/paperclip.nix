@@ -149,7 +149,7 @@ with lib;
         nfp.services.paperclip = {
           enable = true;
           host = config.networking.hostName;
-          bind = "0.0.0.0";
+          bind = "127.0.0.1";
           inherit (cfg) port;
           tailnetName = "paperclip";
           tls = "headscale";
@@ -243,11 +243,13 @@ with lib;
               }
               EOF
             '';
-            ExecStart = "${lib.getExe paperclipPkg} run";
+            ExecStart = "${lib.getExe paperclipPkg} run -c /root/.paperclip/instances/default/config.json";
             Restart = "on-failure";
             RestartSec = "30s";
             WorkingDirectory = cfg.dataDir;
             Environment = [
+              "HOME=/root"
+              "PAPERCLIP_HOME=/root/.paperclip"
               "HOST=0.0.0.0"
               "PORT=${toString cfg.port}"
               "PAPERCLIP_BIND=lan"

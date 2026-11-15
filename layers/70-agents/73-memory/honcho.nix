@@ -120,11 +120,9 @@ with lib;
         honcho-deriver = mkIf cfg.enableDeriver {
           image = "ghcr.io/plastic-labs/honcho:latest"; # nicepkg/honcho on ghcr no longer exists (403)
           cmd = [
-            "uv"
-            "run"
-            "python"
+            "/app/.venv/bin/python3"
             "-m"
-            "honcho.deriver"
+            "src.deriver"
           ];
           environment = {
             DATABASE_URL = cfg.databaseUrl;

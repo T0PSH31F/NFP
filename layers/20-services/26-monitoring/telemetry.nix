@@ -72,12 +72,47 @@ in
       grafana.enable = false;
 
       opentelemetry = {
-        receiver.endpoint = mkIf (
-          cfg.role == "server" || cfg.role == "standalone"
-        ) "0.0.0.0:${toString cfg.otlpGrpcPort}";
         exporter.endpoints = mkIf (cfg.role == "agent") {
           fleet = cfg.remoteCollector;
         };
+      };
+    };
+
+    # ── OpenTelemetry Collector OTLP/HTTP Receiver (:4318; :4317 reserved by Netdata) ─
+    services.opentelemetry-collector = {
+      enable = true;
+      settings = {
+        receivers.otlp.protocols.http.endpoint = "0.0.0.0:${toString cfg.otlpHttpPort}";
+        exporters =
+          if cfg.role == "agent" then
+            {
+              otlphttp.endpoint = "http://luffy.nfp.nix:${toString cfg.otlpHttpPort}";
+            }
+          else
+            {
+              debug = { };
+            };
+        service =
+          let
+            exporterList = if cfg.role == "agent" then [ "otlphttp" ] else [ "debug" ];
+          in
+          {
+            telemetry.metrics.level = "none";
+            pipelines = {
+              traces = {
+                receivers = [ "otlp" ];
+                exporters = exporterList;
+              };
+              metrics = {
+                receivers = [ "otlp" ];
+                exporters = exporterList;
+              };
+              logs = {
+                receivers = [ "otlp" ];
+                exporters = exporterList;
+              };
+            };
+          };
       };
     };
 

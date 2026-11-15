@@ -182,13 +182,13 @@
       nfp.services.hermes = {
         enable = config.layers.layer-76.hermes.enable;
         host = config.networking.hostName;
-        bind = "0.0.0.0";
+        bind = "127.0.0.1";
         port = 9119;
         tailnetName = "hermes";
         tls = "headscale";
         healthcheck = {
           enable = true;
-          path = "/";
+          path = "/api/health";
           expectedStatus = [ 200 ];
         };
         homepage = {
@@ -452,11 +452,13 @@
               ${pkgs.jq}/bin/jq --arg token "$TOKEN" '.remoteApiKey = $token' "${config.services.hermes-agent.stateDir}/.hermes/desktop.json" > "${config.services.hermes-agent.stateDir}/.hermes/desktop.json.tmp" && mv "${config.services.hermes-agent.stateDir}/.hermes/desktop.json.tmp" "${config.services.hermes-agent.stateDir}/.hermes/desktop.json" || true
             fi
           fi
-          # Upgrade any legacy claude-3-7-sonnet / claude-3-5-sonnet default in mutable config.yaml to Nous Portal's most intelligent free model
+          # Upgrade default model in mutable config.yaml to ExtremeRouter Free combo for 24/7 availability
           if [ -f "${config.services.hermes-agent.stateDir}/.hermes/config.yaml" ]; then
             ${pkgs.gnused}/bin/sed -i \
-              -e 's|default:.*claude-3-7-sonnet.*|default: reflection/beam-1.0-501b-a23b:free|g' \
-              -e 's|fallback:.*claude-3-5-sonnet.*|fallback: jev/free-first|g' \
+              -e 's|provider:.*|provider: extreme-router|g' \
+              -e 's|default:.*|default: Free|g' \
+              -e 's|fallback:.*|fallback: DailyDrive|g' \
+              -e 's|base_url:.*https://inference-api.*|base_url: "http://127.0.0.1:20128/v1"|g' \
               "${config.services.hermes-agent.stateDir}/.hermes/config.yaml" || true
           fi
         '';
@@ -499,10 +501,10 @@
             # Mutable runtime prefs live in ~/.hermes/config.yaml (user-owned).
 
             model:
-              provider: nous
-              base_url: "https://inference-api.nousresearch.com/v1"
-              default: "reflection/beam-1.0-501b-a23b:free"
-              fallback: "jev/free-first"
+              provider: extreme-router
+              base_url: "http://127.0.0.1:20128/v1"
+              default: "Free"
+              fallback: "DailyDrive"
               api_mode: chat_completions
 
             providers:
@@ -895,8 +897,8 @@
           ${lib.optionalString cfg.signalBot.enable ''
             # ── Signal ───────────────────────────────────────────────────
             SIGNAL_HTTP_URL=http://127.0.0.1:8080
-            SIGNAL_ACCOUNT=''${config.sops.placeholder.signal_account}
-            SIGNAL_ALLOWED_USERS=''${config.sops.placeholder.signal_allowed_users}
+            SIGNAL_ACCOUNT=${config.sops.placeholder.signal_account}
+            SIGNAL_ALLOWED_USERS=${config.sops.placeholder.signal_allowed_users}
             SIGNAL_ALLOW_ALL_USERS=false
             SIGNAL_IGNORE_STORIES=true
           ''}

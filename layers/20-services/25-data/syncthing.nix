@@ -22,7 +22,7 @@ in
     };
     guiAddress = mkOption {
       type = types.str;
-      default = "127.0.0.1:8384";
+      default = "0.0.0.0:8384";
       description = "Address for local Syncthing Web UI";
     };
   };
@@ -31,7 +31,7 @@ in
     nfp.services.syncthing = {
       enable = true;
       host = config.networking.hostName;
-      bind = "127.0.0.1";
+      bind = "0.0.0.0";
       port = 8384;
       tailnetName = "syncthing";
       tls = "headscale";
@@ -166,6 +166,7 @@ in
 
     # Firewall - open Syncthing listening ports for Tailscale mesh
     networking.firewall.allowedTCPPorts = [ 22000 ];
+    networking.firewall.interfaces."tailscale0".allowedTCPPorts = [ 8384 ];
     networking.firewall.allowedUDPPorts = [
       22000
       21027

@@ -2,6 +2,7 @@
   config,
   lib,
   pkgs,
+  inputs,
   ...
 }:
 {
@@ -10,8 +11,8 @@
 
     workspaceDir = lib.mkOption {
       type = lib.types.str;
-      default = "/home/t0psh31f/.hermes/hermes-workspace";
-      description = "Path to the cloned hermes-webui repository.";
+      default = toString inputs.hermes-webui;
+      description = "Path to the hermes-webui source tree.";
     };
 
     port = lib.mkOption {
@@ -51,6 +52,7 @@
           HERMES_WEBUI_AGENT_DIR = config.services.hermes-agent.stateDir;
           HERMES_WEBUI_PYTHON = "${webuiPython}/bin/python";
           HERMES_HOME = hermesState;
+          PYTHONDONTWRITEBYTECODE = "1";
         };
 
         serviceConfig = {

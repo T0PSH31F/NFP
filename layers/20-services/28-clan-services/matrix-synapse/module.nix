@@ -107,7 +107,8 @@ in
                 };
               };
 
-              nginx.virtualHosts = {
+              # Caddy handles public :443 TLS when enabled; only configure nginx vhosts if Caddy is absent
+              nginx.virtualHosts = lib.mkIf (!(config.services.caddy.enable or false)) {
                 # Matrix Synapse homeserver reverse proxy — matrix.lovelain.duckdns.org
                 ${settings.server_tld} = {
                   enableACME = true;

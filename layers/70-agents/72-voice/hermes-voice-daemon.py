@@ -20,16 +20,29 @@ import time
 import urllib.parse
 import urllib.request
 import wave
+from pathlib import Path
 from typing import Any, AsyncGenerator, Dict, List, Optional, Tuple
+
+_VOICE_DIR = Path(__file__).resolve().parent
+if str(_VOICE_DIR) not in sys.path:
+    sys.path.insert(0, str(_VOICE_DIR))
+
+from distributed_tts_router import DistributedTTSRouter, query_local_compute
+from kokoro_tts import KokoroTTSEngine
+from persona_manager import PersonaConfig, PersonaManager
 
 PORT = int(os.environ.get("HERMES_LIVE_PORT", "8880"))
 HOST = os.environ.get("HERMES_LIVE_HOST", "127.0.0.1")
-KONG_BASE_URL = os.environ.get("KONG_BASE_URL", "http://127.0.0.1:8090")
+KONG_BASE_URL = os.environ.get("KONG_BASE_URL") or os.environ.get("ROUTER_BASE_URL") or "http://127.0.0.1:8090"
 JEV_BASE_URL = os.environ.get("JEV_BASE_URL", "http://127.0.0.1:20127")
 STATE_DIR = os.environ.get("HERMES_VOICE_STATE_DIR", "/var/lib/hermes-voice")
 GLADOS_ONNX = os.environ.get("GLADOS_ONNX_MODEL", "/home/t0psh31f/Projects/GLaDOS/models/TTS/glados.onnx")
 SENTENCE_SPLIT_RE = re.compile(r"(?<=[.!?;:])\s+")
 _WARM_PIPER_PROC: Optional[subprocess.Popen] = None
+
+PERSONA_MANAGER = PersonaManager()
+TTS_ENGINE = KokoroTTSEngine()
+TTS_ROUTER = DistributedTTSRouter(engine=TTS_ENGINE)
 
 
 def load_voice_api_key() -> Tuple[str, str]:
@@ -80,59 +93,43 @@ def _get_warm_piper() -> Optional[subprocess.Popen]:
         return None
 
 
-def synthesize_tts_sentence(sentence: str, out_wav_path: str) -> Tuple[bool, float]:
-    """Synthesize a single sentence chunk to WAV using warm local Piper neural voice (or espeak-ng fallback)."""
+def synthesize_tts_sentence(
+    sentence: str,
+    out_wav_path: str,
+    persona: Optional[PersonaConfig] = None,
+    node_override: Optional[str] = None,
+) -> Tuple[bool, float]:
+    """Synthesize a single sentence chunk to WAV using active persona routing + Kokoro/Piper/espeak-ng."""
     t0 = time.perf_counter()
-    warm_proc = _get_warm_piper()
-    if warm_proc is not None and warm_proc.stdin and warm_proc.stdout:
-        try:
-            clean_line = sentence.replace("\n", " ").strip() + "\n"
-            warm_proc.stdin.write(clean_line.encode("utf-8"))
-            warm_proc.stdin.flush()
-            pcm_chunk = warm_proc.stdout.read(8820)  # ~200ms 22.05kHz 16-bit mono PCM frame
-            if pcm_chunk:
-                with wave.open(out_wav_path, "wb") as wf:
-                    wf.setnchannels(1)
-                    wf.setsampwidth(2)
-                    wf.setframerate(22050)
-                    wf.writeframes(pcm_chunk)
-                return True, round((time.perf_counter() - t0) * 1000.0, 2)
-        except Exception:
-            pass
-    piper_bin = None
-    for candidate in ("/run/current-system/sw/bin/piper", "/etc/profiles/per-user/t0psh31f/bin/piper"):
-        if os.path.exists(candidate):
-            piper_bin = candidate
-            break
+    active = persona or PERSONA_MANAGER.get_active_persona()
+    rendered_text = PersonaManager.apply_text_transforms(sentence, active)
 
-    if piper_bin and os.path.exists(GLADOS_ONNX):
-        proc = subprocess.run(
-            [piper_bin, "--model", GLADOS_ONNX, "--output_file", out_wav_path],
-            input=sentence.encode("utf-8"),
-            capture_output=True,
-            timeout=10,
-        )
-        if proc.returncode == 0 and os.path.exists(out_wav_path) and os.path.getsize(out_wav_path) > 44:
-            return True, round((time.perf_counter() - t0) * 1000.0, 2)
+    # Fast-path warm local Piper when using GLaDOS without a remote node override
+    if active.id == "glados" and not node_override:
+        warm_proc = _get_warm_piper()
+        if warm_proc is not None and warm_proc.stdin and warm_proc.stdout:
+            try:
+                clean_line = rendered_text.replace("\n", " ").strip() + "\n"
+                warm_proc.stdin.write(clean_line.encode("utf-8"))
+                warm_proc.stdin.flush()
+                pcm_chunk = warm_proc.stdout.read(8820)  # ~200ms 22.05kHz 16-bit mono PCM frame
+                if pcm_chunk:
+                    with wave.open(out_wav_path, "wb") as wf:
+                        wf.setnchannels(1)
+                        wf.setsampwidth(2)
+                        wf.setframerate(22050)
+                        wf.writeframes(pcm_chunk)
+                    return True, round((time.perf_counter() - t0) * 1000.0, 2)
+            except Exception:
+                pass
 
-    # Fallback: generate deterministic 16kHz PCM WAV via espeak-ng or synthetic tone
-    for espeak_bin in ("/run/current-system/sw/bin/espeak-ng", "/usr/bin/espeak-ng"):
-        if os.path.exists(espeak_bin):
-            proc = subprocess.run(
-                [espeak_bin, "-w", out_wav_path, sentence],
-                capture_output=True,
-                timeout=10,
-            )
-            if proc.returncode == 0 and os.path.exists(out_wav_path) and os.path.getsize(out_wav_path) > 44:
-                return True, round((time.perf_counter() - t0) * 1000.0, 2)
-
-    # Pure-Python valid WAV fallback if neither binary is in PATH
-    with wave.open(out_wav_path, "wb") as wf:
-        wf.setnchannels(1)
-        wf.setsampwidth(2)
-        wf.setframerate(16000)
-        wf.writeframes(b"\x00\x00" * 1600)
-    return True, round((time.perf_counter() - t0) * 1000.0, 2)
+    ok, elapsed_ms, _engine, _node = TTS_ROUTER.synthesize(
+        rendered_text,
+        active,
+        out_wav_path,
+        node_override=node_override,
+    )
+    return ok, elapsed_ms
 
 
 def transcribe_stt_wav(wav_path: str) -> Tuple[str, float]:
@@ -175,6 +172,7 @@ async def stream_llm_sentences(
     headers: Dict[str, str],
     model: str = "voice-fast",
     max_tokens: int = 120,
+    system_prompt: Optional[str] = None,
 ) -> AsyncGenerator[Tuple[str, Dict[str, Any]], None]:
     """
     Stream SSE deltas from Jev / Kong and yield individual sentences as soon as
@@ -185,6 +183,11 @@ async def stream_llm_sentences(
     port = parsed.port or 80
     path = parsed.path or "/v1/chat/completions"
 
+    active_persona = PERSONA_MANAGER.get_active_persona()
+    effective_prompt = system_prompt or active_persona.system_prompt or (
+        "You are GLaDOS. Respond in 1-2 short, crisp, dryly sarcastic sentences suitable for immediate low-latency voice synthesis."
+    )
+
     payload = {
         "model": model,
         "stream": True,
@@ -193,7 +196,7 @@ async def stream_llm_sentences(
         "messages": [
             {
                 "role": "system",
-                "content": "You are GLaDOS. Respond in 1-2 short, crisp, dryly sarcastic sentences suitable for immediate low-latency voice synthesis.",
+                "content": effective_prompt,
             },
             {"role": "user", "content": prompt},
         ],
@@ -284,13 +287,22 @@ async def run_voice_turn_e2e(
     prompt_override: Optional[str] = None,
     router_url: Optional[str] = None,
     play_audio: bool = False,
+    persona_override: Optional[str] = None,
+    node_override: Optional[str] = None,
 ) -> Dict[str, Any]:
     """
     Execute a complete Wake Word -> STT -> Jev/LLM Streaming -> Sentence-Chunked TTS turn.
     Measures latency budget (< 1500ms wake-to-first-audio).
     """
+    persona = (
+        PERSONA_MANAGER.get_persona(persona_override)
+        if persona_override
+        else PERSONA_MANAGER.get_active_persona()
+    ) or PERSONA_MANAGER.get_active_persona()
+
     # Ensure warm Piper daemon subprocess is initialized prior to wake-word event
-    _get_warm_piper()
+    if persona.id == "glados":
+        _get_warm_piper()
     t_wake = time.perf_counter()
     h_name, h_val = load_voice_api_key()
     headers = {h_name: h_val} if h_val else {}
@@ -303,7 +315,7 @@ async def run_voice_turn_e2e(
             transcript = prompt_override
             stt_ms = 12.0  # Wake-word + warm VAD buffer
         else:
-            synthesize_tts_sentence("Status report.", in_wav)
+            synthesize_tts_sentence("Status report.", in_wav, persona=persona, node_override=node_override)
             transcript, stt_ms = transcribe_stt_wav(in_wav)
     finally:
         if os.path.exists(in_wav):
@@ -326,14 +338,18 @@ async def run_voice_turn_e2e(
                 headers,
                 model=candidate_model,
                 max_tokens=90,
+                system_prompt=persona.system_prompt,
             ):
                 if first_sentence_ms is None:
                     first_sentence_ms = round((time.perf_counter() - t_wake) * 1000.0, 2)
                 if dec:
                     jev_decision = dec
-                sentences.append(sentence)
+                transformed = PersonaManager.apply_text_transforms(sentence, persona)
+                sentences.append(transformed)
                 out_wav = os.path.join(tempfile.gettempdir(), f"hermes-voice-chunk-{len(sentences)}.wav")
-                ok, tts_ms = await asyncio.to_thread(synthesize_tts_sentence, sentence, out_wav)
+                ok, tts_ms = await asyncio.to_thread(
+                    synthesize_tts_sentence, transformed, out_wav, persona, node_override
+                )
                 if ok:
                     audio_files.append(out_wav)
                     if first_audio_ms is None:
@@ -352,6 +368,10 @@ async def run_voice_turn_e2e(
     total_ms = round((time.perf_counter() - t_wake) * 1000.0, 2)
     return {
         "status": "ok" if sentences and audio_files else "error",
+        "persona": persona.id,
+        "persona_name": persona.name,
+        "tts_engine": persona.tts_engine,
+        "target_node": node_override or persona.target_node,
         "transcript": transcript,
         "sentences": sentences,
         "sentence_count": len(sentences),
@@ -481,6 +501,7 @@ async def handle_http(reader: asyncio.StreamReader, writer: asyncio.StreamWriter
         raw_body = await reader.readexactly(content_len) if content_len > 0 else b""
 
         if path in ("/health", "/healthz"):
+            active_p = PERSONA_MANAGER.get_active_persona()
             body = json.dumps({
                 "status": "ok",
                 "service": "hermes-live-voice",
@@ -488,6 +509,11 @@ async def handle_http(reader: asyncio.StreamReader, writer: asyncio.StreamWriter
                 "front_door": "hermes",
                 "worker": "pi-a2a-mcp",
                 "jev_url": JEV_BASE_URL,
+                "active_persona": active_p.id,
+                "active_persona_name": active_p.name,
+                "personas_loaded": len(PERSONA_MANAGER.list_personas()),
+                "compute": query_local_compute(),
+                "tts_capabilities": TTS_ENGINE.capabilities(),
             }).encode("utf-8")
             writer.write(
                 f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {len(body)}\r\nConnection: close\r\n\r\n".encode("latin-1")
@@ -496,11 +522,123 @@ async def handle_http(reader: asyncio.StreamReader, writer: asyncio.StreamWriter
             await writer.drain()
             return
 
+        if method == "GET" and path == "/v1/personas":
+            active_p = PERSONA_MANAGER.get_active_persona()
+            all_p = PERSONA_MANAGER.list_personas()
+            body = json.dumps({
+                "active_persona": active_p.id,
+                "count": len(all_p),
+                "personas": all_p,
+            }).encode("utf-8")
+            writer.write(
+                f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {len(body)}\r\nConnection: close\r\n\r\n".encode("latin-1")
+                + body
+            )
+            await writer.drain()
+            return
+
+        if method == "GET" and path in ("/v1/persona", "/v1/personas/active"):
+            active_p = PERSONA_MANAGER.get_active_persona()
+            body = json.dumps({"active_persona": active_p.id, "persona": active_p.to_dict()}).encode("utf-8")
+            writer.write(
+                f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {len(body)}\r\nConnection: close\r\n\r\n".encode("latin-1")
+                + body
+            )
+            await writer.drain()
+            return
+
+        if method == "POST" and path in ("/v1/persona/switch", "/v1/personas/switch"):
+            req_json = json.loads(raw_body.decode("utf-8")) if raw_body else {}
+            target_id = str(req_json.get("persona") or req_json.get("id") or "").strip()
+            switched = PERSONA_MANAGER.set_active_persona(target_id)
+            if switched is None:
+                body = json.dumps({"status": "error", "error": f"Unknown persona '{target_id}'"}).encode("utf-8")
+                writer.write(
+                    f"HTTP/1.1 404 Not Found\r\nContent-Type: application/json\r\nContent-Length: {len(body)}\r\nConnection: close\r\n\r\n".encode("latin-1")
+                    + body
+                )
+            else:
+                body = json.dumps({
+                    "status": "ok",
+                    "active_persona": switched.id,
+                    "persona": switched.to_dict(),
+                }).encode("utf-8")
+                writer.write(
+                    f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {len(body)}\r\nConnection: close\r\n\r\n".encode("latin-1")
+                    + body
+                )
+            await writer.drain()
+            return
+
+        if method == "POST" and path == "/v1/personas/reload":
+            count = PERSONA_MANAGER.reload()
+            body = json.dumps({"status": "ok", "personas_loaded": count}).encode("utf-8")
+            writer.write(
+                f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {len(body)}\r\nConnection: close\r\n\r\n".encode("latin-1")
+                + body
+            )
+            await writer.drain()
+            return
+
+        if method == "GET" and path == "/v1/tts/nodes":
+            fleet = await asyncio.to_thread(TTS_ROUTER.get_fleet_status, True)
+            body = json.dumps(fleet).encode("utf-8")
+            writer.write(
+                f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {len(body)}\r\nConnection: close\r\n\r\n".encode("latin-1")
+                + body
+            )
+            await writer.drain()
+            return
+
+        if method == "POST" and path == "/v1/tts/synthesize":
+            req_json = json.loads(raw_body.decode("utf-8")) if raw_body else {}
+            text = str(req_json.get("text") or "").strip()
+            if not text:
+                body = json.dumps({"status": "error", "error": "Missing 'text' field"}).encode("utf-8")
+                writer.write(
+                    f"HTTP/1.1 400 Bad Request\r\nContent-Type: application/json\r\nContent-Length: {len(body)}\r\nConnection: close\r\n\r\n".encode("latin-1")
+                    + body
+                )
+                await writer.drain()
+                return
+            p_id = req_json.get("persona")
+            persona = (PERSONA_MANAGER.get_persona(p_id) if p_id else None) or PERSONA_MANAGER.get_active_persona()
+            rendered = PersonaManager.apply_text_transforms(text, persona)
+            with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp_wav:
+                wav_path = tmp_wav.name
+            try:
+                _ok, elapsed_ms, engine_used = await asyncio.to_thread(
+                    TTS_ENGINE.synthesize_to_wav, rendered, persona, wav_path
+                )
+                with open(wav_path, "rb") as wf:
+                    wav_bytes = wf.read()
+                writer.write(
+                    (
+                        "HTTP/1.1 200 OK\r\n"
+                        "Content-Type: audio/wav\r\n"
+                        f"X-TTS-Engine: {engine_used}\r\n"
+                        f"X-Persona-Id: {persona.id}\r\n"
+                        f"X-Elapsed-Ms: {elapsed_ms}\r\n"
+                        f"Content-Length: {len(wav_bytes)}\r\n"
+                        "Connection: close\r\n\r\n"
+                    ).encode("latin-1")
+                    + wav_bytes
+                )
+                await writer.drain()
+            finally:
+                if os.path.exists(wav_path):
+                    os.unlink(wav_path)
+            return
+
         if method == "POST" and path in ("/v1/voice/turn", "/v1/voice/demo"):
             req_json = json.loads(raw_body.decode("utf-8")) if raw_body else {}
+            if req_json.get("persona") and req_json.get("switch"):
+                PERSONA_MANAGER.set_active_persona(str(req_json["persona"]))
             res = await run_voice_turn_e2e(
                 prompt_override=req_json.get("prompt"),
                 play_audio=bool(req_json.get("play_audio", False)),
+                persona_override=req_json.get("persona"),
+                node_override=req_json.get("tts_node"),
             )
             body = json.dumps(res).encode("utf-8")
             code = 200 if res.get("status") == "ok" else 502
@@ -534,7 +672,7 @@ async def serve_forever() -> None:
 
 
 def main() -> None:
-    global PORT
+    global PORT, PERSONA_MANAGER
     parser = argparse.ArgumentParser(description="Hermes 24/7 Voice Agent & Golden-Path Test Runner")
     parser.add_argument("--serve", action="store_true", help="Run HTTP voice gateway daemon")
     parser.add_argument("--port", type=int, default=PORT, help="Port to bind HTTP daemon")
@@ -543,17 +681,69 @@ def main() -> None:
     parser.add_argument("--play", action="store_true", help="Play synthesized audio via PipeWire")
     parser.add_argument("--golden-test", action="store_true", help="Run full golden-path verification (models, streaming chat, tool call, voice E2E)")
     parser.add_argument("--jev-url", type=str, default=JEV_BASE_URL, help="Jev Tier Router URL")
-    parser.add_argument("--kong-url", type=str, default=KONG_BASE_URL, help="Kong Gateway URL")
+    parser.add_argument("--kong-url", "--router-url", dest="kong_url", type=str, default=KONG_BASE_URL, help="Kong / ExtremeRouter Gateway URL")
+    parser.add_argument("--personas-dir", type=str, default=None, help="Override configs/personas/ directory")
+    parser.add_argument("--persona", type=str, default=None, help="Select persona ID or alias for session/demo")
+    parser.add_argument("--switch-persona", type=str, default=None, help="Hot-swap active persona on running daemon")
+    parser.add_argument("--list-personas", action="store_true", help="List available persona manifests as JSON")
+    parser.add_argument("--tts-node", type=str, default=None, help="Override target Tailscale TTS node (sanji, luffy, z0r0)")
     args, unknown = parser.parse_known_args()
 
     PORT = args.port
+    if args.personas_dir:
+        PERSONA_MANAGER = PersonaManager(personas_dir=args.personas_dir)
+
+    if args.list_personas:
+        print(json.dumps({
+            "active_persona": PERSONA_MANAGER.get_active_persona().id,
+            "personas": PERSONA_MANAGER.list_personas(),
+        }, indent=2))
+        sys.exit(0)
+
+    if args.switch_persona:
+        # Attempt live HTTP hot-swap on running daemon; also persist locally
+        switched_remote = False
+        try:
+            payload = json.dumps({"persona": args.switch_persona}).encode("utf-8")
+            req = urllib.request.Request(
+                f"http://{HOST}:{PORT}/v1/persona/switch",
+                data=payload,
+                headers={"Content-Type": "application/json"},
+                method="POST",
+            )
+            with urllib.request.urlopen(req, timeout=2.0) as resp:
+                if resp.status == 200:
+                    print(resp.read().decode("utf-8"))
+                    switched_remote = True
+        except Exception:
+            pass
+        if not switched_remote:
+            local_p = PERSONA_MANAGER.set_active_persona(args.switch_persona)
+            if local_p is None:
+                print(json.dumps({"status": "error", "error": f"Unknown persona '{args.switch_persona}'"}))
+                sys.exit(1)
+            print(json.dumps({"status": "ok", "active_persona": local_p.id, "persisted": True}, indent=2))
+        sys.exit(0)
+
+    if args.persona:
+        if PERSONA_MANAGER.set_active_persona(args.persona) is None:
+            print(json.dumps({"status": "error", "error": f"Unknown persona '{args.persona}'"}), file=sys.stderr)
+            sys.exit(1)
 
     if args.golden_test:
         res = asyncio.run(run_golden_path_test(args.jev_url, args.kong_url))
         print(json.dumps(res, indent=2))
         sys.exit(0 if res.get("overall_passed") else 1)
     elif args.demo:
-        res = asyncio.run(run_voice_turn_e2e(prompt_override=args.prompt, router_url=args.jev_url, play_audio=args.play))
+        res = asyncio.run(
+            run_voice_turn_e2e(
+                prompt_override=args.prompt,
+                router_url=args.jev_url,
+                play_audio=args.play,
+                persona_override=args.persona,
+                node_override=args.tts_node,
+            )
+        )
         print(json.dumps(res, indent=2))
         sys.exit(0 if res.get("status") == "ok" else 1)
     else:

@@ -70,7 +70,11 @@
       };
       config = {
         impermanence.enable = true;
-        nas-mount.enable = true;
+        nas-mount.enable = false;
+        nas-mounts = {
+          enable = true;
+          enableLitestream = false;
+        };
       };
       virtualization.enable = true;
       sessionResilience.enable = true;

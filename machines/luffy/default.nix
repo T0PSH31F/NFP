@@ -93,7 +93,11 @@ in
       # Options: "latest" | "cachyos" | "zen"
       hardware.kernel = "cachyos"; # Maximum performance for desktop
       config.impermanence.enable = true;
-      config.nas-mount.enable = true;
+      config.nas-mount.enable = false;
+      config.nas-mounts = {
+        enable = true;
+        enableLitestream = false;
+      };
       virtualization.enable = true;
       mobile.android.enable = true;
       peripherals.razer.enable = lib.mkForce false; # Disabled: openrazer driver incompatible with linux 7.0.10
@@ -114,7 +118,10 @@ in
     openFirewall = false;
     upstreamRouterUrl = "http://100.64.0.1:20128";
   };
-  layers.layer-20.services.config.nixarr-stack.enable = true;
+  layers.layer-20.services.config.nixarr-stack = {
+    enable = true;
+    mediaDir = "/mnt/drives/backup-1/Media";
+  };
   layers.layer-20.services.config.jackett.enable = false;
   layers.layer-20.services.config.netdata.enable = true;
 
@@ -267,7 +274,12 @@ in
   services = {
     honcho.databaseUrlFile = config.sops.templates."honcho-database-url".path;
     searxng.enable = true;
-    calibre-web-app.enable = true;
+    calibre-web-app = {
+      enable = true;
+      libraryPath = "/mnt/drives/backup-1/CalibreLibrary";
+      backupDir = "/mnt/NAS1/backups/CalibreLibrary";
+    };
+    recovery-organizer.enable = true;
     jev-engine.enable = true;
     jev-exporter.enable = true;
     wyoming-services.enable = true;
@@ -305,14 +317,14 @@ in
     # Deprecated: Caddy now proxies directly to Synapse on 8008 and serves Element Web
     # nginx config kept in case it's needed by other services
     nginx = {
-      defaultHTTPListenPort = 8084;
+      defaultHTTPListenPort = 8097;
       virtualHosts = {
         "matrix.local" = {
           enableACME = lib.mkForce false;
           forceSSL = lib.mkForce false;
           onlySSL = lib.mkForce true;
-          sslCertificate = "/var/lib/acme/matrix.local/fullchain.pem";
-          sslCertificateKey = "/var/lib/acme/matrix.local/key.pem";
+          sslCertificate = "/run/nginx/matrix.local.crt";
+          sslCertificateKey = "/run/nginx/matrix.local.key";
           listen = lib.mkForce [
             {
               addr = "127.0.0.1";
@@ -335,8 +347,8 @@ in
           enableACME = lib.mkForce false;
           forceSSL = lib.mkForce false;
           onlySSL = lib.mkForce true;
-          sslCertificate = "/var/lib/acme/element.local/fullchain.pem";
-          sslCertificateKey = "/var/lib/acme/element.local/key.pem";
+          sslCertificate = "/run/nginx/element.local.crt";
+          sslCertificateKey = "/run/nginx/element.local.key";
           listen = lib.mkForce [
             {
               addr = "127.0.0.1";
@@ -349,7 +361,7 @@ in
         "searx.local".listen = lib.mkForce [
           {
             addr = "127.0.0.1";
-            port = 8084;
+            port = 8097;
           }
         ];
         "hermes-matrix.local" = {
@@ -542,6 +554,16 @@ in
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;
+    users.${config.layers.meta.primaryUser} = {
+      xdg.configFile."hypr/monitors.conf".text = ''
+        # Luffy 4-Monitor 2x2 Square Configuration
+        monitor = desc:Acer Technologies Acer B277 0x95112E9B, 1920x1080@74.99, 0x0, 1
+        monitor = desc:Acer Technologies XB271HK T4UAA0018502, 1920x1080@60, 0x1080, 1
+        monitor = desc:Acer Technologies Acer B277 0x95112E9D, 1920x1080@74.99, 1920x0, 1
+        monitor = desc:Acer Technologies Acer B277 0x95112EBE, 1920x1080@74.99, 1920x1080, 1
+        monitor = , preferred, auto, 1
+      '';
+    };
   };
 
   # ============================================================================
@@ -697,10 +719,23 @@ in
       '';
     };
 
-    # Ensure nginx waits for network-online so it resolves cache.nixos.org reliably
+    # Ensure nginx waits for network-online and has valid internal TLS certs for local vhosts
     nginx = {
       after = [ "network-online.target" ];
       wants = [ "network-online.target" ];
+      preStart = lib.mkBefore ''
+        mkdir -p /run/nginx
+        for h in matrix.local element.local; do
+          if [ ! -s "/run/nginx/$h.crt" ] || [ ! -s "/run/nginx/$h.key" ]; then
+            ${pkgs.openssl}/bin/openssl req -x509 -nodes -days 3650 -newkey rsa:2048 \
+              -keyout "/run/nginx/$h.key" \
+              -out "/run/nginx/$h.crt" \
+              -subj "/CN=$h" >/dev/null 2>&1
+            chmod 600 "/run/nginx/$h.key"
+            chmod 644 "/run/nginx/$h.crt"
+          fi
+        done
+      '';
     };
 
     # Wyoming faster whisper network online and restart safety
@@ -716,13 +751,17 @@ in
     # VictoriaMetrics impermanence bind-mount compatibility
     victoriametrics.serviceConfig.DynamicUser = lib.mkForce false;
 
-    # Filebrowser data directory permissions
+    # Filebrowser data directory permissions (service runs unprivileged as filebrowser; ownership is enforced by tmpfiles)
     filebrowser.preStart = ''
       mkdir -p /var/lib/filebrowser/data
-      chown -R filebrowser:filebrowser /var/lib/filebrowser
       chmod 700 /var/lib/filebrowser/data
     '';
   };
+
+  systemd.tmpfiles.rules = [
+    "d /var/lib/filebrowser 0750 filebrowser filebrowser -"
+    "Z /var/lib/filebrowser - filebrowser filebrowser -"
+  ];
 
   # Persist luffy's root SSH keypair across impermanence rollbacks.
   environment.persistence."/persist".directories = [
