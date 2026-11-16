@@ -103,6 +103,8 @@ jobs:
       - name: Full flake & VM test check
         run: nix flake check --option builders ""
       - name: Deploy entire fleet
+        env:
+          SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
         run: |
           install -d -m 700 "$HOME/.ssh"
           install -m 600 "$CREDENTIALS_DIRECTORY/ci-deploy-ssh-key" "$HOME/.ssh/id_ed25519"
