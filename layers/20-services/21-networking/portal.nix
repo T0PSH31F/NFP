@@ -48,16 +48,42 @@ in
         encode zstd gzip
         header Strict-Transport-Security "max-age=31536000; includeSubDomains"
 
-        # Operator/Admin proxy route to internal Homepage dashboard
-        @internalDash path /dash*
-        handle @internalDash {
-          reverse_proxy localhost:3007
+        ${optionalString (config.layers.layer-20.services.auth.authentik.enable or false) ''
+          handle /outpost.goauthentik.io/* {
+            reverse_proxy localhost:${toString (config.layers.layer-20.services.auth.authentik.port or 9000)}
+          }
+
+          # Authenticated identity metadata for the Media Directory UI
+          handle /api/me {
+            forward_auth localhost:${toString (config.layers.layer-20.services.auth.authentik.port or 9000)} {
+              uri /outpost.goauthentik.io/auth/caddy
+              copy_headers X-Authentik-Username X-Authentik-Groups X-Authentik-Entitlements X-Authentik-Email X-Authentik-Name X-Authentik-Uid
+              trusted_proxies private_ranges
+            }
+            header Content-Type application/json
+            header Cache-Control "no-store"
+            respond `{"username":"{http.request.header.X-Authentik-Username}","name":"{http.request.header.X-Authentik-Name}","email":"{http.request.header.X-Authentik-Email}","groups":"{http.request.header.X-Authentik-Groups}"}` 200
+          }
+        ''}
+
+        # Redirect /dash* to dedicated Admin-only subdomain enforced by Authentik NFP Admins policy
+        handle /dash* {
+          redir https://dash.${cfg.domain} 302
         }
 
-        # Root static file server for Guest Portal & Member Launchpad
-        root * ${cfg.package}
-        file_server
-        try_files {path} /index.html
+        # Authenticated Media & Gaming Directory at root
+        handle {
+          ${optionalString (config.layers.layer-20.services.auth.authentik.enable or false) ''
+            forward_auth localhost:${toString (config.layers.layer-20.services.auth.authentik.port or 9000)} {
+              uri /outpost.goauthentik.io/auth/caddy
+              copy_headers X-Authentik-Username X-Authentik-Groups X-Authentik-Entitlements X-Authentik-Email X-Authentik-Name X-Authentik-Uid
+              trusted_proxies private_ranges
+            }
+          ''}
+          root * ${cfg.package}
+          file_server
+          try_files {path} /index.html
+        }
       '';
     };
   };

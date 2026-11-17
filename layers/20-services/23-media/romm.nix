@@ -94,8 +94,16 @@ in
 
     systemd.services.romm-db-init = {
       description = "Provision MariaDB database and credentials for RomM";
-      after = [ "mysql.service" ];
-      requires = [ "mysql.service" ];
+      after = [
+        "mysql.service"
+      ]
+      ++ optional (config.layers.layer-20.services.auth.authentik.enable or false
+      ) "postgresql-authentik-setup.service";
+      requires = [
+        "mysql.service"
+      ]
+      ++ optional (config.layers.layer-20.services.auth.authentik.enable or false
+      ) "postgresql-authentik-setup.service";
       wantedBy = [ "multi-user.target" ];
       path = [
         pkgs.openssl
@@ -116,6 +124,15 @@ in
         DB_PASSWD=$DB_PW
         ROMM_AUTH_SECRET_KEY=$AUTH_KEY
         EOF
+                fi
+                if [ -r /var/lib/authentik/runtime.env ]; then
+                  . /var/lib/authentik/runtime.env
+                  if [ -n "''${OIDC_ROMM_SECRET:-}" ]; then
+                    grep -v '^OIDC_CLIENT_SECRET=' "$ENV_FILE" > "$ENV_FILE.tmp" || true
+                    printf 'OIDC_CLIENT_SECRET=%s\n' "$OIDC_ROMM_SECRET" >> "$ENV_FILE.tmp"
+                    chmod 600 "$ENV_FILE.tmp"
+                    mv "$ENV_FILE.tmp" "$ENV_FILE"
+                  fi
                 fi
                 set -a
                 . "$ENV_FILE"
@@ -171,9 +188,22 @@ in
         DB_PORT = "3306";
         DB_NAME = "romm";
         DB_USER = "romm";
+      }
+      // lib.optionalAttrs (config.layers.layer-20.services.auth.authentik.enable or false) {
+        OIDC_ENABLED = "true";
+        OIDC_PROVIDER = "authentik";
+        OIDC_CLIENT_ID = "romm";
+        OIDC_REDIRECT_URI = "https://romm.${
+          config.layers.meta.publicDomain or "lovelain.duckdns.org"
+        }/api/oauth/openid";
+        OIDC_SERVER_APPLICATION_URL = "https://${config.layers.layer-20.services.auth.authentik.domain}/application/o/romm/";
       };
       environmentFiles = [ "/var/lib/romm/romm.env" ];
-      extraOptions = [ "--add-host=host.containers.internal:host-gateway" ];
+      extraOptions = [
+        "--add-host=host.containers.internal:host-gateway"
+      ]
+      ++ lib.optional (config.layers.layer-20.services.auth.authentik.enable or false
+      ) "--add-host=${config.layers.layer-20.services.auth.authentik.domain}:host-gateway";
       volumes = [
         "${cfg.romsDir}:/romm/library/roms${optionalString cfg.remoteRoms.enable ":ro,rslave"}"
         "${cfg.dataDir}:/romm/resources"

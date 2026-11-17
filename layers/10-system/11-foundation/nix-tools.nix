@@ -268,5 +268,35 @@ with lib;
       MemoryHigh = "5.5G";
       OOMScoreAdjust = 500;
     };
+
+    # Weekly refresh of prebuilt nix-index database for `comma` and `nix-locate`
+    systemd.user.services.nix-index-db-update = {
+      description = "Update prebuilt nix-index database for comma";
+      after = [ "network-online.target" ];
+      wants = [ "network-online.target" ];
+      serviceConfig = {
+        Type = "oneshot";
+        ExecStart = pkgs.writeShellScript "nix-index-db-update" ''
+          set -euo pipefail
+          cache_dir="''${XDG_CACHE_HOME:-$HOME/.cache}/nix-index"
+          mkdir -p "$cache_dir"
+          arch="$(${pkgs.coreutils}/bin/uname -m)"
+          ${pkgs.curl}/bin/curl -fsSL --connect-timeout 15 --retry 2 \
+            "https://github.com/nix-community/nix-index-database/releases/latest/download/index-''${arch}-linux" \
+            -o "$cache_dir/files.tmp"
+          mv -f "$cache_dir/files.tmp" "$cache_dir/files"
+        '';
+      };
+    };
+
+    systemd.user.timers.nix-index-db-update = {
+      description = "Weekly nix-index database refresh";
+      wantedBy = [ "timers.target" ];
+      timerConfig = {
+        OnCalendar = "weekly";
+        Persistent = true;
+        RandomizedDelaySec = "1h";
+      };
+    };
   };
 }

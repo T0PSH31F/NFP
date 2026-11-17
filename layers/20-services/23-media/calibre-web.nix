@@ -86,6 +86,10 @@ with lib;
           calibreLibrary = config.services.calibre-web-app.libraryPath;
           enableBookUploading = true;
           enableBookConversion = true;
+          reverseProxyAuth = mkIf (config.layers.layer-20.services.auth.authentik.enable or false) {
+            enable = true;
+            header = "X-Authentik-Username";
+          };
         };
       };
 

@@ -45,6 +45,8 @@ in
         Port = cfg.port;
         MusicFolder = cfg.musicFolder;
         ScanSchedule = "@every 1h";
+        ReverseProxyUserHeader = "X-Authentik-Username";
+        ReverseProxyWhitelist = "100.64.0.3/32";
         Transcoding = {
           Enable = true;
         };

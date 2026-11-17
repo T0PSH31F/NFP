@@ -6,6 +6,7 @@
     ./caches.nix
     ./clan-lib.nix
     ./fonts.nix
+    ./hardening.nix
     ./networking.nix
     ./nix-settings.nix
     ./nix-tools.nix

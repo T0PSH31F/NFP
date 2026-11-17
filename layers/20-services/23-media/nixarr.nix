@@ -96,6 +96,67 @@ in
     # Override upstream nixarr setting deprecated services.sabnzbd.configFile
     services.sabnzbd.configFile = mkForce null;
 
+    # Komga native Authentik OIDC integration
+    services.komga.settings = mkIf (config.layers.layer-20.services.auth.authentik.enable or false) (
+      let
+        authDomain = config.layers.layer-20.services.auth.authentik.domain;
+      in
+      {
+        komga.oauth2-account-creation = true;
+        komga.oidc-email-verification = false;
+        spring.security.oauth2.client = {
+          registration.authentik = {
+            client-id = "komga";
+            client-name = "LoveLain SSO";
+            scope = [
+              "openid"
+              "profile"
+              "email"
+            ];
+            authorization-grant-type = "authorization_code";
+            redirect-uri = "{baseUrl}/login/oauth2/code/{registrationId}";
+          };
+          provider.authentik = {
+            issuer-uri = "https://${authDomain}/application/o/komga/";
+            user-name-attribute = "preferred_username";
+          };
+        };
+      }
+    );
+
+    systemd.services.komga-oidc-env =
+      mkIf (config.layers.layer-20.services.auth.authentik.enable or false)
+        {
+          description = "Provision Komga OIDC client secret from Authentik runtime env";
+          wantedBy = [ "multi-user.target" ];
+          before = [ "komga.service" ];
+          after = [ "postgresql-authentik-setup.service" ];
+          requires = [ "postgresql-authentik-setup.service" ];
+          serviceConfig = {
+            Type = "oneshot";
+            RemainAfterExit = true;
+          };
+          script = ''
+            install -d -m 0750 /var/lib/komga
+            if [ -r /var/lib/authentik/runtime.env ]; then
+              . /var/lib/authentik/runtime.env
+              if [ -n "''${OIDC_KOMGA_SECRET:-}" ]; then
+                umask 077
+                printf 'SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_AUTHENTIK_CLIENT_SECRET=%s\n' "$OIDC_KOMGA_SECRET" > /var/lib/komga/oidc.env.tmp
+                chown komga:media /var/lib/komga/oidc.env.tmp
+                chmod 0600 /var/lib/komga/oidc.env.tmp
+                mv /var/lib/komga/oidc.env.tmp /var/lib/komga/oidc.env
+              fi
+            fi
+          '';
+        };
+
+    systemd.services.komga = mkIf (config.layers.layer-20.services.auth.authentik.enable or false) {
+      after = [ "komga-oidc-env.service" ];
+      requires = [ "komga-oidc-env.service" ];
+      serviceConfig.EnvironmentFile = [ "/var/lib/komga/oidc.env" ];
+    };
+
     services.audiobookshelf = {
       host = lib.mkForce "0.0.0.0";
       openFirewall = true;

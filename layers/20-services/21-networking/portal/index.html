@@ -3,268 +3,256 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="LoveLain // Digital Lab & Sovereign Media Archive by Erik Wright (t0psh31f)">
-  <title>LoveLain // Digital Lab & Media Archive</title>
+  <meta name="description" content="LoveLain Media & Gaming Directory — Private Movies, TV, Books, Audiobooks, Music & Video Games">
+  <title>LoveLain // Media & Gaming Directory</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌐</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⬡</text></svg>">
 </head>
 <body class="theme-cyberia">
-  <!-- Top Navigation Bar -->
   <header class="site-header">
     <div class="header-container">
       <div class="brand">
         <span class="brand-glyph">⬡</span>
         <div class="brand-text">
           <span class="brand-title">LOVELAIN</span>
-          <span class="brand-subtitle">CYBERIA FACILITY // NFP FLEET</span>
+          <span class="brand-subtitle">MEDIA & GAMING DIRECTORY</span>
         </div>
       </div>
 
-      <nav class="nav-links" id="main-nav">
-        <button class="nav-btn active" data-tab="tab-welcome">Overview</button>
-        <button class="nav-btn" data-tab="tab-services">Media Archives</button>
-        <button class="nav-btn" data-tab="tab-about">Portfolio & Bio</button>
-        <button class="nav-btn" data-tab="tab-architecture">System Specs</button>
+      <nav class="nav-links" aria-label="Category Filter">
+        <button class="nav-btn active" data-category="all">All</button>
+        <button class="nav-btn" data-category="movies-tv">Movies & TV</button>
+        <button class="nav-btn" data-category="books-audio">Books & Audiobooks</button>
+        <button class="nav-btn" data-category="music">Music</button>
+        <button class="nav-btn" data-category="games">Video Games</button>
       </nav>
 
       <div class="header-actions">
-        <!-- Live Cluster Status Badge -->
-        <div class="status-indicator" title="NixOS Fleet Cluster Operational">
-          <span class="pulse-dot"></span>
-          <span class="status-text">FLEET ONLINE</span>
-        </div>
-
-        <!-- Auth Status Container -->
         <div id="auth-header-container" class="auth-header-container">
-          <a href="https://auth.lovelain.duckdns.org" id="header-auth-btn" class="btn btn-primary btn-sm">
-            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/>
-            </svg>
-            <span>Sign In / Join</span>
+          <a href="https://auth.lovelain.duckdns.org/if/user/#/settings" class="btn btn-outline btn-sm">
+            <span id="header-user-name">Account</span>
+          </a>
+          <a href="https://auth.lovelain.duckdns.org/if/flow/default-invalidation-flow/" class="btn btn-ghost btn-sm">
+            <span>Sign Out</span>
           </a>
         </div>
       </div>
     </div>
   </header>
 
-  <!-- Main Content Viewports -->
   <main class="main-content">
-    
-    <!-- TAB 1: OVERVIEW & WELCOME -->
-    <section id="tab-welcome" class="tab-pane active">
-      <div class="hero-section">
-        <div class="hero-badge">Aperture Science & Sovereign Infrastructure</div>
-        <h1 class="hero-title">Welcome to the <span class="text-accent">LoveLain</span> Digital Facility</h1>
-        <p class="hero-description">
-          A sovereign, self-hosted computing environment and high-fidelity media repository engineered by 
-          <strong>Erik Wright (t0psh31f)</strong>. Operating on a declarative NixOS cluster with end-to-end 
-          encryption, Single Sign-On, and autonomous AI agents.
+    <section class="directory-hero">
+      <div class="directory-hero-copy">
+        <div class="hero-badge">Authenticated SSO Directory</div>
+        <h1 class="directory-title">Welcome, <span id="user-display-name" class="text-accent">Member</span></h1>
+        <p class="directory-subtitle">
+          Choose a category below to open any library directly. Your session is already signed in across services.
         </p>
-
-        <!-- Dynamic User Greeting Banner (Visible when logged in) -->
-        <div id="user-greeting-banner" class="user-greeting-card hidden">
-          <div class="user-greeting-avatar" id="user-avatar">👤</div>
-          <div class="user-greeting-details">
-            <div class="user-greeting-title">Welcome back, <span id="user-display-name">Member</span>!</div>
-            <div class="user-greeting-subtitle">Authenticated via Sovereign SSO (<span id="user-auth-email">user@lovelain</span>)</div>
-          </div>
-          <div class="user-greeting-actions">
-            <button class="btn btn-accent btn-sm" onclick="switchTab('tab-services')">Open Media Launchpad →</button>
-            <a href="https://auth.lovelain.duckdns.org/if/user/#/settings" class="btn btn-outline btn-sm" target="_blank">Account Settings</a>
-            <a href="https://auth.lovelain.duckdns.org/if/flow/default-invalidation-flow/" class="btn btn-ghost btn-sm">Sign Out</a>
-          </div>
-        </div>
-
-        <!-- Unauthenticated Guest Hero Action -->
-        <div id="guest-hero-cta" class="hero-actions">
-          <a href="https://auth.lovelain.duckdns.org" class="btn btn-primary btn-lg">
-            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/>
-            </svg>
-            <span>Access Facility // Authenticate</span>
-          </a>
-          <button class="btn btn-outline btn-lg" onclick="switchTab('tab-services')">
-            <span>Explore Archives</span>
-          </button>
-        </div>
-
-        <!-- Demo / Mode Switcher Pill (Evaluator Convenience) -->
-        <div class="mode-pill-bar">
-          <span class="mode-pill-label">Portal State:</span>
-          <button id="view-mode-toggle" class="mode-pill-btn" onclick="toggleSimulatedAuth()">
-            <span class="mode-pill-icon">⇄</span>
-            <span id="view-mode-text">Viewing as: Guest (Click to Toggle Member View)</span>
-          </button>
-        </div>
       </div>
-
-      <!-- Facility Highlights Grid -->
-      <div class="highlights-grid">
-        <div class="highlight-card">
-          <div class="highlight-icon">🔒</div>
-          <h3>Sovereign Identity</h3>
-          <p>Unified Single Sign-On via Authentik with support for Google, GitHub, Apple, Facebook, or verified email.</p>
+      <div id="user-meta-card" class="user-meta-card">
+        <div class="user-meta-row">
+          <span class="user-meta-label">Signed in as</span>
+          <span id="user-auth-email" class="user-meta-value">Verified Member</span>
         </div>
-        <div class="highlight-card">
-          <div class="highlight-icon">🎬</div>
-          <h3>Curated Media Suite</h3>
-          <p>Uncompressed FLAC audio, 4K HDR home cinema, audiobooks, and graphic novel archives accessible across devices.</p>
-        </div>
-        <div class="highlight-card">
-          <div class="highlight-icon">🛰️</div>
-          <h3>Zero-Trust Tailnet</h3>
-          <p>Encrypted Headscale mesh interconnecting workstation, mobile, and server fleet without centralized third parties.</p>
+        <div class="user-meta-actions">
+          <a id="admin-dash-link" href="https://dash.lovelain.duckdns.org" class="btn btn-accent btn-sm hidden" target="_blank" rel="noopener">Fleet Admin</a>
+          <a href="https://auth.lovelain.duckdns.org/if/user/#/settings" class="btn btn-outline btn-sm" target="_blank" rel="noopener">Profile & Security</a>
+          <a href="https://auth.lovelain.duckdns.org/if/flow/default-invalidation-flow/" class="btn btn-ghost btn-sm">Sign Out</a>
         </div>
       </div>
     </section>
 
-    <!-- TAB 2: MEDIA SERVICES LAUNCHPAD -->
-    <section id="tab-services" class="tab-pane">
-      <div class="section-header">
-        <div class="section-badge">Shared Media & Knowledge Repositories</div>
-        <h2 class="section-title">Facility Service Launchpad</h2>
-        <p class="section-subtitle">
-          Approved members receive direct access to our media collection. Select a service to launch.
-        </p>
+    <!-- Category 1: Movies & TV -->
+    <section class="category-section" data-category="movies-tv">
+      <div class="category-header">
+        <div>
+          <div class="section-badge">01 // CINEMA & TELEVISION</div>
+          <h2 class="category-title">Movies & TV</h2>
+        </div>
+        <p class="category-desc">Stream films, series, and anime in 4K HDR or request titles to be added.</p>
       </div>
 
-      <!-- Services Grid (Big Fancy Cards) -->
       <div class="services-grid">
-
-        <!-- Jellyfin Card -->
-        <article class="service-card" data-service="jellyfin">
+        <article class="service-card">
           <div class="service-header">
-            <div class="service-icon-box cinema-theme">
+            <div class="service-icon-box cinema-theme" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
                 <line x1="7" y1="2" x2="7" y2="22"></line>
                 <line x1="17" y1="2" x2="17" y2="22"></line>
                 <line x1="2" y1="12" x2="22" y2="12"></line>
-                <line x1="2" y1="7" x2="7" y2="7"></line>
-                <line x1="2" y1="17" x2="7" y2="17"></line>
-                <line x1="17" y1="17" x2="22" y2="17"></line>
-                <line x1="17" y1="7" x2="22" y2="7"></line>
               </svg>
             </div>
             <div class="service-meta">
-              <span class="service-tag">4K / HDR Cinema</span>
+              <span class="service-tag">Watch Now</span>
               <span class="service-status online">Online</span>
             </div>
           </div>
           <h3 class="service-name">Jellyfin Cinema</h3>
           <p class="service-desc">
-            Personal theater streaming suite with hardware-accelerated transcoding (Nvidia Quadro P620), surround audio, and synchronized watch parties.
+            Stream the full Movies, TV Shows, and Anime library on browser, smart TV, or mobile apps with hardware transcoding.
           </p>
           <div class="service-specs">
-            <span class="spec-pill">Movies & TV</span>
-            <span class="spec-pill">Anime</span>
-            <span class="spec-pill">NVENC 4K</span>
+            <span class="spec-pill">Movies</span>
+            <span class="spec-pill">TV Series</span>
+            <span class="spec-pill">4K / HDR</span>
           </div>
           <div class="service-footer">
             <a href="https://jellyfin.lovelain.duckdns.org" class="btn btn-service launch-btn" target="_blank" rel="noopener">
-              <span>Launch Theater</span>
+              <span>Browse Movies & TV</span>
               <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </a>
           </div>
         </article>
 
-        <!-- Audiobookshelf Card -->
-        <article class="service-card" data-service="audiobooks">
+        <article class="service-card">
           <div class="service-header">
-            <div class="service-icon-box audio-theme">
+            <div class="service-icon-box request-theme" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="16"></line>
+                <line x1="8" y1="12" x2="16" y2="12"></line>
+              </svg>
+            </div>
+            <div class="service-meta">
+              <span class="service-tag">Requests</span>
+              <span class="service-status online">Online</span>
+            </div>
+          </div>
+          <h3 class="service-name">Seerr Requests</h3>
+          <p class="service-desc">
+            Missing a film or TV series? Search TMDB and request automatic downloads directly into Jellyfin.
+          </p>
+          <div class="service-specs">
+            <span class="spec-pill">Movie Requests</span>
+            <span class="spec-pill">Show Discovery</span>
+          </div>
+          <div class="service-footer">
+            <a href="https://requests.lovelain.duckdns.org" class="btn btn-service launch-btn" target="_blank" rel="noopener">
+              <span>Request Titles</span>
+              <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Category 2: Books & Audiobooks -->
+    <section class="category-section" data-category="books-audio">
+      <div class="category-header">
+        <div>
+          <div class="section-badge">02 // LITERATURE, MANGA & SPOKEN WORD</div>
+          <h2 class="category-title">Books & Audiobooks</h2>
+        </div>
+        <p class="category-desc">Listen to audiobooks & podcasts, read eBooks, or flip through comics and manga.</p>
+      </div>
+
+      <div class="services-grid">
+        <article class="service-card">
+          <div class="service-header">
+            <div class="service-icon-box audio-theme" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M3 18v-6a9 9 0 0 1 18 0v6"></path>
                 <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path>
               </svg>
             </div>
             <div class="service-meta">
-              <span class="service-tag">Spoken Word</span>
+              <span class="service-tag">Audiobooks</span>
               <span class="service-status online">Online</span>
             </div>
           </div>
           <h3 class="service-name">Audiobookshelf</h3>
           <p class="service-desc">
-            Extensive library of unabridged audiobooks, dramatized recordings, and podcasts with chapter markers and multi-device progress synchronization.
+            Unabridged audiobooks and podcasts with chapter support, sleep timers, and cross-device progress sync.
           </p>
           <div class="service-specs">
-            <span class="spec-pill">M4B / MP3</span>
+            <span class="spec-pill">Audiobooks</span>
             <span class="spec-pill">Podcasts</span>
-            <span class="spec-pill">Mobile Sync</span>
+            <span class="spec-pill">OIDC SSO</span>
           </div>
           <div class="service-footer">
             <a href="https://audiobooks.lovelain.duckdns.org" class="btn btn-service launch-btn" target="_blank" rel="noopener">
-              <span>Open Library</span>
+              <span>Listen to Audiobooks</span>
               <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </a>
           </div>
         </article>
 
-        <!-- Komga Card -->
-        <article class="service-card" data-service="komga">
+        <article class="service-card">
           <div class="service-header">
-            <div class="service-icon-box comic-theme">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-              </svg>
-            </div>
-            <div class="service-meta">
-              <span class="service-tag">Graphic Novels</span>
-              <span class="service-status online">Online</span>
-            </div>
-          </div>
-          <h3 class="service-name">Komga Manga & Comics</h3>
-          <p class="service-desc">
-            Media server for digital comic books, manga series, artbooks, and webtoons with full-spread page reading and rich metadata scraping.
-          </p>
-          <div class="service-specs">
-            <span class="spec-pill">CBZ / CBR</span>
-            <span class="spec-pill">Webtoon Reader</span>
-            <span class="spec-pill">Tachiyomi API</span>
-          </div>
-          <div class="service-footer">
-            <a href="https://komga.lovelain.duckdns.org" class="btn btn-service launch-btn" target="_blank" rel="noopener">
-              <span>Read Comics</span>
-              <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-            </a>
-          </div>
-        </article>
-
-        <!-- Calibre-Web Card -->
-        <article class="service-card" data-service="calibre">
-          <div class="service-header">
-            <div class="service-icon-box book-theme">
+            <div class="service-icon-box book-theme" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
                 <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
               </svg>
             </div>
             <div class="service-meta">
-              <span class="service-tag">E-Book Archives</span>
+              <span class="service-tag">E-Books</span>
               <span class="service-status online">Online</span>
             </div>
           </div>
-          <h3 class="service-name">Calibre-Web Literature</h3>
+          <h3 class="service-name">Calibre-Web</h3>
           <p class="service-desc">
-            Comprehensive literary repository, programming texts, and philosophical manuscripts with instant in-browser EPUB reading and wireless e-reader dispatch.
+            Digital bookshelf with in-browser EPUB/PDF reading, instant downloads, and Kindle / e-reader delivery.
           </p>
           <div class="service-specs">
             <span class="spec-pill">EPUB / PDF</span>
             <span class="spec-pill">Kindle Sync</span>
-            <span class="spec-pill">OPDS Catalog</span>
           </div>
           <div class="service-footer">
             <a href="https://calibre.lovelain.duckdns.org" class="btn btn-service launch-btn" target="_blank" rel="noopener">
-              <span>Browse Catalog</span>
+              <span>Browse E-Books</span>
               <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </a>
           </div>
         </article>
 
-        <!-- Navidrome Card -->
-        <article class="service-card" data-service="navidrome">
+        <article class="service-card">
           <div class="service-header">
-            <div class="service-icon-box music-theme">
+            <div class="service-icon-box comic-theme" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+              </svg>
+            </div>
+            <div class="service-meta">
+              <span class="service-tag">Comics & Manga</span>
+              <span class="service-status online">Online</span>
+            </div>
+          </div>
+          <h3 class="service-name">Komga</h3>
+          <p class="service-desc">
+            Read manga, graphic novels, and comic collections in full-page or webtoon mode across any device.
+          </p>
+          <div class="service-specs">
+            <span class="spec-pill">Manga</span>
+            <span class="spec-pill">CBZ / CBR</span>
+            <span class="spec-pill">OIDC SSO</span>
+          </div>
+          <div class="service-footer">
+            <a href="https://komga.lovelain.duckdns.org" class="btn btn-service launch-btn" target="_blank" rel="noopener">
+              <span>Read Comics & Manga</span>
+              <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Category 3: Music -->
+    <section class="category-section" data-category="music">
+      <div class="category-header">
+        <div>
+          <div class="section-badge">03 // LOSSLESS AUDIO</div>
+          <h2 class="category-title">Music</h2>
+        </div>
+        <p class="category-desc">Stream albums, mixes, and lossless FLAC discographies from browser or Subsonic apps.</p>
+      </div>
+
+      <div class="services-grid">
+        <article class="service-card">
+          <div class="service-header">
+            <div class="service-icon-box music-theme" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M9 18V5l12-2v13"></path>
                 <circle cx="6" cy="18" r="3"></circle>
@@ -272,191 +260,89 @@
               </svg>
             </div>
             <div class="service-meta">
-              <span class="service-tag">Hi-Fi Audio</span>
+              <span class="service-tag">Hi-Fi Streaming</span>
               <span class="service-status online">Online</span>
             </div>
           </div>
-          <h3 class="service-name">Navidrome & Feishin</h3>
+          <h3 class="service-name">Navidrome Music</h3>
           <p class="service-desc">
-            Personal high-resolution music streaming server. Plays lossless FLAC, organizes discographies, and links with desktop and mobile Subsonic players.
+            High-resolution personal music streaming server supporting lossless FLAC, smart playlists, and mobile Subsonic players.
           </p>
           <div class="service-specs">
             <span class="spec-pill">FLAC / ALAC</span>
+            <span class="spec-pill">Playlists</span>
             <span class="spec-pill">Subsonic API</span>
-            <span class="spec-pill">Feishin / Symfonium</span>
           </div>
           <div class="service-footer">
             <a href="https://navidrome.lovelain.duckdns.org" class="btn btn-service launch-btn" target="_blank" rel="noopener">
-              <span>Stream Music</span>
+              <span>Listen to Music</span>
               <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </a>
           </div>
         </article>
+      </div>
+    </section>
 
-        <!-- SearXNG Card -->
-        <article class="service-card" data-service="searxng">
+    <!-- Category 4: Video Games -->
+    <section class="category-section" data-category="games">
+      <div class="category-header">
+        <div>
+          <div class="section-badge">04 // RETRO & CONSOLE ARCHIVE</div>
+          <h2 class="category-title">Video Games</h2>
+        </div>
+        <p class="category-desc">Browse console collections, download ROMs, or play supported classics right in the browser.</p>
+      </div>
+
+      <div class="services-grid">
+        <article class="service-card">
           <div class="service-header">
-            <div class="service-icon-box search-theme">
+            <div class="service-icon-box game-theme" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                <line x1="6" y1="12" x2="10" y2="12"></line>
+                <line x1="8" y1="10" x2="8" y2="14"></line>
+                <line x1="15" y1="13" x2="15.01" y2="13"></line>
+                <line x1="18" y1="11" x2="18.01" y2="11"></line>
+                <rect x="2" y="6" width="20" height="12" rx="4"></rect>
               </svg>
             </div>
             <div class="service-meta">
-              <span class="service-tag">Private Intelligence</span>
+              <span class="service-tag">ROM Vault</span>
               <span class="service-status online">Online</span>
             </div>
           </div>
-          <h3 class="service-name">SearXNG Metasearch</h3>
+          <h3 class="service-name">RomM Game Library</h3>
           <p class="service-desc">
-            Zero-tracking, privacy-respecting metasearch engine combining results from dozens of decentralized sources without behavioral profiling.
+            Curated retro and console library covering Nintendo, PlayStation, Sega, MAME arcade, Xbox, and ScummVM with browser play.
           </p>
           <div class="service-specs">
-            <span class="spec-pill">Zero Profiling</span>
-            <span class="spec-pill">Multi-Engine</span>
-            <span class="spec-pill">Open Access</span>
+            <span class="spec-pill">Nintendo / PSX / Sega</span>
+            <span class="spec-pill">MAME Arcade</span>
+            <span class="spec-pill">OIDC SSO</span>
           </div>
           <div class="service-footer">
-            <a href="https://search.lovelain.duckdns.org" class="btn btn-service launch-btn" target="_blank" rel="noopener">
-              <span>Search Web</span>
+            <a href="https://romm.lovelain.duckdns.org" class="btn btn-service launch-btn" target="_blank" rel="noopener">
+              <span>Browse Video Games</span>
               <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </a>
           </div>
         </article>
-
-      </div>
-
-      <!-- Registration / Access Instructions Callout -->
-      <div class="onboarding-callout">
-        <div class="callout-icon">💡</div>
-        <div class="callout-content">
-          <h4>Need an Invitation or Access Approval?</h4>
-          <p>
-            Media archives are gated by Single Sign-On. If you are a friend or family member, simply click 
-            <a href="https://auth.lovelain.duckdns.org" class="link-accent">Sign In / Join</a> to authenticate using your Google, GitHub, Apple, or email account. 
-            New accounts trigger an automated alert to the system administrator for instant approval.
-          </p>
-        </div>
       </div>
     </section>
-
-    <!-- TAB 3: PORTFOLIO & BIO -->
-    <section id="tab-about" class="tab-pane">
-      <div class="section-header">
-        <div class="section-badge">Architect // Operator</div>
-        <h2 class="section-title">About Erik Wright (t0psh31f)</h2>
-        <p class="section-subtitle">
-          Systems architect, distributed infrastructure engineer, and digital preservationist.
-        </p>
-      </div>
-
-      <div class="about-grid">
-        <div class="about-bio-card">
-          <div class="bio-avatar">⚡</div>
-          <h3>System Architect</h3>
-          <p class="bio-lead">
-            Designing resilient, deterministic platforms that reject corporate cloud dependency in favor of sovereign computing.
-          </p>
-          <p class="bio-text">
-            My work focuses on the intersection of declarative operating systems (NixOS), distributed zero-trust overlays, 
-            local AI agent orchestrations (GLaDOS, Jarvis, Hermes), and personal cloud infrastructure.
-          </p>
-          <p class="bio-text">
-            LoveLain serves as both my live production environment and research laboratory—powering real-time communication, 
-            automated knowledge synthesis, and continuous media delivery.
-          </p>
-
-          <div class="contact-links">
-            <a href="mailto:wrighterik77@gmail.com" class="btn btn-outline btn-sm">Email Contact</a>
-            <a href="https://github.com/t0psh31f" class="btn btn-outline btn-sm" target="_blank">GitHub Profile</a>
-          </div>
-        </div>
-
-        <div class="about-projects-card">
-          <h3>Core Projects & Initiatives</h3>
-          
-          <div class="project-entry">
-            <div class="project-title">NFP (NixOS Fleet Platform)</div>
-            <p class="project-desc">
-              Dendritic, multi-host NixOS framework managing workstations, homelab nodes, and mobile endpoints with Clan core variables and SOPS encryption.
-            </p>
-          </div>
-
-          <div class="project-entry">
-            <div class="project-title">Jarvis OS & GLaDOS Voice Suite</div>
-            <p class="project-desc">
-              Fully autonomous AI agent architecture with local neural speech synthesis (Piper ONNX), dual-track semantic RAG, and proactive incident response.
-            </p>
-          </div>
-
-          <div class="project-entry">
-            <div class="project-title">Sovereign Identity Gateway</div>
-            <p class="project-desc">
-              Centralized SSO federation via Authentik, Caddy reverse-proxying, and Tailnet mesh enabling unified credential management for friends and family.
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- TAB 4: SYSTEM SPECS & ARCHITECTURE -->
-    <section id="tab-architecture" class="tab-pane">
-      <div class="section-header">
-        <div class="section-badge">Infrastructure Telemetry</div>
-        <h2 class="section-title">Fleet Topology & Hardware</h2>
-        <p class="section-subtitle">
-          Declarative, reproducible, and monitored via VictoriaMetrics & Grafana.
-        </p>
-      </div>
-
-      <div class="specs-grid">
-        <div class="node-card">
-          <div class="node-badge">Primary Server & Host</div>
-          <h3 class="node-name">luffy</h3>
-          <div class="node-detail"><strong>Role:</strong> Homelab Control Plane & Public Ingress</div>
-          <div class="node-detail"><strong>Hardware:</strong> Intel i7-9700F (8C/8T) // 24GB RAM</div>
-          <div class="node-detail"><strong>GPU:</strong> Nvidia Quadro P620 (Hardware Transcode)</div>
-          <div class="node-detail"><strong>Services:</strong> Caddy, Authentik, VictoriaMetrics, Media Suite</div>
-          <div class="node-detail"><strong>IP:</strong> 100.64.0.3 (Tailnet) // 192.168.1.54 (LAN)</div>
-        </div>
-
-        <div class="node-card">
-          <div class="node-badge">AI Builder & Heavy Compute</div>
-          <h3 class="node-name">z0r0</h3>
-          <div class="node-detail"><strong>Role:</strong> Remote Builder & ExtremeRouter</div>
-          <div class="node-detail"><strong>Hardware:</strong> High-Thread Workstation // 64GB RAM</div>
-          <div class="node-detail"><strong>Services:</strong> Nix Remote Builder, Ollama SLM, GraphRAG</div>
-          <div class="node-detail"><strong>IP:</strong> 100.64.0.1 (Tailnet)</div>
-        </div>
-
-        <div class="node-card">
-          <div class="node-badge">Primary Workstation</div>
-          <h3 class="node-name">sanji</h3>
-          <div class="node-detail"><strong>Role:</strong> Mobile Workstation & Development</div>
-          <div class="node-detail"><strong>Hardware:</strong> Dell Precision 7680 (i7-13850HX / RTX 3500 Ada)</div>
-          <div class="node-detail"><strong>Services:</strong> Hyprland Desktop, Antigravity IDE, GLaDOS TTS</div>
-          <div class="node-detail"><strong>IP:</strong> 100.64.0.6 (Tailnet)</div>
-        </div>
-      </div>
-    </section>
-
   </main>
 
-  <!-- Site Footer -->
   <footer class="site-footer">
     <div class="footer-container">
       <div class="footer-left">
         <span class="footer-brand">LOVELAIN.DUCKDNS.ORG</span>
         <span class="footer-sep">•</span>
-        <span>Aperture Science Enrichment Center</span>
-      </div>
-      <div class="footer-center">
-        <span>Protected by Sovereign SSO & Headscale WireGuard Mesh</span>
+        <span>Unified OAuth &amp; Media Directory</span>
       </div>
       <div class="footer-right">
-        <a href="https://auth.lovelain.duckdns.org" class="footer-link">Authentik SSO</a>
+        <a href="https://search.lovelain.duckdns.org" class="footer-link" target="_blank" rel="noopener">Private Search</a>
         <span class="footer-sep">•</span>
-        <a href="https://search.lovelain.duckdns.org" class="footer-link">SearXNG</a>
+        <a href="https://auth.lovelain.duckdns.org/if/user/" class="footer-link" target="_blank" rel="noopener">My Account</a>
+        <span class="footer-sep">•</span>
+        <a id="footer-admin-link" href="https://auth.lovelain.duckdns.org/if/admin/" class="footer-link hidden" target="_blank" rel="noopener">User Admin</a>
       </div>
     </div>
   </footer>

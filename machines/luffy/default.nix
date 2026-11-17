@@ -815,6 +815,22 @@ in
   # /data/.state/nixarr/autobrr/config.toml is defaults only
   # (checkForUpdates=false, host 0.0.0.0, port 7474 — no filters), so nothing
   # is lost by moving to the native module's StateDirectory.
+  # Enable ClamAV daemon + nightly malware scan on public gateway server
+  layers.layer-10.system.security.clamavDaemon = true;
+
+  # Strictly clamp global firewall TCP ports on luffy so internal DBs, AI backends,
+  # *arr consoles, and admin panels are never exposed outside Tailscale/LAN.
+  networking.firewall.allowedTCPPorts = lib.mkForce [
+    80
+    443
+    21115
+    21116
+    21117
+    21118
+    21119
+    22000
+  ];
+
   nixarr.autobrr.enable = lib.mkForce false;
   nixarr.anchorr.enable = lib.mkForce false;
 }
