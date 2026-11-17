@@ -8,8 +8,8 @@ let
   elementConf = {
     default_server_config = {
       "${"m.homeserver"}" = {
-        base_url = "https://matrix.lovelain.duckdns.org";
-        server_name = "lovelain.duckdns.org";
+        base_url = "https://matrix.lovelain.lol";
+        server_name = "matrix.lovelain.lol";
       };
     };
     disable_custom_urls = false;
@@ -401,7 +401,7 @@ in
     mautrix-bridges = {
       enable = true;
       homeserverUrl = "http://localhost:8008";
-      homeserverDomain = "matrix.lovelain.duckdns.org";
+      homeserverDomain = "matrix.lovelain.lol";
       whatsapp.enable = true;
       signal.enable = true;
       telegram.enable = true;
@@ -461,7 +461,8 @@ in
             }
           '';
         };
-        "element.lovelain.duckdns.org" = {
+        "element.lovelain.lol" = {
+          useACMEHost = "lovelain.lol";
           extraConfig = ''
             root * ${elementWebPkg}
             file_server
@@ -481,19 +482,20 @@ in
             }
           '';
         };
-        # Public Matrix homeserver on duckdns domain
-        "matrix.lovelain.duckdns.org" = {
+        # Public Matrix homeserver on lovelain.lol (via Cloudflare Tunnel & LAN)
+        "matrix.lovelain.lol" = {
+          useACMEHost = "lovelain.lol";
           extraConfig = ''
             # Serve well-known discovery documents for phone clients
             @wellknownClient path /.well-known/matrix/client
             handle @wellknownClient {
               header Content-Type application/json
-              respond `{"m.homeserver":{"base_url":"https://matrix.lovelain.duckdns.org"}}` 200
+              respond `{"m.homeserver":{"base_url":"https://matrix.lovelain.lol"}}` 200
             }
             @wellknownServer path /.well-known/matrix/server
             handle @wellknownServer {
               header Content-Type application/json
-              respond `{"m.server":"matrix.lovelain.duckdns.org:443"}` 200
+              respond `{"m.server":"matrix.lovelain.lol:443"}` 200
             }
             reverse_proxy http://127.0.0.1:8008 {
               header_up Host {host}
@@ -587,6 +589,16 @@ in
       smtp_pass = {
         sopsFile = ../../layers/00-cyberia/03-treasure/secrets/external_services.yaml;
       };
+      "cloudflared-creds-json" = {
+        sopsFile = lib.mkForce ../../layers/00-cyberia/03-treasure/secrets/cloudflared.yaml;
+        format = lib.mkForce "yaml";
+        key = "credentials_json";
+      };
+      "cloudflare-acme-dns-token" = {
+        sopsFile = lib.mkForce ../../layers/00-cyberia/03-treasure/secrets/cloudflared.yaml;
+        format = lib.mkForce "yaml";
+        key = "acme_dns_api_token";
+      };
     };
 
     templates = {
@@ -597,6 +609,10 @@ in
       '';
       "duckdns-env".content = ''
         DUCKDNS_TOKEN=${config.sops.placeholder."duckdns-token"}
+      '';
+      "cloudflare-acme-env".content = ''
+        CF_DNS_API_TOKEN=${config.sops.placeholder."cloudflare-acme-dns-token"}
+        CLOUDFLARE_DNS_API_TOKEN=${config.sops.placeholder."cloudflare-acme-dns-token"}
       '';
       "synapse-email-config" = {
         content = ''
@@ -637,7 +653,7 @@ in
     };
   };
 
-  # ACME Let's Encrypt Wildcard via DuckDNS
+  # ACME Let's Encrypt Wildcard (Cloudflare DNS-01 for lovelain.lol + DuckDNS for legacy Matrix/Headscale)
   security.acme = {
     acceptTerms = true;
     defaults.email = lib.mkForce "admin@lovelain.duckdns.org";
@@ -647,6 +663,28 @@ in
       domain = "*.lovelain.duckdns.org";
       dnsProvider = "duckdns";
       environmentFile = config.sops.templates."duckdns-env".path;
+    };
+    certs."lovelain.lol" = {
+      domain = "*.lovelain.lol";
+      extraDomainNames = [ "lovelain.lol" ];
+      dnsProvider = "cloudflare";
+      environmentFile = config.sops.templates."cloudflare-acme-env".path;
+      group = "caddy";
+    };
+  };
+
+  # Cloudflare Tunnel (Zero-Port-Forward Global HTTPS Ingress for lovelain.lol)
+  services.cloudflared = {
+    enable = true;
+    tunnels."836d1df2-2540-4e3c-ae69-8a77d3629a01" = {
+      credentialsFile = config.sops.secrets."cloudflared-creds-json".path;
+      edgeIPVersion = "4";
+      originRequest.noTLSVerify = true;
+      ingress = {
+        "lovelain.lol" = "https://127.0.0.1:443";
+        "*.lovelain.lol" = "https://127.0.0.1:443";
+      };
+      default = "http_status:404";
     };
   };
 

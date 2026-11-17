@@ -18,9 +18,9 @@ with lib;
       type = types.str;
       default =
         if (config.services.matrix-synapse.enable or false) then
-          (config.services.matrix-synapse.settings.server_name or "matrix.lovelain.duckdns.org")
+          (config.services.matrix-synapse.settings.server_name or "matrix.lovelain.lol")
         else
-          "matrix.lovelain.duckdns.org";
+          "matrix.lovelain.lol";
       description = "Domain of the Matrix homeserver";
     };
 

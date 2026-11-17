@@ -141,18 +141,32 @@ in
               # 2026-09-23: stale nami IP here broke LAN bootstrap.
               domain = "headscale.lovelain.duckdns.org";
               answer = cfg.gatewayIp;
+              enabled = true;
             }
             {
               domain = "mission-control.lovelain.duckdns.org";
               answer = "47.254.90.69";
+              enabled = true;
+            }
+            {
+              domain = "lovelain.lol";
+              answer = cfg.gatewayIp;
+              enabled = true;
+            }
+            {
+              domain = "*.lovelain.lol";
+              answer = cfg.gatewayIp;
+              enabled = true;
             }
             {
               domain = "lovelain.duckdns.org";
               answer = cfg.gatewayIp;
+              enabled = true;
             }
             {
               domain = "*.lovelain.duckdns.org";
               answer = cfg.gatewayIp;
+              enabled = true;
             }
           ];
           # IMPORTANT: nfp.nix must NOT be claimed by AdGuard rewrites or local authoritative

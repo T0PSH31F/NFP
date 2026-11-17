@@ -108,8 +108,8 @@ in
         roles.default.machines = {
           luffy = {
             settings = {
-              server_tld = "matrix.lovelain.duckdns.org";
-              app_domain = "element.lovelain.duckdns.org";
+              server_tld = "matrix.lovelain.lol";
+              app_domain = "element.lovelain.lol";
               acmeEmail = "admin@lovelain.duckdns.org";
               users.t0psh31f = {
                 admin = true;

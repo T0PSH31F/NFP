@@ -17,7 +17,7 @@
       mautrix-bridges = {
         enable = lib.mkDefault true;
         homeserverUrl = lib.mkDefault "http://localhost:8008";
-        homeserverDomain = lib.mkDefault "matrix.lovelain.duckdns.org";
+        homeserverDomain = lib.mkDefault "matrix.lovelain.lol";
         whatsapp.enable = lib.mkDefault true;
         signal.enable = lib.mkDefault true;
       };

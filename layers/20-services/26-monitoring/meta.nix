@@ -11,8 +11,8 @@
     # tailnetDomain: only for Headscale base_domain, MagicDNS hosts, Tailnet-only services.
     publicDomain = lib.mkOption {
       type = lib.types.str;
-      default = "lovelain.duckdns.org";
-      description = "Public/WAN/Caddy/ACME domain (e.g. *.lovelain.duckdns.org)";
+      default = "lovelain.lol";
+      description = "Public/WAN/Caddy/ACME domain (e.g. *.lovelain.lol)";
     };
     tailnetDomain = lib.mkOption {
       type = lib.types.str;
@@ -21,7 +21,7 @@
     };
     domain = lib.mkOption {
       type = lib.types.str;
-      default = "lovelain.duckdns.org";
+      default = "lovelain.lol";
       description = "DEPRECATED generic domain alias — use publicDomain (WAN/Caddy) or tailnetDomain (Headscale/MagicDNS) explicitly.";
     };
     fleetNetwork = lib.mkOption {
@@ -50,8 +50,8 @@
   # Cross-domain safety assertions — generic domain must match one of the authorities
   config.assertions = [
     {
-      assertion = config.layers.meta.publicDomain == "lovelain.duckdns.org";
-      message = "layers.meta.publicDomain must be lovelain.duckdns.org (WAN/ACME authority)";
+      assertion = config.layers.meta.publicDomain == "lovelain.lol";
+      message = "layers.meta.publicDomain must be lovelain.lol (WAN/ACME authority)";
     }
     {
       assertion = config.layers.meta.tailnetDomain == "nfp.nix";
