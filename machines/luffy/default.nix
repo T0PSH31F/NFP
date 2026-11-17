@@ -613,6 +613,7 @@ in
       "cloudflare-acme-env".content = ''
         CF_DNS_API_TOKEN=${config.sops.placeholder."cloudflare-acme-dns-token"}
         CLOUDFLARE_DNS_API_TOKEN=${config.sops.placeholder."cloudflare-acme-dns-token"}
+        LEGO_DISABLE_CNAME_SUPPORT=true
       '';
       "synapse-email-config" = {
         content = ''
@@ -679,7 +680,10 @@ in
     tunnels."836d1df2-2540-4e3c-ae69-8a77d3629a01" = {
       credentialsFile = config.sops.secrets."cloudflared-creds-json".path;
       edgeIPVersion = "4";
-      originRequest.noTLSVerify = true;
+      originRequest = {
+        noTLSVerify = true;
+        originServerName = "lovelain.lol";
+      };
       ingress = {
         "lovelain.lol" = "https://127.0.0.1:443";
         "*.lovelain.lol" = "https://127.0.0.1:443";
