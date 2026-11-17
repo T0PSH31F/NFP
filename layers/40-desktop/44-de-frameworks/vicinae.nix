@@ -41,13 +41,8 @@ let
 in
 {
   config = mkIf cfg.enable {
-    # Install Vicinae package
-    home.packages = [
-      inputs.vicinae.packages.${pkgs.stdenv.hostPlatform.system}.default
-    ];
-
-    # Configure Vicinae service
-    services.vicinae = {
+    # Configure Vicinae service (programs.vicinae also installs the configured package)
+    programs.vicinae = {
       enable = true;
 
       # Systemd service configuration

@@ -216,9 +216,20 @@
         # bypasses our overlay. We fix it here directly using `inputs`.
         package =
           let
-            origTui = inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system}.tui;
-            origWeb = inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system}.web;
-            origAgent = inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system}.default;
+            fixedPmPackages = pkgs.lib.filterAttrs (_: pkgs.lib.isDerivation) (
+              pkgs.callPackage "${inputs.hermes-agent}/nix/pm-packages.nix" {
+                # nixpkgs ships patchelf 0.15.2, whereas hermes-agent appends a
+                # 0.19.2-only patch (#674) that fails to apply on 0.15.2.
+                patchelf = pkgs.patchelf // {
+                  overrideAttrs = _: pkgs.patchelf;
+                };
+              }
+            );
+            origAgent = inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system}.default.override {
+              pmPackages = fixedPmPackages;
+            };
+            origTui = origAgent.hermesTui;
+            origWeb = origAgent.hermesWeb;
             fixedTui = origTui.overrideAttrs (old: {
               buildInputs = (old.buildInputs or [ ]) ++ [ pkgs.linuxHeaders ];
               NIX_CFLAGS_COMPILE = (old.NIX_CFLAGS_COMPILE or "") + " -isystem ${pkgs.linuxHeaders}/include";

@@ -120,8 +120,11 @@ in
   };
   layers.layer-20.services.config.nixarr-stack = {
     enable = true;
-    mediaDir = "/mnt/drives/backup-1/Media";
+    mediaDir = "/storage/Media";
   };
+  layers.layer-20.services.config.jellystat.enable = true;
+  layers.layer-20.services.config.flaresolverr.enable = true;
+  layers.layer-20.services.config.romm.remoteRoms.enable = true;
   layers.layer-20.services.config.jackett.enable = false;
   layers.layer-20.services.config.netdata.enable = true;
 

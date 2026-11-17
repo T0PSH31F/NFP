@@ -106,8 +106,22 @@ jobs:
         env:
           SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
         run: |
-          install -d -m 700 "$HOME/.ssh"
+          install -d -m 700 "$HOME/.ssh" "$RUNNER_TEMP/bin"
           install -m 600 "$CREDENTIALS_DIRECTORY/ci-deploy-ssh-key" "$HOME/.ssh/id_ed25519"
+          cat > "$HOME/.ssh/config" <<EOF
+          Host *
+            IdentitiesOnly yes
+            IdentityFile $HOME/.ssh/id_ed25519
+            UserKnownHostsFile $HOME/.ssh/known_hosts
+            GlobalKnownHostsFile /etc/ssh/ssh_known_hosts
+          EOF
+          REAL_SSH="$(command -v ssh)"
+          cat > "$RUNNER_TEMP/bin/ssh" <<EOF
+          #!/usr/bin/env sh
+          exec "$REAL_SSH" -F "$HOME/.ssh/config" "\$@"
+          EOF
+          chmod 700 "$RUNNER_TEMP/bin/ssh"
+          export PATH="$RUNNER_TEMP/bin:$PATH"
           self=$(uname -n)
           for host in sanji luffy z0r0; do
             if [ "$host" != "$self" ]; then

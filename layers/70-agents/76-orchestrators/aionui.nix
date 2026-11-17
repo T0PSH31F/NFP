@@ -77,24 +77,7 @@ with lib;
           exec ${pkgs.python3}/bin/python3 -m http.server "$PORT" --bind 0.0.0.0
         '')
         );
-      aionuiPkg =
-        if rawAionuiPkg ? overrideAttrs then
-          rawAionuiPkg.overrideAttrs (old: {
-            preBuild = (old.preBuild or "") + ''
-              for d in node_modules/.bun/better-sqlite3@*/node_modules/better-sqlite3/src; do
-                if [ -d "$d" ]; then
-                  chmod -R u+w "$d"
-                  substituteInPlace "$d/better_sqlite3.cpp" \
-                    --replace-quiet "v8::External::New(isolate, addon)" "v8::External::New(isolate, addon, v8::kExternalPointerTypeTagDefault)"
-                  substituteInPlace "$d/util/macros.cpp" \
-                    --replace-quiet "As<v8::External>()->Value()" "As<v8::External>()->Value(v8::kExternalPointerTypeTagDefault)"
-                  sed -i 's/\b0,/nullptr,/g' "$d/util/helpers.cpp"
-                fi
-              done
-            '';
-          })
-        else
-          rawAionuiPkg;
+      aionuiPkg = rawAionuiPkg;
       aioncoreSrc = pkgs.fetchurl {
         url = "https://github.com/iOfficeAI/AionCore/releases/download/v0.2.2/aioncore-v0.2.2-x86_64-unknown-linux-gnu.tar.gz";
         sha256 = "1c3f241c7deff8e9d6da189c1017e6b12df7b538a1f557276c79b3c33d257335";

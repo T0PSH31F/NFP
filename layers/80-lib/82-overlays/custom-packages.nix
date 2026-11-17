@@ -14,24 +14,18 @@ final: prev: {
   # If pinning is ever needed, do it where the package is actually consumed
   # (llmPkgs.paseo-desktop.override { electron_41 = ...; }), not in our overlay.
 
-  # ── typescript-language-server: stale pnpmDeps pin ─────────────────
-  # nixpkgs (rev 7fd4004d / 2026-10-11) pins pnpmDeps to
-  #   sha256-MUSxDMlbG21KSesGdEvqa2kEpuVfLlXRUX1qV/FGsSo=
-  # but `fetchPnpmDeps` reproducibly produces
-  #   sha256-xR/EF60lVBsITKgH7wCM2wHM46PFQevD51KfCENSUH4=
-  # under our toolchain — verified: that "got" hash is byte-identical to the
-  # already-valid store path 4q1qpv5q...-typescript-language-server-pnpm-deps,
-  # so the build output is correct and the pin is what's wrong. Left alone this
-  # FOD aborts and cascades into tsserver -> helix-languages-config, neovim,
-  # nixvim, home-manager-generation -> the toplevel on BOTH machines.
-  # Drop this override once nixpkgs fixes the pin (nix-update / upstream PR).
-  typescript-language-server = prev.typescript-language-server.overrideAttrs (old: {
-    pnpmDeps = prev.fetchPnpmDeps {
-      inherit (old) pname version src;
-      pnpm = prev.pnpm_12;
-      fetcherVersion = 4;
-      hash = "sha256-xR/EF60lVBsITKgH7wCM2wHM46PFQevD51KfCENSUH4=";
-    };
+  # ── aider-chat: litellm 1.108+ exceptions parity ────────────────────
+  # nixpkgs litellm 1.108.0 added five new LiteLLM exceptions and leaks pydantic's
+  # ValidationError / stdlib ZoneInfoNotFoundError on dir(litellm); aider's
+  # LiteLLMExceptions._load() asserts 1:1 parity at import/test time.
+  aider-chat = prev.aider-chat.overridePythonAttrs (old: {
+    postPatch = (old.postPatch or "") + ''
+      sed -i '/ExInfo("BudgetExceededError"/a\    ExInfo("CallerCredentialAuthenticationError", False, "Authentication credentials could not be resolved."),\n    ExInfo("CallerCredentialRateLimitError", True, None),\n    ExInfo("MalformedRequestFieldError", False, None),\n    ExInfo("ModelNotMappedError", False, None),\n    ExInfo("PaymentRequiredError", False, "Insufficient credits or payment required with the API provider."),' aider/exceptions.py
+      substituteInPlace aider/exceptions.py \
+        --replace-fail '[ "ErrorEventError" ]' '[ "ErrorEventError", "ValidationError", "ZoneInfoNotFoundError" ]'
+      grep -q CallerCredentialAuthenticationError aider/exceptions.py
+      grep -q ZoneInfoNotFoundError aider/exceptions.py
+    '';
   });
 
   # REMOVED (2026-08-06): glibc 2.42+ linuxHeaders overlays for flatpak,

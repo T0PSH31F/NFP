@@ -12,7 +12,7 @@ let
   stellarPkg =
     if stellarRaw != null && stellarRaw ? overrideAttrs then
       stellarRaw.overrideAttrs (_old: {
-        vendorHash = "sha256-nhoKZpOlzYhZGaccVlozpNczUJeKkKC1C52VDxpQ8L0=";
+        vendorHash = "sha256-qG11exywPhmE8Puo9Mhp/N25FO/DpZE4MWfU4AC3ljc=";
         proxyVendor = true;
       })
     else

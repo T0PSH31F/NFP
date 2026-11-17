@@ -31,6 +31,22 @@ in
       default = "/var/lib/romm/data";
       description = "Path to RomM application state and DB";
     };
+
+    remoteRoms = {
+      enable = mkEnableOption "Mount remote ROMs library into RomM via rclone FUSE";
+
+      source = mkOption {
+        type = types.str;
+        default = "gdrive:Games/Games/ROMs";
+        description = "rclone remote:path to mount read-only at cfg.romsDir";
+      };
+
+      rcloneConfigFile = mkOption {
+        type = types.str;
+        default = "/persist/home/t0psh31f/.config/rclone/rclone.conf";
+        description = "Path to rclone.conf with OAuth credentials for remoteRoms.source";
+      };
+    };
   };
 
   config = mkIf cfg.enable {
@@ -117,9 +133,33 @@ in
       '';
     };
 
+    programs.fuse.userAllowOther = mkIf cfg.remoteRoms.enable true;
+
+    systemd.services.romm-gdrive-roms = mkIf cfg.remoteRoms.enable {
+      description = "Mount remote Google Drive ROM library for RomM";
+      after = [ "network-online.target" ];
+      wants = [ "network-online.target" ];
+      wantedBy = [ "multi-user.target" ];
+      path = [ pkgs.coreutils ];
+      serviceConfig = {
+        Type = "simple";
+        Environment = "PATH=/run/wrappers/bin";
+        ExecStartPre = [
+          "-/run/wrappers/bin/fusermount3 -uz ${cfg.romsDir}"
+          "${pkgs.coreutils}/bin/mkdir -p ${cfg.romsDir}"
+        ];
+        ExecStart = "${pkgs.rclone}/bin/rclone mount ${escapeShellArg cfg.remoteRoms.source} ${escapeShellArg cfg.romsDir} --config ${escapeShellArg cfg.remoteRoms.rcloneConfigFile} --read-only --allow-other --vfs-cache-mode full --vfs-cache-max-size 10G --dir-cache-time 12h";
+        ExecStartPost = "${pkgs.bash}/bin/bash -c 'i=0; while [ \"$i\" -lt 30 ]; do ${pkgs.util-linux}/bin/mountpoint -q ${escapeShellArg cfg.romsDir} && exit 0; i=$((i+1)); ${pkgs.coreutils}/bin/sleep 0.5; done; exit 1'";
+        ExecStop = "-/run/wrappers/bin/fusermount3 -uz ${cfg.romsDir}";
+        Restart = "on-failure";
+        RestartSec = "10s";
+      };
+    };
+
     systemd.services.podman-romm = {
-      after = [ "romm-db-init.service" ];
-      requires = [ "romm-db-init.service" ];
+      after = [ "romm-db-init.service" ] ++ optional cfg.remoteRoms.enable "romm-gdrive-roms.service";
+      requires = [ "romm-db-init.service" ] ++ optional cfg.remoteRoms.enable "romm-gdrive-roms.service";
+      partOf = optional cfg.remoteRoms.enable "romm-gdrive-roms.service";
     };
 
     virtualisation.oci-containers.containers.romm = {
@@ -135,15 +175,15 @@ in
       environmentFiles = [ "/var/lib/romm/romm.env" ];
       extraOptions = [ "--add-host=host.containers.internal:host-gateway" ];
       volumes = [
-        "${cfg.romsDir}:/romm/roms"
+        "${cfg.romsDir}:/romm/library/roms${optionalString cfg.remoteRoms.enable ":ro,rslave"}"
         "${cfg.dataDir}:/romm/resources"
       ];
     };
 
     systemd.tmpfiles.rules = [
-      "d ${cfg.romsDir} 0755 root root -"
       "d ${cfg.dataDir} 0755 root root -"
-    ];
+    ]
+    ++ optional (!cfg.remoteRoms.enable) "d ${cfg.romsDir} 0755 root root -";
 
     networking.firewall.allowedTCPPorts = [ cfg.port ];
 

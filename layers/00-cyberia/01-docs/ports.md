@@ -70,11 +70,13 @@
 | **8091** | Kong Admin API         | luffy  | `layers/70-agents/78-llm-routers/kong-gateway.nix` | Kong declarative admin API
 | **8092** | EverOS Memory Server   | z0r0   | `layers/70-agents/73-memory/everos.nix`           | Memory consolidation engine     |
 | **7119** | CalibreWeb             | luffy  | `layers/20-services/23-media/calibre-web.nix`   | E-book Web Reader |
+| **7120** | Jellystat              | luffy  | `layers/20-services/23-media/jellystat.nix`     | Jellyfin Analytics & Playback Stats |
 | **8093** | Kong Manager GUI       | luffy  | `layers/70-agents/78-llm-routers/kong-gateway.nix` | Kong dashboard loopback-only `http://127.0.0.1:8093` |
 | **8095** | qBittorrent WebUI      | luffy  | `layers/20-services/23-media/download-clients.nix`| Torrent Client Web Interface    |
 | **8096** | Jellyfin               | luffy  | `layers/20-services/23-media/media-stack.nix`     | Media Streaming Server          |
 | **8098** | RomM                   | luffy  | `layers/20-services/23-media/romm.nix`             | ROM Manager & Web Emulator      |
 | **8099** | ntfy-sh                | Both   | `layers/20-services/26-monitoring/ntfy-sh.nix`     | Push Notification Service       |
+| **8191** | FlareSolverr           | luffy  | `layers/20-services/23-media/flaresolverr.nix`  | Prowlarr Cloudflare Challenge Proxy |
 | **8428** | VictoriaMetrics        | luffy  | `layers/20-services/26-monitoring/monitoring.nix` | High-efficiency single-node TSDB (:8428)|
 | **8429** | vmalert                | luffy  | `layers/20-services/26-monitoring/monitoring.nix` | VictoriaMetrics alerting engine |
 | **8443** | HTTPS Alt 1            | luffy  | `machines/luffy/default.nix`                       | Secondary TLS Ingress           |

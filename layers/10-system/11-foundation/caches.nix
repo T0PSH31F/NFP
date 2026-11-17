@@ -45,6 +45,7 @@
         "https://niri.cachix.org"
         "https://noctalia.cachix.org"
         "https://cache.numtide.com"
+        "https://cache.lantian.pub/lantian"
         "https://yazelix.cachix.org"
       ];
 
@@ -70,6 +71,7 @@
         "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
         "niri.cachix.org-1:Wv0OmO7PsuocRKzfDoJ3mulSl7Z6oezYhGhR+3W2964="
         "noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4="
+        "lantian:WVGO7vsRMSEN+h7Lp7kv6SAmrkEXgUGbbXm7jMDjBuQ="
         "yazelix.cachix.org-1:ZgxIjQvaP0VTWL8Racx27mpUNzDJ97xC2y7QWYjmGNM="
       ];
 
@@ -84,6 +86,7 @@
         "https://hyprland.cachix.org"
         "https://niri.cachix.org"
         "https://noctalia.cachix.org"
+        "https://cache.lantian.pub/lantian"
       ];
     };
   };
