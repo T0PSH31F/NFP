@@ -398,10 +398,13 @@ in
           # ── Privilege Tiers (Groups) ───────────────────────────────────
           - model: authentik_core.group
             id: group-admins
+            state: created
             identifiers:
               name: NFP Admins
             attrs:
               is_superuser: true
+              users:
+                - !Find [authentik_core.user, [username, akadmin]]
               attributes:
                 role: admin
           - model: authentik_core.group
