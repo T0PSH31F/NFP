@@ -90,7 +90,7 @@ jobs:
     needs: validate
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: [self-hosted, nixos, deployer]
-    timeout-minutes: 60
+    timeout-minutes: 180
     steps:
       - uses: actions/checkout@v4
       - name: Configure private Jarvis flake access
