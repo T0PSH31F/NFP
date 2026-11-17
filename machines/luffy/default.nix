@@ -669,6 +669,7 @@ in
       domain = "*.lovelain.lol";
       extraDomainNames = [ "lovelain.lol" ];
       dnsProvider = "cloudflare";
+      dnsResolver = "1.1.1.1:53";
       environmentFile = config.sops.templates."cloudflare-acme-env".path;
       group = "caddy";
     };
