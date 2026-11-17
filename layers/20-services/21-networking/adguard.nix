@@ -147,6 +147,10 @@ in
               answer = "47.254.90.69";
             }
             {
+              domain = "lovelain.duckdns.org";
+              answer = cfg.gatewayIp;
+            }
+            {
               domain = "*.lovelain.duckdns.org";
               answer = cfg.gatewayIp;
             }

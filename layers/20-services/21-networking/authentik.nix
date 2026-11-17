@@ -221,9 +221,12 @@ in
       };
     };
 
-    # Resolve local public subdomains via loopback so OIDC backchannel discovery
-    # (Komga, Audiobookshelf, Authentik) never stalls on router NAT hairpinning.
-    networking.hosts."127.0.0.1" = [
+    # Resolve local public subdomains to luffy's LAN IP (never 127.0.0.1, because AdGuardHome
+    # reads /etc/hosts and would hand 127.0.0.1 to LAN/Tailnet clients!).
+    # Keeps OIDC discovery on luffy local while routing LAN browsers straight to luffy.
+    networking.hosts."${config.layers.layer-20.services.networking.adguard.gatewayIp or "192.168.1.54"
+    }" =
+    [
       cfg.domain
       publicDomain
     ]
