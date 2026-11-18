@@ -131,6 +131,7 @@ in
                       ROMM_SECRET="$(openssl rand -hex 24)"
                       KOMGA_SECRET="$(openssl rand -hex 24)"
                       ABS_SECRET="$(openssl rand -hex 24)"
+                      JELLYFIN_SECRET="$(openssl rand -hex 24)"
                       umask 077
                       cat > "$RUNTIME_ENV" <<EOF
           AUTHENTIK_POSTGRESQL__USER=authentik
@@ -141,12 +142,17 @@ in
           OIDC_ROMM_SECRET=$ROMM_SECRET
           OIDC_KOMGA_SECRET=$KOMGA_SECRET
           OIDC_AUDIOBOOKSHELF_SECRET=$ABS_SECRET
+          OIDC_JELLYFIN_SECRET=$JELLYFIN_SECRET
           EOF
                       cat > "$ADMIN_FILE" <<EOF
-          username=akadmin
+          username=t0psh31f
           email=wrighterik77@gmail.com
           password=$ADMIN_PW
           EOF
+                    fi
+                    if [ -s "$RUNTIME_ENV" ] && ! grep -q '^OIDC_JELLYFIN_SECRET=' "$RUNTIME_ENV"; then
+                      JELLYFIN_SECRET="$(openssl rand -hex 24)"
+                      printf 'OIDC_JELLYFIN_SECRET=%s\n' "$JELLYFIN_SECRET" >> "$RUNTIME_ENV"
                     fi
                     set -a
                     . "$RUNTIME_ENV"
@@ -404,7 +410,7 @@ in
             attrs:
               is_superuser: true
               users:
-                - !Find [authentik_core.user, [username, akadmin]]
+                - !Find [authentik_core.user, [username, t0psh31f]]
               attributes:
                 role: admin
           - model: authentik_core.group
@@ -822,17 +828,31 @@ in
                 - matching_mode: strict
                   url: https://romm.nfp.nix/api/oauth/openid
 
-          # ── Forward-Auth Proxy Providers (Embedded Outpost) ───────────
-          - model: authentik_providers_proxy.proxyprovider
-            id: proxy-jellyfin
+          - model: authentik_providers_oauth2.oauth2provider
+            id: oidc-jellyfin
             identifiers:
-              name: Jellyfin Proxy Provider
+              name: Jellyfin OIDC Provider
             attrs:
-              mode: forward_single
-              external_host: https://jellyfin.${publicDomain}
+              client_type: confidential
+              client_id: jellyfin
+              client_secret: !Env OIDC_JELLYFIN_SECRET
               authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
               invalidation_flow: !Find [authentik_flows.flow, [slug, default-provider-invalidation-flow]]
-              skip_path_regex: "^/(api|Items|Videos|Audio|Shows|Movies|Playback|Sessions|Users|Images|System|emby|QuickConnect|Branding|socket|web/configuration).*"
+              signing_key: !Find [authentik_crypto.certificatekeypair, [name, "authentik Self-signed Certificate"]]
+              include_claims_in_id_token: true
+              property_mappings:
+                - !Find [authentik_providers_oauth2.scopemapping, [managed, goauthentik.io/providers/oauth2/scope-openid]]
+                - !Find [authentik_providers_oauth2.scopemapping, [managed, goauthentik.io/providers/oauth2/scope-email]]
+                - !Find [authentik_providers_oauth2.scopemapping, [managed, goauthentik.io/providers/oauth2/scope-profile]]
+              redirect_uris:
+                - matching_mode: strict
+                  url: https://jellyfin.${publicDomain}/sso/OID/redirect/authentik
+                - matching_mode: strict
+                  url: https://jellyfin.${publicDomain}/sso/OID/r/authentik
+                - matching_mode: strict
+                  url: https://jellyfin.nfp.nix/sso/OID/redirect/authentik
+
+          # ── Forward-Auth Proxy Providers (Embedded Outpost) ───────────
 
           - model: authentik_providers_proxy.proxyprovider
             id: proxy-calibre
@@ -906,7 +926,6 @@ in
                 authentik_host_browser: https://${cfg.domain}
                 log_level: info
               providers:
-                - !KeyOf proxy-jellyfin
                 - !KeyOf proxy-calibre
                 - !KeyOf proxy-navidrome
                 - !KeyOf proxy-searxng
@@ -921,7 +940,7 @@ in
               slug: jellyfin
             attrs:
               name: Jellyfin Cinema
-              provider: !KeyOf proxy-jellyfin
+              provider: !KeyOf oidc-jellyfin
               meta_launch_url: https://jellyfin.${publicDomain}
               meta_description: 4K HDR Movie & Television Streaming
               meta_publisher: LoveLain Cyberia
@@ -1195,27 +1214,13 @@ in
           '';
         };
 
-        # Jellyfin (Authentik forward_auth on web UI; preserve mobile/TV API paths)
+        # Jellyfin (Native OIDC via jellyfin-plugin-sso against auth.${publicDomain}/application/o/jellyfin/)
         "jellyfin.${publicDomain}" = {
           useACMEHost = publicDomain;
           extraConfig = ''
             encode zstd gzip
             header Strict-Transport-Security "max-age=31536000; includeSubDomains"
-            handle /outpost.goauthentik.io/* {
-              reverse_proxy localhost:${toString cfg.port}
-            }
-            @jellyfinBrowser not path /api/* /Items/* /Videos/* /Audio/* /Shows/* /Movies/* /Playback/* /Sessions/* /Users/* /Images/* /System/* /emby/* /QuickConnect/* /Branding/* /socket* /web/configuration*
-            handle @jellyfinBrowser {
-              forward_auth localhost:${toString cfg.port} {
-                uri /outpost.goauthentik.io/auth/caddy
-                copy_headers X-Authentik-Username X-Authentik-Groups X-Authentik-Entitlements X-Authentik-Email X-Authentik-Name X-Authentik-Uid
-                trusted_proxies private_ranges
-              }
-              reverse_proxy localhost:8096
-            }
-            handle {
-              reverse_proxy localhost:8096
-            }
+            reverse_proxy localhost:8096
           '';
         };
 
