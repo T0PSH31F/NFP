@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="LoveLain Wired Sound for Wired People — Private Movies, TV, Books, Audiobooks, Music & Video Games">
+  <meta name="description" content="LoveLain Wired Sound for Wired People — Movies, TV, Music, Books, Audiobooks, Manga & Video Games">
   <title>⌈Ｗｉｒｅｄ　Ｓｏｕｎｄ　／／　ＬｏｖｅＬａｉｎ⌋</title>
   <link rel="stylesheet" href="style.css">
   <link rel="icon" type="image/png" href="assets/favicon.png">
@@ -17,15 +17,16 @@
         <img src="assets/wiredlain.gif" alt="" class="brand-icon" width="34" height="34">
         <div class="brand-text">
           <span class="brand-title">⌈ＬｏｖｅＬａｉｎ⌋</span>
-          <span class="brand-subtitle">Wired Media &amp; Gaming Terminal</span>
+          <span class="brand-subtitle">Wired Media &amp; Archive</span>
         </div>
       </div>
 
       <nav class="nav-links" aria-label="Category Filter">
         <button type="button" class="nav-btn active" data-category="all">All</button>
-        <button type="button" class="nav-btn" data-category="movies-tv">Cinema &amp; Audio</button>
-        <button type="button" class="nav-btn" data-category="games">Arcade</button>
-        <button type="button" class="nav-btn" data-category="books-audio">Archive</button>
+        <button type="button" class="nav-btn" data-category="watch">Watch</button>
+        <button type="button" class="nav-btn" data-category="listen">Listen</button>
+        <button type="button" class="nav-btn" data-category="play">Play</button>
+        <button type="button" class="nav-btn" data-category="read">Read</button>
       </nav>
 
       <div class="header-actions">
@@ -42,7 +43,6 @@
   </header>
 
   <main id="main-directory" class="main-content">
-    <!-- Hero + Session + Inline Layer-07 Private Search -->
     <section class="directory-hero wired-panel" aria-label="Wired Session Overview">
       <div class="wired-corners" aria-hidden="true">
         <span class="blink">⌈</span>
@@ -69,7 +69,7 @@
           <hr class="wired-hr">
 
           <p class="directory-subtitle">
-            Connected as <strong id="user-display-name" class="text-pink">Member</strong>. One Wired session unlocks every terminal below.
+            Welcome to the Wired, <strong id="user-display-name" class="text-pink">Member</strong>. Pick what you want to watch, listen to, read, or play below.
           </p>
 
           <div class="user-session-strip">
@@ -80,12 +80,11 @@
             <div id="user-tier-badges" class="tier-badges" aria-label="Access groups"></div>
           </div>
 
-          <!-- Inline Layer 07 Private Web Search -->
           <form class="wired-search-bar" action="https://search.lovelain.lol/search" method="get" target="_blank" rel="noopener">
-            <label for="wired-q" class="sr-only">Private Wired Web Search</label>
+            <label for="wired-q" class="sr-only">Private Web Search</label>
             <span class="search-prefix" aria-hidden="true">SEARCH://</span>
-            <input id="wired-q" name="q" type="search" placeholder="Query private decentralized index..." autocomplete="off">
-            <button type="submit" class="btn btn-accent btn-sm">Query</button>
+            <input id="wired-q" name="q" type="search" placeholder="Search the web privately..." autocomplete="off">
+            <button type="submit" class="btn btn-accent btn-sm">Search</button>
           </form>
 
           <div class="user-meta-actions">
@@ -96,7 +95,7 @@
         </div>
 
         <div class="hero-emblem-panel">
-          <a href="https://jellyfin.lovelain.lol/sso/OID/start/authentik" class="lain-emblem-link" target="_blank" rel="noopener" aria-label="Open Jellyfin Cinema">
+          <a href="https://jellyfin.lovelain.lol/sso/OID/start/authentik" class="lain-emblem-link" target="_blank" rel="noopener" aria-label="Open Movies & TV">
             <img src="assets/loveLain.gif" alt="Let's All Love Lain Wired Emblem" class="lain-emblem-img" width="185" height="296">
           </a>
           <p class="emblem-caption">⌈Ｌｅｔ’ｓ　Ａｌｌ　Ｌｏｖｅ　Ｌａｉｎ！⌋</p>
@@ -109,256 +108,181 @@
       </div>
     </section>
 
-    <!-- 01 // Cinema Flatscreen + Flanking 3D Acoustic Monitors + Seerr Deck -->
-    <section class="category-section wired-panel" data-category="movies-tv music">
+    <!-- 01 // Watch: Movies, TV & Requests -->
+    <section class="category-section wired-panel" data-category="watch">
       <div class="category-header">
         <img src="assets/favicon-16.gif" alt="" class="article-icon" width="16" height="16">
-        <div class="section-badge">01 // WIRED HOME THEATER &amp; ACOUSTIC RIG</div>
-        <h2 class="category-title">Cinema &amp; Hi-Fi Audio</h2>
-        <p class="category-desc">Hover any unit to power on its display. Flanking studio monitors launch lossless music; center display launches 4K cinema.</p>
+        <div class="section-badge">01 // WATCH</div>
+        <h2 class="category-title">Movies &amp; TV</h2>
+        <p class="category-desc">Stream films, series, and anime in 4K HDR or request anything missing from the catalog.</p>
       </div>
 
-      <div class="av-stage">
-        <!-- Left 3D Acoustic Monitor: Feishin Web -->
-        <a href="https://feishin.lovelain.lol" target="_blank" rel="noopener" class="hw-unit speaker-unit speaker-left" aria-label="Launch Feishin Music Player">
-          <div class="hw-3d-body speaker-cabinet">
-            <div class="scanline-veil" aria-hidden="true"></div>
-            <div class="speaker-face">
-              <div class="speaker-led-bar">
-                <span class="led-dot"></span>
-                <span>FEISHIN // HI-FI</span>
-              </div>
-              <div class="tweeter-horn" aria-hidden="true">
-                <div class="tweeter-dome"></div>
-              </div>
-              <div class="woofer-cone" aria-hidden="true">
-                <div class="woofer-ring">
-                  <div class="woofer-cap"></div>
-                </div>
-              </div>
-              <div class="eq-meters" aria-hidden="true">
-                <span></span><span></span><span></span><span></span><span></span><span></span>
-              </div>
+      <div class="gallery-grid two-col">
+        <article class="media-card featured-card">
+          <a href="https://jellyfin.lovelain.lol/sso/OID/start/authentik" class="media-card-link" target="_blank" rel="noopener">
+            <div class="card-viewport">
+              <img src="assets/card-cinema.jpg" alt="Retro CRT cinema monitor and tape decks" class="card-artwork" loading="lazy">
+              <div class="card-scanlines" aria-hidden="true"></div>
+              <span class="card-corner-tag">4K HDR // ANIME // TV</span>
             </div>
-          </div>
-          <div class="hw-label-plate">
-            <span class="hw-tag">SPOTIFY-STYLE PLAYER</span>
-            <h3 class="hw-title">Feishin Audio</h3>
-            <span class="hw-action">[ STREAM MUSIC &rarr; ]</span>
-          </div>
-        </a>
-
-        <!-- Center 3D Cinema Flatscreen + Under-Screen Seerr Receiver -->
-        <div class="cinema-column">
-          <a href="https://jellyfin.lovelain.lol/sso/OID/start/authentik" target="_blank" rel="noopener" class="hw-unit flatscreen-unit" aria-label="Launch Jellyfin Cinema via Single Sign-On">
-            <div class="hw-3d-body tv-chassis">
-              <div class="tv-bezel">
-                <div class="tv-screen">
-                  <img src="assets/oldScreen.gif" alt="" class="tv-feed-art" loading="lazy">
-                  <div class="scanline-veil" aria-hidden="true"></div>
-                  <div class="tv-hud">
-                    <div class="tv-hud-top">
-                      <span class="hud-chip">CH-01 // 4K HDR</span>
-                      <span class="hud-chip live">1-CLICK OIDC</span>
-                    </div>
-                    <div class="tv-hud-center">
-                      <span class="cinema-play-icon" aria-hidden="true">&#9654;</span>
-                      <span class="cinema-prompt">ENTER JELLYFIN CINEMA</span>
-                    </div>
-                    <div class="tv-hud-bottom">
-                      <span>MOVIES</span>
-                      <span>SERIES</span>
-                      <span>ANIME</span>
-                    </div>
-                  </div>
-                </div>
+            <div class="card-body">
+              <div class="card-title-row">
+                <h3 class="card-title">Movies &amp; TV</h3>
+                <span class="card-arrow" aria-hidden="true">WATCH &rarr;</span>
               </div>
-              <div class="tv-stand-neck" aria-hidden="true"></div>
-              <div class="tv-stand-base" aria-hidden="true"></div>
+              <p class="card-desc">Full cinema, television, and anime library ready to stream on browser, TV, or mobile.</p>
             </div>
           </a>
+        </article>
 
-          <!-- Seerr Request Receiver Docked Beneath Flatscreen -->
-          <a href="https://requests.lovelain.lol" target="_blank" rel="noopener" class="receiver-bar" aria-label="Open Seerr Title Requests">
-            <div class="receiver-vfd">
-              <span class="vfd-dot" aria-hidden="true"></span>
-              <span class="vfd-text">SEERR // TMDB REQUEST RECEIVER</span>
+        <article class="media-card">
+          <a href="https://requests.lovelain.lol" class="media-card-link" target="_blank" rel="noopener">
+            <div class="card-viewport">
+              <img src="assets/card-requests.jpg" alt="Cyber telemetry radar monitor for title requests" class="card-artwork" loading="lazy">
+              <div class="card-scanlines" aria-hidden="true"></div>
+              <span class="card-corner-tag">DISCOVERY &amp; REQUESTS</span>
             </div>
-            <span class="receiver-cta">[ REQUEST TITLE &rarr; ]</span>
+            <div class="card-body">
+              <div class="card-title-row">
+                <h3 class="card-title">Request Movies &amp; Shows</h3>
+                <span class="card-arrow" aria-hidden="true">REQUEST &rarr;</span>
+              </div>
+              <p class="card-desc">Can't find a title? Search and request new films or series to be downloaded automatically.</p>
+            </div>
           </a>
-        </div>
-
-        <!-- Right 3D Acoustic Monitor: Navidrome Zero-Click SSO -->
-        <a href="https://navidrome.lovelain.lol" target="_blank" rel="noopener" class="hw-unit speaker-unit speaker-right" aria-label="Launch Navidrome Lossless Server">
-          <div class="hw-3d-body speaker-cabinet">
-            <div class="scanline-veil" aria-hidden="true"></div>
-            <div class="speaker-face">
-              <div class="speaker-led-bar">
-                <span class="led-dot"></span>
-                <span>NAVIDROME // SSO</span>
-              </div>
-              <div class="tweeter-horn" aria-hidden="true">
-                <div class="tweeter-dome"></div>
-              </div>
-              <div class="woofer-cone" aria-hidden="true">
-                <div class="woofer-ring">
-                  <div class="woofer-cap"></div>
-                </div>
-              </div>
-              <div class="eq-meters reverse" aria-hidden="true">
-                <span></span><span></span><span></span><span></span><span></span><span></span>
-              </div>
-            </div>
-          </div>
-          <div class="hw-label-plate">
-            <span class="hw-tag">SUBSONIC + ZERO-CLICK</span>
-            <h3 class="hw-title">Navidrome Vault</h3>
-            <span class="hw-action">[ OPEN LIBRARY &rarr; ]</span>
-          </div>
-        </a>
+        </article>
       </div>
     </section>
 
-    <!-- 02 // Retro CRT TV + Console & Dual Controllers: RomM Arcade -->
-    <section class="category-section wired-panel" data-category="games">
+    <!-- 02 // Listen: Music & Audiobooks -->
+    <section class="category-section wired-panel" data-category="listen">
       <div class="category-header">
         <img src="assets/favicon-16.gif" alt="" class="article-icon" width="16" height="16">
-        <div class="section-badge">02 // CONSOLE &amp; CRT EMULATION STATION</div>
-        <h2 class="category-title">RomM Retro Arcade</h2>
-        <p class="category-desc">Nintendo, PlayStation, Sega, MAME, and ScummVM archives — auto-authenticated through the Wired.</p>
+        <div class="section-badge">02 // LISTEN</div>
+        <h2 class="category-title">Music &amp; Spoken Word</h2>
+        <p class="category-desc">Lossless FLAC albums, custom playlists, audiobooks, and podcasts synced across devices.</p>
       </div>
 
-      <div class="arcade-stage">
-        <a href="https://romm.lovelain.lol" target="_blank" rel="noopener" class="hw-unit crt-rig" aria-label="Press Start to open RomM Game Library">
-          <div class="hw-3d-body crt-assembly">
-            <!-- Retro Curved CRT Monitor -->
-            <div class="crt-shell">
-              <div class="crt-glass">
-                <img src="assets/retro2_live.gif" alt="" class="crt-bg-gif" loading="lazy">
-                <div class="scanline-veil" aria-hidden="true"></div>
-                <div class="crt-osd">
-                  <div class="crt-players-row">
-                    <span class="p-badge">PLAYER 1 // READY</span>
-                    <span class="p-badge">PLAYER 2 // READY</span>
-                  </div>
-                  <div class="crt-marquee">
-                    <span class="crt-rom-line">CHRONO TRIGGER</span>
-                    <span class="crt-rom-line">CASTLEVANIA: SOTN</span>
-                    <span class="crt-rom-line">METAL GEAR SOLID &bull; MARIO 64</span>
-                  </div>
-                  <div class="press-start-wrap">
-                    <span class="press-start-btn">[ PRESS START ]</span>
-                  </div>
+      <div class="gallery-grid two-col">
+        <article class="media-card">
+          <div class="media-card-shell">
+            <a href="https://feishin.lovelain.lol" class="media-card-link" target="_blank" rel="noopener">
+              <div class="card-viewport">
+                <img src="assets/card-music.jpg" alt="Studio monitor speakers, turntable, and glowing oscilloscope" class="card-artwork" loading="lazy">
+                <div class="card-scanlines" aria-hidden="true"></div>
+                <span class="card-corner-tag">FLAC // HI-FI AUDIO</span>
+              </div>
+              <div class="card-body">
+                <div class="card-title-row">
+                  <h3 class="card-title">Music</h3>
+                  <span class="card-arrow" aria-hidden="true">LISTEN &rarr;</span>
                 </div>
+                <p class="card-desc">High-resolution personal music library, albums, mixes, and lossless playlists.</p>
               </div>
-              <div class="crt-controls-strip" aria-hidden="true">
-                <span class="crt-brand">TRINITRON // ROMM-04</span>
-                <div class="crt-knobs">
-                  <span class="knob"></span>
-                  <span class="knob"></span>
-                  <span class="power-led"></span>
-                </div>
-              </div>
-            </div>
-
-            <!-- 16-Bit Console Deck -->
-            <div class="console-deck" aria-hidden="true">
-              <div class="cartridge-slot"><span>NFP-ROM // 16-BIT</span></div>
-              <div class="console-ports">
-                <span class="port-led">P1</span>
-                <span class="port-led">P2</span>
-              </div>
-            </div>
-
-            <!-- Dual Front Gamepads -->
-            <div class="controllers-row" aria-hidden="true">
-              <div class="gamepad p1">
-                <span class="dpad">+</span>
-                <span class="gp-label">PLAYER 1</span>
-                <span class="abxy"><i></i><i></i></span>
-              </div>
-              <div class="gamepad p2">
-                <span class="dpad">+</span>
-                <span class="gp-label">PLAYER 2</span>
-                <span class="abxy"><i></i><i></i></span>
-              </div>
+            </a>
+            <div class="card-subbar">
+              <span>Player mode: Modern Desktop-Style UI</span>
+              <a href="https://navidrome.lovelain.lol" class="subbar-link" target="_blank" rel="noopener">Open Direct Web Player &rarr;</a>
             </div>
           </div>
-        </a>
+        </article>
+
+        <article class="media-card">
+          <a href="https://audiobooks.lovelain.lol" class="media-card-link" target="_blank" rel="noopener">
+            <div class="card-viewport">
+              <img src="assets/card-audio.jpg" alt="Cassette walkman, reel-to-reel deck, and headphones" class="card-artwork" loading="lazy">
+              <div class="card-scanlines" aria-hidden="true"></div>
+              <span class="card-corner-tag">CHAPTER SYNC // PODCASTS</span>
+            </div>
+            <div class="card-body">
+              <div class="card-title-row">
+                <h3 class="card-title">Audiobooks &amp; Podcasts</h3>
+                <span class="card-arrow" aria-hidden="true">PLAY &rarr;</span>
+              </div>
+              <p class="card-desc">Unabridged audiobooks and podcasts with sleep timers and cross-device progress sync.</p>
+            </div>
+          </a>
+        </article>
       </div>
     </section>
 
-    <!-- 03 // 3D Rotating Relics: Books, Audiobooks & Manga -->
-    <section class="category-section wired-panel" data-category="books-audio">
+    <!-- 03 // Play: Video Games -->
+    <section class="category-section wired-panel" data-category="play">
       <div class="category-header">
         <img src="assets/favicon-16.gif" alt="" class="article-icon" width="16" height="16">
-        <div class="section-badge">03 // LITERATURE, MANGA &amp; SPOKEN WORD</div>
-        <h2 class="category-title">Archive Terminals</h2>
-        <p class="category-desc">Large 3D hardware relics — hover any unit to rotate, reveal scanlines, and launch directly with SSO.</p>
+        <div class="section-badge">03 // PLAY</div>
+        <h2 class="category-title">Video Games</h2>
+        <p class="category-desc">Classic console archives and retro ROM collections playable in-browser or ready to download.</p>
       </div>
 
-      <div class="relics-grid">
-        <!-- Audiobookshelf: 3D Cassette Tape Deck -->
-        <a href="https://audiobooks.lovelain.lol" target="_blank" rel="noopener" class="hw-unit relic-card" aria-label="Open Audiobookshelf">
-          <div class="hw-3d-body relic-stage">
-            <div class="relic-object cassette-deck">
-              <div class="scanline-veil" aria-hidden="true"></div>
-              <div class="cassette-top-label">WIRED TAPE // 90M</div>
-              <div class="cassette-window">
-                <span class="tape-reel left"></span>
-                <span class="tape-bridge">AUDIO</span>
-                <span class="tape-reel right"></span>
-              </div>
-              <div class="cassette-bottom-trapezoid"></div>
+      <div class="gallery-grid single-feature">
+        <article class="media-card wide-card">
+          <a href="https://romm.lovelain.lol" class="media-card-link wide-layout" target="_blank" rel="noopener">
+            <div class="card-viewport">
+              <img src="assets/card-arcade.jpg" alt="Retro CRT television, 16-bit game console, and two wired controllers" class="card-artwork" loading="lazy">
+              <div class="card-scanlines" aria-hidden="true"></div>
+              <span class="card-corner-tag">NINTENDO // PLAYSTATION // SEGA // ARCADE</span>
             </div>
-          </div>
-          <div class="relic-info">
-            <span class="hw-tag">AUTO SSO &bull; PODCASTS</span>
-            <h3 class="hw-title">Audiobookshelf</h3>
-            <p class="relic-desc">Unabridged audiobooks &amp; podcasts with synced chapter playback.</p>
-            <span class="hw-action">[ PLAY TAPE &rarr; ]</span>
-          </div>
-        </a>
+            <div class="card-body wide-body">
+              <div class="card-title-row">
+                <h3 class="card-title">Video Games</h3>
+                <span class="card-arrow" aria-hidden="true">PRESS START &rarr;</span>
+              </div>
+              <p class="card-desc">Curated retro and console library spanning Nintendo, PlayStation, Sega, MAME arcade, Xbox, and ScummVM with instant in-browser play or ROM downloads.</p>
+              <div class="wide-pills">
+                <span class="spec-pill">Player 1 &amp; 2 Ready</span>
+                <span class="spec-pill">Browser Emulation</span>
+                <span class="spec-pill">Auto SSO</span>
+              </div>
+            </div>
+          </a>
+        </article>
+      </div>
+    </section>
 
-        <!-- Calibre-Web: 3D Cyber Grimoire -->
-        <a href="https://calibre.lovelain.lol" target="_blank" rel="noopener" class="hw-unit relic-card" aria-label="Open Calibre-Web E-Books">
-          <div class="hw-3d-body relic-stage">
-            <div class="relic-object grimoire-tome">
-              <div class="tome-spine"></div>
-              <div class="tome-cover">
-                <div class="scanline-veil" aria-hidden="true"></div>
-                <img src="assets/wiredlain.gif" alt="" class="tome-emblem" width="44" height="44" loading="lazy">
-                <span class="tome-title">CALIBRE</span>
-                <span class="tome-sub">3,400+ TOMES</span>
-              </div>
-            </div>
-          </div>
-          <div class="relic-info">
-            <span class="hw-tag">ZERO-CLICK &bull; VIP SHELF</span>
-            <h3 class="hw-title">Calibre-Web</h3>
-            <p class="relic-desc">EPUB/PDF archive with browser reader, Kindle sync &amp; VIP volumes.</p>
-            <span class="hw-action">[ OPEN ARCHIVE &rarr; ]</span>
-          </div>
-        </a>
+    <!-- 04 // Read: Books & Manga -->
+    <section class="category-section wired-panel" data-category="read">
+      <div class="category-header">
+        <img src="assets/favicon-16.gif" alt="" class="article-icon" width="16" height="16">
+        <div class="section-badge">04 // READ</div>
+        <h2 class="category-title">Books, Manga &amp; Comics</h2>
+        <p class="category-desc">Over 3,400 eBooks plus manga, webtoons, and graphic novels readable straight in your browser.</p>
+      </div>
 
-        <!-- Komga: 3D Manga Tankobon Frame (Direct 1-Click OIDC) -->
-        <a href="https://komga.lovelain.lol/oauth2/authorization/authentik" target="_blank" rel="noopener" class="hw-unit relic-card" aria-label="Open Komga Manga via Single Sign-On">
-          <div class="hw-3d-body relic-stage">
-            <div class="relic-object manga-folio">
-              <div class="folio-frame">
-                <div class="scanline-veil" aria-hidden="true"></div>
-                <img src="assets/lainconnectsmile.png" alt="" class="folio-art" loading="lazy">
-                <span class="folio-badge">KOMGA // CBZ</span>
-              </div>
+      <div class="gallery-grid two-col">
+        <article class="media-card">
+          <a href="https://calibre.lovelain.lol" class="media-card-link" target="_blank" rel="noopener">
+            <div class="card-viewport">
+              <img src="assets/card-books.jpg" alt="Nocturnal library stacks and glowing terminal desk lamp" class="card-artwork" loading="lazy">
+              <div class="card-scanlines" aria-hidden="true"></div>
+              <span class="card-corner-tag">EPUB // PDF // KINDLE</span>
             </div>
-          </div>
-          <div class="relic-info">
-            <span class="hw-tag">1-CLICK OIDC &bull; MANGA</span>
-            <h3 class="hw-title">Komga Folio</h3>
-            <p class="relic-desc">High-res manga, webtoons, and comic series in full-page mode.</p>
-            <span class="hw-action">[ READ MANGA &rarr; ]</span>
-          </div>
-        </a>
+            <div class="card-body">
+              <div class="card-title-row">
+                <h3 class="card-title">Books &amp; eBooks</h3>
+                <span class="card-arrow" aria-hidden="true">READ &rarr;</span>
+              </div>
+              <p class="card-desc">Digital bookshelf with in-browser EPUB/PDF reader, downloads, and VIP collections.</p>
+            </div>
+          </a>
+        </article>
+
+        <article class="media-card">
+          <a href="https://komga.lovelain.lol/oauth2/authorization/authentik" class="media-card-link" target="_blank" rel="noopener">
+            <div class="card-viewport">
+              <img src="assets/card-manga.jpg" alt="Stacked manga volumes, dip pens, and open sketchbook under desk lamp" class="card-artwork" loading="lazy">
+              <div class="card-scanlines" aria-hidden="true"></div>
+              <span class="card-corner-tag">CBZ // CBR // WEBTOON</span>
+            </div>
+            <div class="card-body">
+              <div class="card-title-row">
+                <h3 class="card-title">Manga &amp; Comics</h3>
+                <span class="card-arrow" aria-hidden="true">BROWSE &rarr;</span>
+              </div>
+              <p class="card-desc">Read manga series, graphic novels, and comic archives in full-page or webtoon mode.</p>
+            </div>
+          </a>
+        </article>
       </div>
     </section>
   </main>
