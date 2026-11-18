@@ -194,12 +194,13 @@ in
         serviceConfig = {
           Type = "oneshot";
           ExecStart = pkgs.writeShellScript "sync-authentik-blueprints" ''
-            mkdir -p /var/lib/authentik/blueprints /var/lib/authentik/media/public
+            mkdir -p /var/lib/authentik/blueprints /var/lib/authentik/media/public /var/lib/authentik/custom-templates/if
             cp -f /etc/authentik/blueprints/media-suite.yaml /var/lib/authentik/blueprints/media-suite.yaml
             cp -f /etc/authentik/custom.css /var/lib/authentik/custom.css
+            cp -f /etc/authentik/templates/if/flow.html /var/lib/authentik/custom-templates/if/flow.html
             cp -f ${./portal/assets}/* /var/lib/authentik/media/public/
             chown -R 1000:1000 /var/lib/authentik/media/public
-            chmod 0644 /var/lib/authentik/custom.css /var/lib/authentik/media/public/*
+            chmod 0644 /var/lib/authentik/custom.css /var/lib/authentik/custom-templates/if/flow.html /var/lib/authentik/media/public/*
           '';
         };
       };
@@ -364,6 +365,56 @@ in
       ];
     };
 
+    # Override default Authentik flow template so flow_background.jpg is never prefetched or injected
+    environment.etc."authentik/templates/if/flow.html".text = ''
+      {% extends "base/skeleton.html" %}
+
+      {% load static %}
+      {% load authentik_core %}
+
+      {% block head_before %}
+      {{ block.super }}
+      {% if flow.compatibility_mode and not inspector %}
+      <script>ShadyDOM = { force: !navigator.webdriver };</script>
+      {% endif %}
+      {% include "base/header_js.html" %}
+      <script>
+      window.authentik.flow = {
+          "layout": "{{ flow.layout }}",
+      };
+      </script>
+      {% endblock %}
+
+      {% block head %}
+      <script src="{% versioned_script 'dist/flow/FlowInterface-%v.js' %}" type="module"></script>
+      <style>
+      :root {
+          --ak-flow-background: url("/media/public/bg-dis-03.gif");
+      }
+      </style>
+      <script>
+      window.addEventListener("DOMContentLoaded", function () {
+        var brandTitle = (window.authentik && window.authentik.brand && window.authentik.brand.branding_title) || "LoveLain";
+        var fixTitle = function () {
+          if (document.title.indexOf(" - undefined") !== -1) {
+            document.title = document.title.replace(/ - undefined$/, " - " + brandTitle);
+          }
+        };
+        var t = document.querySelector("title");
+        if (t) new MutationObserver(fixTitle).observe(t, { childList: true });
+        fixTitle();
+      });
+      </script>
+      {% endblock %}
+
+      {% block body %}
+      <ak-message-container></ak-message-container>
+      <ak-flow-executor flowSlug="{{ flow.slug }}">
+          <ak-loading></ak-loading>
+      </ak-flow-executor>
+      {% endblock %}
+    '';
+
     # Fauux Wired 2.0 Custom CSS injected into Authentik root + Shadow DOM
     environment.etc."authentik/custom.css".text = ''
       :root, :host {
@@ -378,9 +429,14 @@ in
         --ak-dark-foreground-darker: #c1b492;
         --ak-dark-foreground-link: #d2738a;
         --ak-global--Color--100: #dfd5bc;
-        --ak-flow-background:
-          url("/media/public/bg-dis-03.gif"),
-          url("/media/public/bg-main2.gif");
+        --ak-flow-background: url("/media/public/bg-dis-03.gif") !important;
+        --pf-c-background-image--BackgroundColor: #d2738a;
+        --pf-c-background-image--BackgroundImage: url("/media/public/bg-dis-03.gif");
+        --pf-c-background-image--BackgroundImage-2x: url("/media/public/bg-dis-03.gif");
+        --pf-c-background-image--BackgroundImage--sm: url("/media/public/bg-dis-03.gif");
+        --pf-c-background-image--BackgroundImage--sm-2x: url("/media/public/bg-dis-03.gif");
+        --pf-c-background-image--BackgroundImage--lg: url("/media/public/bg-dis-03.gif");
+        --pf-c-background-image--Filter: none;
         --pf-v5-global--primary-color--100: #d2738a;
         --pf-v5-global--primary-color--200: #e793a8;
         --pf-v5-global--link--Color: #d2738a;
@@ -392,8 +448,12 @@ in
         --pf-v5-global--BorderColor--100: rgba(210, 115, 138, 0.42);
       }
 
-      body {
-        background-color: #d2738a !important;
+      body,
+      ak-loading {
+        background-color: #000000 !important;
+        background-image:
+          url("/media/public/bg-dis-03.gif"),
+          url("/media/public/bg-main2.gif") !important;
         color: #dfd5bc !important;
       }
 
@@ -405,24 +465,80 @@ in
             to bottom,
             rgba(0, 0, 0, 0) 0px,
             rgba(0, 0, 0, 0) 2px,
-            rgba(0, 0, 0, 0.22) 3px,
-            rgba(0, 0, 0, 0.22) 4px
+            rgba(0, 0, 0, 0.24) 3px,
+            rgba(0, 0, 0, 0.24) 4px
           ),
           url("/media/public/bg-dis-03.gif"),
           url("/media/public/bg-main2.gif") !important;
         background-repeat: repeat !important;
+        background-size: auto !important;
+      }
+
+      .pf-c-background-image::before,
+      .pf-c-background-image::after,
+      .pf-v5-c-background-image::before,
+      .pf-v5-c-background-image::after {
+        background-color: transparent !important;
+        background-image:
+          repeating-linear-gradient(
+            to bottom,
+            rgba(0, 0, 0, 0) 0px,
+            rgba(0, 0, 0, 0) 2px,
+            rgba(0, 0, 0, 0.24) 3px,
+            rgba(0, 0, 0, 0.24) 4px
+          ),
+          url("/media/public/bg-dis-03.gif"),
+          url("/media/public/bg-main2.gif") !important;
+        background-repeat: repeat !important;
+        background-size: auto !important;
+        filter: none !important;
+        opacity: 1 !important;
+      }
+
+      .pf-c-background-image__filter,
+      .pf-v5-c-background-image__filter {
+        display: none !important;
       }
 
       .pf-c-login__main,
       .pf-v5-c-login__main {
         background-color: rgba(5, 3, 7, 0.94) !important;
         background-image:
-          linear-gradient(rgba(4, 2, 6, 0.78), rgba(4, 2, 6, 0.86)),
+          linear-gradient(rgba(4, 2, 6, 0.68), rgba(4, 2, 6, 0.80)),
           url("/media/public/bg-rip-02.gif") !important;
-        border: 1px solid rgba(210, 115, 138, 0.55) !important;
-        box-shadow: 0 5px 18px #000000, 0 0 32px rgba(210, 115, 138, 0.18) !important;
+        border: 1px solid rgba(210, 115, 138, 0.58) !important;
+        box-shadow: 0 6px 24px #000000, 0 0 36px rgba(210, 115, 138, 0.22) !important;
         border-radius: 4px !important;
         color: #dfd5bc !important;
+      }
+
+      .pf-c-login__main-footer,
+      .pf-v5-c-login__main-footer {
+        background-color: rgba(12, 7, 15, 0.82) !important;
+        border-top: 1px solid rgba(210, 115, 138, 0.22) !important;
+      }
+
+      .pf-c-login__footer,
+      .pf-v5-c-login__footer {
+        justify-content: center !important;
+        color: rgba(223, 213, 188, 0.72) !important;
+      }
+
+      .pf-c-login__footer .pf-c-list li:last-child,
+      .pf-v5-c-login__footer .pf-v5-c-list li:last-child {
+        display: none !important;
+      }
+
+      .pf-c-login__footer::after,
+      .pf-v5-c-login__footer::after {
+        content: "PRESENT DAY // PRESENT TIME";
+        display: block;
+        font-family: "JetBrains Mono", "Courier New", monospace;
+        font-size: 0.72rem;
+        letter-spacing: 0.24em;
+        color: rgba(223, 213, 188, 0.78);
+        text-shadow: 0 1px 4px #000000;
+        text-align: center;
       }
 
       .pf-c-login__main-header,
@@ -563,6 +679,29 @@ in
               identifiers:
                 path: system/providers-proxy.yaml
               required: false
+
+          # ── Strip "Welcome to authentik!" from default flow headings ──
+          - model: authentik_flows.flow
+            identifiers:
+              slug: default-authentication-flow
+            attrs:
+              name: Enter the Wired
+              title: Enter the Wired
+              designation: authentication
+          - model: authentik_flows.flow
+            identifiers:
+              slug: default-source-authentication
+            attrs:
+              name: Connect to the Wired
+              title: Connect to the Wired
+              designation: authentication
+          - model: authentik_flows.flow
+            identifiers:
+              slug: default-source-enrollment
+            attrs:
+              name: Choose your Wired handle
+              title: Choose your Wired handle
+              designation: enrollment
 
           # ── Privilege Tiers (Groups) ───────────────────────────────────
           - model: authentik_core.group
