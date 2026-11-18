@@ -1,4 +1,4 @@
-// LoveLain Media & Gaming Directory Client
+// LoveLain Wired Directory Client
 (function () {
   'use strict';
 
@@ -7,8 +7,19 @@
   const userDisplayName = document.getElementById('user-display-name');
   const headerUserName = document.getElementById('header-user-name');
   const userAuthEmail = document.getElementById('user-auth-email');
+  const userTierBadges = document.getElementById('user-tier-badges');
   const adminDashLink = document.getElementById('admin-dash-link');
   const footerAdminLink = document.getElementById('footer-admin-link');
+  const footerAdminSep = document.getElementById('footer-admin-sep');
+  const wiredPhraseEl = document.getElementById('wired-phrase');
+
+  const WIRED_PHRASES = [
+    "[let's all love lain]",
+    "[present day, present time]",
+    "[no matter where you go, everyone is connected]",
+    "[close the world, open the next]",
+    "[⌈いとをひく⌋]"
+  ];
 
   function setupCategoryFilter() {
     navBtns.forEach((btn) => {
@@ -23,6 +34,33 @@
     });
   }
 
+  function setupWiredPhraseTicker() {
+    if (!wiredPhraseEl) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    let idx = 0;
+    window.setInterval(() => {
+      idx = (idx + 1) % WIRED_PHRASES.length;
+      wiredPhraseEl.textContent = WIRED_PHRASES[idx];
+    }, 3600);
+  }
+
+  function renderGroupBadges(groupsStr) {
+    if (!userTierBadges) return;
+    const rawGroups = groupsStr
+      .split('|')
+      .map((g) => g.trim())
+      .filter((g) => g && g !== 'authentik Admins');
+
+    userTierBadges.textContent = '';
+    rawGroups.forEach((groupName) => {
+      const span = document.createElement('span');
+      span.className = 'tier-pill';
+      span.textContent = groupName;
+      userTierBadges.appendChild(span);
+    });
+  }
+
   function applyUserInfo(user) {
     const display = (user.name || user.username || 'Member').trim();
     const email = (user.email || user.username || 'Authenticated SSO Member').trim();
@@ -32,10 +70,13 @@
     if (headerUserName && display) headerUserName.textContent = display;
     if (userAuthEmail && email) userAuthEmail.textContent = email;
 
+    renderGroupBadges(groups);
+
     const isAdmin = groups.includes('NFP Admins') || groups.includes('authentik Admins');
     if (isAdmin) {
       if (adminDashLink) adminDashLink.classList.remove('hidden');
       if (footerAdminLink) footerAdminLink.classList.remove('hidden');
+      if (footerAdminSep) footerAdminSep.classList.remove('hidden');
     }
   }
 
@@ -46,7 +87,6 @@
         const data = await resp.json();
         if (data && (data.username || data.email || data.name)) {
           applyUserInfo(data);
-          return;
         }
       }
     } catch (_) {
@@ -56,6 +96,7 @@
 
   function init() {
     setupCategoryFilter();
+    setupWiredPhraseTicker();
     loadCurrentUser();
   }
 

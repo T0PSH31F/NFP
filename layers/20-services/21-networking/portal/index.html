@@ -3,33 +3,35 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="LoveLain Media & Gaming Directory — Private Movies, TV, Books, Audiobooks, Music & Video Games">
-  <title>LoveLain // Media & Gaming Directory</title>
+  <meta name="description" content="LoveLain Wired Media & Gaming Directory — Private Movies, TV, Books, Audiobooks, Music & Video Games">
+  <title>⌈ＬｏｖｅＬａｉｎ　／／　Ｗｉｒｅｄ　Ｄｉｒｅｃｔｏｒｙ⌋</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⬡</text></svg>">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
 </head>
-<body class="theme-cyberia">
+<body class="theme-wired">
+  <a href="#main-directory" class="skip-link">Skip to directory</a>
+
   <header class="site-header">
     <div class="header-container">
       <div class="brand">
-        <span class="brand-glyph">⬡</span>
+        <img src="assets/mebious.gif" alt="" class="brand-icon" width="34" height="34">
         <div class="brand-text">
-          <span class="brand-title">LOVELAIN</span>
-          <span class="brand-subtitle">MEDIA & GAMING DIRECTORY</span>
+          <span class="brand-title">⌈ＬｏｖｅＬａｉｎ⌋</span>
+          <span class="brand-subtitle">Wired Media &amp; Gaming Directory</span>
         </div>
       </div>
 
       <nav class="nav-links" aria-label="Category Filter">
-        <button class="nav-btn active" data-category="all">All</button>
-        <button class="nav-btn" data-category="movies-tv">Movies & TV</button>
-        <button class="nav-btn" data-category="books-audio">Books & Audiobooks</button>
-        <button class="nav-btn" data-category="music">Music</button>
-        <button class="nav-btn" data-category="games">Video Games</button>
+        <button type="button" class="nav-btn active" data-category="all">All</button>
+        <button type="button" class="nav-btn" data-category="movies-tv">Movies &amp; TV</button>
+        <button type="button" class="nav-btn" data-category="books-audio">Books &amp; Audio</button>
+        <button type="button" class="nav-btn" data-category="music">Music</button>
+        <button type="button" class="nav-btn" data-category="games">Games</button>
       </nav>
 
       <div class="header-actions">
         <div id="auth-header-container" class="auth-header-container">
-          <a href="https://auth.lovelain.lol/if/user/#/settings" class="btn btn-outline btn-sm">
+          <a href="https://auth.lovelain.lol/if/user/#/settings" class="btn btn-sm">
             <span id="header-user-name">Account</span>
           </a>
           <a href="https://auth.lovelain.lol/if/flow/default-invalidation-flow/" class="btn btn-ghost btn-sm">
@@ -40,25 +42,36 @@
     </div>
   </header>
 
-  <main class="main-content">
+  <main id="main-directory" class="main-content">
     <section class="directory-hero">
       <div class="directory-hero-copy">
-        <div class="hero-badge">Authenticated SSO Directory</div>
-        <h1 class="directory-title">Welcome, <span id="user-display-name" class="text-accent">Member</span></h1>
+        <div class="hero-badge">⌈Ｗｉｒｅｄ　２．０　／／　ＳＳＯ　Ｇａｔｅｗａｙ⌋</div>
+        <h1 class="directory-title">Present Time, <span id="user-display-name" class="text-pink">Member</span></h1>
+        <p id="wired-phrase" class="wired-phrase">[let's all love lain]</p>
         <p class="directory-subtitle">
-          Choose a category below to open any library directly. Your session is already signed in across services.
+          Select any node below to enter your private cinema, lossless audio, e-book, audiobook, or retro ROM libraries.
         </p>
-      </div>
-      <div id="user-meta-card" class="user-meta-card">
-        <div class="user-meta-row">
-          <span class="user-meta-label">Signed in as</span>
-          <span id="user-auth-email" class="user-meta-value">Verified Member</span>
+
+        <div class="user-session-strip">
+          <div class="user-meta-pair">
+            <span class="user-meta-label">Identity:</span>
+            <span id="user-auth-email" class="user-meta-value">Verified Member</span>
+          </div>
+          <div id="user-tier-badges" class="tier-badges" aria-label="Access groups"></div>
         </div>
+
         <div class="user-meta-actions">
           <a id="admin-dash-link" href="https://dash.lovelain.lol" class="btn btn-accent btn-sm hidden" target="_blank" rel="noopener">Fleet Admin</a>
-          <a href="https://auth.lovelain.lol/if/user/#/settings" class="btn btn-outline btn-sm" target="_blank" rel="noopener">Profile & Security</a>
+          <a href="https://auth.lovelain.lol/if/user/#/settings" class="btn btn-sm" target="_blank" rel="noopener">Profile &amp; Security</a>
           <a href="https://auth.lovelain.lol/if/flow/default-invalidation-flow/" class="btn btn-ghost btn-sm">Sign Out</a>
         </div>
+      </div>
+
+      <div class="hero-emblem-panel">
+        <a href="https://jellyfin.lovelain.lol" class="lain-emblem-link" target="_blank" rel="noopener" aria-label="Open Jellyfin Cinema">
+          <img src="assets/loveLain.gif" alt="Let's All Love Lain Wired Emblem" class="lain-emblem-img" width="195" height="312">
+        </a>
+        <p class="emblem-caption">⌈Ｌｅｔ’ｓ　Ａｌｌ　Ｌｏｖｅ　Ｌａｉｎ！⌋</p>
       </div>
     </section>
 
@@ -66,49 +79,49 @@
     <section class="category-section" data-category="movies-tv">
       <div class="category-header">
         <div>
-          <div class="section-badge">01 // CINEMA & TELEVISION</div>
-          <h2 class="category-title">Movies & TV</h2>
+          <div class="section-badge">01 // CINEMA &amp; TELEVISION</div>
+          <h2 class="category-title">Movies &amp; TV</h2>
         </div>
-        <p class="category-desc">Stream films, series, and anime in 4K HDR or request titles to be added.</p>
+        <p class="category-desc">Stream films, series, and anime in 4K HDR or request new titles.</p>
       </div>
 
       <div class="services-grid">
         <article class="service-card">
           <div class="service-header">
-            <div class="service-icon-box cinema-theme" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
+            <div class="service-icon-box" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <rect x="2" y="2" width="20" height="20" rx="2"></rect>
                 <line x1="7" y1="2" x2="7" y2="22"></line>
                 <line x1="17" y1="2" x2="17" y2="22"></line>
                 <line x1="2" y1="12" x2="22" y2="12"></line>
               </svg>
             </div>
             <div class="service-meta">
-              <span class="service-tag">Watch Now</span>
+              <span class="service-tag">Stream</span>
               <span class="service-status online">Online</span>
             </div>
           </div>
           <h3 class="service-name">Jellyfin Cinema</h3>
           <p class="service-desc">
-            Stream the full Movies, TV Shows, and Anime library on browser, smart TV, or mobile apps with hardware transcoding.
+            Stream the full Movies, TV Shows, and Anime library on browser, smart TV, or mobile apps with LoveLain SSO.
           </p>
           <div class="service-specs">
             <span class="spec-pill">Movies</span>
-            <span class="spec-pill">TV Series</span>
-            <span class="spec-pill">4K / HDR</span>
+            <span class="spec-pill">TV &amp; Anime</span>
+            <span class="spec-pill">OIDC SSO</span>
           </div>
           <div class="service-footer">
-            <a href="https://jellyfin.lovelain.lol" class="btn btn-service launch-btn" target="_blank" rel="noopener">
-              <span>Browse Movies & TV</span>
-              <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            <a href="https://jellyfin.lovelain.lol" class="btn btn-service" target="_blank" rel="noopener">
+              <span>Enter Cinema</span>
+              <svg class="btn-arrow" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </a>
           </div>
         </article>
 
         <article class="service-card">
           <div class="service-header">
-            <div class="service-icon-box request-theme" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <div class="service-icon-box" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                 <circle cx="12" cy="12" r="10"></circle>
                 <line x1="12" y1="8" x2="12" y2="16"></line>
                 <line x1="8" y1="12" x2="16" y2="12"></line>
@@ -128,9 +141,9 @@
             <span class="spec-pill">Show Discovery</span>
           </div>
           <div class="service-footer">
-            <a href="https://requests.lovelain.lol" class="btn btn-service launch-btn" target="_blank" rel="noopener">
+            <a href="https://requests.lovelain.lol" class="btn btn-service" target="_blank" rel="noopener">
               <span>Request Titles</span>
-              <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              <svg class="btn-arrow" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </a>
           </div>
         </article>
@@ -141,17 +154,17 @@
     <section class="category-section" data-category="books-audio">
       <div class="category-header">
         <div>
-          <div class="section-badge">02 // LITERATURE, MANGA & SPOKEN WORD</div>
-          <h2 class="category-title">Books & Audiobooks</h2>
+          <div class="section-badge">02 // LITERATURE, MANGA &amp; SPOKEN WORD</div>
+          <h2 class="category-title">Books &amp; Audiobooks</h2>
         </div>
-        <p class="category-desc">Listen to audiobooks & podcasts, read eBooks, or flip through comics and manga.</p>
+        <p class="category-desc">Listen to audiobooks &amp; podcasts, read eBooks, or browse manga and graphic novels.</p>
       </div>
 
       <div class="services-grid">
         <article class="service-card">
           <div class="service-header">
-            <div class="service-icon-box audio-theme" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <div class="service-icon-box" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                 <path d="M3 18v-6a9 9 0 0 1 18 0v6"></path>
                 <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path>
               </svg>
@@ -168,20 +181,20 @@
           <div class="service-specs">
             <span class="spec-pill">Audiobooks</span>
             <span class="spec-pill">Podcasts</span>
-            <span class="spec-pill">OIDC SSO</span>
+            <span class="spec-pill">Auto SSO</span>
           </div>
           <div class="service-footer">
-            <a href="https://audiobooks.lovelain.lol" class="btn btn-service launch-btn" target="_blank" rel="noopener">
-              <span>Listen to Audiobooks</span>
-              <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            <a href="https://audiobooks.lovelain.lol" class="btn btn-service" target="_blank" rel="noopener">
+              <span>Open Audiobooks</span>
+              <svg class="btn-arrow" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </a>
           </div>
         </article>
 
         <article class="service-card">
           <div class="service-header">
-            <div class="service-icon-box book-theme" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <div class="service-icon-box" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                 <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
                 <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
               </svg>
@@ -193,30 +206,31 @@
           </div>
           <h3 class="service-name">Calibre-Web</h3>
           <p class="service-desc">
-            Digital bookshelf with in-browser EPUB/PDF reading, instant downloads, and Kindle / e-reader delivery.
+            Digital bookshelf with in-browser EPUB/PDF reader, downloads, and VIP tag collections.
           </p>
           <div class="service-specs">
             <span class="spec-pill">EPUB / PDF</span>
             <span class="spec-pill">Kindle Sync</span>
+            <span class="spec-pill">Auto SSO</span>
           </div>
           <div class="service-footer">
-            <a href="https://calibre.lovelain.lol" class="btn btn-service launch-btn" target="_blank" rel="noopener">
+            <a href="https://calibre.lovelain.lol" class="btn btn-service" target="_blank" rel="noopener">
               <span>Browse E-Books</span>
-              <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              <svg class="btn-arrow" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </a>
           </div>
         </article>
 
         <article class="service-card">
           <div class="service-header">
-            <div class="service-icon-box comic-theme" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <div class="service-icon-box" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                 <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
                 <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
               </svg>
             </div>
             <div class="service-meta">
-              <span class="service-tag">Comics & Manga</span>
+              <span class="service-tag">Comics &amp; Manga</span>
               <span class="service-status online">Online</span>
             </div>
           </div>
@@ -230,9 +244,9 @@
             <span class="spec-pill">OIDC SSO</span>
           </div>
           <div class="service-footer">
-            <a href="https://komga.lovelain.lol" class="btn btn-service launch-btn" target="_blank" rel="noopener">
-              <span>Read Comics & Manga</span>
-              <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            <a href="https://komga.lovelain.lol" class="btn btn-service" target="_blank" rel="noopener">
+              <span>Read Comics</span>
+              <svg class="btn-arrow" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </a>
           </div>
         </article>
@@ -252,15 +266,15 @@
       <div class="services-grid">
         <article class="service-card">
           <div class="service-header">
-            <div class="service-icon-box music-theme" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <div class="service-icon-box" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                 <path d="M9 18V5l12-2v13"></path>
                 <circle cx="6" cy="18" r="3"></circle>
                 <circle cx="18" cy="16" r="3"></circle>
               </svg>
             </div>
             <div class="service-meta">
-              <span class="service-tag">Hi-Fi Streaming</span>
+              <span class="service-tag">Hi-Fi Audio</span>
               <span class="service-status online">Online</span>
             </div>
           </div>
@@ -270,13 +284,13 @@
           </p>
           <div class="service-specs">
             <span class="spec-pill">FLAC / ALAC</span>
-            <span class="spec-pill">Playlists</span>
             <span class="spec-pill">Subsonic API</span>
+            <span class="spec-pill">Auto SSO</span>
           </div>
           <div class="service-footer">
-            <a href="https://navidrome.lovelain.lol" class="btn btn-service launch-btn" target="_blank" rel="noopener">
+            <a href="https://navidrome.lovelain.lol" class="btn btn-service" target="_blank" rel="noopener">
               <span>Listen to Music</span>
-              <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              <svg class="btn-arrow" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </a>
           </div>
         </article>
@@ -287,17 +301,17 @@
     <section class="category-section" data-category="games">
       <div class="category-header">
         <div>
-          <div class="section-badge">04 // RETRO & CONSOLE ARCHIVE</div>
+          <div class="section-badge">04 // RETRO &amp; CONSOLE ARCHIVE</div>
           <h2 class="category-title">Video Games</h2>
         </div>
-        <p class="category-desc">Browse console collections, download ROMs, or play supported classics right in the browser.</p>
+        <p class="category-desc">Browse console collections, download ROMs, or play supported classics in the browser.</p>
       </div>
 
       <div class="services-grid">
         <article class="service-card">
           <div class="service-header">
-            <div class="service-icon-box game-theme" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <div class="service-icon-box" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                 <line x1="6" y1="12" x2="10" y2="12"></line>
                 <line x1="8" y1="10" x2="8" y2="14"></line>
                 <line x1="15" y1="13" x2="15.01" y2="13"></line>
@@ -312,7 +326,7 @@
           </div>
           <h3 class="service-name">RomM Game Library</h3>
           <p class="service-desc">
-            Curated retro and console library covering Nintendo, PlayStation, Sega, MAME arcade, Xbox, and ScummVM with browser play.
+            Curated retro and console library covering Nintendo, PlayStation, Sega, MAME arcade, Xbox, and ScummVM.
           </p>
           <div class="service-specs">
             <span class="spec-pill">Nintendo / PSX / Sega</span>
@@ -320,9 +334,9 @@
             <span class="spec-pill">OIDC SSO</span>
           </div>
           <div class="service-footer">
-            <a href="https://romm.lovelain.lol" class="btn btn-service launch-btn" target="_blank" rel="noopener">
-              <span>Browse Video Games</span>
-              <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            <a href="https://romm.lovelain.lol" class="btn btn-service" target="_blank" rel="noopener">
+              <span>Browse Games</span>
+              <svg class="btn-arrow" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </a>
           </div>
         </article>
@@ -333,15 +347,15 @@
   <footer class="site-footer">
     <div class="footer-container">
       <div class="footer-left">
-        <span class="footer-brand">LOVELAIN.LOL</span>
-        <span class="footer-sep">•</span>
-        <span>Unified OAuth &amp; Media Directory</span>
+        <span class="footer-brand">⌈ＬＯＶＥＬＡＩＮ．ＬＯＬ⌋</span>
+        <span class="footer-sep">//</span>
+        <span>Wired Sound for Wired People</span>
       </div>
       <div class="footer-right">
         <a href="https://search.lovelain.lol" class="footer-link" target="_blank" rel="noopener">Private Search</a>
-        <span class="footer-sep">•</span>
+        <span class="footer-sep">︱</span>
         <a href="https://auth.lovelain.lol/if/user/" class="footer-link" target="_blank" rel="noopener">My Account</a>
-        <span class="footer-sep">•</span>
+        <span class="footer-sep hidden" id="footer-admin-sep">︱</span>
         <a id="footer-admin-link" href="https://auth.lovelain.lol/if/admin/" class="footer-link hidden" target="_blank" rel="noopener">User Admin</a>
       </div>
     </div>
