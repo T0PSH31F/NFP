@@ -3,7 +3,8 @@
   'use strict';
 
   const navBtns = document.querySelectorAll('.nav-btn');
-  const categorySections = document.querySelectorAll('.category-section');
+  const directoryGroups = document.querySelectorAll('.directory-group');
+  const allCards = document.querySelectorAll('.card');
   const userDisplayName = document.getElementById('user-display-name');
   const headerUserName = document.getElementById('header-user-name');
   const userAuthEmail = document.getElementById('user-auth-email');
@@ -26,10 +27,14 @@
       btn.addEventListener('click', () => {
         const selected = btn.getAttribute('data-category') || 'all';
         navBtns.forEach((b) => b.classList.toggle('active', b === btn));
-        categorySections.forEach((section) => {
-          const cats = (section.getAttribute('data-category') || '').split(/\s+/);
-          const matches = selected === 'all' || cats.includes(selected);
-          section.classList.toggle('hidden', !matches);
+        allCards.forEach((card) => {
+          const cat = card.getAttribute('data-category') || '';
+          const matches = selected === 'all' || cat === selected;
+          card.classList.toggle('hidden', !matches);
+        });
+        directoryGroups.forEach((group) => {
+          const hasVisible = group.querySelectorAll('.card:not(.hidden)').length > 0;
+          group.classList.toggle('hidden', !hasVisible);
         });
       });
     });
