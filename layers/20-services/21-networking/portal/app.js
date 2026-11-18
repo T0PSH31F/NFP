@@ -27,7 +27,8 @@
         const selected = btn.getAttribute('data-category') || 'all';
         navBtns.forEach((b) => b.classList.toggle('active', b === btn));
         categorySections.forEach((section) => {
-          const matches = selected === 'all' || section.getAttribute('data-category') === selected;
+          const cats = (section.getAttribute('data-category') || '').split(/\s+/);
+          const matches = selected === 'all' || cats.includes(selected);
           section.classList.toggle('hidden', !matches);
         });
       });

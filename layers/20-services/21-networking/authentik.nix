@@ -1226,6 +1226,16 @@ in
               authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
               invalidation_flow: !Find [authentik_flows.flow, [slug, default-provider-invalidation-flow]]
 
+          - model: authentik_providers_proxy.proxyprovider
+            id: proxy-feishin
+            identifiers:
+              name: Feishin Music Proxy Provider
+            attrs:
+              mode: forward_single
+              external_host: https://feishin.${publicDomain}
+              authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
+              invalidation_flow: !Find [authentik_flows.flow, [slug, default-provider-invalidation-flow]]
+
           - model: authentik_outposts.outpost
             identifiers:
               managed: goauthentik.io/outposts/embedded
@@ -1239,6 +1249,7 @@ in
               providers:
                 - !KeyOf proxy-calibre
                 - !KeyOf proxy-navidrome
+                - !KeyOf proxy-feishin
                 - !KeyOf proxy-searxng
                 - !KeyOf proxy-portal-dash
                 - !KeyOf proxy-admin-dash
@@ -1298,6 +1309,17 @@ in
               provider: !KeyOf proxy-navidrome
               meta_launch_url: https://navidrome.${publicDomain}
               meta_description: High-Fidelity Lossless Music Streaming
+              meta_publisher: LoveLain Cyberia
+              open_in_new_tab: true
+          - model: authentik_core.application
+            id: app-feishin
+            identifiers:
+              slug: feishin
+            attrs:
+              name: Feishin Audio Player
+              provider: !KeyOf proxy-feishin
+              meta_launch_url: https://feishin.${publicDomain}
+              meta_description: Modern Wired Music Streaming Interface
               meta_publisher: LoveLain Cyberia
               open_in_new_tab: true
           - model: authentik_core.application
@@ -1489,11 +1511,23 @@ in
             "app-seerr"
             "app-jellyfin"
             "app-navidrome"
+            "app-feishin"
             "app-searxng"
             "app-audiobookshelf"
             "app-komga"
             "app-calibre"
             "app-romm"
+          ]
+      +
+        concatMapStrings
+          (
+            group:
+            "  - model: authentik_policies.policybinding\n    identifiers:\n      target: !KeyOf app-feishin\n      group: !KeyOf ${group}\n      order: 0\n"
+          )
+          [
+            "group-admins"
+            "group-family"
+            "group-friends"
           ];
     };
 
@@ -1573,6 +1607,16 @@ in
             handle {
               reverse_proxy http://100.64.0.1:4533
             }
+          '';
+        };
+
+        # Feishin Modern Spotify-Like Music Client (hosted on luffy:9180, forward_auth gated)
+        "feishin.${publicDomain}" = {
+          useACMEHost = publicDomain;
+          extraConfig = ''
+            encode zstd gzip
+            header Strict-Transport-Security "max-age=31536000; includeSubDomains"
+            ${forwardAuthCaddy "localhost:9180"}
           '';
         };
 

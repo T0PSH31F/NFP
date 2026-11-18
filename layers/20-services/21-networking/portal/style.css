@@ -98,6 +98,18 @@ body.theme-wired::after {
   display: none !important;
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .text-pink {
   color: var(--accent-pink);
 }
@@ -418,7 +430,992 @@ body.theme-wired::after {
   max-width: 58ch;
 }
 
-/* Service Cards */
+/* ── Inline Layer-07 Private Search Bar ───────────────────────── */
+.wired-search-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding: 0.45rem 0.65rem;
+  background: rgba(0, 0, 0, 0.88);
+  border: 1px solid var(--border-wired);
+}
+
+.search-prefix {
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  color: var(--accent-pink);
+}
+
+.wired-search-bar input {
+  flex: 1 1 190px;
+  min-width: 0;
+  background: transparent;
+  border: 0;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  padding: 0.25rem 0.4rem;
+}
+
+.wired-search-bar input::placeholder {
+  color: var(--text-muted);
+}
+
+.wired-search-bar input:focus {
+  outline: none;
+}
+
+/* ── Shared Hardware Unit & Scanline Reveal Mechanics ─────────── */
+.hw-unit {
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  perspective: 1100px;
+  cursor: pointer;
+}
+
+.hw-3d-body {
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 340ms cubic-bezier(0.22, 1, 0.36, 1), filter 300ms ease;
+}
+
+.scanline-veil {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 4;
+  opacity: 0.18;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0) 0px,
+      rgba(0, 0, 0, 0) 2px,
+      rgba(0, 0, 0, 0.42) 3px,
+      rgba(0, 0, 0, 0.42) 4px
+    ),
+    linear-gradient(
+      180deg,
+      rgba(210, 115, 138, 0) 0%,
+      rgba(210, 115, 138, 0.32) 50%,
+      rgba(210, 115, 138, 0) 100%
+    );
+  background-size: 100% 4px, 100% 220%;
+  background-position: 0 0, 0 -120%;
+  transition: opacity 280ms ease;
+}
+
+.hw-unit:hover .scanline-veil,
+.hw-unit:focus-visible .scanline-veil {
+  opacity: 0.88;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hw-unit:hover .scanline-veil,
+  .hw-unit:focus-visible .scanline-veil {
+    animation: scanSweep 1.8s linear infinite;
+  }
+}
+
+.hw-label-plate {
+  margin-top: 0.85rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.hw-tag {
+  font-size: 0.66rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent-pink);
+}
+
+.hw-title {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: 1.15rem;
+  letter-spacing: 0.14em;
+  color: var(--text-primary);
+}
+
+.hw-action {
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  color: var(--text-secondary);
+  transition: color 200ms ease;
+}
+
+.hw-unit:hover .hw-action,
+.hw-unit:focus-visible .hw-action {
+  color: var(--accent-pink-bright);
+}
+
+/* ── 01 // Cinema Flatscreen + Twin Acoustic Monitors ─────────── */
+.av-stage {
+  display: grid;
+  grid-template-columns: minmax(175px, 1fr) minmax(300px, 2.15fr) minmax(175px, 1fr);
+  gap: 1.5rem;
+  align-items: end;
+}
+
+.speaker-cabinet {
+  width: 100%;
+  max-width: 210px;
+  background: linear-gradient(155deg, #150e19 0%, #050307 100%);
+  border: 2px solid var(--border-wired);
+  padding: 0.85rem 0.8rem 1rem;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.9);
+}
+
+.speaker-left .speaker-cabinet {
+  transform: rotateY(14deg) rotateX(3deg);
+}
+
+.speaker-right .speaker-cabinet {
+  transform: rotateY(-14deg) rotateX(3deg);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .speaker-left:hover .speaker-cabinet,
+  .speaker-left:focus-visible .speaker-cabinet {
+    animation: sway3dLeft 2.4s ease-in-out infinite;
+    border-color: var(--accent-pink-bright);
+    box-shadow: 0 16px 34px rgba(0, 0, 0, 0.95), 0 0 26px rgba(210, 115, 138, 0.32);
+  }
+
+  .speaker-right:hover .speaker-cabinet,
+  .speaker-right:focus-visible .speaker-cabinet {
+    animation: sway3dRight 2.4s ease-in-out infinite;
+    border-color: var(--accent-pink-bright);
+    box-shadow: 0 16px 34px rgba(0, 0, 0, 0.95), 0 0 26px rgba(210, 115, 138, 0.32);
+  }
+}
+
+.speaker-face {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.speaker-led-bar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  font-size: 0.64rem;
+  letter-spacing: 0.14em;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-dim);
+  padding-bottom: 0.35rem;
+}
+
+.led-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent-pink);
+  box-shadow: 0 0 8px var(--accent-pink);
+}
+
+.tweeter-horn {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 2px solid var(--border-wired);
+  background: radial-gradient(circle, #1e1222 0%, #050307 70%);
+  display: grid;
+  place-items: center;
+}
+
+.tweeter-dome {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid var(--accent-cream);
+  background: rgba(210, 115, 138, 0.35);
+}
+
+.woofer-cone {
+  width: 112px;
+  height: 112px;
+  border-radius: 50%;
+  border: 3px solid var(--accent-cream);
+  background: radial-gradient(circle, #180f1c 0%, #020103 78%);
+  display: grid;
+  place-items: center;
+  transition: border-color 240ms ease, transform 240ms ease;
+}
+
+.woofer-ring {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  border: 1px dashed var(--accent-pink);
+  display: grid;
+  place-items: center;
+}
+
+.woofer-cap {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 2px solid var(--accent-pink);
+  background: #08040b;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .speaker-unit:hover .woofer-cone {
+    border-color: var(--accent-pink-bright);
+    animation: wooferPulse 0.9s ease-in-out infinite;
+  }
+}
+
+.eq-meters {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 22px;
+}
+
+.eq-meters span {
+  width: 6px;
+  height: 6px;
+  background: var(--accent-pink);
+  transition: height 200ms ease, background-color 200ms ease;
+}
+
+.eq-meters span:nth-child(2n) {
+  background: var(--accent-cream);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .speaker-unit:hover .eq-meters span {
+    animation: eqDance 0.75s ease-in-out infinite alternate;
+  }
+  .speaker-unit:hover .eq-meters span:nth-child(2) { animation-delay: 0.12s; }
+  .speaker-unit:hover .eq-meters span:nth-child(3) { animation-delay: 0.24s; }
+  .speaker-unit:hover .eq-meters span:nth-child(4) { animation-delay: 0.36s; }
+  .speaker-unit:hover .eq-meters span:nth-child(5) { animation-delay: 0.18s; }
+  .speaker-unit:hover .eq-meters span:nth-child(6) { animation-delay: 0.42s; }
+}
+
+/* Center Cinema Flatscreen + Seerr Receiver */
+.cinema-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.flatscreen-unit {
+  width: 100%;
+}
+
+.tv-chassis {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: rotateX(2deg);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .flatscreen-unit:hover .tv-chassis,
+  .flatscreen-unit:focus-visible .tv-chassis {
+    animation: sway3dCenter 2.8s ease-in-out infinite;
+  }
+}
+
+.tv-bezel {
+  width: 100%;
+  padding: 10px;
+  background: linear-gradient(180deg, #160f1a 0%, #060408 100%);
+  border: 2px solid var(--border-wired);
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.95);
+  transition: border-color 260ms ease, box-shadow 260ms ease;
+}
+
+.flatscreen-unit:hover .tv-bezel,
+.flatscreen-unit:focus-visible .tv-bezel {
+  border-color: var(--accent-pink-bright);
+  box-shadow: 0 22px 44px rgba(0, 0, 0, 0.98), 0 0 34px rgba(210, 115, 138, 0.35);
+}
+
+.tv-screen {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: #020103;
+  overflow: hidden;
+  border: 1px solid var(--border-dim);
+}
+
+.tv-feed-art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.24;
+  filter: contrast(1.15) saturate(0.85);
+  transition: opacity 320ms ease, transform 420ms ease;
+}
+
+.flatscreen-unit:hover .tv-feed-art,
+.flatscreen-unit:focus-visible .tv-feed-art {
+  opacity: 0.72;
+  transform: scale(1.03);
+}
+
+.tv-hud {
+  position: relative;
+  z-index: 5;
+  height: 100%;
+  padding: 0.85rem 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: radial-gradient(circle at center, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0.78) 100%);
+}
+
+.tv-hud-top,
+.tv-hud-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  color: var(--text-secondary);
+}
+
+.hud-chip {
+  padding: 0.15rem 0.5rem;
+  background: rgba(0, 0, 0, 0.85);
+  border: 1px solid var(--border-dim);
+}
+
+.hud-chip.live {
+  border-color: var(--accent-pink);
+  color: var(--accent-pink-bright);
+}
+
+.tv-hud-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+  text-align: center;
+}
+
+.cinema-play-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 2px solid var(--accent-cream);
+  background: rgba(0, 0, 0, 0.82);
+  color: var(--accent-cream);
+  display: grid;
+  place-items: center;
+  font-size: 1.2rem;
+  padding-left: 3px;
+  transition: background-color 240ms ease, border-color 240ms ease, color 240ms ease, transform 240ms ease;
+}
+
+.flatscreen-unit:hover .cinema-play-icon,
+.flatscreen-unit:focus-visible .cinema-play-icon {
+  background: var(--accent-pink);
+  border-color: var(--accent-pink-bright);
+  color: #000000;
+  transform: scale(1.08);
+}
+
+.cinema-prompt {
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  letter-spacing: 0.18em;
+  color: var(--text-primary);
+  text-shadow: 0 2px 10px #000000;
+}
+
+.tv-stand-neck {
+  width: 48px;
+  height: 16px;
+  background: #140d18;
+  border-inline: 1px solid var(--border-wired);
+}
+
+.tv-stand-base {
+  width: 170px;
+  height: 7px;
+  background: #0d0810;
+  border: 1px solid var(--border-wired);
+}
+
+.receiver-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  padding: 0.65rem 1rem;
+  background: rgba(4, 2, 6, 0.96);
+  border: 1px solid var(--border-wired);
+  text-decoration: none;
+  color: var(--text-primary);
+  transition: border-color 200ms ease, box-shadow 200ms ease;
+}
+
+.receiver-bar:hover,
+.receiver-bar:focus-visible {
+  border-color: var(--accent-pink-bright);
+  box-shadow: var(--glow-pink);
+}
+
+.receiver-vfd {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 0.74rem;
+  letter-spacing: 0.15em;
+  color: var(--text-secondary);
+}
+
+.vfd-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--accent-pink);
+  box-shadow: 0 0 8px var(--accent-pink);
+}
+
+.receiver-cta {
+  font-size: 0.74rem;
+  letter-spacing: 0.14em;
+  color: var(--accent-pink-bright);
+}
+
+/* ── 02 // Retro CRT TV + Console + Player 1 / Player 2 ──────── */
+.arcade-stage {
+  display: flex;
+  justify-content: center;
+}
+
+.crt-rig {
+  width: 100%;
+  max-width: 660px;
+}
+
+.crt-assembly {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .crt-rig:hover .crt-assembly,
+  .crt-rig:focus-visible .crt-assembly {
+    animation: sway3dCenter 2.6s ease-in-out infinite;
+  }
+}
+
+.crt-shell {
+  width: 100%;
+  padding: 16px 18px 12px;
+  background: linear-gradient(170deg, #19121e 0%, #07040a 100%);
+  border: 2px solid var(--border-wired);
+  border-radius: 14px 14px 6px 6px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.96);
+  transition: border-color 260ms ease, box-shadow 260ms ease;
+}
+
+.crt-rig:hover .crt-shell,
+.crt-rig:focus-visible .crt-shell {
+  border-color: var(--accent-pink-bright);
+  box-shadow: 0 20px 44px rgba(0, 0, 0, 0.98), 0 0 38px rgba(210, 115, 138, 0.34);
+}
+
+.crt-glass {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  background: #020103;
+  border: 3px solid #000000;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.95);
+}
+
+.crt-bg-gif {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.16;
+  filter: saturate(0.7) contrast(1.15);
+  transition: opacity 320ms ease, filter 320ms ease, transform 420ms ease;
+}
+
+.crt-rig:hover .crt-bg-gif,
+.crt-rig:focus-visible .crt-bg-gif {
+  opacity: 0.85;
+  filter: saturate(1.1) contrast(1.1);
+  transform: scale(1.03);
+}
+
+.crt-osd {
+  position: relative;
+  z-index: 5;
+  height: 100%;
+  padding: 1rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: radial-gradient(circle, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.84) 100%);
+}
+
+.crt-players-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  color: var(--text-secondary);
+}
+
+.p-badge {
+  background: rgba(0, 0, 0, 0.88);
+  border: 1px solid var(--border-dim);
+  padding: 0.18rem 0.55rem;
+  transition: color 220ms ease, border-color 220ms ease;
+}
+
+.crt-rig:hover .p-badge,
+.crt-rig:focus-visible .p-badge {
+  color: var(--accent-pink-bright);
+  border-color: var(--accent-pink);
+}
+
+.crt-marquee {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.28rem;
+  text-align: center;
+  opacity: 0.42;
+  transition: opacity 280ms ease;
+}
+
+.crt-rig:hover .crt-marquee,
+.crt-rig:focus-visible .crt-marquee {
+  opacity: 1;
+}
+
+.crt-rom-line {
+  font-family: var(--font-mono);
+  font-size: clamp(0.76rem, 1.5vw, 0.92rem);
+  letter-spacing: 0.2em;
+  color: var(--accent-cream);
+  text-shadow: 0 0 12px rgba(210, 115, 138, 0.85), 0 2px 4px #000000;
+}
+
+.press-start-wrap {
+  display: flex;
+  justify-content: center;
+}
+
+.press-start-btn {
+  font-family: var(--font-mono);
+  font-size: 0.86rem;
+  letter-spacing: 0.24em;
+  padding: 0.42rem 1.25rem;
+  background: rgba(0, 0, 0, 0.9);
+  border: 2px solid var(--accent-cream);
+  color: var(--accent-cream);
+  transition: background-color 220ms ease, color 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+}
+
+.crt-rig:hover .press-start-btn,
+.crt-rig:focus-visible .press-start-btn {
+  background: var(--accent-pink);
+  border-color: var(--accent-pink-bright);
+  color: #000000;
+  box-shadow: 0 0 20px rgba(210, 115, 138, 0.7);
+}
+
+.crt-controls-strip {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 0.6rem;
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  color: var(--text-muted);
+}
+
+.crt-knobs {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.knob {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  border: 1px solid var(--border-wired);
+  background: #040206;
+}
+
+.power-led {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent-pink);
+  box-shadow: 0 0 8px var(--accent-pink);
+}
+
+.console-deck {
+  width: 68%;
+  height: 28px;
+  background: linear-gradient(180deg, #1b1322 0%, #09060c 100%);
+  border: 1px solid var(--border-wired);
+  border-top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1rem;
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  color: var(--text-secondary);
+}
+
+.console-ports {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.port-led {
+  padding: 0.05rem 0.35rem;
+  border: 1px solid var(--border-dim);
+  color: var(--accent-pink);
+}
+
+.controllers-row {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 0.7rem;
+  width: 100%;
+}
+
+.gamepad {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.42rem 0.85rem;
+  min-width: 170px;
+  background: #09060d;
+  border: 1px solid var(--border-wired);
+  border-radius: 999px;
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+  color: var(--text-secondary);
+  transition: border-color 220ms ease, transform 220ms ease;
+}
+
+.crt-rig:hover .gamepad.p1 { transform: rotate(-3deg) translateY(-2px); border-color: var(--accent-pink); }
+.crt-rig:hover .gamepad.p2 { transform: rotate(3deg) translateY(-2px); border-color: var(--accent-pink); }
+
+.dpad {
+  font-size: 1rem;
+  font-weight: bold;
+  color: var(--accent-cream);
+}
+
+.abxy {
+  display: flex;
+  gap: 4px;
+}
+
+.abxy i {
+  display: block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent-pink);
+}
+
+/* ── 03 // 3D Rotating Relics (Books, Audiobooks, Manga) ──────── */
+.relics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.4rem;
+}
+
+.relic-card {
+  background: rgba(8, 5, 11, 0.9);
+  border: 1px solid var(--border-dim);
+  padding: 1.4rem 1.25rem;
+  transition: border-color 260ms ease, box-shadow 260ms ease;
+}
+
+.relic-card:hover,
+.relic-card:focus-visible {
+  border-color: var(--accent-pink);
+  box-shadow: var(--glow-pink);
+}
+
+.relic-stage {
+  width: 100%;
+  height: 172px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 1rem;
+}
+
+.relic-object {
+  position: relative;
+  transition: transform 340ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 300ms ease;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .relic-card:hover .relic-object,
+  .relic-card:focus-visible .relic-object {
+    animation: relicRock 2.4s ease-in-out infinite;
+  }
+}
+
+/* Cassette Deck */
+.cassette-deck {
+  width: 196px;
+  height: 126px;
+  background: linear-gradient(155deg, #1b1121 0%, #060408 100%);
+  border: 2px solid var(--border-wired);
+  border-radius: 8px;
+  padding: 0.7rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  transform: rotateY(-10deg) rotateX(6deg);
+  box-shadow: 0 14px 26px rgba(0, 0, 0, 0.9);
+}
+
+.cassette-top-label {
+  width: 100%;
+  background: var(--accent-cream);
+  color: #000000;
+  font-size: 0.65rem;
+  letter-spacing: 0.16em;
+  text-align: center;
+  padding: 0.15rem 0;
+  font-weight: 700;
+}
+
+.cassette-window {
+  width: 84%;
+  height: 44px;
+  background: #020103;
+  border: 1px solid var(--accent-pink);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 0.5rem;
+}
+
+.tape-reel {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px dashed var(--accent-cream);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .relic-card:hover .tape-reel {
+    animation: spinReel 1.8s linear infinite;
+    border-color: var(--accent-pink-bright);
+  }
+}
+
+.tape-bridge {
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  color: var(--accent-pink);
+}
+
+.cassette-bottom-trapezoid {
+  width: 62%;
+  height: 14px;
+  border: 1px solid var(--border-dim);
+  border-bottom: 0;
+}
+
+/* Grimoire Tome */
+.grimoire-tome {
+  width: 142px;
+  height: 158px;
+  display: flex;
+  transform: rotateY(-18deg) rotateX(6deg);
+  box-shadow: 10px 14px 26px rgba(0, 0, 0, 0.95);
+}
+
+.tome-spine {
+  width: 18px;
+  height: 100%;
+  background: linear-gradient(90deg, #542836, #d2738a 60%, #7d3f50);
+  border: 1px solid var(--accent-cream);
+}
+
+.tome-cover {
+  position: relative;
+  flex: 1;
+  background: linear-gradient(145deg, #160e1b 0%, #050307 100%);
+  border: 2px solid var(--accent-cream);
+  border-left: 0;
+  padding: 0.75rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  overflow: hidden;
+}
+
+.tome-emblem {
+  image-rendering: pixelated;
+  border: 1px solid var(--border-wired);
+}
+
+.tome-title {
+  font-family: var(--font-serif);
+  letter-spacing: 0.16em;
+  font-size: 0.95rem;
+  color: var(--accent-cream);
+}
+
+.tome-sub {
+  font-size: 0.58rem;
+  letter-spacing: 0.12em;
+  color: var(--accent-pink-bright);
+}
+
+/* Manga Folio */
+.manga-folio {
+  width: 148px;
+  height: 156px;
+  transform: rotateY(14deg) rotateX(6deg);
+  box-shadow: -8px 14px 26px rgba(0, 0, 0, 0.95);
+}
+
+.folio-frame {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border: 2px solid var(--accent-pink);
+  background: #040206;
+  overflow: hidden;
+}
+
+.folio-art {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(0.45) contrast(1.15);
+  transition: filter 260ms ease, transform 300ms ease;
+}
+
+.relic-card:hover .folio-art {
+  filter: grayscale(0) contrast(1.2);
+  transform: scale(1.05);
+}
+
+.folio-badge {
+  position: absolute;
+  bottom: 0;
+  inset-inline: 0;
+  background: rgba(0, 0, 0, 0.88);
+  border-top: 1px solid var(--accent-pink);
+  font-size: 0.64rem;
+  letter-spacing: 0.16em;
+  text-align: center;
+  padding: 0.22rem 0;
+  color: var(--accent-cream);
+  z-index: 5;
+}
+
+.relic-info {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.relic-desc {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+@keyframes scanSweep {
+  0% { background-position: 0 0, 0 -120%; }
+  100% { background-position: 0 0, 0 220%; }
+}
+
+@keyframes sway3dLeft {
+  0%, 100% { transform: rotateY(18deg) rotateX(4deg) translateY(-3px); }
+  50% { transform: rotateY(-6deg) rotateX(-2deg) translateY(-6px); }
+}
+
+@keyframes sway3dRight {
+  0%, 100% { transform: rotateY(-18deg) rotateX(4deg) translateY(-3px); }
+  50% { transform: rotateY(6deg) rotateX(-2deg) translateY(-6px); }
+}
+
+@keyframes sway3dCenter {
+  0%, 100% { transform: rotateY(-4deg) rotateX(3deg) translateY(-2px); }
+  50% { transform: rotateY(4deg) rotateX(-1deg) translateY(-5px); }
+}
+
+@keyframes relicRock {
+  0%, 100% { transform: rotateY(-18deg) rotateX(8deg) translateY(-3px); }
+  50% { transform: rotateY(18deg) rotateX(-4deg) translateY(-6px); }
+}
+
+@keyframes spinReel {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes wooferPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.045); }
+}
+
+@keyframes eqDance {
+  0% { height: 6px; }
+  100% { height: 22px; }
+}
+
+@media (max-width: 900px) {
+  .av-stage {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+
+  .speaker-left .speaker-cabinet,
+  .speaker-right .speaker-cabinet {
+    transform: none;
+  }
+}
+
+/* Service Cards (legacy fallback unused) */
 .services-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));

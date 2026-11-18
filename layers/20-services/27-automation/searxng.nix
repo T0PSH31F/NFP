@@ -59,6 +59,9 @@ in
       enable = true;
       environmentFile = config.clan.core.vars.generators.searxng.files."searxng.env".path;
       settings = {
+        general = {
+          instance_name = "⌈Ｗｉｒｅｄ　Ｓｅａｒｃｈ⌋";
+        };
         server = {
           inherit (cfg) port;
           bind_address = "127.0.0.1";
@@ -66,6 +69,10 @@ in
         };
         ui = {
           static_use_hash = true;
+          default_theme = "simple";
+          theme_args = {
+            simple_style = "dark";
+          };
         };
         search = {
           safe_search = 0;

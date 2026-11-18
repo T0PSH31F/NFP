@@ -128,6 +128,17 @@ in
   layers.layer-20.services.config.jackett.enable = false;
   layers.layer-20.services.config.netdata.enable = true;
 
+  services.feishin = {
+    enable = true;
+    mode = "server";
+    port = 9180;
+    serverConnection = {
+      url = "https://navidrome.lovelain.lol";
+      serverType = "navidrome";
+      name = "LoveLain Music";
+    };
+  };
+
   # Central fleet orchestrators hosted strictly on luffy (single instance for all 3 machines)
   layers.layer-76.orchestrators = {
     paperclip = {

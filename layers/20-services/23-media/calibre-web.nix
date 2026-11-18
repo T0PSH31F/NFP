@@ -160,6 +160,69 @@ with lib;
         };
       };
 
+      systemd.services.calibre-web-user-sync =
+        mkIf (config.layers.layer-20.services.auth.authentik.enable or false)
+          {
+            description = "Sync Authentik VIP/Family/Friend/Admin users & dark theme into Calibre-Web";
+            after = [
+              "calibre-web.service"
+              "postgresql.service"
+            ];
+            wantedBy = [ "multi-user.target" ];
+            serviceConfig = {
+              Type = "oneshot";
+            };
+            script = ''
+                            set -euo pipefail
+                            DB="${config.services.calibre-web-app.dataDir}/app.db"
+                            [ -f "$DB" ] || exit 0
+                            ROWS="$(${pkgs.util-linux}/bin/runuser -u postgres -- ${config.services.postgresql.package}/bin/psql -d authentik -t -A -F $'\t' -c \
+                              "SELECT u.username, COALESCE(u.email, u.username), string_agg(g.name, ',') FROM authentik_core_user u JOIN authentik_core_user_ak_groups ug ON u.id=ug.user_id JOIN authentik_core_group g ON g.group_uuid=ug.group_id WHERE u.is_active=true AND u.type='internal' GROUP BY u.username, u.email;")"
+                            ROWS="$ROWS" ${pkgs.python3}/bin/python3 - "$DB" <<'PY'
+              import os, sqlite3, sys
+              conn = sqlite3.connect(sys.argv[1], timeout=15)
+              cur = conn.cursor()
+              cur.execute(
+                  "UPDATE settings SET config_theme = 1, config_calibre_web_title = ? "
+                  "WHERE config_theme != 1 OR config_calibre_web_title = ?",
+                  ("⌈ＬｏｖｅＬａｉｎ　Ａｒｃｈｉｖｅ⌋", "Calibre-Web"),
+              )
+              for line in os.environ.get("ROWS", "").splitlines():
+                  if not line.strip():
+                      continue
+                  uname, uemail, ugroups = line.split("\t")
+                  groups = set(ugroups.split(","))
+                  if "NFP Admins" in groups or "authentik Admins" in groups:
+                      role, denied = 479, ""
+                  elif "VIP" in groups:
+                      role, denied = 338, ""
+                  else:
+                      role, denied = 338, "VIP"
+                  cur.execute(
+                      "INSERT OR IGNORE INTO user (name, email, role, password, kindle_mail, locale, sidebar_view, default_language, denied_tags, allowed_tags, denied_column_value, allowed_column_value, view_settings) "
+                      "VALUES (?, ?, ?, ?, ?, ?, 262143, ?, ?, ?, ?, ?, ?)",
+                      (uname, uemail, role, "", "", "en", "all", denied, "", "", "", "{}"),
+                  )
+                  cur.execute(
+                      "UPDATE user SET role = ?, denied_tags = ?, email = COALESCE(NULLIF(?, ?), email) WHERE name = ?",
+                      (role, denied, uemail, "", uname),
+                  )
+              conn.commit()
+              PY
+            '';
+          };
+
+      systemd.timers.calibre-web-user-sync =
+        mkIf (config.layers.layer-20.services.auth.authentik.enable or false)
+          {
+            description = "Periodic Authentik -> Calibre-Web VIP & User Sync";
+            wantedBy = [ "timers.target" ];
+            timerConfig = {
+              OnBootSec = "1m";
+              OnUnitActiveSec = "10m";
+            };
+          };
+
       # Firewall
       networking.firewall.allowedTCPPorts = [ config.services.calibre-web-app.port ];
 

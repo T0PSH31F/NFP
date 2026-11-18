@@ -191,8 +191,11 @@ in
       }
       // lib.optionalAttrs (config.layers.layer-20.services.auth.authentik.enable or false) {
         OIDC_ENABLED = "true";
+        OIDC_AUTOLOGIN = "true";
         OIDC_PROVIDER = "authentik";
         OIDC_CLIENT_ID = "romm";
+        OIDC_CLAIM_ROLES = "groups";
+        OIDC_ROLE_ADMIN = "NFP Admins";
         OIDC_REDIRECT_URI = "https://romm.${
           config.layers.meta.publicDomain or "lovelain.duckdns.org"
         }/api/oauth/openid";

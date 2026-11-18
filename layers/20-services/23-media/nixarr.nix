@@ -174,70 +174,96 @@ in
               RemainAfterExit = true;
             };
             script = ''
-              CFG_DIR="${cfg.stateDir}/jellyfin/data/plugins/configurations"
-              CFG_FILE="$CFG_DIR/SSO-Auth.xml"
-              if [ -r /var/lib/authentik/runtime.env ]; then
-                . /var/lib/authentik/runtime.env
-                if [ -n "''${OIDC_JELLYFIN_SECRET:-}" ]; then
-                  install -d -m 0750 -o jellyfin -g media "$CFG_DIR"
-                  umask 077
-                  cat > "$CFG_FILE.tmp" <<EOF
+                            CFG_DIR="${cfg.stateDir}/jellyfin/data/plugins/configurations"
+                            CFG_FILE="$CFG_DIR/SSO-Auth.xml"
+                            if [ -r /var/lib/authentik/runtime.env ]; then
+                              . /var/lib/authentik/runtime.env
+                              if [ -n "''${OIDC_JELLYFIN_SECRET:-}" ]; then
+                                install -d -m 0750 -o jellyfin -g media "$CFG_DIR"
+                                umask 077
+                                cat > "$CFG_FILE.tmp" <<EOF
+                            <?xml version="1.0" encoding="utf-8"?>
+                            <PluginConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+                              <SamlConfigs />
+                              <OidConfigs>
+                                <item>
+                                  <key>
+                                    <string>authentik</string>
+                                  </key>
+                                  <value>
+                                    <PluginConfiguration>
+                                      <OidEndpoint>https://${authDomain}/application/o/jellyfin/</OidEndpoint>
+                                      <OidClientId>jellyfin</OidClientId>
+                                      <OidSecret>$OIDC_JELLYFIN_SECRET</OidSecret>
+                                      <Enabled>true</Enabled>
+                                      <EnableAuthorization>true</EnableAuthorization>
+                                      <EnableAllFolders>true</EnableAllFolders>
+                                      <EnabledFolders />
+                                      <AdminRoles>
+                                        <string>NFP Admins</string>
+                                      </AdminRoles>
+                                      <Roles>
+                                        <string>NFP Admins</string>
+                                        <string>Family</string>
+                                        <string>Friends</string>
+                                        <string>VIP</string>
+                                      </Roles>
+                                      <EnableFolderRoles>false</EnableFolderRoles>
+                                      <EnableLiveTvRoles>false</EnableLiveTvRoles>
+                                      <EnableLiveTv>false</EnableLiveTv>
+                                      <EnableLiveTvManagement>false</EnableLiveTvManagement>
+                                      <FolderRoleMappings />
+                                      <RoleClaim>groups</RoleClaim>
+                                      <OidScopes>
+                                        <string>profile</string>
+                                        <string>email</string>
+                                      </OidScopes>
+                                      <SchemeOverride>https</SchemeOverride>
+                                      <PortOverride xsi:nil="true" />
+                                      <NewPath>true</NewPath>
+                                      <CanonicalLinks />
+                                      <DefaultUsernameClaim>preferred_username</DefaultUsernameClaim>
+                                      <DisableHttps>false</DisableHttps>
+                                      <DisablePushedAuthorization>false</DisablePushedAuthorization>
+                                      <DoNotValidateEndpoints>false</DoNotValidateEndpoints>
+                                      <DoNotValidateIssuerName>false</DoNotValidateIssuerName>
+                                      <DoNotLoadProfile>false</DoNotLoadProfile>
+                                    </PluginConfiguration>
+                                  </value>
+                                </item>
+                              </OidConfigs>
+                            </PluginConfiguration>
+                            EOF
+                                chown jellyfin:media "$CFG_FILE.tmp"
+                                chmod 0600 "$CFG_FILE.tmp"
+                                mv "$CFG_FILE.tmp" "$CFG_FILE"
+                              fi
+                            fi
+
+                            BRAND_DIR="${cfg.stateDir}/jellyfin/config"
+                            BRAND_FILE="$BRAND_DIR/branding.xml"
+                            install -d -m 0750 -o jellyfin -g media "$BRAND_DIR"
+                            cat > "$BRAND_FILE.tmp" <<'XML'
               <?xml version="1.0" encoding="utf-8"?>
-              <PluginConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-                <SamlConfigs />
-                <OidConfigs>
-                  <item>
-                    <key>
-                      <string>authentik</string>
-                    </key>
-                    <value>
-                      <PluginConfiguration>
-                        <OidEndpoint>https://${authDomain}/application/o/jellyfin/</OidEndpoint>
-                        <OidClientId>jellyfin</OidClientId>
-                        <OidSecret>$OIDC_JELLYFIN_SECRET</OidSecret>
-                        <Enabled>true</Enabled>
-                        <EnableAuthorization>true</EnableAuthorization>
-                        <EnableAllFolders>true</EnableAllFolders>
-                        <EnabledFolders />
-                        <AdminRoles>
-                          <string>NFP Admins</string>
-                        </AdminRoles>
-                        <Roles>
-                          <string>NFP Admins</string>
-                          <string>Family</string>
-                          <string>Friends</string>
-                        </Roles>
-                        <EnableFolderRoles>false</EnableFolderRoles>
-                        <EnableLiveTvRoles>false</EnableLiveTvRoles>
-                        <EnableLiveTv>false</EnableLiveTv>
-                        <EnableLiveTvManagement>false</EnableLiveTvManagement>
-                        <FolderRoleMappings />
-                        <RoleClaim>groups</RoleClaim>
-                        <OidScopes>
-                          <string>profile</string>
-                          <string>email</string>
-                        </OidScopes>
-                        <SchemeOverride>https</SchemeOverride>
-                        <PortOverride xsi:nil="true" />
-                        <NewPath>true</NewPath>
-                        <CanonicalLinks />
-                        <DefaultUsernameClaim>preferred_username</DefaultUsernameClaim>
-                        <DisableHttps>false</DisableHttps>
-                        <DisablePushedAuthorization>false</DisablePushedAuthorization>
-                        <DoNotValidateEndpoints>false</DoNotValidateEndpoints>
-                        <DoNotValidateIssuerName>false</DoNotValidateIssuerName>
-                        <DoNotLoadProfile>false</DoNotLoadProfile>
-                      </PluginConfiguration>
-                    </value>
-                  </item>
-                </OidConfigs>
-              </PluginConfiguration>
-              EOF
-                  chown jellyfin:media "$CFG_FILE.tmp"
-                  chmod 0600 "$CFG_FILE.tmp"
-                  mv "$CFG_FILE.tmp" "$CFG_FILE"
-                fi
-              fi
+              <BrandingOptions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+                <LoginDisclaimer>Enter the Wired Cinema&lt;br/&gt;&lt;br/&gt;&lt;form action="/sso/OID/start/authentik"&gt;&lt;button class="raised block emby-button button-submit"&gt;Sign in with LoveLain SSO&lt;/button&gt;&lt;/form&gt;</LoginDisclaimer>
+                <CustomCss>
+                  :root { --accent: #d2738a; --accent-soft: #e793a8; --cream: #dfd5bc; }
+                  html, body, .backgroundContainer, .mainAnimatedPages, .page { background-color: #030205 !important; color: #dfd5bc !important; }
+                  .skinHeader, .mainDrawer { background-color: rgba(6, 4, 9, 0.94) !important; border-bottom: 1px solid rgba(210, 115, 138, 0.4) !important; }
+                  .button-submit, .emby-button.button-submit { background: transparent !important; border: 2px solid #dfd5bc !important; color: #dfd5bc !important; border-radius: 999px !important; }
+                  .button-submit:hover { background: #d2738a !important; border-color: #d2738a !important; color: #000000 !important; }
+                  .cardBox { background-color: #09060d !important; border: 1px solid rgba(210, 115, 138, 0.25) !important; }
+                  .itemProgressBarForeground, .mdl-slider__background-lower { background-color: #d2738a !important; }
+                  .headerTabs .emby-tab-button-active, a { color: #d2738a !important; }
+                </CustomCss>
+                <SplashscreenEnabled>true</SplashscreenEnabled>
+                <SplashscreenLocation>/data/.state/nixarr/jellyfin/data/data/splashscreen-upload.gif</SplashscreenLocation>
+              </BrandingOptions>
+              XML
+                            chown jellyfin:media "$BRAND_FILE.tmp"
+                            chmod 0600 "$BRAND_FILE.tmp"
+                            mv "$BRAND_FILE.tmp" "$BRAND_FILE"
             '';
           }
         );
