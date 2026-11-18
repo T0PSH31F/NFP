@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="LoveLain Wired Media & Gaming Directory — Private Movies, TV, Books, Audiobooks, Music & Video Games">
-  <title>⌈ＬｏｖｅＬａｉｎ　／／　Ｗｉｒｅｄ　Ｄｉｒｅｃｔｏｒｙ⌋</title>
+  <meta name="description" content="LoveLain Wired Sound for Wired People — Private Movies, TV, Books, Audiobooks, Music & Video Games">
+  <title>⌈Ｗｉｒｅｄ　Ｓｏｕｎｄ　／／　ＬｏｖｅＬａｉｎ⌋</title>
   <link rel="stylesheet" href="style.css">
   <link rel="icon" type="image/png" href="assets/favicon.png">
 </head>
@@ -43,45 +43,70 @@
   </header>
 
   <main id="main-directory" class="main-content">
-    <section class="directory-hero">
-      <div class="directory-hero-copy">
-        <div class="hero-badge">⌈Ｗｉｒｅｄ　２．０　／／　ＳＳＯ　Ｇａｔｅｗａｙ⌋</div>
-        <h1 class="directory-title">Present Time, <span id="user-display-name" class="text-pink">Member</span></h1>
-        <p id="wired-phrase" class="wired-phrase">[let's all love lain]</p>
-        <p class="directory-subtitle">
-          Select any node below to enter your private cinema, lossless audio, e-book, audiobook, or retro ROM libraries.
-        </p>
+    <section class="directory-hero wired-panel" aria-label="Wired Session Overview">
+      <div class="wired-corners" aria-hidden="true">
+        <span class="blink">⌈</span>
+        <span class="blink">⌉</span>
+      </div>
 
-        <div class="user-session-strip">
-          <div class="user-meta-pair">
-            <span class="user-meta-label">Identity:</span>
-            <span id="user-auth-email" class="user-meta-value">Verified Member</span>
+      <div class="hero-grid">
+        <div class="directory-hero-copy">
+          <h1 class="wired-banner-title">
+            <span class="wiredAnim">⌈ Wired</span>
+            <span class="wdel1s">Sound For</span>
+            <span class="wdel2s">Wired</span>
+            <span class="wdel3s">People ⌋</span>
+          </h1>
+          <div class="equalizer-bar" aria-hidden="true">
+            <span class="del6s">║</span><span class="del5s">▒</span><span class="del4s">░</span>
+            <span class="del2s">║</span><span class="del1s5ms">▒</span><span class="del1s">░</span>
+            <span class="blink">♫</span>
+            <span class="del1s">░</span><span class="del1s5ms">▒</span><span class="del2s">║</span>
+            <span class="del4s">░</span><span class="del5s">▒</span><span class="del6s">║</span>
           </div>
-          <div id="user-tier-badges" class="tier-badges" aria-label="Access groups"></div>
+          <p id="wired-phrase" class="wired-phrase">[let's all love lain]</p>
+
+          <hr class="wired-hr">
+
+          <p class="directory-subtitle">
+            Welcome to the Wired, <strong id="user-display-name" class="text-pink">Member</strong>. Choose any library below to launch directly with your SSO session.
+          </p>
+
+          <div class="user-session-strip">
+            <div class="user-meta-pair">
+              <span class="user-meta-label">Identity:</span>
+              <span id="user-auth-email" class="user-meta-value">Verified Member</span>
+            </div>
+            <div id="user-tier-badges" class="tier-badges" aria-label="Access groups"></div>
+          </div>
+
+          <div class="user-meta-actions">
+            <a id="admin-dash-link" href="https://dash.lovelain.lol" class="btn btn-accent btn-sm hidden" target="_blank" rel="noopener">Fleet Admin</a>
+            <a href="https://auth.lovelain.lol/if/user/#/settings" class="btn btn-sm" target="_blank" rel="noopener">Profile &amp; Security</a>
+            <a href="https://auth.lovelain.lol/if/flow/default-invalidation-flow/" class="btn btn-ghost btn-sm">Sign Out</a>
+          </div>
         </div>
 
-        <div class="user-meta-actions">
-          <a id="admin-dash-link" href="https://dash.lovelain.lol" class="btn btn-accent btn-sm hidden" target="_blank" rel="noopener">Fleet Admin</a>
-          <a href="https://auth.lovelain.lol/if/user/#/settings" class="btn btn-sm" target="_blank" rel="noopener">Profile &amp; Security</a>
-          <a href="https://auth.lovelain.lol/if/flow/default-invalidation-flow/" class="btn btn-ghost btn-sm">Sign Out</a>
+        <div class="hero-emblem-panel">
+          <a href="https://jellyfin.lovelain.lol" class="lain-emblem-link" target="_blank" rel="noopener" aria-label="Open Jellyfin Cinema">
+            <img src="assets/loveLain.gif" alt="Let's All Love Lain Wired Emblem" class="lain-emblem-img" width="185" height="296">
+          </a>
+          <p class="emblem-caption">⌈Ｌｅｔ’ｓ　Ａｌｌ　Ｌｏｖｅ　Ｌａｉｎ！⌋</p>
         </div>
       </div>
 
-      <div class="hero-emblem-panel">
-        <a href="https://jellyfin.lovelain.lol" class="lain-emblem-link" target="_blank" rel="noopener" aria-label="Open Jellyfin Cinema">
-          <img src="assets/loveLain.gif" alt="Let's All Love Lain Wired Emblem" class="lain-emblem-img" width="195" height="312">
-        </a>
-        <p class="emblem-caption">⌈Ｌｅｔ’ｓ　Ａｌｌ　Ｌｏｖｅ　Ｌａｉｎ！⌋</p>
+      <div class="wired-corners bottom" aria-hidden="true">
+        <span class="blink">⌊</span>
+        <span class="blink">⌋</span>
       </div>
     </section>
 
     <!-- Category 1: Movies & TV -->
-    <section class="category-section" data-category="movies-tv">
+    <section class="category-section wired-panel" data-category="movies-tv">
       <div class="category-header">
-        <div>
-          <div class="section-badge">01 // CINEMA &amp; TELEVISION</div>
-          <h2 class="category-title">Movies &amp; TV</h2>
-        </div>
+        <img src="assets/favicon-16.gif" alt="" class="article-icon" width="16" height="16">
+        <div class="section-badge">01 // CINEMA &amp; TELEVISION</div>
+        <h2 class="category-title">Movies &amp; TV</h2>
         <p class="category-desc">Stream films, series, and anime in 4K HDR or request new titles.</p>
       </div>
 
@@ -151,12 +176,11 @@
     </section>
 
     <!-- Category 2: Books & Audiobooks -->
-    <section class="category-section" data-category="books-audio">
+    <section class="category-section wired-panel" data-category="books-audio">
       <div class="category-header">
-        <div>
-          <div class="section-badge">02 // LITERATURE, MANGA &amp; SPOKEN WORD</div>
-          <h2 class="category-title">Books &amp; Audiobooks</h2>
-        </div>
+        <img src="assets/favicon-16.gif" alt="" class="article-icon" width="16" height="16">
+        <div class="section-badge">02 // LITERATURE, MANGA &amp; SPOKEN WORD</div>
+        <h2 class="category-title">Books &amp; Audiobooks</h2>
         <p class="category-desc">Listen to audiobooks &amp; podcasts, read eBooks, or browse manga and graphic novels.</p>
       </div>
 
@@ -254,12 +278,11 @@
     </section>
 
     <!-- Category 3: Music -->
-    <section class="category-section" data-category="music">
+    <section class="category-section wired-panel" data-category="music">
       <div class="category-header">
-        <div>
-          <div class="section-badge">03 // LOSSLESS AUDIO</div>
-          <h2 class="category-title">Music</h2>
-        </div>
+        <img src="assets/favicon-16.gif" alt="" class="article-icon" width="16" height="16">
+        <div class="section-badge">03 // LOSSLESS AUDIO</div>
+        <h2 class="category-title">Music</h2>
         <p class="category-desc">Stream albums, mixes, and lossless FLAC discographies from browser or Subsonic apps.</p>
       </div>
 
@@ -298,12 +321,11 @@
     </section>
 
     <!-- Category 4: Video Games -->
-    <section class="category-section" data-category="games">
+    <section class="category-section wired-panel" data-category="games">
       <div class="category-header">
-        <div>
-          <div class="section-badge">04 // RETRO &amp; CONSOLE ARCHIVE</div>
-          <h2 class="category-title">Video Games</h2>
-        </div>
+        <img src="assets/favicon-16.gif" alt="" class="article-icon" width="16" height="16">
+        <div class="section-badge">04 // RETRO &amp; CONSOLE ARCHIVE</div>
+        <h2 class="category-title">Video Games</h2>
         <p class="category-desc">Browse console collections, download ROMs, or play supported classics in the browser.</p>
       </div>
 
@@ -346,12 +368,12 @@
 
   <footer class="site-footer">
     <div class="footer-container">
-      <div class="footer-left">
-        <span class="footer-brand">⌈ＬＯＶＥＬＡＩＮ．ＬＯＬ⌋</span>
+      <div class="footer-pill">
+        <span>⌈ＬＯＶＥＬＡＩＮ．ＬＯＬ⌋</span>
         <span class="footer-sep">//</span>
         <span>Wired Sound for Wired People</span>
       </div>
-      <div class="footer-right">
+      <div class="footer-pill">
         <a href="https://search.lovelain.lol" class="footer-link" target="_blank" rel="noopener">Private Search</a>
         <span class="footer-sep">︱</span>
         <a href="https://auth.lovelain.lol/if/user/" class="footer-link" target="_blank" rel="noopener">My Account</a>

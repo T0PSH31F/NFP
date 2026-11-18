@@ -379,7 +379,8 @@ in
         --ak-dark-foreground-link: #d2738a;
         --ak-global--Color--100: #dfd5bc;
         --ak-flow-background:
-          radial-gradient(circle at 50% 24%, rgba(210, 115, 138, 0.16) 0%, rgba(0, 0, 0, 0.96) 58%, #000000 100%);
+          url("/media/public/bg-dis-03.gif"),
+          url("/media/public/bg-main2.gif");
         --pf-v5-global--primary-color--100: #d2738a;
         --pf-v5-global--primary-color--200: #e793a8;
         --pf-v5-global--link--Color: #d2738a;
@@ -392,29 +393,34 @@ in
       }
 
       body {
-        background-color: #000000 !important;
+        background-color: #d2738a !important;
         color: #dfd5bc !important;
       }
 
       .pf-c-background-image,
       .pf-v5-c-background-image {
-        background:
+        background-color: #d2738a !important;
+        background-image:
           repeating-linear-gradient(
             to bottom,
             rgba(0, 0, 0, 0) 0px,
             rgba(0, 0, 0, 0) 2px,
-            rgba(0, 0, 0, 0.25) 3px,
-            rgba(0, 0, 0, 0.25) 4px
+            rgba(0, 0, 0, 0.22) 3px,
+            rgba(0, 0, 0, 0.22) 4px
           ),
-          radial-gradient(circle at 50% 24%, rgba(210, 115, 138, 0.16) 0%, #000000 62%) !important;
-        background-color: #000000 !important;
+          url("/media/public/bg-dis-03.gif"),
+          url("/media/public/bg-main2.gif") !important;
+        background-repeat: repeat !important;
       }
 
       .pf-c-login__main,
       .pf-v5-c-login__main {
-        background-color: rgba(6, 4, 8, 0.94) !important;
-        border: 1px solid rgba(210, 115, 138, 0.5) !important;
-        box-shadow: 0 0 32px rgba(210, 115, 138, 0.18) !important;
+        background-color: rgba(5, 3, 7, 0.94) !important;
+        background-image:
+          linear-gradient(rgba(4, 2, 6, 0.78), rgba(4, 2, 6, 0.86)),
+          url("/media/public/bg-rip-02.gif") !important;
+        border: 1px solid rgba(210, 115, 138, 0.55) !important;
+        box-shadow: 0 5px 18px #000000, 0 0 32px rgba(210, 115, 138, 0.18) !important;
         border-radius: 4px !important;
         color: #dfd5bc !important;
       }
