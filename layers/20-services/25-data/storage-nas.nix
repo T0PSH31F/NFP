@@ -21,6 +21,7 @@ let
 
   vaultUnlock = pkgs.writeShellScriptBin "private-vault-unlock" ''
     set -euo pipefail
+    export PATH="/run/wrappers/bin:${pkgs.fuse3}/bin:$PATH"
     CIPHER="${cipherDir}"
     MNT="${vaultMount}"
     mkdir -p "$MNT"
@@ -221,27 +222,37 @@ in
           Group = "users";
         };
         script = ''
-                    set -euo pipefail
-                    CIPHER="${cfg.storageRoot}/.Private.enc"
-                    PASS_FILE="${config.sops.secrets.luffy_private_vault_password.path}"
-                    if [ -f "$CIPHER/gocryptfs.conf" ] || [ ! -r "$PASS_FILE" ]; then
-                      exit 0
-                    fi
-                    mkdir -p "$CIPHER"
-                    chmod 700 "$CIPHER"
-                    ${pkgs.gocryptfs}/bin/gocryptfs -init -q -passfile "$PASS_FILE" "$CIPHER"
-                    TMP_MNT="$(mktemp -d)"
-                    trap '${pkgs.fuse3}/bin/fusermount3 -u "$TMP_MNT" >/dev/null 2>&1 || true; rmdir "$TMP_MNT" >/dev/null 2>&1 || true' EXIT
-                    ${pkgs.gocryptfs}/bin/gocryptfs -q -passfile "$PASS_FILE" "$CIPHER" "$TMP_MNT"
-                    mkdir -p "$TMP_MNT/Passwords" "$TMP_MNT/Personal" "$TMP_MNT/Documents_Sensitive" "$TMP_MNT/Keys_and_Recovery"
-                    chmod 700 "$TMP_MNT/Passwords" "$TMP_MNT/Personal" "$TMP_MNT/Documents_Sensitive" "$TMP_MNT/Keys_and_Recovery"
-                    cat > "$TMP_MNT/README.txt" <<'EOF'
-          NFP Encrypted Private Vault (gocryptfs AES-256-GCM)
-          --------------------------------------------------
-          Ciphertext lives encrypted at /Storage/.Private.enc on luffy.
-          Use `private-vault-unlock` to open ~/Private and `private-vault-lock` to lock it.
-          EOF
-                    chmod 600 "$TMP_MNT/README.txt"
+          set -euo pipefail
+          export PATH="/run/wrappers/bin:${pkgs.fuse3}/bin:$PATH"
+          CIPHER="${cfg.storageRoot}/.Private.enc"
+          PASS_FILE="${config.sops.secrets.luffy_private_vault_password.path}"
+          if [ ! -r "$PASS_FILE" ]; then
+            exit 0
+          fi
+          mkdir -p "$CIPHER"
+          chmod 700 "$CIPHER"
+          if [ ! -f "$CIPHER/gocryptfs.conf" ]; then
+            ${pkgs.gocryptfs}/bin/gocryptfs -init -q -passfile "$PASS_FILE" "$CIPHER"
+          fi
+          if [ ! -f "$CIPHER/.seeded" ]; then
+            TMP_MNT="$(mktemp -d)"
+            trap '/run/wrappers/bin/fusermount3 -u "$TMP_MNT" >/dev/null 2>&1 || ${pkgs.fuse3}/bin/fusermount3 -u "$TMP_MNT" >/dev/null 2>&1 || true; rmdir "$TMP_MNT" >/dev/null 2>&1 || true' EXIT
+            ${pkgs.gocryptfs}/bin/gocryptfs -q -passfile "$PASS_FILE" "$CIPHER" "$TMP_MNT"
+            mkdir -p "$TMP_MNT/Passwords" "$TMP_MNT/Personal" "$TMP_MNT/Documents_Sensitive" "$TMP_MNT/Keys_and_Recovery"
+            chmod 700 "$TMP_MNT/Passwords" "$TMP_MNT/Personal" "$TMP_MNT/Documents_Sensitive" "$TMP_MNT/Keys_and_Recovery"
+            printf '%s\n' \
+              "NFP Encrypted Private Vault (gocryptfs AES-256-GCM)" \
+              "--------------------------------------------------" \
+              "Ciphertext lives encrypted at /Storage/.Private.enc on luffy." \
+              "Use private-vault-unlock to open ~/Private and private-vault-lock to lock it." \
+              > "$TMP_MNT/README.txt"
+            chmod 600 "$TMP_MNT/README.txt"
+            /run/wrappers/bin/fusermount3 -u "$TMP_MNT"
+            trap - EXIT
+            rmdir "$TMP_MNT"
+            touch "$CIPHER/.seeded"
+            chmod 600 "$CIPHER/.seeded"
+          fi
         '';
       };
     })
