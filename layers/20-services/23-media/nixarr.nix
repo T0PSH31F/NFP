@@ -157,6 +157,96 @@ in
       serviceConfig.EnvironmentFile = [ "/var/lib/komga/oidc.env" ];
     };
 
+    systemd.services.jellyfin-sso-config =
+      mkIf (config.layers.layer-20.services.auth.authentik.enable or false)
+        (
+          let
+            authDomain = config.layers.layer-20.services.auth.authentik.domain;
+          in
+          {
+            description = "Sync Jellyfin SSO-Auth OIDC client secret from Authentik runtime env";
+            wantedBy = [ "multi-user.target" ];
+            before = [ "jellyfin.service" ];
+            after = [ "postgresql-authentik-setup.service" ];
+            requires = [ "postgresql-authentik-setup.service" ];
+            serviceConfig = {
+              Type = "oneshot";
+              RemainAfterExit = true;
+            };
+            script = ''
+              CFG_DIR="${cfg.stateDir}/jellyfin/data/plugins/configurations"
+              CFG_FILE="$CFG_DIR/SSO-Auth.xml"
+              if [ -r /var/lib/authentik/runtime.env ]; then
+                . /var/lib/authentik/runtime.env
+                if [ -n "''${OIDC_JELLYFIN_SECRET:-}" ]; then
+                  install -d -m 0750 -o jellyfin -g media "$CFG_DIR"
+                  umask 077
+                  cat > "$CFG_FILE.tmp" <<EOF
+              <?xml version="1.0" encoding="utf-8"?>
+              <PluginConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+                <SamlConfigs />
+                <OidConfigs>
+                  <item>
+                    <key>
+                      <string>authentik</string>
+                    </key>
+                    <value>
+                      <PluginConfiguration>
+                        <OidEndpoint>https://${authDomain}/application/o/jellyfin/</OidEndpoint>
+                        <OidClientId>jellyfin</OidClientId>
+                        <OidSecret>$OIDC_JELLYFIN_SECRET</OidSecret>
+                        <Enabled>true</Enabled>
+                        <EnableAuthorization>true</EnableAuthorization>
+                        <EnableAllFolders>true</EnableAllFolders>
+                        <EnabledFolders />
+                        <AdminRoles>
+                          <string>NFP Admins</string>
+                        </AdminRoles>
+                        <Roles>
+                          <string>NFP Admins</string>
+                          <string>Family</string>
+                          <string>Friends</string>
+                        </Roles>
+                        <EnableFolderRoles>false</EnableFolderRoles>
+                        <EnableLiveTvRoles>false</EnableLiveTvRoles>
+                        <EnableLiveTv>false</EnableLiveTv>
+                        <EnableLiveTvManagement>false</EnableLiveTvManagement>
+                        <FolderRoleMappings />
+                        <RoleClaim>groups</RoleClaim>
+                        <OidScopes>
+                          <string>profile</string>
+                          <string>email</string>
+                        </OidScopes>
+                        <SchemeOverride>https</SchemeOverride>
+                        <PortOverride xsi:nil="true" />
+                        <NewPath>true</NewPath>
+                        <CanonicalLinks />
+                        <DefaultUsernameClaim>preferred_username</DefaultUsernameClaim>
+                        <DisableHttps>false</DisableHttps>
+                        <DisablePushedAuthorization>false</DisablePushedAuthorization>
+                        <DoNotValidateEndpoints>false</DoNotValidateEndpoints>
+                        <DoNotValidateIssuerName>false</DoNotValidateIssuerName>
+                        <DoNotLoadProfile>false</DoNotLoadProfile>
+                      </PluginConfiguration>
+                    </value>
+                  </item>
+                </OidConfigs>
+              </PluginConfiguration>
+              EOF
+                  chown jellyfin:media "$CFG_FILE.tmp"
+                  chmod 0600 "$CFG_FILE.tmp"
+                  mv "$CFG_FILE.tmp" "$CFG_FILE"
+                fi
+              fi
+            '';
+          }
+        );
+
+    systemd.services.jellyfin = mkIf (config.layers.layer-20.services.auth.authentik.enable or false) {
+      after = [ "jellyfin-sso-config.service" ];
+      requires = [ "jellyfin-sso-config.service" ];
+    };
+
     services.audiobookshelf = {
       host = lib.mkForce "0.0.0.0";
       openFirewall = true;
