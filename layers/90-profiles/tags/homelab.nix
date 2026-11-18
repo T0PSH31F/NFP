@@ -23,9 +23,15 @@
       };
     };
 
-    layers.layer-20.services.config = {
-      ntfy-sh.enable = lib.mkDefault true;
-      ntfy-sh.port = lib.mkDefault 8099;
+    layers.layer-20.services = {
+      config = {
+        ntfy-sh.enable = lib.mkDefault true;
+        ntfy-sh.port = lib.mkDefault 8099;
+      };
+      data.storage-organizer = {
+        enable = lib.mkDefault true;
+        mode = lib.mkDefault "server";
+      };
     };
   };
 }

@@ -9,6 +9,7 @@
     (mkDendriticModule "postgresql-vectordb" ./postgresql-vectordb.nix)
     (mkDendriticModule "qdrant" ./qdrant.nix)
     (mkDendriticModule "restic-backups" ./restic-backups.nix)
+    (mkDendriticModule "storage-organizer" ./storage-organizer.nix)
     (mkDendriticModule "syncthing" ./syncthing.nix)
     (mkDendriticModule "vaultwarden" ./vaultwarden.nix)
   ];

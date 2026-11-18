@@ -17,6 +17,10 @@
         monitoring.enable = lib.mkDefault true;
         syncthing.enable = lib.mkDefault true;
       };
+      layer-20.services.data.storage-organizer = {
+        enable = lib.mkDefault true;
+        mode = lib.mkDefault "client";
+      };
       layer-20.services.backups.restic.enable = lib.mkDefault true;
     };
 
