@@ -28,6 +28,10 @@
     };
 
     home.file.".config/gtk-3.0/bookmarks".text = ''
+      file:///Storage Storage NAS (luffy)
+      file:///Storage/CalibreLibrary Calibre Library
+      file:///Storage/Media Media Library
+      file:///home/t0psh31f/Private Private Vault (Encrypted)
       file:///home/t0psh31f/Downloads Downloads
       file:///home/t0psh31f/Documents Documents
       file:///home/t0psh31f/GoogleDrive Google Drive
@@ -42,10 +46,7 @@
       file:///home/t0psh31f/.hermes .hermes
     ''
     + lib.optionalString (config.networking.hostName == "luffy") ''
-      file:///mnt/drives/backup-1/CalibreLibrary Calibre Library
-      file:///mnt/drives/backup-1/Media Luffy Media
       file:///mnt/drives/backup-1 Backup_1 (932GB)
-      file:///storage Storage SSD
       file:///mnt/drives/ssd-win Windows SSD (RO)
     '';
   };

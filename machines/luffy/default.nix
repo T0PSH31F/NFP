@@ -279,7 +279,7 @@ in
     searxng.enable = true;
     calibre-web-app = {
       enable = true;
-      libraryPath = "/mnt/drives/backup-1/CalibreLibrary";
+      libraryPath = "/storage/CalibreLibrary";
       backupDir = "/mnt/NAS1/backups/CalibreLibrary";
     };
     recovery-organizer.enable = true;

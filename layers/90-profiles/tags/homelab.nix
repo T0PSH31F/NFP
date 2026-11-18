@@ -30,7 +30,11 @@
       };
       data.storage-organizer = {
         enable = lib.mkDefault true;
-        mode = lib.mkDefault "server";
+        mode = lib.mkOverride 900 "server";
+      };
+      data.storage-nas = {
+        enable = lib.mkDefault true;
+        mode = lib.mkOverride 900 "server";
       };
     };
   };

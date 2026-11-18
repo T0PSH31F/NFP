@@ -26,6 +26,10 @@ SKIP_NAMES = {
     "desktop.ini",
     ".syncing",
     ".git",
+    ".stfolder",
+    ".Private.enc",
+    "Private",
+    "Syncthing",
 }
 
 SKIP_SUFFIXES = (".part", ".crdownload", ".aria2", ".!qB", ".tmp", ".rsync-tmp")
@@ -390,7 +394,7 @@ def process_category_dir(cat_dir, category, storage_root, min_age_sec, uid, user
 
         # Keep intact top-level PC Game directories & Movie/TV release folders
         if os.path.isdir(full_path):
-            if os.path.exists(os.path.join(full_path, ".git")):
+            if os.path.exists(os.path.join(full_path, ".git")) or os.path.exists(os.path.join(full_path, ".stfolder")):
                 continue
             if category == "Games":
                 dst_dir = os.path.join(storage_root, "Games", "PC", entry)
@@ -418,7 +422,13 @@ def process_category_dir(cat_dir, category, storage_root, min_age_sec, uid, user
 
             # Recurse normal subdirectories file-by-file
             for root, dirs, files in os.walk(full_path):
-                dirs[:] = [d for d in dirs if not should_skip_name(d) and not os.path.exists(os.path.join(root, d, ".git"))]
+                dirs[:] = [
+                    d
+                    for d in dirs
+                    if not should_skip_name(d)
+                    and not os.path.exists(os.path.join(root, d, ".git"))
+                    and not os.path.exists(os.path.join(root, d, ".stfolder"))
+                ]
                 for f in files:
                     if should_skip_name(f):
                         continue

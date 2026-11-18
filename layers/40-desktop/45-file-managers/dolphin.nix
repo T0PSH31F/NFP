@@ -42,15 +42,16 @@
             tree = ET.ElementTree(root)
 
         desired = [
+            ("file:///Storage", "Storage NAS (luffy)", "folder-network"),
+            ("file:///Storage/CalibreLibrary", "Calibre Library", "accessories-ebook-reader"),
+            ("file:///Storage/Media", "Media Library", "folder-videos"),
+            ("file:///home/t0psh31f/Private", "Private Vault (Encrypted)", "folder-locked"),
             ("file:///mnt/NAS1", "NAS1 (2TB)", "folder-network"),
             ("file:///mnt/NAS2", "NAS2 (1TB)", "folder-network"),
         ]
         ${lib.optionalString isLuffy ''
           desired.extend([
-              ("file:///mnt/drives/backup-1/CalibreLibrary", "Calibre Library", "accessories-ebook-reader"),
-              ("file:///mnt/drives/backup-1/Media", "Luffy Media", "folder-videos"),
               ("file:///mnt/drives/backup-1", "Backup_1 (932GB)", "drive-harddisk"),
-              ("file:///storage", "Storage SSD", "drive-harddisk"),
           ])
         ''}
 

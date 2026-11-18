@@ -21,6 +21,10 @@
         enable = lib.mkDefault true;
         mode = lib.mkDefault "client";
       };
+      layer-20.services.data.storage-nas = {
+        enable = lib.mkDefault true;
+        mode = lib.mkDefault "client";
+      };
       layer-20.services.backups.restic.enable = lib.mkDefault true;
     };
 

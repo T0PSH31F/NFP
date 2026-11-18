@@ -89,7 +89,7 @@ let
       (
         cd "$src"
         ${pkgs.findutils}/bin/find . \
-          \( -type d -name '.*' \) -prune -o \
+          \( -type d \( -name '.*' -o -name 'Syncthing' -o -exec ${pkgs.coreutils}/bin/test -e '{}/.stfolder' \; -o -exec ${pkgs.coreutils}/bin/test -e '{}/.git' \; \) \) -prune -o \
           -type f -mmin +${toString cfg.minAgeMinutes} \
           ! -name '.*' ! -name '*.part' ! -name '*.crdownload' \
           ! -name '*.aria2' ! -name '*.!qB' ! -name '*.tmp' \
